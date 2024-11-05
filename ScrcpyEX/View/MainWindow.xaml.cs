@@ -48,7 +48,17 @@ namespace ScrcpyEX.View
             await ConnectScrcpy();
         }
 
-        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        
+
+        private void Stp_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Console.WriteLine($"stp大小变更:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
+            //bd.Width = Stp.ActualWidth - 37;
+            //bd.Height = Stp.ActualHeight - 314.5;
+            Console.WriteLine($"差:{Stp.ActualWidth-bd.ActualWidth}，{Stp.ActualHeight-bd.ActualHeight}。");
+        }
+
+        private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
             if (scrcpyHandle != (IntPtr)(-1))
             {
@@ -58,12 +68,26 @@ namespace ScrcpyEX.View
             }
         }
 
-        private void Stp_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine($"stp大小变更:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
-            //bd.Width = Stp.ActualWidth - 37;
-            //bd.Height = Stp.ActualHeight - 314.5;
-            Console.WriteLine($"差:{Stp.ActualWidth-bd.ActualWidth}，{Stp.ActualHeight-bd.ActualHeight}。");
+            Close();
+        }
+
+        private void BtnMaximize_Click(object sender, RoutedEventArgs e)
+        {
+            if (WindowState == WindowState.Maximized)
+            {
+                WindowState = WindowState.Normal;
+            }
+            else
+            {
+                WindowState = WindowState.Maximized;
+            }
+        }
+
+        private void BtnMinimize_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
         }
     }
 }
