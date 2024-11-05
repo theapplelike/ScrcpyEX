@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         xmlns:wfh="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
-        Title="MainWindow" Height="700" Width="800" WindowStartupLocation="CenterScreen"
+        Title="MainWindow" Height="700" Width="1400" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded" Closed="Window_Closed">
 
     <Grid x:Name="Stp" SizeChanged="Stp_SizeChanged">
@@ -25,7 +25,7 @@
             <Button DockPanel.Dock="Right" Content="D" Width="40" HorizontalAlignment="Right" />
         </DockPanel>
 
-        <Border x:Name="bd" Grid.Row="1" BorderBrush="Gray" BorderThickness="3" Width="750" Height="350">
+        <Border x:Name="bd" Grid.Row="1" BorderBrush="Gray" BorderThickness="3" Width="1350" Height="630">
             <Grid x:Name="gShow">
                 <WindowsFormsHost>
                     <wf:Panel x:Name="pnlShow"/>
