@@ -7,24 +7,31 @@
         mc:Ignorable="d"
         xmlns:wfh="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
-        Title="MainWindow" Height="700" Width="800" 
+        Title="MainWindow" Height="700" Width="800" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded" Closed="Window_Closed">
-    
-    <StackPanel>
+
+    <Grid x:Name="Stp" SizeChanged="Stp_SizeChanged">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
         <DockPanel Height="40" Background="AliceBlue" VerticalAlignment="Top">
-            <Button Name="BtnWired" Content="有线" Width="40" Click="BtnWired_Click"/>
+            <Button x:Name="BtnWired" Content="有线" Width="40" Click="BtnWired_Click"/>
+            <Button x:Name="BtnClose" Content="关闭" Width="40" Click="BtnClose_Click"/>
 
             <Button DockPanel.Dock="Right" Content="X" Width="40"/>
             <Button DockPanel.Dock="Right" Content="D" Width="40" HorizontalAlignment="Right" />
         </DockPanel>
 
-        <Border BorderBrush="Red" BorderThickness="3" Width="750" Height="350">
-            <Grid Name="gShow" >
-                <WindowsFormsHost >
-                    <wf:Panel x:Name="pnlShow"></wf:Panel>
+        <Border x:Name="bd" Grid.Row="1" BorderBrush="Gray" BorderThickness="3" Width="750" Height="350">
+            <Grid x:Name="gShow">
+                <WindowsFormsHost>
+                    <wf:Panel x:Name="pnlShow"/>
                 </WindowsFormsHost>
             </Grid>
             
         </Border>
-    </StackPanel>
+    </Grid>
 </Window>

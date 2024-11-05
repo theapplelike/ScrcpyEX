@@ -45,36 +45,25 @@ namespace ScrcpyEX.View
 
         private async void BtnWired_Click(object sender, RoutedEventArgs e)
         {
-            if (scrcpyHandle != (IntPtr)(-1)) { return; }
-
-            string arg = $"{GetAllArguments()} --select-usb";
-            
-            ProcessStartInfo info = new(MV.ScrcpyPath)
-            {
-                Arguments = arg,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                //RedirectStandardInput = true,
-            };
-            prc.StartInfo = info;
-            prc.Start();
-            prc.BeginOutputReadLine();
-            prc.BeginErrorReadLine();
-            
-            do
-            {
-                await Task.Delay(500);
-                if (EmbeddedForm())
-                {
-                    break;
-                }
-                Console.WriteLine($">>>>>>>>>>>>>>查找程序：{scrcpyName}。");
-            }
-            while (true);
+            await ConnectScrcpy();
         }
 
-        
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            if (scrcpyHandle != (IntPtr)(-1))
+            {
+                prc.Kill();// 如果外部程序没有结束运行则强行终止
+                scrcpyHandle = (IntPtr)(-1);
+                Console.WriteLine("手动结束scrcpy程序。");
+            }
+        }
+
+        private void Stp_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Console.WriteLine($"stp大小变更:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
+            //bd.Width = Stp.ActualWidth - 37;
+            //bd.Height = Stp.ActualHeight - 314.5;
+            Console.WriteLine($"差:{Stp.ActualWidth-bd.ActualWidth}，{Stp.ActualHeight-bd.ActualHeight}。");
+        }
     }
 }

@@ -16,11 +16,13 @@ namespace ScrcpyEX.View
     {
         private void Init()
         {
+            //设置额外程序的绑定事件，且触发退出事件
+            prc.EnableRaisingEvents = true;
             prc.Exited += Prc_Exited;
             prc.ErrorDataReceived += Prc_ErrorDataReceived;
             prc.OutputDataReceived += Prc_OutputDataReceived;
-            ReadCfg();
 
+            ReadCfg();
         }
 
         /// <summary>
@@ -54,22 +56,36 @@ namespace ScrcpyEX.View
             MyCfg.Save();
         }
 
-        /// <summary>
-        /// 获得指定属性（Property）的特性（Attribute），如果没有特性（Attribute）则返回null。
-        /// </summary>
-        /// <param name="Prop">属性（Property）的名称。</param>
-        private string GetArg(string Prop)
+        private async Task ConnectScrcpy()
         {
-            var info = typeof(MyCfg).GetProperty(Prop).GetCustomAttribute<ArgumentsAttribute>();
-            return info?.Arguments ?? null;
-        }
+            if (scrcpyHandle != (IntPtr)(-1)) { return; }
 
-        /// <summary>
-        /// 获得指定值是否可以转化为bool，不能返回false，如果可以返回其bool值。
-        /// </summary>
-        private bool GetVal(object val)
-        {
-            return val is bool result ? result : false;
+            string arg = $"{GetAllArguments()} --select-usb";
+
+            ProcessStartInfo info = new(MV.ScrcpyPath)
+            {
+                Arguments = arg,
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                //RedirectStandardInput = true,
+            };
+            prc.StartInfo = info;
+            prc.Start();
+            prc.BeginOutputReadLine();
+            prc.BeginErrorReadLine();
+
+            do
+            {
+                await Task.Delay(500);
+                if (EmbeddedForm())
+                {
+                    break;
+                }
+                Console.WriteLine($">>>>>>>>>>>>>>查找程序：{scrcpyName}。");
+            }
+            while (true);
         }
 
         /// <summary>
@@ -94,6 +110,24 @@ namespace ScrcpyEX.View
             sb.Append($"--window-title={scrcpyName} ");
             //Console.WriteLine($"命令行：{sb}。");
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// 获得指定属性（Property）的特性（Attribute），如果没有特性（Attribute）则返回null。
+        /// </summary>
+        /// <param name="Prop">属性（Property）的名称。</param>
+        private string GetArg(string Prop)
+        {
+            var info = typeof(MyCfg).GetProperty(Prop).GetCustomAttribute<ArgumentsAttribute>();
+            return info?.Arguments ?? null;
+        }
+
+        /// <summary>
+        /// 获得指定值是否可以转化为bool，不能返回false，如果可以返回其bool值。
+        /// </summary>
+        private bool GetVal(object val)
+        {
+            return val is bool result && result;
         }
 
         /// <summary>
