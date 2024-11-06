@@ -48,8 +48,6 @@ namespace ScrcpyEX.View
             await ConnectScrcpy();
         }
 
-        
-
         private void Stp_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             Console.WriteLine($"stp大小变更:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
@@ -78,16 +76,28 @@ namespace ScrcpyEX.View
             if (WindowState == WindowState.Maximized)
             {
                 WindowState = WindowState.Normal;
+                BtnMaximize.Content = "▢";
             }
             else
             {
                 WindowState = WindowState.Maximized;
+                BtnMaximize.Content = "▣";
             }
         }
 
         private void BtnMinimize_Click(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
+        }
+
+        private void Dpl_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void Dpl_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+
         }
     }
 }

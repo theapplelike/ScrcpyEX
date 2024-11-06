@@ -16,7 +16,9 @@
 
     <Window.Resources>
         <Style TargetType="Button">
-            <Setter Property="Width" Value="40"></Setter>
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="FontFamily" Value="幼圆"/>
+            <Setter Property="FontSize" Value="20"/>
         </Style>
     </Window.Resources>
 
@@ -27,13 +29,13 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <DockPanel Height="40" Background="AliceBlue" VerticalAlignment="Top">
+        <DockPanel x:Name="Dpl" Height="40" Background="AliceBlue" VerticalAlignment="Top" MouseDown="Dpl_MouseDown" MouseUp="Dpl_MouseUp">
             <Button x:Name="BtnWired" Content="有线" Click="BtnWired_Click"/>
             <Button x:Name="BtnStop"  Content="关闭" Click="BtnStop_Click"/>
 
-            <Button x:Name="BtnClose"    Content="X" Click="BtnClose_Click" DockPanel.Dock="Right"/>
-            <Button x:Name="BtnMaximize" Content="D" Click="BtnMaximize_Click" DockPanel.Dock="Right"/>
-            <Button x:Name="BtnMinimize" Content="L" Click="BtnMinimize_Click" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
+            <Button x:Name="BtnClose"    Content="⨉" Click="BtnClose_Click" DockPanel.Dock="Right"/>
+            <Button x:Name="BtnMaximize" Content="▢" Click="BtnMaximize_Click" DockPanel.Dock="Right"/>
+            <Button x:Name="BtnMinimize" Content="∀" Click="BtnMinimize_Click" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
         </DockPanel>
 
         <Border x:Name="bd" Grid.Row="1" BorderBrush="Gray" BorderThickness="3" Width="1350" Height="630">
