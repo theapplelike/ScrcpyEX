@@ -13,6 +13,7 @@ namespace ScrcpyEX.View
         {
             prc.CancelOutputRead();
             prc.CancelErrorRead();
+            scrcpyHandle = (IntPtr)(-1);
             Console.WriteLine($"scrcpy程序退出。");
         }
 

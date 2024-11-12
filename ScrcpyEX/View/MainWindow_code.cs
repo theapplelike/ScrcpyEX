@@ -56,6 +56,10 @@ namespace ScrcpyEX.View
             MyCfg.Save();
         }
 
+        /// <summary>
+        /// 启动scrcpy并以有线方式连接手机。
+        /// </summary>
+        /// <returns></returns>
         private async Task ConnectScrcpy()
         {
             if (scrcpyHandle != (IntPtr)(-1)) { return; }
@@ -144,8 +148,6 @@ namespace ScrcpyEX.View
                     //ShowWindow(p.MainWindowHandle, 0);
                     Console.WriteLine($"程序信息：{p.MainWindowHandle},{p.MainWindowTitle}。");
                     IntPtr pnl = pnlShow.Handle;
-                    IntPtr h = ((HwndSource)PresentationSource.FromDependencyObject(gShow)).Handle;
-                    IntPtr formh = ((HwndSource)PresentationSource.FromVisual(this)).Handle;
 
                     scrcpyHandle = p.MainWindowHandle;
 
@@ -154,7 +156,6 @@ namespace ScrcpyEX.View
                     ShowWindow(p.MainWindowHandle, 3);
 
                     Console.WriteLine($"父级的句柄：{pnl}，{pnlShow.Width}，{pnlShow.Height}。");
-                    Console.WriteLine($"窗体的句柄：{h},{formh}。");
                     return true;
                 }
             }

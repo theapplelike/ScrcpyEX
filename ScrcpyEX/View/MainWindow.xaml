@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:wfI="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
-        Title="MainWindow" Height="700" Width="1400" WindowStartupLocation="CenterScreen"
+        Title="MainWindow" Height="600" Width="1200" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded" Closed="Window_Closed">
 
     <WindowChrome.WindowChrome>
@@ -29,7 +29,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <DockPanel x:Name="Dpl" Height="40" Background="AliceBlue" VerticalAlignment="Top" MouseDown="Dpl_MouseDown" MouseUp="Dpl_MouseUp">
+        <DockPanel x:Name="Dpl" Height="40" Background="AliceBlue" VerticalAlignment="Top" MouseLeftButtonDown="Dpl_MouseLeftButtonDown">
             <Button x:Name="BtnWired" Content="有线" Click="BtnWired_Click"/>
             <Button x:Name="BtnStop"  Content="关闭" Click="BtnStop_Click"/>
 
@@ -38,13 +38,15 @@
             <Button x:Name="BtnMinimize" Content="∀" Click="BtnMinimize_Click" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
         </DockPanel>
 
-        <Border x:Name="bd" Grid.Row="1" BorderBrush="Gray" BorderThickness="3" Width="1350" Height="630">
-            <Grid x:Name="gShow">
-                <WindowsFormsHost>
-                    <wf:Panel x:Name="pnlShow"/>
-                </WindowsFormsHost>
-            </Grid>
-        </Border>
-        
+        <!--<Border x:Name="bd" Grid.Row="1" BorderBrush="Gray" BorderThickness="3" Width="1350" Height="630">
+            
+        </Border>-->
+
+        <Grid x:Name="gShow" Grid.Row="1"  Background="Gray">
+            <WindowsFormsHost>
+                <wf:Panel x:Name="pnlShow"/>
+            </WindowsFormsHost>
+        </Grid>
+
     </Grid>
 </Window>

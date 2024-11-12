@@ -48,12 +48,17 @@ namespace ScrcpyEX.View
             await ConnectScrcpy();
         }
 
-        private void Stp_SizeChanged(object sender, SizeChangedEventArgs e)
+        private async void Stp_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             Console.WriteLine($"stp大小变更:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
-            //bd.Width = Stp.ActualWidth - 37;
-            //bd.Height = Stp.ActualHeight - 314.5;
-            Console.WriteLine($"差:{Stp.ActualWidth-bd.ActualWidth}，{Stp.ActualHeight-bd.ActualHeight}。");
+            //gShow.Width = Stp.ActualWidth - 50;
+            //gShow.Height = Stp.ActualHeight - 70;
+            Console.WriteLine($"差:{Stp.ActualWidth- gShow.ActualWidth}，{Stp.ActualHeight- gShow.ActualHeight}。");
+            Console.WriteLine($"panel的大小：{pnlShow.Width}，{pnlShow.Height}。");
+
+            ShowWindow(scrcpyHandle, 1);
+            await Task.Delay(100);
+            ShowWindow(scrcpyHandle, 3);
         }
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)
@@ -90,14 +95,9 @@ namespace ScrcpyEX.View
             WindowState = WindowState.Minimized;
         }
 
-        private void Dpl_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Dpl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-
-        }
-
-        private void Dpl_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-
+            DragMove();//点击自定义标题栏拖拽窗口
         }
     }
 }
