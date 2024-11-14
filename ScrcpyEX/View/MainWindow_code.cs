@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Interop;
 using System.Windows;
+using System.Runtime.InteropServices;
 
 namespace ScrcpyEX.View
 {
@@ -17,10 +18,10 @@ namespace ScrcpyEX.View
         private void Init()
         {
             //设置额外程序的绑定事件，且触发退出事件
-            prc.EnableRaisingEvents = true;
-            prc.Exited += Prc_Exited;
-            prc.ErrorDataReceived += Prc_ErrorDataReceived;
-            prc.OutputDataReceived += Prc_OutputDataReceived;
+            _prc.EnableRaisingEvents = true;
+            _prc.Exited += Prc_Exited;
+            _prc.ErrorDataReceived += Prc_ErrorDataReceived;
+            _prc.OutputDataReceived += Prc_OutputDataReceived;
 
             ReadCfg();
         }
@@ -62,7 +63,7 @@ namespace ScrcpyEX.View
         /// <returns></returns>
         private async Task ConnectScrcpy()
         {
-            if (scrcpyHandle != (IntPtr)(-1)) { return; }
+            if (_scHandle != (IntPtr)(-1)) { return; }
 
             string arg = $"{GetAllArguments()} --select-usb";
 
@@ -75,10 +76,10 @@ namespace ScrcpyEX.View
                 RedirectStandardError = true,
                 //RedirectStandardInput = true,
             };
-            prc.StartInfo = info;
-            prc.Start();
-            prc.BeginOutputReadLine();
-            prc.BeginErrorReadLine();
+            _prc.StartInfo = info;
+            _prc.Start();
+            _prc.BeginOutputReadLine();
+            _prc.BeginErrorReadLine();
 
             do
             {
@@ -87,7 +88,7 @@ namespace ScrcpyEX.View
                 {
                     break;
                 }
-                Console.WriteLine($">>>>>>>>>>>>>>查找程序：{scrcpyName}。");
+                Console.WriteLine($">>>>>>>>>>>>>>查找程序：{_scName}。");
             }
             while (true);
         }
@@ -110,8 +111,8 @@ namespace ScrcpyEX.View
                 //Console.WriteLine($"属性{prop.Name}：{prop.GetValue(MyCfg.Cfg)}，{GetArg(prop.Name)}。");
             }
 
-            scrcpyName = DateTime.Now.ToString("HHmmss") + "mook";
-            sb.Append($"--window-title={scrcpyName} ");
+            _scName = DateTime.Now.ToString("HHmmss") + "mook";
+            sb.Append($"--window-title={_scName} ");
             //Console.WriteLine($"命令行：{sb}。");
             return sb.ToString();
         }
@@ -143,15 +144,15 @@ namespace ScrcpyEX.View
             foreach (var p in Process.GetProcesses())
             {
                 //Console.WriteLine($"进入foreach：{p.MainWindowTitle}。");
-                if (p.MainWindowTitle.Contains(scrcpyName))
+                if (p.MainWindowTitle.Contains(_scName))
                 {
                     //ShowWindow(p.MainWindowHandle, 0);
                     Console.WriteLine($"程序信息：{p.MainWindowHandle},{p.MainWindowTitle}。");
                     IntPtr pnl = pnlShow.Handle;
 
-                    scrcpyHandle = p.MainWindowHandle;
+                    _scHandle = p.MainWindowHandle;
 
-                    HideTitleBar(scrcpyHandle);
+                    HideTitleBar(_scHandle);
                     SetParent(p.MainWindowHandle, pnl);
                     ShowWindow(p.MainWindowHandle, 3);
 
@@ -178,6 +179,22 @@ namespace ScrcpyEX.View
 
             //设置为新的窗口样式
             SetWindowLong(handle, GWL_STYLE, style);
+        }
+
+        /// <summary>
+        /// 改变scrcpy窗口的大小，以完全贴合父级panel，需要先最小化再最大化，防止相对坐标错误。
+        /// </summary>
+        private async Task ChgScrcpySize()
+        {
+            //Console.WriteLine($"stp大小变更:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
+            //gShow.Width = Stp.ActualWidth - 50;
+            //gShow.Height = Stp.ActualHeight - 70;
+            //Console.WriteLine($"差:{Stp.ActualWidth - gShow.ActualWidth}，{Stp.ActualHeight - gShow.ActualHeight}。");
+            Console.WriteLine($"panel的大小：{pnlShow.Width}，{pnlShow.Height}。");
+
+            ShowWindow(_scHandle, 2);
+            await Task.Delay(100);
+            ShowWindow(_scHandle, 3);
         }
 
 

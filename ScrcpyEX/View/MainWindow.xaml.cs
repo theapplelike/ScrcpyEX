@@ -36,9 +36,9 @@ namespace ScrcpyEX.View
         {
             SaveCfg();
 
-            if (scrcpyHandle != (IntPtr)(-1))
+            if (_scHandle != (IntPtr)(-1))
             {
-                prc.Kill();// 如果外部程序没有结束运行则强行终止
+                _prc.Kill();// 如果外部程序没有结束运行则强行终止
                 Console.WriteLine("退出程序应用。");
             }
         }
@@ -50,23 +50,18 @@ namespace ScrcpyEX.View
 
         private async void Stp_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Console.WriteLine($"stp大小变更:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
-            //gShow.Width = Stp.ActualWidth - 50;
-            //gShow.Height = Stp.ActualHeight - 70;
-            Console.WriteLine($"差:{Stp.ActualWidth- gShow.ActualWidth}，{Stp.ActualHeight- gShow.ActualHeight}。");
-            Console.WriteLine($"panel的大小：{pnlShow.Width}，{pnlShow.Height}。");
-
-            ShowWindow(scrcpyHandle, 1);
-            await Task.Delay(100);
-            ShowWindow(scrcpyHandle, 3);
+            if (!_isResize)
+            {
+                await ChgScrcpySize();
+            }
         }
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
-            if (scrcpyHandle != (IntPtr)(-1))
+            if (_scHandle != (IntPtr)(-1))
             {
-                prc.Kill();// 如果外部程序没有结束运行则强行终止
-                scrcpyHandle = (IntPtr)(-1);
+                _prc.Kill();// 如果外部程序没有结束运行则强行终止
+                _scHandle = (IntPtr)(-1);
                 Console.WriteLine("手动结束scrcpy程序。");
             }
         }
@@ -82,11 +77,13 @@ namespace ScrcpyEX.View
             {
                 WindowState = WindowState.Normal;
                 BtnMaximize.Content = "▢";
+                Stp.Margin = new Thickness(0);
             }
             else
             {
                 WindowState = WindowState.Maximized;
                 BtnMaximize.Content = "▣";
+                Stp.Margin = new Thickness(6);
             }
         }
 
@@ -98,6 +95,32 @@ namespace ScrcpyEX.View
         private void Dpl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DragMove();//点击自定义标题栏拖拽窗口
+        }
+
+        private async void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Console.WriteLine("窗体大小进行改变");
+            //_isResize = true;
+        }
+
+        private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            //Console.WriteLine("窗体鼠标：down");
+        }
+
+        private void Window_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            //Console.WriteLine("窗体鼠标：up");
+        }
+
+        private async void BtnTest_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine($"stp的大小:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
+            Console.WriteLine($"gShow的大小:{gShow.ActualWidth}，{gShow.ActualHeight}，{gShow.Width}，{gShow.Height}。");
+            Console.WriteLine($"wfh的大小:{wfh.ActualWidth}，{wfh.ActualHeight}，{wfh.Width}，{wfh.Height}。");
+            Console.WriteLine($"panel的大小：{pnlShow.Width}，{pnlShow.Height}。");
+            _isResize = false;
+            await ChgScrcpySize();
         }
     }
 }

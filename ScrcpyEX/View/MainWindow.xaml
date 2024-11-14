@@ -8,17 +8,55 @@
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:wfI="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         Title="MainWindow" Height="600" Width="1200" WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded" Closed="Window_Closed">
+        Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged" 
+        PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown" 
+        PreviewMouseLeftButtonUp="Window_PreviewMouseLeftButtonUp">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False"></WindowChrome>
+        <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False" NonClientFrameEdges="Left,Bottom,Right"></WindowChrome>
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
         <Style TargetType="Button">
-            <Setter Property="Width" Value="40"/>
+            <Setter Property="Width" Value="50"/>
             <Setter Property="FontFamily" Value="幼圆"/>
             <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Margin" Value="0,1,0,0"/>
+
+            <!--隐藏鼠标悬停在按钮上显示的蓝色边框-->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <!--使用按钮原来的样式，不做更改-->
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <!-- 禁用焦点视觉样式 -->
+                        <ControlTemplate.Triggers>
+                            <!--鼠标悬停时只显示背景颜色，这里不需要设置BorderBrush为Transparent，因为已经移除了焦点视觉样式-->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="LightBlue"/>
+                            </Trigger>
+                            <!--鼠标按下时的样式-->
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="SkyBlue"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <!--鼠标禁用时的样式-->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#EEEEEE"/>
+                                <Setter Property="Foreground" Value="#AAAAAA"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
         </Style>
     </Window.Resources>
 
@@ -29,13 +67,19 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <DockPanel x:Name="Dpl" Height="40" Background="AliceBlue" VerticalAlignment="Top" MouseLeftButtonDown="Dpl_MouseLeftButtonDown">
+        <DockPanel x:Name="Dpl" Background="AliceBlue" MouseLeftButtonDown="Dpl_MouseLeftButtonDown">
             <Button x:Name="BtnWired" Content="有线" Click="BtnWired_Click"/>
             <Button x:Name="BtnStop"  Content="关闭" Click="BtnStop_Click"/>
+            <Button x:Name="BtnTest"  Content="◉" Click="BtnTest_Click"/>
 
-            <Button x:Name="BtnClose"    Content="⨉" Click="BtnClose_Click" DockPanel.Dock="Right"/>
-            <Button x:Name="BtnMaximize" Content="▢" Click="BtnMaximize_Click" DockPanel.Dock="Right"/>
-            <Button x:Name="BtnMinimize" Content="∀" Click="BtnMinimize_Click" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
+            <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
+            <Button x:Name="BtnSave"  Content="保存" />
+            <Button x:Name="BtnCanel" Content="取消" />
+            <TextBlock Text="正在进行大小调整，调整完毕后请选择..." VerticalAlignment="Center" FontSize="12" />
+
+            <Button x:Name="BtnClose"    Content="⨉" Click="BtnClose_Click" DockPanel.Dock="Right" Margin="0"/>
+            <Button x:Name="BtnMaximize" Content="▢"  Click="BtnMaximize_Click" DockPanel.Dock="Right"/>
+            <Button x:Name="BtnMinimize" Content="-" Click="BtnMinimize_Click" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
         </DockPanel>
 
         <!--<Border x:Name="bd" Grid.Row="1" BorderBrush="Gray" BorderThickness="3" Width="1350" Height="630">
@@ -43,8 +87,8 @@
         </Border>-->
 
         <Grid x:Name="gShow" Grid.Row="1"  Background="Gray">
-            <WindowsFormsHost>
-                <wf:Panel x:Name="pnlShow"/>
+            <WindowsFormsHost x:Name="wfh" Margin="5">
+                <wf:Panel x:Name="pnlShow" />
             </WindowsFormsHost>
         </Grid>
 

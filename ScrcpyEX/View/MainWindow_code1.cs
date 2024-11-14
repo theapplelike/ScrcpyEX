@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ScrcpyEX.View
 {
@@ -11,9 +12,9 @@ namespace ScrcpyEX.View
     {
         private void Prc_Exited(object sender, EventArgs e)
         {
-            prc.CancelOutputRead();
-            prc.CancelErrorRead();
-            scrcpyHandle = (IntPtr)(-1);
+            _prc.CancelOutputRead();
+            _prc.CancelErrorRead();
+            _scHandle = (IntPtr)(-1);
             Console.WriteLine($"scrcpy程序退出。");
         }
 

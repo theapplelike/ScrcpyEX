@@ -5,27 +5,32 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace ScrcpyEX.View
 {
     public partial class MainWindow//var
     {
-        Process prc = new();
+        /// <summary>
+        /// 对第三方程序的引用。
+        /// </summary>
+        private Process _prc = new();
 
         /// <summary>
         /// scrcpy的句柄，为-1时代表scrcpy没有启动。
         /// </summary>
-        private IntPtr scrcpyHandle = (IntPtr)(-1);
+        private IntPtr _scHandle = (IntPtr)(-1);
 
         /// <summary>
         /// scrcpy窗口的名称。
         /// </summary>
-        private string scrcpyName;
+        private string _scName;
 
         /// <summary>
         /// 判断顶级窗体是否在调整大小。
         /// </summary>
-        private bool isResize;
+        private bool _isResize = false;
+
 
         /// <summary>
         /// 获取窗体的句柄函数
