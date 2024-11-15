@@ -19,7 +19,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// scrcpy的句柄，为-1时代表scrcpy没有启动。
         /// </summary>
-        private IntPtr _scHandle = (IntPtr)(-1);
+        private IntPtr _scHandle = IntPtr.Zero;
 
         /// <summary>
         /// scrcpy窗口的名称。
@@ -29,15 +29,20 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 判断顶级窗体是否在调整大小。
         /// </summary>
-        private bool _isResize = false;
-
+        //private bool _isResize = false;
 
         /// <summary>
-        /// 获取窗体的句柄函数
+        /// 调整scrcpy窗口大小的计时器。
         /// </summary>
-        /// <param name="lpClassName">窗口类名</param>
-        /// <param name="lpWindowName">窗口标题名</param>
-        /// <returns>返回句柄</returns>
+        private readonly DispatcherTimer _resizeTimer = new();
+
+        /// <summary>
+        /// 获得一个与给定名称相匹配的顶层窗口的句柄，不查找子窗口，查找时不区分大小写。至少需要其中一个参数。
+        /// 若要从指定的子窗口开始搜索子窗口，请使用FindWindowEx函数。
+        /// </summary>
+        /// <param name="lpClassName">要查找窗口的类。比如笔记本的类是"Notepad"。</param>
+        /// <param name="lpWindowName">要查找窗口的标题。如果该参数为空，则匹配所有窗口。<</param>
+        /// <returns>成功 -- 返回匹配窗口的句柄；失败 -- 返回值为NULL。</returns>
         [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 

@@ -36,32 +36,33 @@ namespace ScrcpyEX.View
         {
             SaveCfg();
 
-            if (_scHandle != (IntPtr)(-1))
+            _resizeTimer.Stop();
+            if (_scHandle != IntPtr.Zero)
             {
                 _prc.Kill();// 如果外部程序没有结束运行则强行终止
                 Console.WriteLine("退出程序应用。");
             }
+
+            _prc.Dispose();
+            _prc.Close();
         }
 
         private async void BtnWired_Click(object sender, RoutedEventArgs e)
         {
-            await ConnectScrcpy();
-        }
-
-        private async void Stp_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (!_isResize)
+            if (_scHandle == IntPtr.Zero)
             {
-                await ChgScrcpySize();
+                await ConnectScrcpy();
             }
         }
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
-            if (_scHandle != (IntPtr)(-1))
+            if (_scHandle != IntPtr.Zero)
             {
                 _prc.Kill();// 如果外部程序没有结束运行则强行终止
-                _scHandle = (IntPtr)(-1);
+                _prc.Dispose();
+                _prc.Close();
+                _scHandle = IntPtr.Zero;
                 Console.WriteLine("手动结束scrcpy程序。");
             }
         }
@@ -92,15 +93,23 @@ namespace ScrcpyEX.View
             WindowState = WindowState.Minimized;
         }
 
+        /// <summary>
+        /// 点击自定义标题栏拖拽窗口。
+        /// </summary>
         private void Dpl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            DragMove();//点击自定义标题栏拖拽窗口
+            DragMove();
         }
 
-        private async void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Console.WriteLine("窗体大小进行改变");
-            //_isResize = true;
+            Console.WriteLine($"窗体大小进行改变：{Keyboard.FocusedElement}。");
+
+            //第三方程序句柄不为空调整scrcpy大小
+            if (_scHandle != IntPtr.Zero)
+            {
+                _resizeTimer.Start();
+            }
         }
 
         private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -115,12 +124,24 @@ namespace ScrcpyEX.View
 
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
+            //Console.WriteLine($"gShow的大小:{gShow.ActualWidth}，{gShow.ActualHeight}，{gShow.Width}，{gShow.Height}。");
+
             Console.WriteLine($"stp的大小:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
-            Console.WriteLine($"gShow的大小:{gShow.ActualWidth}，{gShow.ActualHeight}，{gShow.Width}，{gShow.Height}。");
             Console.WriteLine($"wfh的大小:{wfh.ActualWidth}，{wfh.ActualHeight}，{wfh.Width}，{wfh.Height}。");
             Console.WriteLine($"panel的大小：{pnlShow.Width}，{pnlShow.Height}。");
-            _isResize = false;
-            await ChgScrcpySize();
+            Console.WriteLine($"焦点：{Keyboard.FocusedElement}。");
+            //_isResize = false;
+            //await ChgScrcpySize();
+        }
+
+        private void pnlShow_GotFocus(object sender, EventArgs e)
+        {
+            //Console.WriteLine("pnlShow获得焦点。");
+        }
+
+        private void wfh_GotFocus(object sender, RoutedEventArgs e)
+        {
+            //Console.WriteLine("wfh获得焦点。");
         }
     }
 }

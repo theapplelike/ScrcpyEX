@@ -13,7 +13,7 @@
         PreviewMouseLeftButtonUp="Window_PreviewMouseLeftButtonUp">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False" NonClientFrameEdges="Left,Bottom,Right"></WindowChrome>
+        <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False" NonClientFrameEdges="Left,Bottom,Right" ResizeBorderThickness="5"></WindowChrome>
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
@@ -56,11 +56,10 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-
         </Style>
     </Window.Resources>
 
-    <Grid x:Name="Stp" SizeChanged="Stp_SizeChanged">
+    <Grid x:Name="Stp">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
@@ -72,25 +71,30 @@
             <Button x:Name="BtnStop"  Content="关闭" Click="BtnStop_Click"/>
             <Button x:Name="BtnTest"  Content="◉" Click="BtnTest_Click"/>
 
-            <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
+            <!--<TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
             <Button x:Name="BtnSave"  Content="保存" />
             <Button x:Name="BtnCanel" Content="取消" />
-            <TextBlock Text="正在进行大小调整，调整完毕后请选择..." VerticalAlignment="Center" FontSize="12" />
-
+            <TextBlock Text="正在进行大小调整，调整完毕后请选择是否保存..." VerticalAlignment="Center" FontSize="12" />
+            -->
+            
             <Button x:Name="BtnClose"    Content="⨉" Click="BtnClose_Click" DockPanel.Dock="Right" Margin="0"/>
             <Button x:Name="BtnMaximize" Content="▢"  Click="BtnMaximize_Click" DockPanel.Dock="Right"/>
-            <Button x:Name="BtnMinimize" Content="-" Click="BtnMinimize_Click" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
+            <Button x:Name="BtnMinimize" Content="—" Click="BtnMinimize_Click" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
         </DockPanel>
 
         <!--<Border x:Name="bd" Grid.Row="1" BorderBrush="Gray" BorderThickness="3" Width="1350" Height="630">
             
-        </Border>-->
+        </Border>
 
         <Grid x:Name="gShow" Grid.Row="1"  Background="Gray">
-            <WindowsFormsHost x:Name="wfh" Margin="5">
-                <wf:Panel x:Name="pnlShow" />
+            <WindowsFormsHost x:Name="wfh" Margin="5" GotFocus="wfh_GotFocus">
+                <wf:Panel x:Name="pnlShow" GotFocus="pnlShow_GotFocus" />
             </WindowsFormsHost>
-        </Grid>
+        </Grid>-->
+
+        <WindowsFormsHost x:Name="wfh" Grid.Row="1" Background="Gray" Margin="5" GotFocus="wfh_GotFocus">
+            <wf:Panel x:Name="pnlShow" GotFocus="pnlShow_GotFocus" Dock="Fill" AutoSize="True" />
+        </WindowsFormsHost>
 
     </Grid>
 </Window>
