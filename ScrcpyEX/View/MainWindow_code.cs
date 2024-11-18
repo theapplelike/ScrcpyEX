@@ -24,6 +24,24 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
+        /// 外部程序未关闭时需要关闭，并且在关闭前要一直等待，防止Exited事件未执行完就执行Close()和Dispose()，
+        /// 这样会导致非托管资源不能被释放。
+        /// </summary>
+        private void ClosePrc()
+        {
+            if (_scHandle != IntPtr.Zero)
+            {
+                _prc.Kill();
+                _prc.WaitForExit();
+                Console.WriteLine("Main程序应用退出时关闭scrcpy。");
+            }
+
+            _prc.Close();
+            _prc.Dispose();
+            Console.WriteLine("Main程序应用退出。");
+        }
+
+        /// <summary>
         /// 读取配置的值给UI界面。
         /// </summary>
         private void ReadCfg()
@@ -49,7 +67,7 @@ namespace ScrcpyEX.View
             //MyCfg.Cfg.IP = txtIP.Text;
             MyCfg.Cfg.StayAwake = true;
             MyCfg.Cfg.OffScreen = false;
-            MyCfg.Cfg.ShowTouches = true;
+            MyCfg.Cfg.ShowTouches = false;
             MyCfg.Cfg.DeviceSleep = false;
             MyCfg.Save();
         }
@@ -68,7 +86,6 @@ namespace ScrcpyEX.View
                 RedirectStandardError = true,
                 //RedirectStandardInput = true,
             };
-            _prc = new();
             _prc.StartInfo = info;
             
             if (_prc.Start())
@@ -140,12 +157,10 @@ namespace ScrcpyEX.View
             //2024.11.15
             foreach (var p in Process.GetProcesses())
             {
-                //Console.WriteLine($"进入foreach：{p.MainWindowTitle}。");
                 if (p.MainWindowTitle.Contains(_scName))
                 {
                     //ShowWindow(p.MainWindowHandle, 0);
                     //IntPtr pnl = pnlShow.Handle;
-            
                     _scHandle = p.MainWindowHandle;
             
                     HideTitleBar(_scHandle);
@@ -163,7 +178,9 @@ namespace ScrcpyEX.View
             //    _scHandle = h;
             //
             //    HideTitleBar(h);
+            //    await Task.Delay(100);
             //    SetParent(h, pnlShow.Handle);
+            //    await Task.Delay(100);
             //    ShowWindow(h, 3);
             //
             //    Console.WriteLine($"找到scrcpy句柄：{h}。");

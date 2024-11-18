@@ -34,35 +34,30 @@ namespace ScrcpyEX.View
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            SaveCfg();
-
             _resizeTimer.Stop();
-            if (_scHandle != IntPtr.Zero)
-            {
-                _prc.Kill();// 如果外部程序没有结束运行则强行终止
-                Console.WriteLine("退出程序应用。");
-            }
 
-            _prc.Dispose();
-            _prc.Close();
+            SaveCfg();
+            ClosePrc();
         }
 
         private async void BtnWired_Click(object sender, RoutedEventArgs e)
         {
             if (_scHandle == IntPtr.Zero)
             {
+                BtnWired.IsEnabled = false;
                 await ConnectScrcpy();
+                BtnWired.IsEnabled = true;
             }
         }
 
+        /// <summary>
+        /// 外部程序被Kill()后，会执行Exited事件，前提是EnableRaisingEvents要设置为true。
+        /// </summary>
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
             if (_scHandle != IntPtr.Zero)
             {
-                _prc.Kill();// 如果外部程序没有结束运行则强行终止
-                _prc.Dispose();
-                _prc.Close();
-                _scHandle = IntPtr.Zero;
+                _prc.Kill();
                 Console.WriteLine("手动结束scrcpy程序。");
             }
         }
@@ -77,13 +72,13 @@ namespace ScrcpyEX.View
             if (WindowState == WindowState.Maximized)
             {
                 WindowState = WindowState.Normal;
-                BtnMaximize.Content = "▢";
+                BtnMaximize.Content = "\ue923";
                 Stp.Margin = new Thickness(0);
             }
             else
             {
                 WindowState = WindowState.Maximized;
-                BtnMaximize.Content = "▣";
+                BtnMaximize.Content = "\ue922";
                 Stp.Margin = new Thickness(6);
             }
         }
@@ -112,26 +107,20 @@ namespace ScrcpyEX.View
             }
         }
 
-        private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            //Console.WriteLine("窗体鼠标：down");
-        }
-
-        private void Window_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            //Console.WriteLine("窗体鼠标：up");
-        }
-
-        private async void BtnTest_Click(object sender, RoutedEventArgs e)
+        private void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             //Console.WriteLine($"gShow的大小:{gShow.ActualWidth}，{gShow.ActualHeight}，{gShow.Width}，{gShow.Height}。");
 
-            Console.WriteLine($"stp的大小:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
-            Console.WriteLine($"wfh的大小:{wfh.ActualWidth}，{wfh.ActualHeight}，{wfh.Width}，{wfh.Height}。");
-            Console.WriteLine($"panel的大小：{pnlShow.Width}，{pnlShow.Height}。");
-            Console.WriteLine($"焦点：{Keyboard.FocusedElement}。");
+            //Console.WriteLine($"stp的大小:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
+            //Console.WriteLine($"wfh的大小:{wfh.ActualWidth}，{wfh.ActualHeight}，{wfh.Width}，{wfh.Height}。");
+            //Console.WriteLine($"panel的大小：{pnlShow.Width}，{pnlShow.Height}。");
+            //Console.WriteLine($"焦点：{Keyboard.FocusedElement}。");
             //_isResize = false;
             //await ChgScrcpySize();
+
+            pop.IsOpen = false;
+            pop.IsOpen = true;
+            _popTimer.Start();
         }
 
         private void pnlShow_GotFocus(object sender, EventArgs e)
@@ -143,5 +132,7 @@ namespace ScrcpyEX.View
         {
             //Console.WriteLine("wfh获得焦点。");
         }
+
+        
     }
 }

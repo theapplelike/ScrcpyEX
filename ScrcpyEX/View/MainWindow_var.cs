@@ -14,7 +14,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 对第三方程序的引用。
         /// </summary>
-        private Process _prc = new();
+        private readonly Process _prc = new();
 
         /// <summary>
         /// scrcpy的句柄，为-1时代表scrcpy没有启动。
@@ -35,6 +35,8 @@ namespace ScrcpyEX.View
         /// 调整scrcpy窗口大小的计时器。
         /// </summary>
         private readonly DispatcherTimer _resizeTimer = new();
+
+        private readonly DispatcherTimer _popTimer = new();
 
         /// <summary>
         /// 获得一个与给定名称相匹配的顶层窗口的句柄，不查找子窗口，查找时不区分大小写。至少需要其中一个参数。

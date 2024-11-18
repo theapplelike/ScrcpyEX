@@ -30,7 +30,7 @@ namespace ScrcpyEX.View
             _prc.CancelOutputRead();
             _prc.CancelErrorRead();
             _scHandle = IntPtr.Zero;
-            Console.WriteLine($"scrcpy程序退出。");
+            Console.WriteLine($"scrcpy程序已关闭。");
         }
 
         /// <summary>
@@ -54,19 +54,30 @@ namespace ScrcpyEX.View
         /// </summary>
         private void SetTimer()
         {
-            _resizeTimer.Tick += new EventHandler(Timer_Tick);
+            _resizeTimer.Tick += new EventHandler(Resize_Tick);
             _resizeTimer.Interval = TimeSpan.FromSeconds(0.1);
+
+            _popTimer.Tick += new EventHandler(Pop_Tick);
+            _popTimer.Interval = TimeSpan.FromSeconds(3);
         }
 
         /// <summary>
         /// 要使用Thread在线程中调整第三方程序大小，这样不会改变焦点，导致用户调整大小操作被打断。
         /// </summary>
-        private void Timer_Tick(object sender, EventArgs e)
+        private void Resize_Tick(object sender, EventArgs e)
         {
             Console.WriteLine("正在timer中修改窗体大小。");
 
             new Thread(ResizeSC).Start();
             _resizeTimer.Stop();
+        }
+
+        private void Pop_Tick(object sender, EventArgs e)
+        {
+            Console.WriteLine("**************");
+            pop.IsOpen = false;
+            _popTimer.Stop();
+            Console.WriteLine("隐藏pop。");
         }
     }
 }
