@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScrcpyEX.ExtensionMethod;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -55,10 +56,7 @@ namespace ScrcpyEX.View
         private void SetTimer()
         {
             _resizeTimer.Tick += new EventHandler(Resize_Tick);
-            _resizeTimer.Interval = TimeSpan.FromSeconds(0.1);
-
-            _popTimer.Tick += new EventHandler(Pop_Tick);
-            _popTimer.Interval = TimeSpan.FromSeconds(3);
+            _resizeTimer.Interval = TimeSpan.FromSeconds(0.1);//大小调整间隔
         }
 
         /// <summary>
@@ -66,18 +64,12 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Resize_Tick(object sender, EventArgs e)
         {
-            Console.WriteLine("正在timer中修改窗体大小。");
+            Console.WriteLine("正在timer中修改scrcpy大小。");
 
             new Thread(ResizeSC).Start();
             _resizeTimer.Stop();
         }
 
-        private void Pop_Tick(object sender, EventArgs e)
-        {
-            Console.WriteLine("**************");
-            pop.IsOpen = false;
-            _popTimer.Stop();
-            Console.WriteLine("隐藏pop。");
-        }
+
     }
 }

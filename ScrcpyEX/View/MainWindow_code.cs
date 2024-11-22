@@ -11,13 +11,19 @@ using System.Windows.Interop;
 using System.Windows;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Media;
+using System.Windows.Controls;
 
 namespace ScrcpyEX.View
 {
     public partial class MainWindow//code
     {
-        private void Init()
+        /// <summary>
+        /// 自定义初始化。
+        /// </summary>
+        private void MyInit()
         {
+            MV.Pop = pop;
             SetProcess();
             SetTimer();
             ReadCfg();
@@ -39,6 +45,15 @@ namespace ScrcpyEX.View
             _prc.Close();
             _prc.Dispose();
             Console.WriteLine("Main程序应用退出。");
+        }
+
+        /// <summary>
+        /// 设置整体的窗口大小，宽=scrcpy宽+左右边距，高=scrcpy高+上下边距+标题栏高。
+        /// </summary>
+        private void SetUISize()
+        {
+            Width = 960 + 10;
+            Height = 448 + 50;
         }
 
         /// <summary>
@@ -92,6 +107,7 @@ namespace ScrcpyEX.View
             {
                 _prc.BeginOutputReadLine();
                 _prc.BeginErrorReadLine();
+                int i = 0;
 
                 do
                 {
@@ -101,8 +117,9 @@ namespace ScrcpyEX.View
                         break;
                     }
                     Console.WriteLine($">>>>>>>>>>>>>>查找程序：{_scName}。");
+                    i++;
                 }
-                while (true);
+                while (1 < 10);
             }
         }
 
@@ -231,11 +248,29 @@ namespace ScrcpyEX.View
         /// </summary>
         private void ResizeSC()
         {
-            Console.WriteLine($"重新设置process大小。");
+            Console.WriteLine($"重新设置scrcpy大小。");
 
             ShowWindow(_scHandle, 1);
             //await Task.Delay(100);
             ShowWindow(_scHandle, 3);
+        }
+
+        private void fo()
+        {
+            double x = SystemParameters.WorkArea.Width;//得到屏幕工作区域宽度
+            double y = SystemParameters.WorkArea.Height;
+
+            // Calculate the window size to be one-fourth of the screen
+            double quarterWidth = x / 2;
+            double quarterHeight = y / 2;
+
+            // Set the window's position to the top-right quarter
+            this.Left = x - quarterWidth;
+            this.Top = 0;
+
+            // Set the window's size to one-fourth of the screen
+            this.Width = quarterWidth;
+            this.Height = quarterHeight;
         }
 
 

@@ -36,8 +36,6 @@ namespace ScrcpyEX.View
         /// </summary>
         private readonly DispatcherTimer _resizeTimer = new();
 
-        private readonly DispatcherTimer _popTimer = new();
-
         /// <summary>
         /// 获得一个与给定名称相匹配的顶层窗口的句柄，不查找子窗口，查找时不区分大小写。至少需要其中一个参数。
         /// 若要从指定的子窗口开始搜索子窗口，请使用FindWindowEx函数。

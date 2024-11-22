@@ -1,4 +1,5 @@
 ﻿using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.MyDefinition;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -25,11 +27,12 @@ namespace ScrcpyEX.View
         public MainWindow()
         {
             InitializeComponent();
+            SetUISize();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Init();
+            MyInit();
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -44,9 +47,9 @@ namespace ScrcpyEX.View
         {
             if (_scHandle == IntPtr.Zero)
             {
-                BtnWired.IsEnabled = false;
+                btnWired.IsEnabled = false;
                 await ConnectScrcpy();
-                BtnWired.IsEnabled = true;
+                btnWired.IsEnabled = true;
             }
         }
 
@@ -72,14 +75,14 @@ namespace ScrcpyEX.View
             if (WindowState == WindowState.Maximized)
             {
                 WindowState = WindowState.Normal;
-                BtnMaximize.Content = "\ue923";
-                Stp.Margin = new Thickness(0);
+                btnMaximize.Content = "\ue923";
+                gMain.Margin = new Thickness(0);
             }
             else
             {
                 WindowState = WindowState.Maximized;
-                BtnMaximize.Content = "\ue922";
-                Stp.Margin = new Thickness(6);
+                btnMaximize.Content = "\ue922";
+                gMain.Margin = new Thickness(6);
             }
         }
 
@@ -118,9 +121,8 @@ namespace ScrcpyEX.View
             //_isResize = false;
             //await ChgScrcpySize();
 
-            pop.IsOpen = false;
-            pop.IsOpen = true;
-            _popTimer.Start();
+            MyGM.POP("yesman");
+            fo();
         }
 
         private void pnlShow_GotFocus(object sender, EventArgs e)

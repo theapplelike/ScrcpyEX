@@ -16,22 +16,26 @@
 
     <Window.Resources></Window.Resources>
 
-    <Grid x:Name="Stp">
+    <Grid x:Name="gMain" Background="LightSteelBlue">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!--程序通用的提示控件-->
         <Popup x:Name="pop" PopupAnimation="Fade" Placement="Mouse" StaysOpen="True" AllowsTransparency="True" FlowDirection="LeftToRight">
-            <TextBlock Background="White" Text="提示：Hello？" />
+            <TextBlock 
+                Text="提示：Hello？"
+                Background="White"
+                Padding="10"/>
         </Popup>
 
-        <DockPanel x:Name="Dpl" Background="AliceBlue" MouseLeftButtonDown="Dpl_MouseLeftButtonDown">
-            <Button x:Name="BtnWired" Style="{StaticResource MenuBtn}" Content="&#xF0B9;" Click="BtnWired_Click" Margin="0" ToolTip="有线连接"/>
-            <Button x:Name="BtnWirel" Style="{StaticResource MenuBtn}" Content="&#xe952;" />
-            <Button x:Name="BtnStop"  Style="{StaticResource MenuBtn}" Content="&#xECCB;" Click="BtnStop_Click"/>
-            <Button x:Name="BtnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click"/>
+        <DockPanel x:Name="dpl" Background="AliceBlue" MouseLeftButtonDown="Dpl_MouseLeftButtonDown">
+            <Button x:Name="btnWired" Style="{StaticResource MenuBtn}" Content="&#xF0B9;" Click="BtnWired_Click" Margin="0" ToolTip="有线连接"/>
+            <Button x:Name="btnWirel" Style="{StaticResource MenuBtn}" Content="&#xe952;" ToolTip="无线连接"/>
+            <Button x:Name="btnStop"  Style="{StaticResource MenuBtn}" Content="&#xECCB;" Click="BtnStop_Click" ToolTip="停止投屏"/>
+            <Button x:Name="btnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click"/>
             
             
             <!--<TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
@@ -40,9 +44,9 @@
             <TextBlock Text="正在进行大小调整，调整完毕后请选择是否保存..." VerticalAlignment="Center" FontSize="12" />
             -->
 
-            <Button x:Name="BtnClose"    Style="{StaticResource MenuBtn}" Content="&#xe711;" Click="BtnClose_Click" DockPanel.Dock="Right" Margin="0"/>
-            <Button x:Name="BtnMaximize" Style="{StaticResource MenuBtn}" Content="&#xe923;" Click="BtnMaximize_Click" DockPanel.Dock="Right"/>
-            <Button x:Name="BtnMinimize" Style="{StaticResource MenuBtn}" Content="&#xe73c;" Click="BtnMinimize_Click" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
+            <Button x:Name="btnClose"    Style="{StaticResource MenuBtn}" Content="&#xe711;" Click="BtnClose_Click" DockPanel.Dock="Right" Margin="0"/>
+            <Button x:Name="btnMaximize" Style="{StaticResource MenuBtn}" Content="&#xe923;" Click="BtnMaximize_Click" DockPanel.Dock="Right"/>
+            <Button x:Name="btnMinimize" Style="{StaticResource MenuBtn}" Content="&#xe73c;" Click="BtnMinimize_Click" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
         </DockPanel>
 
         <!--<Border x:Name="bd" Grid.Row="1" BorderBrush="Gray" BorderThickness="3" Width="1350" Height="630">
