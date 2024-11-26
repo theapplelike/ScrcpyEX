@@ -41,6 +41,7 @@ namespace ScrcpyEX.View
 
             SaveCfg();
             ClosePrc();
+            wfh.Dispose();
         }
 
         private async void BtnWired_Click(object sender, RoutedEventArgs e)
@@ -112,6 +113,7 @@ namespace ScrcpyEX.View
 
         private void BtnTest_Click(object sender, RoutedEventArgs e)
         {
+            Console.WriteLine($"gMain的大小:{gMain.ActualWidth}，{gMain.ActualHeight}，{gMain.Width}，{gMain.Height}。");
             //Console.WriteLine($"gShow的大小:{gShow.ActualWidth}，{gShow.ActualHeight}，{gShow.Width}，{gShow.Height}。");
 
             //Console.WriteLine($"stp的大小:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
@@ -127,14 +129,28 @@ namespace ScrcpyEX.View
 
         private void pnlShow_GotFocus(object sender, EventArgs e)
         {
-            //Console.WriteLine("pnlShow获得焦点。");
+            Console.WriteLine("pnlShow获得焦点。");
         }
 
         private void wfh_GotFocus(object sender, RoutedEventArgs e)
         {
-            //Console.WriteLine("wfh获得焦点。");
+            Console.WriteLine("wfh获得焦点。");
         }
 
-        
+        /// <summary>
+        /// 定位的两个按钮颜色联动。
+        /// </summary>
+        private void BtnLocate_MouseEnter(object sender, MouseEventArgs e)
+        {
+            btnLocate.Background = btnOption.Background = Brushes.LightBlue;
+        }
+
+        /// <summary>
+        /// 定位的两个按钮颜色联动。
+        /// </summary>
+        private void BtnLocate_MouseLeave(object sender, MouseEventArgs e)
+        {
+            btnLocate.Background = btnOption.Background = Brushes.Transparent;
+        }
     }
 }

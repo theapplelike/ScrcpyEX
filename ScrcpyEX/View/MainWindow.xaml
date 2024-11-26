@@ -19,7 +19,7 @@
     <Grid x:Name="gMain" Background="LightSteelBlue">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -35,11 +35,16 @@
             <Button x:Name="btnWired" Style="{StaticResource MenuBtn}" Content="&#xF0B9;" Click="BtnWired_Click" Margin="0" ToolTip="有线连接"/>
             <Button x:Name="btnWirel" Style="{StaticResource MenuBtn}" Content="&#xe952;" ToolTip="无线连接"/>
             <Button x:Name="btnStop"  Style="{StaticResource MenuBtn}" Content="&#xECCB;" Click="BtnStop_Click" ToolTip="停止投屏"/>
+            <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
+
+            <Button x:Name="btnLocate" Style="{StaticResource MenuBtn}" Content="&#xEC26;" ToolTip="快速定位" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave"/>
+            <Button x:Name="btnOption" Style="{StaticResource MenuBtn}" Content="&#xeb11;" ToolTip="定位选项" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave" Width="22"/>
+            <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
+
             <Button x:Name="btnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click"/>
-            
-            
-            <!--<TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
-            <Button x:Name="BtnSave"  Content="保存" />
+
+
+            <!--<Button x:Name="BtnSave"  Content="保存" />
             <Button x:Name="BtnCanel" Content="取消" />
             <TextBlock Text="正在进行大小调整，调整完毕后请选择是否保存..." VerticalAlignment="Center" FontSize="12" />
             -->

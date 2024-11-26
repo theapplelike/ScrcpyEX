@@ -53,7 +53,7 @@ namespace ScrcpyEX.View
         private void SetUISize()
         {
             Width = 960 + 10;
-            Height = 448 + 50;
+            Height = 448 + 40;
         }
 
         /// <summary>
@@ -259,16 +259,19 @@ namespace ScrcpyEX.View
         {
             double x = SystemParameters.WorkArea.Width;//得到屏幕工作区域宽度
             double y = SystemParameters.WorkArea.Height;
+            double x1 = SystemParameters.PrimaryScreenWidth;//得到屏幕整体宽度
+            double y1 = SystemParameters.PrimaryScreenHeight;//得到屏幕整体高度
 
-            // Calculate the window size to be one-fourth of the screen
+            Console.WriteLine($"屏幕工作区：({x}，{y})，({x1}，{y1})。");
+            // 计算窗口大小为屏幕的四分之一
             double quarterWidth = x / 2;
             double quarterHeight = y / 2;
 
-            // Set the window's position to the top-right quarter
+            // 将窗口的位置设置为右上角
             this.Left = x - quarterWidth;
             this.Top = 0;
 
-            // Set the window's size to one-fourth of the screen
+            // 将窗口大小设置为屏幕的四分之一
             this.Width = quarterWidth;
             this.Height = quarterHeight;
         }
