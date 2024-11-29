@@ -22,7 +22,7 @@ namespace ScrcpyEX.ExtensionMethod
         /// <summary>
         /// Scrcpy的路径。
         /// </summary>
-        public static string ScrcpyPath { get; set; } = @".\scrcpy-win64-v2.7\scrcpy.exe";
+        public static string ScrcpyPath { get; set; } = @".\scrcpy-win64-v3.0\scrcpy.exe";
 
         /// <summary>
         /// 全局提示控件。

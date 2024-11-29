@@ -30,6 +30,7 @@ namespace ScrcpyEX.View
             SetUISize();
         }
 
+        #region Window界面事件
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             MyInit();
@@ -42,6 +43,27 @@ namespace ScrcpyEX.View
             SaveCfg();
             ClosePrc();
             wfh.Dispose();
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Console.WriteLine($"窗体大小进行改变：{Keyboard.FocusedElement}。");
+
+            //第三方程序句柄不为空调整scrcpy大小
+            if (_scHandle != IntPtr.Zero)
+            {
+                _resizeTimer.Start();
+            }
+        }
+        #endregion
+
+        #region 自定义菜单栏事件
+        /// <summary>
+        /// 点击自定义标题栏拖拽窗口。
+        /// </summary>
+        private void Dpl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
         }
 
         private async void BtnWired_Click(object sender, RoutedEventArgs e)
@@ -92,25 +114,6 @@ namespace ScrcpyEX.View
             WindowState = WindowState.Minimized;
         }
 
-        /// <summary>
-        /// 点击自定义标题栏拖拽窗口。
-        /// </summary>
-        private void Dpl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            DragMove();
-        }
-
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Console.WriteLine($"窗体大小进行改变：{Keyboard.FocusedElement}。");
-
-            //第三方程序句柄不为空调整scrcpy大小
-            if (_scHandle != IntPtr.Zero)
-            {
-                _resizeTimer.Start();
-            }
-        }
-
         private void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             Console.WriteLine($"gMain的大小:{gMain.ActualWidth}，{gMain.ActualHeight}，{gMain.Width}，{gMain.Height}。");
@@ -124,21 +127,11 @@ namespace ScrcpyEX.View
             //await ChgScrcpySize();
 
             MyGM.POP("yesman");
-            fo();
-        }
-
-        private void pnlShow_GotFocus(object sender, EventArgs e)
-        {
-            Console.WriteLine("pnlShow获得焦点。");
-        }
-
-        private void wfh_GotFocus(object sender, RoutedEventArgs e)
-        {
-            Console.WriteLine("wfh获得焦点。");
+            //fo();
         }
 
         /// <summary>
-        /// 定位的两个按钮颜色联动。
+        /// 定位的两个按钮颜色联动，鼠标进入时同时修改背景色。
         /// </summary>
         private void BtnLocate_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -146,11 +139,43 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 定位的两个按钮颜色联动。
+        /// 定位的两个按钮颜色联动，鼠标离开时同时修改背景色。
         /// </summary>
         private void BtnLocate_MouseLeave(object sender, MouseEventArgs e)
         {
             btnLocate.Background = btnOption.Background = Brushes.Transparent;
+        }
+
+        private void BtnLocate_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnOption_Click(object sender, RoutedEventArgs e)
+        {
+            //重新绑定上下文菜单
+            ctm.PlacementTarget = btnLocate;
+            ctm.Placement = PlacementMode.Bottom;
+            ctm.IsOpen = true;
+
+            //联动两个定位按钮
+            btnLocate.Background = btnOption.Background = Brushes.LightBlue;
+        }
+
+        private void Ctm_Closed(object sender, RoutedEventArgs e)
+        {
+            btnLocate.Background = btnOption.Background = Brushes.Transparent;
+        }
+        #endregion
+
+        private void pnlShow_GotFocus(object sender, EventArgs e)
+        {
+            //Console.WriteLine("pnlShow获得焦点。");
+        }
+
+        private void wfh_GotFocus(object sender, RoutedEventArgs e)
+        {
+            //Console.WriteLine("wfh获得焦点。");
         }
     }
 }

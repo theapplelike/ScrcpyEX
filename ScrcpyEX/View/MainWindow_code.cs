@@ -27,6 +27,9 @@ namespace ScrcpyEX.View
             SetProcess();
             SetTimer();
             ReadCfg();
+
+            //界面初始化
+            btnOption.ContextMenu = null;
         }
 
         /// <summary>
@@ -114,12 +117,12 @@ namespace ScrcpyEX.View
                     await Task.Delay(500);
                     if (EmbeddedForm())
                     {
-                        break;
+                        return;
                     }
-                    Console.WriteLine($">>>>>>>>>>>>>>查找程序：{_scName}。");
-                    i++;
+                    Console.WriteLine($">>>>>>>>>>>>>>查找程序：{_scName}，{i++}。");
                 }
-                while (1 < 10);
+                while (i < 10);
+                MessageBox.Show("未能成功启动程序，请重试。", "提示");
             }
         }
 
