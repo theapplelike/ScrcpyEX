@@ -27,6 +27,7 @@ namespace ScrcpyEX.View
             SetProcess();
             SetTimer();
             ReadCfg();
+            SetUISize();
 
             //界面初始化
             btnOption.ContextMenu = null;
@@ -51,12 +52,16 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 设置整体的窗口大小，宽=scrcpy宽+左右边距，高=scrcpy高+上下边距+标题栏高。
+        /// 设置整体的窗口大小并居中，宽=scrcpy宽+左右边距，高=scrcpy高+上下边距+标题栏高。
         /// </summary>
         private void SetUISize()
         {
-            Width = 960 + 10;
-            Height = 448 + 40;
+            Width = 960 + ExtraWidth;
+            Height = 448 + ExtraHeight;
+
+            Left = (SystemParameters.WorkArea.Width - ActualWidth) / 2;
+            Top = (SystemParameters.WorkArea.Height - ActualHeight) / 2;
+            //Console.WriteLine($"{Width},{Height}。");
         }
 
         /// <summary>
@@ -119,7 +124,7 @@ namespace ScrcpyEX.View
                     {
                         return;
                     }
-                    Console.WriteLine($">>>>>>>>>>>>>>查找程序：{_scName}，{i++}。");
+                    Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}。");
                 }
                 while (i < 10);
                 MessageBox.Show("未能成功启动程序，请重试。", "提示");
@@ -144,7 +149,7 @@ namespace ScrcpyEX.View
                 //Console.WriteLine($"属性{prop.Name}：{prop.GetValue(MyCfg.Cfg)}，{GetArg(prop.Name)}。");
             }
 
-            _scName = DateTime.Now.ToString("HHmmss") + "mook";
+            _scName = $"{DateTime.Now:HHmmss}mook";
             sb.Append($"--window-title={_scName} ");
             //Console.WriteLine($"命令行：{sb}。");
             return sb.ToString();
@@ -258,25 +263,24 @@ namespace ScrcpyEX.View
             ShowWindow(_scHandle, 3);
         }
 
-        private void fo()
+        /// <summary>
+        /// 将窗体定位到屏幕右上角。
+        /// </summary>
+        private void Move()
         {
-            double x = SystemParameters.WorkArea.Width;//得到屏幕工作区域宽度
-            double y = SystemParameters.WorkArea.Height;
-            double x1 = SystemParameters.PrimaryScreenWidth;//得到屏幕整体宽度
-            double y1 = SystemParameters.PrimaryScreenHeight;//得到屏幕整体高度
+            Left = SystemParameters.WorkArea.Width - Width;
+            Top = 0;
+        }
 
-            Console.WriteLine($"屏幕工作区：({x}，{y})，({x1}，{y1})。");
-            // 计算窗口大小为屏幕的四分之一
-            double quarterWidth = x / 2;
-            double quarterHeight = y / 2;
-
-            // 将窗口的位置设置为右上角
-            this.Left = x - quarterWidth;
-            this.Top = 0;
-
-            // 将窗口大小设置为屏幕的四分之一
-            this.Width = quarterWidth;
-            this.Height = quarterHeight;
+        /// <summary>
+        /// 窗体尺寸修改为屏幕的四分之一并移动到右上角，高度根据15:7调整。
+        /// </summary>
+        private void QuarterMove()
+        {
+            Left = Width = SystemParameters.WorkArea.Width / 2;
+            Top = 0;
+            Height = (Width - ExtraWidth) * 1.0 / 15 * 7 + ExtraHeight;
+            Console.WriteLine($"宽高：{Width},{Height}。");
         }
 
 

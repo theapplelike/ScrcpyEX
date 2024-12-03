@@ -27,7 +27,6 @@ namespace ScrcpyEX.View
         public MainWindow()
         {
             InitializeComponent();
-            SetUISize();
         }
 
         #region Window界面事件
@@ -148,15 +147,18 @@ namespace ScrcpyEX.View
 
         private void BtnLocate_Click(object sender, RoutedEventArgs e)
         {
-
+            Move();
         }
 
         private void BtnOption_Click(object sender, RoutedEventArgs e)
         {
             //重新绑定上下文菜单
-            ctm.PlacementTarget = btnLocate;
-            ctm.Placement = PlacementMode.Bottom;
-            ctm.IsOpen = true;
+            //ctm.PlacementTarget = btnLocate;
+            //ctm.Placement = PlacementMode.Bottom;
+            //ctm.IsOpen = true;
+
+            popMenu.IsOpen = false;
+            popMenu.IsOpen = true;
 
             //联动两个定位按钮
             btnLocate.Background = btnOption.Background = Brushes.LightBlue;
@@ -164,7 +166,18 @@ namespace ScrcpyEX.View
 
         private void Ctm_Closed(object sender, RoutedEventArgs e)
         {
-            btnLocate.Background = btnOption.Background = Brushes.Transparent;
+            //btnLocate.Background = btnOption.Background = Brushes.Transparent;
+        }
+
+        private void MiQuarterMove_Click(object sender, RoutedEventArgs e)
+        {
+            QuarterMove();
+        }
+
+        private void MiMove_Click(object sender, RoutedEventArgs e)
+        {
+            SetUISize();
+            Move();
         }
         #endregion
 
@@ -176,6 +189,11 @@ namespace ScrcpyEX.View
         private void wfh_GotFocus(object sender, RoutedEventArgs e)
         {
             //Console.WriteLine("wfh获得焦点。");
+        }
+
+        private void PopMenu_Closed(object sender, EventArgs e)
+        {
+            btnLocate.Background = btnOption.Background = Brushes.Transparent;
         }
     }
 }

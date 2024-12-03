@@ -67,7 +67,7 @@
     <Compile Include="MyDefinition\MyCfg.cs" />
     <Compile Include="MyDefinition\MyEM.cs" />
     <Compile Include="MyDefinition\MyGM.cs" />
-    <Compile Include="ViewModel\MainWindowViewModel.cs" />
+    <Compile Include="ViewModel\MainWindowVM.cs" />
     <Compile Include="View\MainWindow_code.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>

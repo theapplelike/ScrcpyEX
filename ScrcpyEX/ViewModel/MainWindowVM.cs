@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ScrcpyEX.ViewModel
 {
-    internal class MainWindowViewModel
+    internal class MainWindowVM
     {
     }
 }

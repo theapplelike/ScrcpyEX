@@ -37,6 +37,16 @@ namespace ScrcpyEX.View
         private readonly DispatcherTimer _resizeTimer = new();
 
         /// <summary>
+        /// 窗口除开scrcpy的额外高度，不能在构造函数中，控件没有显示时其ActualWidth始终为0。
+        /// </summary>
+        private double ExtraWidth => wfh.Margin.Left + wfh.Margin.Right;
+
+        /// <summary>
+        /// 窗口除开scrcpy的额外高度，不能在构造函数中，控件没有显示时其ActualHeight始终为0。
+        /// </summary>
+        private double ExtraHeight => dpl.ActualHeight + wfh.Margin.Top + wfh.Margin.Bottom;
+
+        /// <summary>
         /// 获得一个与给定名称相匹配的顶层窗口的句柄，不查找子窗口，查找时不区分大小写。至少需要其中一个参数。
         /// 若要从指定的子窗口开始搜索子窗口，请使用FindWindowEx函数。
         /// </summary>

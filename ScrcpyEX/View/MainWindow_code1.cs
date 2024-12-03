@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -39,7 +40,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Prc_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            Console.WriteLine($"〓〓：{e.Data}。");
+            Console.WriteLine($"[E]{e.Data}。");
         }
 
         /// <summary>
@@ -47,7 +48,15 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Prc_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            Console.WriteLine($"{e.Data}。");
+            Console.WriteLine($"[I]{e.Data}。");
+
+            //获得当前分辨率
+            if (e.Data.Contains("Texture"))
+            {
+                Regex reg = new("[0-9]+");
+                MatchCollection mc = reg.Matches(e.Data);
+                tbkResolution.Text = $"{mc[0].Value}*{mc[1].Value}";
+            }
         }
 
         /// <summary>

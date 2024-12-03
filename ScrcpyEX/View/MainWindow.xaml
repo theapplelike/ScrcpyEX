@@ -14,7 +14,8 @@
         <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False" NonClientFrameEdges="Left,Bottom,Right" ResizeBorderThickness="5"></WindowChrome>
     </WindowChrome.WindowChrome>
 
-    <Window.Resources></Window.Resources>
+    <Window.Resources>
+    </Window.Resources>
 
     <Grid x:Name="gMain" Background="LightSteelBlue">
 
@@ -32,16 +33,13 @@
         </Popup>
 
         <!--显示的菜单-->
-        <Popup x:Name="popMenu" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnLocate}">
-            <Border BorderBrush="Gainsboro" BorderThickness="2" >
+        <Popup x:Name="popMenu" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnLocate}" Closed="PopMenu_Closed">
+            <Border BorderBrush="Gainsboro" BorderThickness="2" Width="200">
                 <StackPanel>
-                    <TextBlock 
-                        Text="分割按钮菜单"
-                        Background="White"
-                        Padding="10"/>
-                    <Button Content="▾项目(_P)..." Width="200" BorderThickness="0,1"/>
-                    <Button Content="▾项目(_P)..." Height="40" BorderThickness="0,0,0,1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-                    <Button Content="▾项目(_P)..." BorderThickness="0,0,0,1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                    <TextBlock x:Name="tbkResolution" Text="未进行投屏" Background="White" Padding="10"/>
+                    <Button Content="▾项目(_P)..." BorderThickness="0,1"/>
+                    <Button Content="▾项目(_P)..." Height="40" BorderThickness="0,0,0,1"/>
+                    <Button Content="▾项目(_P)..." BorderThickness="0,0,0,1"/>
                 </StackPanel>
             </Border>
         </Popup>
@@ -52,12 +50,12 @@
             <Button x:Name="btnStop"  Style="{StaticResource MenuBtn}" Content="&#xECCB;" Click="BtnStop_Click" ToolTip="停止投屏"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
-            <Button x:Name="btnLocate" Click="BtnLocate_Click" Style="{StaticResource MenuBtn}" Content="&#xEC26;" ToolTip="快速定位" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave" Width="40"/>
-            <Button x:Name="btnOption" Click="BtnOption_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" ToolTip="定位选项" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave" Width="22" ContextMenuService.Placement="Bottom" ContextMenuService.PlacementTarget="{Binding ElementName=btnLocate}">
+            <Button x:Name="btnLocate" Click="BtnLocate_Click" Style="{StaticResource MenuBtn}" Content="&#xe7f7;" ToolTip="快速定位" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave" Width="40"/>
+            <Button x:Name="btnOption" Click="BtnOption_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" ToolTip="定位与大小选项" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave" Width="22" ContextMenuService.Placement="Bottom" ContextMenuService.PlacementTarget="{Binding ElementName=btnLocate}">
                 <Button.ContextMenu>
                     <ContextMenu Name="ctm" Closed="Ctm_Closed">
-                        <MenuItem Header="¼"/>
-                        <MenuItem Header="调整到右上角"/>
+                        <MenuItem x:Name="miQuarterMove" Click="MiQuarterMove_Click" Header="¼电脑屏幕尺寸并移动到右上角"/>
+                        <MenuItem x:Name="miMove" Click="MiMove_Click" Header="使用手机分辨率尺寸并移动到右上角"/>
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
