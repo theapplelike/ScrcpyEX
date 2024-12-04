@@ -1,4 +1,5 @@
-﻿using ScrcpyEX.ExtensionMethod;
+﻿using Newtonsoft.Json.Linq;
+using ScrcpyEX.ExtensionMethod;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -48,6 +49,10 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Prc_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
+            if (e.Data == null)
+            {
+                return;
+            }
             Console.WriteLine($"[I]{e.Data}。");
 
             //获得当前分辨率
@@ -55,8 +60,34 @@ namespace ScrcpyEX.View
             {
                 Regex reg = new("[0-9]+");
                 MatchCollection mc = reg.Matches(e.Data);
-                tbkResolution.Text = $"{mc[0].Value}*{mc[1].Value}";
+
+                _vm.ResolutionDesc = $"投屏分辨率 {mc[0].Value}*{mc[1].Value}，{GetRatio(mc)}";
             }
+        }
+
+        /// <summary>
+        /// 获得分辨率的最小比例值。
+        /// </summary>
+        private string GetRatio(MatchCollection mc)
+        {
+            int.TryParse(mc[0].Value, out int a);
+            int.TryParse(mc[1].Value, out int b);
+            int max = GetGreatestCommonDivisor(a, b);
+            return $"比例 {a / max}:{b / max}";
+        }
+
+        /// <summary>
+        /// 获得最大公约数。
+        /// </summary>
+        private int GetGreatestCommonDivisor(int a, int b)
+        {
+            if (a < b)
+            {
+                a += b;
+                b = a - b;
+                a -= b;
+            }
+            return (a % b == 0) ? b : GetGreatestCommonDivisor(a % b, b);
         }
 
         /// <summary>

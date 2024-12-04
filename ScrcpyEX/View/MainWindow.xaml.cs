@@ -1,5 +1,6 @@
 ﻿using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.MyDefinition;
+using ScrcpyEX.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,6 +28,7 @@ namespace ScrcpyEX.View
         public MainWindow()
         {
             InitializeComponent();
+            _vm = (MainWindowVM)DataContext;
         }
 
         #region Window界面事件
@@ -37,11 +39,7 @@ namespace ScrcpyEX.View
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            _resizeTimer.Stop();
-
-            SaveCfg();
-            ClosePrc();
-            wfh.Dispose();
+            MyClose();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -94,18 +92,7 @@ namespace ScrcpyEX.View
 
         private void BtnMaximize_Click(object sender, RoutedEventArgs e)
         {
-            if (WindowState == WindowState.Maximized)
-            {
-                WindowState = WindowState.Normal;
-                btnMaximize.Content = "\ue923";
-                gMain.Margin = new Thickness(0);
-            }
-            else
-            {
-                WindowState = WindowState.Maximized;
-                btnMaximize.Content = "\ue922";
-                gMain.Margin = new Thickness(6);
-            }
+            Maximize();
         }
 
         private void BtnMinimize_Click(object sender, RoutedEventArgs e)
@@ -126,7 +113,6 @@ namespace ScrcpyEX.View
             //await ChgScrcpySize();
 
             MyGM.POP("yesman");
-            //fo();
         }
 
         /// <summary>
@@ -147,12 +133,12 @@ namespace ScrcpyEX.View
 
         private void BtnLocate_Click(object sender, RoutedEventArgs e)
         {
-            Move();
+            Locate();
         }
 
         private void BtnOption_Click(object sender, RoutedEventArgs e)
         {
-            //重新绑定上下文菜单
+            //重新绑定上下文菜单24.12.3
             //ctm.PlacementTarget = btnLocate;
             //ctm.Placement = PlacementMode.Bottom;
             //ctm.IsOpen = true;
@@ -160,24 +146,44 @@ namespace ScrcpyEX.View
             popMenu.IsOpen = false;
             popMenu.IsOpen = true;
 
-            //联动两个定位按钮
+            //联动两个定位按钮，显示一致的背景色
             btnLocate.Background = btnOption.Background = Brushes.LightBlue;
         }
+        //24.12.3
+        //private void Ctm_Closed(object sender, RoutedEventArgs e)
+        //{
+        //    //btnLocate.Background = btnOption.Background = Brushes.Transparent;
+        //}
+        //
+        //private void MiQuarterMove_Click(object sender, RoutedEventArgs e)
+        //{
+        //    QuarterMove();
+        //}
+        //
+        //private void MiMove_Click(object sender, RoutedEventArgs e)
+        //{
+        //    SetUISize();
+        //    Locate();
+        //}
+        #endregion
 
-        private void Ctm_Closed(object sender, RoutedEventArgs e)
+        #region 自定义菜单事件
+        private void PopMenu_Closed(object sender, EventArgs e)
         {
-            //btnLocate.Background = btnOption.Background = Brushes.Transparent;
+            btnLocate.Background = btnOption.Background = Brushes.Transparent;
         }
 
-        private void MiQuarterMove_Click(object sender, RoutedEventArgs e)
+        private void BtnQuarterLoc_Click(object sender, RoutedEventArgs e)
         {
             QuarterMove();
+            popMenu.IsOpen = false;
         }
 
-        private void MiMove_Click(object sender, RoutedEventArgs e)
+        private void BtnOriginalLoc_Click(object sender, RoutedEventArgs e)
         {
             SetUISize();
-            Move();
+            Locate();
+            popMenu.IsOpen = false;
         }
         #endregion
 
@@ -191,9 +197,8 @@ namespace ScrcpyEX.View
             //Console.WriteLine("wfh获得焦点。");
         }
 
-        private void PopMenu_Closed(object sender, EventArgs e)
-        {
-            btnLocate.Background = btnOption.Background = Brushes.Transparent;
-        }
+        
+
+        
     }
 }

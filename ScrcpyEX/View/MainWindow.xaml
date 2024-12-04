@@ -7,18 +7,26 @@
         mc:Ignorable="d"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:wfI="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+        xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
         Title="MainWindow" Height="600" Width="1200" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged">
+
+    <Window.DataContext>
+        <ViewModel:MainWindowVM/>
+    </Window.DataContext>
 
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False" NonClientFrameEdges="Left,Bottom,Right" ResizeBorderThickness="5"></WindowChrome>
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
+        <Style x:Key="ItemBtn" TargetType="Button">
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Height" Value="30"/>
+        </Style>
     </Window.Resources>
 
     <Grid x:Name="gMain" Background="LightSteelBlue">
-
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
@@ -34,12 +42,27 @@
 
         <!--显示的菜单-->
         <Popup x:Name="popMenu" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnLocate}" Closed="PopMenu_Closed">
-            <Border BorderBrush="Gainsboro" BorderThickness="2" Width="200">
+            <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel>
-                    <TextBlock x:Name="tbkResolution" Text="未进行投屏" Background="White" Padding="10"/>
-                    <Button Content="▾项目(_P)..." BorderThickness="0,1"/>
-                    <Button Content="▾项目(_P)..." Height="40" BorderThickness="0,0,0,1"/>
-                    <Button Content="▾项目(_P)..." BorderThickness="0,0,0,1"/>
+                    <TextBlock Text="{Binding ResolutionDesc}" Background="White" Padding="10"/>
+                    <Grid Background="WhiteSmoke">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <RadioButton x:Name="rdoLoc1" Grid.Row="0" Grid.Column="0" Content="左上" Margin="0,10,0,5" HorizontalAlignment="Center"/>
+                        <RadioButton x:Name="rdoLoc2" Grid.Row="0" Grid.Column="1" Content="右上" Margin="0,10,0,5" HorizontalAlignment="Center"/>
+                        <RadioButton x:Name="rdoLoc3" Grid.Row="1" Grid.Column="0" Content="左下" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                        <RadioButton x:Name="rdoLoc4" Grid.Row="1" Grid.Column="1" Content="右下" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                    </Grid>
+
+                    <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并移动定位" BorderThickness="0,1"/>
+                    <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="⌂手机原始尺寸并移动定位"/>
+                    <Button Style="{StaticResource ItemBtn}" Content="▾项目(_P)..."/>
                 </StackPanel>
             </Border>
         </Popup>
@@ -52,12 +75,12 @@
 
             <Button x:Name="btnLocate" Click="BtnLocate_Click" Style="{StaticResource MenuBtn}" Content="&#xe7f7;" ToolTip="快速定位" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave" Width="40"/>
             <Button x:Name="btnOption" Click="BtnOption_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" ToolTip="定位与大小选项" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave" Width="22" ContextMenuService.Placement="Bottom" ContextMenuService.PlacementTarget="{Binding ElementName=btnLocate}">
-                <Button.ContextMenu>
+                <!--<Button.ContextMenu>
                     <ContextMenu Name="ctm" Closed="Ctm_Closed">
                         <MenuItem x:Name="miQuarterMove" Click="MiQuarterMove_Click" Header="¼电脑屏幕尺寸并移动到右上角"/>
                         <MenuItem x:Name="miMove" Click="MiMove_Click" Header="使用手机分辨率尺寸并移动到右上角"/>
                     </ContextMenu>
-                </Button.ContextMenu>
+                </Button.ContextMenu>-->
             </Button>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 

@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Media;
 using System.Windows.Controls;
+using ScrcpyEX.MyDefinition;
 
 namespace ScrcpyEX.View
 {
@@ -28,27 +29,6 @@ namespace ScrcpyEX.View
             SetTimer();
             ReadCfg();
             SetUISize();
-
-            //界面初始化
-            btnOption.ContextMenu = null;
-        }
-
-        /// <summary>
-        /// 外部程序未关闭时需要关闭，并且在关闭前要一直等待，防止Exited事件未执行完就执行Close()和Dispose()，
-        /// 这样会导致非托管资源不能被释放。
-        /// </summary>
-        private void ClosePrc()
-        {
-            if (_scHandle != IntPtr.Zero)
-            {
-                _prc.Kill();
-                _prc.WaitForExit();
-                Console.WriteLine("Main程序应用退出时关闭scrcpy。");
-            }
-
-            _prc.Close();
-            _prc.Dispose();
-            Console.WriteLine("Main程序应用退出。");
         }
 
         /// <summary>
@@ -74,6 +54,11 @@ namespace ScrcpyEX.View
             //chkOffScreen.Checked = MyCfg.Cfg.OffScreen;
             //chkShowTouches.Checked = MyCfg.Cfg.ShowTouches;
             //chkDeviceSleep.Checked = MyCfg.Cfg.DeviceSleep;
+
+            rdoLoc1.IsChecked = MyCfg.Cfg.Locate1;
+            rdoLoc2.IsChecked = MyCfg.Cfg.Locate2;
+            rdoLoc3.IsChecked = MyCfg.Cfg.Locate3;
+            rdoLoc4.IsChecked = MyCfg.Cfg.Locate4;
         }
 
         /// <summary>
@@ -92,7 +77,39 @@ namespace ScrcpyEX.View
             MyCfg.Cfg.OffScreen = false;
             MyCfg.Cfg.ShowTouches = false;
             MyCfg.Cfg.DeviceSleep = false;
+
+            MyCfg.Cfg.Locate1 = (bool)rdoLoc1.IsChecked;
+            MyCfg.Cfg.Locate2 = (bool)rdoLoc2.IsChecked;
+            MyCfg.Cfg.Locate3 = (bool)rdoLoc3.IsChecked;
+            MyCfg.Cfg.Locate4 = (bool)rdoLoc4.IsChecked;
             MyCfg.Save();
+        }
+
+        private void MyClose()
+        {
+            _resizeTimer.Stop();
+
+            SaveCfg();
+            ClosePrc();
+            wfh.Dispose();
+        }
+
+        /// <summary>
+        /// 外部程序未关闭时需要关闭，并且在关闭前要一直等待，防止Exited事件未执行完就执行Close()和Dispose()，
+        /// 这样会导致非托管资源不能被释放。
+        /// </summary>
+        private void ClosePrc()
+        {
+            if (_scHandle != IntPtr.Zero)
+            {
+                _prc.Kill();
+                _prc.WaitForExit();
+                Console.WriteLine("Main程序应用退出时关闭scrcpy。");
+            }
+
+            _prc.Close();
+            _prc.Dispose();
+            Console.WriteLine("Main程序应用退出。");
         }
 
         /// <summary>
@@ -127,7 +144,7 @@ namespace ScrcpyEX.View
                     Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}。");
                 }
                 while (i < 10);
-                MessageBox.Show("未能成功启动程序，请重试。", "提示");
+                MessageBox.Show("未能成功启动程序，请重试。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -179,7 +196,6 @@ namespace ScrcpyEX.View
         /// <returns>true--嵌入成功；false嵌入失败。</returns>
         private bool EmbeddedForm()
         {
-            //2024.11.15
             foreach (var p in Process.GetProcesses())
             {
                 if (p.MainWindowTitle.Contains(_scName))
@@ -189,14 +205,15 @@ namespace ScrcpyEX.View
                     _scHandle = p.MainWindowHandle;
             
                     HideTitleBar(_scHandle);
-                    SetParent(_scHandle, pnlShow.Handle);
-                    ShowWindow(_scHandle, 3);
+                    DLL.SetParent(_scHandle, pnlShow.Handle);
+                    DLL.ShowWindow(_scHandle, 3);
             
                     Console.WriteLine($"程序信息：{_scHandle},{p.MainWindowTitle}。");
                     return true;
                 }
             }
 
+            //2024.11.15
             //IntPtr h = FindWindow(null, _scName);
             //if (h != IntPtr.Zero)
             //{
@@ -221,7 +238,13 @@ namespace ScrcpyEX.View
         /// <param name="handle">窗口的句柄。</param>
         private void HideTitleBar(IntPtr handle)
         {
-            int style = GetWindowLong(handle, GWL_STYLE);
+            int GWL_STYLE = -16;//检索窗口样式
+            int WS_CAPTION = 0xC00000;//是窗口标题栏的样式标志
+            int WS_THICKFRAME = 0x00040000;//允许通过拖动边缘来调整窗口大小
+            //在窗口的标题栏中添加“最大化”按钮
+            //int WS_MAXIMIZEBOX = 0x00010000;
+
+            int style = DLL.GetWindowLong(handle, GWL_STYLE);
 
             //删除WS_CAPTION样式以隐藏标题栏  
             style = style & ~WS_CAPTION;
@@ -230,7 +253,26 @@ namespace ScrcpyEX.View
             style = style & ~WS_THICKFRAME;
 
             //设置为新的窗口样式
-            SetWindowLong(handle, GWL_STYLE, style);
+            DLL.SetWindowLong(handle, GWL_STYLE, style);
+        }
+
+        /// <summary>
+        /// 最大化或者还原窗口，最大化时增加6的边距。
+        /// </summary>
+        private void Maximize()
+        {
+            if (WindowState == WindowState.Maximized)
+            {
+                WindowState = WindowState.Normal;
+                btnMaximize.Content = "\ue923";
+                gMain.Margin = new Thickness(0);
+            }
+            else
+            {
+                WindowState = WindowState.Maximized;
+                btnMaximize.Content = "\ue922";
+                gMain.Margin = new Thickness(6);
+            }
         }
 
         /// <summary>
@@ -245,9 +287,9 @@ namespace ScrcpyEX.View
             //Console.WriteLine($"差:{Stp.ActualWidth - gShow.ActualWidth}，{Stp.ActualHeight - gShow.ActualHeight}。");
             Console.WriteLine($"panel的大小：{pnlShow.Width}，{pnlShow.Height}。");
 
-            ShowWindow(_scHandle, 2);
+            DLL.ShowWindow(_scHandle, 2);
             await Task.Delay(100);
-            ShowWindow(_scHandle, 3);
+            DLL.ShowWindow(_scHandle, 3);
         }
 
         /// <summary>
@@ -258,28 +300,45 @@ namespace ScrcpyEX.View
         {
             Console.WriteLine($"重新设置scrcpy大小。");
 
-            ShowWindow(_scHandle, 1);
+            DLL.ShowWindow(_scHandle, 1);
             //await Task.Delay(100);
-            ShowWindow(_scHandle, 3);
+            DLL.ShowWindow(_scHandle, 3);
         }
 
         /// <summary>
-        /// 将窗体定位到屏幕右上角。
+        /// 将窗体定位到指定位置。
         /// </summary>
-        private void Move()
+        private void Locate()
         {
-            Left = SystemParameters.WorkArea.Width - Width;
-            Top = 0;
+            if ((bool)rdoLoc1.IsChecked)
+            {
+                Left = Top = 0;
+            }
+            else if ((bool)rdoLoc2.IsChecked)
+            {
+                Left = SystemParameters.WorkArea.Width - Width;
+                Top = 0;
+            }
+            else if ((bool)rdoLoc3.IsChecked)
+            {
+                Left = 0;
+                Top= SystemParameters.WorkArea.Height - Height;
+            }
+            else if ((bool)rdoLoc4.IsChecked)
+            {
+                Left = SystemParameters.WorkArea.Width - Width;
+                Top = SystemParameters.WorkArea.Height - Height;
+            }
         }
 
         /// <summary>
-        /// 窗体尺寸修改为屏幕的四分之一并移动到右上角，高度根据15:7调整。
+        /// 窗体宽度修改为屏幕的四分之一并移动定位，高度根据15:7调整。
         /// </summary>
         private void QuarterMove()
         {
-            Left = Width = SystemParameters.WorkArea.Width / 2;
-            Top = 0;
+            Width = SystemParameters.WorkArea.Width / 2;
             Height = (Width - ExtraWidth) * 1.0 / 15 * 7 + ExtraHeight;
+            Locate();
             Console.WriteLine($"宽高：{Width},{Height}。");
         }
 

@@ -52,6 +52,26 @@ namespace ScrcpyEX.ExtensionMethod
         public string IP { get; set; }
 
         /// <summary>
+        /// 定位到左上角。
+        /// </summary>
+        public bool Locate1 { get; set; } = false;
+
+        /// <summary>
+        /// 定位到右上角。
+        /// </summary>
+        public bool Locate2 { get; set; } = true;
+
+        /// <summary>
+        /// 定位到左下角。
+        /// </summary>
+        public bool Locate3 { get; set; } = false;
+
+        /// <summary>
+        /// 定位到右下角。
+        /// </summary>
+        public bool Locate4 { get; set; } = false;
+
+        /// <summary>
         /// 保持清醒，防止设备进入休眠状态。
         /// </summary>
         [Arguments("--stay-awake")]

@@ -1,0 +1,80 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ScrcpyEX.MyDefinition
+{
+    internal class DLL
+    {
+        /// <summary>
+        /// 获得一个与给定名称相匹配的顶层窗口的句柄，不查找子窗口，查找时不区分大小写。至少需要其中一个参数。
+        /// 若要从指定的子窗口开始搜索子窗口，请使用FindWindowEx函数。
+        /// </summary>
+        /// <param name="lpClassName">要查找窗口的类。比如笔记本的类是"Notepad"。</param>
+        /// <param name="lpWindowName">要查找窗口的标题。如果该参数为空，则匹配所有窗口。<</param>
+        /// <returns>成功 -- 返回匹配窗口的句柄；失败 -- 返回值为NULL。</returns>
+        [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        /// <summary>
+        /// 更改指定子窗口的父窗口。
+        /// </summary>
+        /// <param name="hWndChild">作为子窗口的句柄。</param>
+        /// <param name="hWndNewParent">新父窗口的句柄。如果此参数为 NULL，桌面窗口将成为新的父窗口。如果此参数 HWND_MESSAGE，则子窗口将成为仅消息窗口。</param>
+        /// <returns>如果函数成功，则返回值是上一个父窗口的句柄。</returns>
+        [DllImport("User32.dll", EntryPoint = "SetParent")]
+        public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
+        /// <summary>
+        /// 设置指定窗口的显示状态。
+        /// </summary>
+        /// <param name="hwnd">窗口的句柄。</param>
+        /// <param name="nCmdShow">控制窗口的显示方式。更多参考：https://learn.microsoft.com/zh-cn/windows/win32/api/winuser/nf-winuser-showwindow。</param>
+        /// <returns>如果窗口以前可见，则返回值为非零值。如果以前隐藏窗口，则返回值为零。</returns>
+        [DllImport("user32.dll", EntryPoint = "ShowWindow")]
+        public static extern int ShowWindow(IntPtr hwnd, int nCmdShow);
+
+        /// <summary>
+        /// 更改指定窗口的位置和尺寸。对于顶级窗口，位置和尺寸是相对于屏幕左上角的。对于子窗口，它们相对于父窗口工作区的左上角。
+        /// </summary>
+        /// <param name="hwnd">窗口的句柄。</param>
+        /// <param name="x">窗口左侧的新位置。</param>
+        /// <param name="y">窗口顶部的新位置。</param>
+        /// <param name="nWidth">窗口的新宽度。</param>
+        /// <param name="nHeight">窗口的新高度。</param>
+        /// <param name="repaint">指示是否重新绘制窗口。如果此参数为TRUE，则窗口将收到消息。如果参数为FALSE，则不会进行任何类型的重新绘制。这适用于工作区、非工作区 (包括标题栏和滚动条) ，以及由于移动子窗口而发现父窗口的任何部分。</param>
+        /// <returns>如果该函数成功，则返回值为非零值。如果函数失败，则返回值为零。 要获得更多的错误信息，请调用 GetLastError。</returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool MoveWindow(IntPtr hwnd, int x, int y, int nWidth, int nHeight, bool repaint);
+
+        /// <summary>
+        /// 将焦点切换到指定的窗口，并将其带到前台，最小化时会将窗口弹出。
+        /// </summary>
+        /// <param name="hWnd">窗口的句柄。</param>
+        /// <param name="fAltTab">TRUE--指示窗口正切换到使用Alt/Ctl+Tab键序列；否则此参数应为FALSE。</param>
+        [DllImport("user32.dll")]
+        public static extern void SwitchToThisWindow(IntPtr hWnd, bool fAltTab);
+
+        /// <summary>
+        /// 更改指定窗口的属性。 
+        /// </summary>
+        /// <param name="hWnd">窗口的句柄，以及窗口所属的类的间接句柄。</param>
+        /// <param name="nIndex">要设置的值的从零开始的偏移量。更多参考：https://learn.microsoft.com/zh-cn/windows/win32/api/winuser/nf-winuser-setwindowlonga。</param>
+        /// <param name="dwNewLong">替换值。</param>
+        /// <returns>如果函数成功，则返回值为指定 32 位整数的上一个值。如果函数失败，则返回值为零。</returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        /// <summary>
+        /// 检索有关指定窗口的信息。
+        /// </summary>
+        /// <param name="hWnd">窗口的句柄。</param>
+        /// <param name="nIndex">要检索的值的从零开始的偏移量。值的含义参考：https://learn.microsoft.com/zh-cn/windows/win32/api/winuser/nf-winuser-getwindowlonga。</param>
+        /// <returns>如果函数成功，则返回值是请求的值。如果函数失败，则返回值为零。 </returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+    }
+}
