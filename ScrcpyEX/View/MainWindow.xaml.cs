@@ -100,21 +100,6 @@ namespace ScrcpyEX.View
             WindowState = WindowState.Minimized;
         }
 
-        private void BtnTest_Click(object sender, RoutedEventArgs e)
-        {
-            Console.WriteLine($"gMain的大小:{gMain.ActualWidth}，{gMain.ActualHeight}，{gMain.Width}，{gMain.Height}。");
-            //Console.WriteLine($"gShow的大小:{gShow.ActualWidth}，{gShow.ActualHeight}，{gShow.Width}，{gShow.Height}。");
-
-            //Console.WriteLine($"stp的大小:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
-            //Console.WriteLine($"wfh的大小:{wfh.ActualWidth}，{wfh.ActualHeight}，{wfh.Width}，{wfh.Height}。");
-            //Console.WriteLine($"panel的大小：{pnlShow.Width}，{pnlShow.Height}。");
-            //Console.WriteLine($"焦点：{Keyboard.FocusedElement}。");
-            //_isResize = false;
-            //await ChgScrcpySize();
-
-            MyGM.POP("yesman");
-        }
-
         /// <summary>
         /// 定位的两个按钮颜色联动，鼠标进入时同时修改背景色。
         /// </summary>
@@ -189,15 +174,13 @@ namespace ScrcpyEX.View
 
         private void pnlShow_GotFocus(object sender, EventArgs e)
         {
-            //Console.WriteLine("pnlShow获得焦点。");
+            Console.WriteLine("pnlShow获得焦点。");
         }
 
         private void wfh_GotFocus(object sender, RoutedEventArgs e)
         {
-            //Console.WriteLine("wfh获得焦点。");
+            Console.WriteLine("wfh获得焦点。");
         }
-
-        
 
         
     }

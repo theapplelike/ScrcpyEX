@@ -167,7 +167,7 @@ namespace ScrcpyEX.View
             }
 
             _scName = $"{DateTime.Now:HHmmss}mook";
-            sb.Append($"--window-title={_scName} ");
+            sb.Append($"--keyboard=uhid --window-title={_scName} ");
             //Console.WriteLine($"命令行：{sb}。");
             return sb.ToString();
         }

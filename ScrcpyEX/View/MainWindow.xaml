@@ -62,7 +62,7 @@
 
                     <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并移动定位" BorderThickness="0,1"/>
                     <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="⌂手机原始尺寸并移动定位"/>
-                    <Button Style="{StaticResource ItemBtn}" Content="▾项目(_P)..."/>
+                    <!--<Button Style="{StaticResource ItemBtn}" Content="▾项目(_P)..."/>-->
                 </StackPanel>
             </Border>
         </Popup>
@@ -84,7 +84,7 @@
             </Button>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
-            <Button x:Name="btnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click"/>
+            <Button x:Name="btnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
 
 
             <!--<Button x:Name="BtnSave"  Content="保存" />

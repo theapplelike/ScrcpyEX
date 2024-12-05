@@ -72,7 +72,7 @@ namespace ScrcpyEX.ExtensionMethod
         public bool Locate4 { get; set; } = false;
 
         /// <summary>
-        /// 保持清醒，防止设备进入休眠状态。
+        /// 保持清醒，防止设备进入休眠状态（无线连接时无效）。
         /// </summary>
         [Arguments("--stay-awake")]
         public bool StayAwake { get; set; }

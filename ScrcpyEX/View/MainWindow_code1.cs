@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.MyDefinition;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,7 +9,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace ScrcpyEX.View
 {
@@ -108,6 +111,35 @@ namespace ScrcpyEX.View
 
             new Thread(ResizeSC).Start();
             _resizeTimer.Stop();
+        }
+
+        private async void BtnTest_Click(object sender, RoutedEventArgs e)
+        {
+            //Console.WriteLine($"gMain的大小:{gMain.ActualWidth}，{gMain.ActualHeight}，{gMain.Width}，{gMain.Height}。");
+            //Console.WriteLine($"gShow的大小:{gShow.ActualWidth}，{gShow.ActualHeight}，{gShow.Width}，{gShow.Height}。");
+            //Console.WriteLine($"stp的大小:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
+            //Console.WriteLine($"wfh的大小:{wfh.ActualWidth}，{wfh.ActualHeight}，{wfh.Width}，{wfh.Height}。");
+            //Console.WriteLine($"panel的大小：{pnlShow.Width}，{pnlShow.Height}。");
+
+            //_isResize = false;
+            //await ChgScrcpySize();
+
+            //IntPtr intPtr = IntPtr.Zero;
+            //IntPtr intPtr = DLL.SetFocus(_scHandle);
+            //DLL.SwitchToThisWindow(pnlShow.Handle, false);
+
+            await Task.Delay(1000);
+            //Console.WriteLine($"焦点：{Keyboard.FocusedElement}，{_scHandle}，{intPtr}。");
+
+            //System.Windows.Forms.SendKeys.SendWait("+K");
+            //System.Windows.Forms.SendKeys.SendWait("{ENTER}");
+
+            //MyGM.POP("yesman");
+        }
+
+        private void BtnTest_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            MyGM.POP("yesclick");
         }
 
 

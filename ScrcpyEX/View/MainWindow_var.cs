@@ -23,7 +23,7 @@ namespace ScrcpyEX.View
         private readonly MainWindowVM _vm;
 
         /// <summary>
-        /// scrcpy的句柄，为-1时代表scrcpy没有启动。
+        /// scrcpy的句柄，为IntPtr.Zero时代表scrcpy没有启动。
         /// </summary>
         private IntPtr _scHandle = IntPtr.Zero;
 

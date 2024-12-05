@@ -76,5 +76,8 @@ namespace ScrcpyEX.MyDefinition
         /// <returns>如果函数成功，则返回值是请求的值。如果函数失败，则返回值为零。 </returns>
         [DllImport("user32.dll", SetLastError = true)]
         public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr SetFocus(IntPtr hWnd);
     }
 }
