@@ -182,6 +182,9 @@ namespace ScrcpyEX.View
             Console.WriteLine("wfh获得焦点。");
         }
 
-        
+        private void wfh_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Console.WriteLine("鼠标在wfh按下。");
+        }
     }
 }

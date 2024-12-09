@@ -207,7 +207,7 @@ namespace ScrcpyEX.View
                     HideTitleBar(_scHandle);
                     DLL.SetParent(_scHandle, pnlShow.Handle);
                     DLL.ShowWindow(_scHandle, 3);
-            
+
                     Console.WriteLine($"程序信息：{_scHandle},{p.MainWindowTitle}。");
                     return true;
                 }

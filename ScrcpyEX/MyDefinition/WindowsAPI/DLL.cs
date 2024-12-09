@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ScrcpyEX.MyDefinition
 {
@@ -77,7 +78,38 @@ namespace ScrcpyEX.MyDefinition
         [DllImport("user32.dll", SetLastError = true)]
         public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
+        /// <summary>
+        /// 将消息置于消息队列中，该消息与创建指定窗口的线程相关联，并返回，而无需等待线程处理消息。
+        /// </summary>
+        /// <param name="hWnd">句柄，消息不会发布到子窗口。</param>
+        /// <param name="Msg">要发布的消息，系统提供的消息列表参阅：https://learn.microsoft.com/zh-cn/windows/win32/winmsg/about-messages-and-message-queues。</param>
+        /// <param name="wParam">其他特定于消息的信息，取值根据第二个参数Msg而定。</param>
+        /// <param name="lParam">其他特定于消息的信息，取值根据第二个参数Msg而定。</param>
+        /// <returns>函数成功--返回值为非零；函数失败--返回值为零。</returns>
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr SetFocus(IntPtr hWnd);
+
+        [DllImport("User32.dll", EntryPoint = "SendMessage", SetLastError = true)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern bool PostThreadMessage(uint idThread, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll")] 
+        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, uint dwExtraInfo);
+
+        [DllImport("user32.dll")]
+        public static extern int SetCursorPos(int x, int y);//让鼠标移动到指定位置
+
+        [DllImport("user32.dll")]
+        public static extern int mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);//控制鼠标执行点击操作
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
     }
 }

@@ -62,7 +62,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="MyDefinition\DLL.cs" />
+    <Compile Include="MyDefinition\WindowsAPI\DLL.cs" />
     <Compile Include="MyDefinition\MV.cs" />
     <Compile Include="MyDefinition\MyAttribute\ArgumentsAttribute.cs" />
     <Compile Include="MyDefinition\MyCfg.cs" />
@@ -70,6 +70,7 @@
     <Compile Include="MyDefinition\MyGM.cs" />
     <Compile Include="MyDefinition\NotificationObject.cs" />
     <Compile Include="MyDefinition\RelayCommand.cs" />
+    <Compile Include="MyDefinition\WindowsAPI\MP.cs" />
     <Compile Include="ViewModel\MainWindowVM.cs" />
     <Compile Include="View\MainWindow_code.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

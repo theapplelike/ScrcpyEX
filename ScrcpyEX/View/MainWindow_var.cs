@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Threading;
 
 namespace ScrcpyEX.View
@@ -33,14 +34,11 @@ namespace ScrcpyEX.View
         private string _scName;
 
         /// <summary>
-        /// 判断顶级窗体是否在调整大小。
-        /// </summary>
-        //private bool _isResize = false;
-
-        /// <summary>
         /// 调整scrcpy窗口大小的计时器。
         /// </summary>
         private readonly DispatcherTimer _resizeTimer = new();
+
+        private readonly DispatcherTimer _t = new();
 
         /// <summary>
         /// 窗口除开scrcpy的额外高度，不能在构造函数中，控件没有显示时其ActualWidth始终为0。
@@ -52,7 +50,6 @@ namespace ScrcpyEX.View
         /// </summary>
         private double ExtraHeight => dpl.ActualHeight + wfh.Margin.Top + wfh.Margin.Bottom;
 
-        
 
 
     }

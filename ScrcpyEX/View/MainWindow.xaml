@@ -107,7 +107,7 @@
             </WindowsFormsHost>
         </Grid>-->
 
-        <WindowsFormsHost x:Name="wfh" Grid.Row="1" Background="Gray" Margin="5" GotFocus="wfh_GotFocus">
+        <WindowsFormsHost x:Name="wfh" Grid.Row="1" Background="Gray" Margin="5" GotFocus="wfh_GotFocus" PreviewMouseDown="wfh_PreviewMouseDown" >
             <wf:Panel x:Name="pnlShow" GotFocus="pnlShow_GotFocus" Dock="Fill" AutoSize="True" />
         </WindowsFormsHost>
 

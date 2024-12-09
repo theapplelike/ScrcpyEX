@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
 using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.MyDefinition;
+using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -12,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using static ScrcpyEX.MyDefinition.DLL;
 
 namespace ScrcpyEX.View
 {
@@ -100,6 +103,9 @@ namespace ScrcpyEX.View
         {
             _resizeTimer.Tick += new EventHandler(Resize_Tick);
             _resizeTimer.Interval = TimeSpan.FromSeconds(0.1);//大小调整间隔
+
+            _t.Tick += new EventHandler(t_Tick);
+            _t.Interval = TimeSpan.FromSeconds(1);//大小调整间隔
         }
 
         /// <summary>
@@ -113,33 +119,44 @@ namespace ScrcpyEX.View
             _resizeTimer.Stop();
         }
 
+        /// <summary>
+        /// PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
+        /// </summary>
+        private void t_Tick(object sender, EventArgs e)
+        {
+            IntPtr lp = new((1500 << 16) + 700);
+            DLL.PostMessage(_scHandle, MP.WM_MOUSEMOVE, IntPtr.Zero, lp);
+            DLL.PostMessage(_scHandle, MP.WM_LBUTTONDOWN, (IntPtr)MP.MK_LBUTTON, lp);
+            DLL.PostMessage(_scHandle, MP.WM_LBUTTONUP, IntPtr.Zero, lp);
+        }
+
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             //Console.WriteLine($"gMain的大小:{gMain.ActualWidth}，{gMain.ActualHeight}，{gMain.Width}，{gMain.Height}。");
-            //Console.WriteLine($"gShow的大小:{gShow.ActualWidth}，{gShow.ActualHeight}，{gShow.Width}，{gShow.Height}。");
-            //Console.WriteLine($"stp的大小:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
-            //Console.WriteLine($"wfh的大小:{wfh.ActualWidth}，{wfh.ActualHeight}，{wfh.Width}，{wfh.Height}。");
-            //Console.WriteLine($"panel的大小：{pnlShow.Width}，{pnlShow.Height}。");
-
-            //_isResize = false;
-            //await ChgScrcpySize();
 
             //IntPtr intPtr = IntPtr.Zero;
-            //IntPtr intPtr = DLL.SetFocus(_scHandle);
-            //DLL.SwitchToThisWindow(pnlShow.Handle, false);
 
-            await Task.Delay(1000);
+            //DLL.SwitchToThisWindow(_scHandle, true);
+            //IntPtr intPtr = DLL.SetFocus(_scHandle);
+
             //Console.WriteLine($"焦点：{Keyboard.FocusedElement}，{_scHandle}，{intPtr}。");
 
             //System.Windows.Forms.SendKeys.SendWait("+K");
             //System.Windows.Forms.SendKeys.SendWait("{ENTER}");
+            //Console.WriteLine($"scrcpy句柄：{btnTest.Cursor}。");
 
-            //MyGM.POP("yesman");
+            //Point point2 = Mouse.GetPosition(btnTest);
+            //Console.WriteLine("(" + point2.X + ", " + point2.Y + ")");
+            //await Task.Delay(3000);
+
+            //Console.WriteLine($"值：{p}，{(long)p:X8}。");
+
+            _t.Start();
         }
 
         private void BtnTest_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            MyGM.POP("yesclick");
+            //MyGM.POP("yesclick");
         }
 
 
