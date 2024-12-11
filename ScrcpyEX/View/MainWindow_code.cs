@@ -36,12 +36,12 @@ namespace ScrcpyEX.View
         /// </summary>
         private void SetUISize()
         {
-            Width = 960 + ExtraWidth;
-            Height = 448 + ExtraHeight;
+            Width = _scWidth + ExtraWidth;
+            Height = _scHeight + ExtraHeight;
 
             Left = (SystemParameters.WorkArea.Width - ActualWidth) / 2;
             Top = (SystemParameters.WorkArea.Height - ActualHeight) / 2;
-            //Console.WriteLine($"{Width},{Height}。");
+            //Console.WriteLine($"窗体尺寸：{Width},{Height}。");
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace ScrcpyEX.View
 
             //MyCfg.Cfg.IP = txtIP.Text;
             MyCfg.Cfg.StayAwake = true;
-            MyCfg.Cfg.OffScreen = false;
+            MyCfg.Cfg.OffScreen = true;
             MyCfg.Cfg.ShowTouches = false;
             MyCfg.Cfg.DeviceSleep = false;
 

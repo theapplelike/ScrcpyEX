@@ -12,9 +12,10 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
-using static ScrcpyEX.MyDefinition.DLL;
+using System.Windows.Media;
 
 namespace ScrcpyEX.View
 {
@@ -104,8 +105,11 @@ namespace ScrcpyEX.View
             _resizeTimer.Tick += new EventHandler(Resize_Tick);
             _resizeTimer.Interval = TimeSpan.FromSeconds(0.1);//大小调整间隔
 
-            _t.Tick += new EventHandler(t_Tick);
-            _t.Interval = TimeSpan.FromSeconds(1);//大小调整间隔
+            _clickTimer.Tick += new EventHandler(Click_Tick);
+            _clickTimer.Interval = TimeSpan.FromSeconds(1);
+
+            _testTimer.Tick += new EventHandler(Test_Tick);
+            _testTimer.Interval = TimeSpan.FromSeconds(1);
         }
 
         /// <summary>
@@ -122,12 +126,48 @@ namespace ScrcpyEX.View
         /// <summary>
         /// PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
         /// </summary>
-        private void t_Tick(object sender, EventArgs e)
+        private void Click_Tick(object sender, EventArgs e)
         {
-            IntPtr lp = new((1500 << 16) + 700);
+            System.Windows.Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置
+            System.Drawing.Point pt2 = System.Windows.Forms.Control.MousePosition;//获取鼠标相对于屏幕的位置
+            DpiScale dpi = VisualTreeHelper.GetDpi(this);
+
+            int x = (int)(pt2.X - pt1.X - (ExtraWidthLeft * dpi.DpiScaleX - pt1.X));
+            int y = (int)(pt2.Y - pt1.Y - ExtraHeightTop * dpi.DpiScaleY);
+
+            Console.WriteLine($"程序相对于屏幕：({pt1.X}, {pt1.Y})");
+            Console.WriteLine($"鼠标相对于屏幕：({pt2.X}, {pt2.Y})");
+            Console.WriteLine($"鼠标在程序中坐标：({x}, {y})。\n");
+
+            IntPtr lp = new((y << 16) + x);
             DLL.PostMessage(_scHandle, MP.WM_MOUSEMOVE, IntPtr.Zero, lp);
             DLL.PostMessage(_scHandle, MP.WM_LBUTTONDOWN, (IntPtr)MP.MK_LBUTTON, lp);
             DLL.PostMessage(_scHandle, MP.WM_LBUTTONUP, IntPtr.Zero, lp);
+        }
+
+        /// <summary>
+        /// 测试专用。
+        /// </summary>
+        private void Test_Tick(object sender, EventArgs e)
+        {
+            //Point point = Mouse.GetPosition(wfh);
+            //Console.WriteLine($"wfh相对于与鼠标：({point.X}, {point.Y})");
+            //
+            //Window window = Window.GetWindow(wfh);
+            //Point point1 = wfh.TransformToAncestor(window).Transform(new Point(0, 0));
+            //Console.WriteLine($"相对于屏幕：({point1.X}, {point1.Y})");
+
+            Point point2 = PointToScreen(new Point(0,0));
+            Console.WriteLine($"程序相对于屏幕：({point2.X}, {point2.Y})");
+
+            //Point point3 = PointFromScreen(new Point(0, 0));
+            //Console.WriteLine($"：({point3.X}, {point3.Y})");
+
+            // 获取鼠标相对于屏幕的位置
+            System.Drawing.Point point4 = System.Windows.Forms.Control.MousePosition;
+            Console.WriteLine($"鼠标相对于屏幕：({point4.X}, {point4.Y})");
+
+            Console.WriteLine($"鼠标在程序中坐标：({point4.X-point2.X}, {point4.Y-point2.Y})\n");
         }
 
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
@@ -145,18 +185,48 @@ namespace ScrcpyEX.View
             //System.Windows.Forms.SendKeys.SendWait("{ENTER}");
             //Console.WriteLine($"scrcpy句柄：{btnTest.Cursor}。");
 
-            //Point point2 = Mouse.GetPosition(btnTest);
-            //Console.WriteLine("(" + point2.X + ", " + point2.Y + ")");
             //await Task.Delay(3000);
-
             //Console.WriteLine($"值：{p}，{(long)p:X8}。");
 
-            _t.Start();
+            _isRecord = true;
+
+            //if (_clickTimer.IsEnabled)
+            //{
+            //    _clickTimer.Stop();
+            //}
+            //else
+            //{
+            //    _clickTimer.Start();
+            //}
+
+            if (MouseHook.RegisterHook())
+            {
+                Console.WriteLine("yes");
+            }
+            else
+            {
+                Console.WriteLine("no");
+            }
         }
 
         private void BtnTest_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             //MyGM.POP("yesclick");
+        }
+
+        private void GetDpi()
+        {
+            //winform使用Graphics获得DPI
+            //using System.Drawing.Graphics g = pnlShow.CreateGraphics();
+            //float dpiX = g.DpiX;
+            //float dpiY = g.DpiY;
+            //Console.WriteLine($"DPI X: {dpiX}, DPI Y: {dpiY}");
+            //Console.WriteLine($"缩放比例: {dpiX / 96.0f * 100:.0f}%");
+
+            // 获取与当前窗口关联的 DPI 设置
+            DpiScale dpi = VisualTreeHelper.GetDpi(this);
+            Console.WriteLine($"DPI X: {dpi.PixelsPerInchX}, DPI Y: {dpi.PixelsPerInchY}");
+            Console.WriteLine($"缩放比例: {dpi.DpiScaleX}，{dpi.DpiScaleY}");
         }
 
 

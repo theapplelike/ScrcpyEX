@@ -9,7 +9,7 @@
         xmlns:wfI="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
         Title="MainWindow" Height="600" Width="1200" WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged">
+        Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged" PreviewMouseDown="Window_PreviewMouseDown">
 
     <Window.DataContext>
         <ViewModel:MainWindowVM/>
@@ -108,7 +108,7 @@
         </Grid>-->
 
         <WindowsFormsHost x:Name="wfh" Grid.Row="1" Background="Gray" Margin="5" GotFocus="wfh_GotFocus" PreviewMouseDown="wfh_PreviewMouseDown" >
-            <wf:Panel x:Name="pnlShow" GotFocus="pnlShow_GotFocus" Dock="Fill" AutoSize="True" />
+            <wf:Panel x:Name="pnlShow" GotFocus="pnlShow_GotFocus" Dock="Fill" AutoSize="True" MouseDown="PnlShow_MouseDown"/>
         </WindowsFormsHost>
 
     </Grid>

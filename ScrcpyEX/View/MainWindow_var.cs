@@ -38,19 +38,39 @@ namespace ScrcpyEX.View
         /// </summary>
         private readonly DispatcherTimer _resizeTimer = new();
 
-        private readonly DispatcherTimer _t = new();
+        private readonly DispatcherTimer _clickTimer = new();
+
+        private readonly DispatcherTimer _testTimer = new();
 
         /// <summary>
-        /// 窗口除开scrcpy的额外高度，不能在构造函数中，控件没有显示时其ActualWidth始终为0。
+        /// scrcpy的默认宽高（在100%缩放下），使用比例为15：7。
+        /// </summary>
+        private readonly int _scWidth = 960, _scHeight = 448;
+
+        /// <summary>
+        /// 是否处于录制操作下。
+        /// </summary>
+        private bool _isRecord = false;
+
+        /// <summary>
+        /// 窗口除开scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
         private double ExtraWidth => wfh.Margin.Left + wfh.Margin.Right;
 
         /// <summary>
-        /// 窗口除开scrcpy的额外高度，不能在构造函数中，控件没有显示时其ActualHeight始终为0。
+        /// 窗口除开scrcpy的额外高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
         private double ExtraHeight => dpl.ActualHeight + wfh.Margin.Top + wfh.Margin.Bottom;
 
+        /// <summary>
+        /// 窗口除开scrcpy的额外左侧宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
+        /// </summary>
+        private double ExtraWidthLeft => wfh.Margin.Left;
 
+        /// <summary>
+        /// 窗口除开scrcpy的额外上方高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
+        /// </summary>
+        private double ExtraHeightTop => dpl.ActualHeight + wfh.Margin.Top;
 
     }
 }

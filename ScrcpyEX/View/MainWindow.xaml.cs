@@ -152,7 +152,7 @@ namespace ScrcpyEX.View
         //}
         #endregion
 
-        #region 自定义菜单事件
+        #region 弹出菜单事件
         private void PopMenu_Closed(object sender, EventArgs e)
         {
             btnLocate.Background = btnOption.Background = Brushes.Transparent;
@@ -185,6 +185,16 @@ namespace ScrcpyEX.View
         private void wfh_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             Console.WriteLine("鼠标在wfh按下。");
+        }
+
+        private void PnlShow_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            Console.WriteLine("鼠标在pnlShow按下。");
+        }
+
+        private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Console.WriteLine("鼠标在窗体按下。");
         }
     }
 }
