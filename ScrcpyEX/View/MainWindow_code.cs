@@ -25,6 +25,8 @@ namespace ScrcpyEX.View
         private void MyInit()
         {
             MV.Pop = pop;
+            MV.MainWin = this;
+
             SetProcess();
             SetTimer();
             ReadCfg();
@@ -141,9 +143,9 @@ namespace ScrcpyEX.View
                     {
                         return;
                     }
-                    Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}。");
+                    Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}，{_prc.HasExited}。");
                 }
-                while (i < 10);
+                while (!_prc.HasExited);
                 MessageBox.Show("未能成功启动程序，请重试。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
@@ -306,13 +308,16 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 将窗体定位到指定位置。
+        /// 将窗体定位到指定位置，当把Left设置为0时，左侧可能不会完全贴合，会留下一点空白，
+        /// 这是窗口边框，其大小取决于当前的Windows主题，左侧要贴合要减去非工作区的左侧宽度。
         /// </summary>
         private void Locate()
         {
+            Console.WriteLine($"左侧非工作区大小：{SystemParameters.WindowNonClientFrameThickness.Left}。");
             if ((bool)rdoLoc1.IsChecked)
             {
-                Left = Top = 0;
+                Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
+                Top = 0;
             }
             else if ((bool)rdoLoc2.IsChecked)
             {
@@ -321,8 +326,8 @@ namespace ScrcpyEX.View
             }
             else if ((bool)rdoLoc3.IsChecked)
             {
-                Left = 0;
-                Top= SystemParameters.WorkArea.Height - Height;
+                Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
+                Top = SystemParameters.WorkArea.Height - Height;
             }
             else if ((bool)rdoLoc4.IsChecked)
             {

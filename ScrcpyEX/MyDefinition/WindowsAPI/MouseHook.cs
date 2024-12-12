@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using ScrcpyEX.ExtensionMethod;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace ScrcpyEX.MyDefinition.WindowsAPI
 {
@@ -15,9 +17,6 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         // 定义一个委托来表示鼠标钩子回调函数
         private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-        // 存储钩子句柄的私有字段
-        private static IntPtr hookID = IntPtr.Zero;
-
         // 定义Windows API函数和常量
         private const int WH_KEYBOARD = 2;//安装用于监视击键消息的hook过程
         private const int WH_KEYBOARD_LL = 13;//安装监视低级别键盘输入事件的hook过程
@@ -25,11 +24,11 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         // 定义Windows API函数和常量
         private const int WH_MOUSE = 7;//安装监视鼠标消息的hook过程
         private const int WH_MOUSE_LL = 14;//安装监视低级别鼠标输入事件的hook过程，获得的消息更全面
-        private const int WM_LBUTTONDOWN = 0x0201;
-        private const int WM_LBUTTONUP = 0x0202;
-        private const int WM_RBUTTONDOWN = 0x0204;
-        private const int WM_RBUTTONUP = 0x0205;
-        private const int WM_MOUSEMOVE = 0x0200;
+
+        /// <summary>
+        /// 钩子句柄。
+        /// </summary>
+        public static IntPtr HookID { get; set; } = IntPtr.Zero;
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
@@ -93,57 +92,57 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// </summary>
         /// <param name="nCode">如果nCode小于零，则钩子过程必须将消息传递给CallNextHookEx函数，而无需进一步处理，并且应返回CallNextHookEx返回的值。</param>
         /// <param name="wParam">鼠标消息的标识符。例如WM_LBUTTONDOWN等常量。</param>
-        /// <param name="lParam">指向 MSLLHOOKSTRUCT 结构的指针。</param>
+        /// <param name="lParam">指向MSLLHOOKSTRUCT结构的指针。</param>
         /// <returns>CallNextHookEx函数的处理值。</returns>
         private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode >= 0)
             {
                 // 检查鼠标事件类型
-                switch (wParam.ToInt32())
+                switch ((uint)wParam)
                 {
-                    case WM_LBUTTONDOWN:
-                        // 处理左键按下事件
-                        Console.WriteLine("鼠标左键按下。");
-                        break;
-                    case WM_LBUTTONUP:
-                        // 处理左键释放事件
-                        break;
-                    case WM_RBUTTONDOWN:
-                        // 处理右键按下事件
-                        break;
-                    case WM_RBUTTONUP:
-                        // 处理右键释放事件
-                        break;
-                    case WM_MOUSEMOVE:
-                        // 处理鼠标移动事件
-                        break;
+                    case MP.WM_LBUTTONDOWN: RecordPosition(lParam); break;
+                    //case MP.WM_LBUTTONUP: break;
+                    //case MP.WM_RBUTTONDOWN: break;
+                    //case MP.WM_RBUTTONUP: break;
+                    //case MP.WM_MOUSEMOVE: break;
                 }
-
-                // 获取鼠标位置（示例）
-                MSLLHOOKSTRUCT mouseData = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
-                Point mPt = new(mouseData.pt.x, mouseData.pt.y);
-
-                Console.WriteLine($"鼠标坐标：{mPt.X},{mPt.Y}。");
-                // 注意：在实际应用中，你可能需要在这里添加更多的逻辑来处理鼠标事件
             }
-            return CallNextHookEx(hookID, nCode, wParam, lParam);
+            return CallNextHookEx(HookID, nCode, wParam, lParam);
         }
 
+        private static void RecordPosition(IntPtr lParam)
+        {
+            Console.WriteLine("鼠标左键按下。");
+
+            Point pt = MV.MainWin.GetMouseInScrcpy();
+        }
+
+        /// <summary>
+        /// 获取鼠标位置。
+        /// </summary>
+        /// <param name="lParam">指向MSLLHOOKSTRUCT结构的指针。</param>
+        private void GetMouseLocation(IntPtr lParam)
+        {
+            MSLLHOOKSTRUCT mouseData = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
+            Point mPt = new(mouseData.pt.x, mouseData.pt.y);
+
+            Console.WriteLine($"鼠标坐标1：{mPt.X},{mPt.Y}。");
+        }
+
+        /// <summary>
+        /// 注册监听鼠标消息的句柄。
+        /// </summary>
+        /// <returns>是否注册成功。</returns>
         public static bool RegisterHook()
         {
             // 获取当前模块的句柄
             IntPtr hMod = GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName);
 
             // 设置鼠标钩子
-            hookID = SetWindowsHookEx(WH_MOUSE_LL, HookCallback, hMod, 0);
+            HookID = SetWindowsHookEx(WH_MOUSE_LL, HookCallback, hMod, 0);
 
-            // 检查钩子是否成功设置
-            if (hookID == IntPtr.Zero)
-            {
-                Console.WriteLine("Failed to set mouse hook.");
-            }
-            return hookID != IntPtr.Zero;
+            return HookID != IntPtr.Zero;
         }
 
         /// <summary>
@@ -151,7 +150,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// </summary>
         protected static void CancelHook()
         {
-            UnhookWindowsHookEx(hookID);
+            UnhookWindowsHookEx(HookID);
         }
 
 

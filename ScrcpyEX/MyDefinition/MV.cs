@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScrcpyEX.View;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,11 @@ namespace ScrcpyEX.ExtensionMethod
         /// Scrcpy的路径。
         /// </summary>
         public static string ScrcpyPath { get; set; } = @".\scrcpy-win64-v3.0\scrcpy.exe";
+
+        /// <summary>
+        /// 主窗体的引用。
+        /// </summary>
+        public static MainWindow MainWin { get; set; }
 
         /// <summary>
         /// 全局提示控件。

@@ -44,7 +44,7 @@ namespace ScrcpyEX.View
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Console.WriteLine($"窗体大小进行改变：{Keyboard.FocusedElement}。");
+            Console.WriteLine($"窗体大小进行改变，scrcpy句柄：{IntPtr.Zero}。");
 
             //第三方程序句柄不为空调整scrcpy大小
             if (_scHandle != IntPtr.Zero)
@@ -123,33 +123,17 @@ namespace ScrcpyEX.View
 
         private void BtnOption_Click(object sender, RoutedEventArgs e)
         {
-            //重新绑定上下文菜单24.12.3
-            //ctm.PlacementTarget = btnLocate;
-            //ctm.Placement = PlacementMode.Bottom;
-            //ctm.IsOpen = true;
-
             popMenu.IsOpen = false;
             popMenu.IsOpen = true;
 
             //联动两个定位按钮，显示一致的背景色
             btnLocate.Background = btnOption.Background = Brushes.LightBlue;
         }
-        //24.12.3
-        //private void Ctm_Closed(object sender, RoutedEventArgs e)
-        //{
-        //    //btnLocate.Background = btnOption.Background = Brushes.Transparent;
-        //}
-        //
-        //private void MiQuarterMove_Click(object sender, RoutedEventArgs e)
-        //{
-        //    QuarterMove();
-        //}
-        //
-        //private void MiMove_Click(object sender, RoutedEventArgs e)
-        //{
-        //    SetUISize();
-        //    Locate();
-        //}
+
+        private void BtnRecord_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
         #endregion
 
         #region 弹出菜单事件
@@ -196,5 +180,7 @@ namespace ScrcpyEX.View
         {
             Console.WriteLine("鼠标在窗体按下。");
         }
+
+        
     }
 }

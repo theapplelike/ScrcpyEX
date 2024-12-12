@@ -80,6 +80,9 @@
     <Compile Include="View\MainWindow_code1.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\MainWindow_code2.cs" >
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\MainWindow_var.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
