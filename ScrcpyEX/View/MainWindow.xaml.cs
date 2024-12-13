@@ -132,7 +132,7 @@ namespace ScrcpyEX.View
 
         private void BtnRecord_Click(object sender, RoutedEventArgs e)
         {
-
+            CenterPop("hhhh");
         }
         #endregion
 

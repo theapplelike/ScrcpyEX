@@ -18,12 +18,12 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
 
         // 定义Windows API函数和常量
-        private const int WH_KEYBOARD = 2;//安装用于监视击键消息的hook过程
-        private const int WH_KEYBOARD_LL = 13;//安装监视低级别键盘输入事件的hook过程
+        private const int WH_KEYBOARD = 2;      //安装用于监视击键消息的hook过程
+        private const int WH_KEYBOARD_LL = 13;  //安装监视低级别键盘输入事件的hook过程，获得的消息更全面
 
         // 定义Windows API函数和常量
-        private const int WH_MOUSE = 7;//安装监视鼠标消息的hook过程
-        private const int WH_MOUSE_LL = 14;//安装监视低级别鼠标输入事件的hook过程，获得的消息更全面
+        private const int WH_MOUSE = 7;         //安装监视鼠标消息的hook过程
+        private const int WH_MOUSE_LL = 14;     //安装监视低级别鼠标输入事件的hook过程，获得的消息更全面
 
         /// <summary>
         /// 钩子句柄。

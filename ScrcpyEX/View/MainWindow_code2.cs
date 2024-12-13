@@ -11,11 +11,23 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
+using ScrcpyEX.ExtensionMethod;
 
 namespace ScrcpyEX.View
 {
     public partial class MainWindow//code2
     {
+        /// <summary>
+        /// 代码设置界面控件的事件。
+        /// </summary>
+        private void SetControlEvent()
+        {
+            rdoLoc1.Click += (s, e) => Locate();
+            rdoLoc2.Click += (s, e) => Locate();
+            rdoLoc3.Click += (s, e) => Locate();
+            rdoLoc4.Click += (s, e) => Locate();
+        }
+
         /// <summary>
         /// 设置第三方程序的绑定事件，且触发退出事件。
         /// </summary>
@@ -125,10 +137,10 @@ namespace ScrcpyEX.View
         {
             System.Windows.Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置
             System.Drawing.Point pt2 = System.Windows.Forms.Control.MousePosition;//获取鼠标相对于屏幕的位置
-            DpiScale dpi = VisualTreeHelper.GetDpi(this);
+            //DpiScale dpi = VisualTreeHelper.GetDpi(this);
 
-            int x = (int)(pt2.X - pt1.X - ExtraWidthLeft * dpi.DpiScaleX + SystemParameters.WindowNonClientFrameThickness.Left * dpi.DpiScaleX);
-            int y = (int)(pt2.Y - pt1.Y - ExtraHeightTop * dpi.DpiScaleY);
+            int x = (int)(pt2.X - pt1.X - ExtraWidthLeft * ScaleX + SystemParameters.WindowNonClientFrameThickness.Left * ScaleX);
+            int y = (int)(pt2.Y - pt1.Y - ExtraHeightTop * ScaleY);
 
             Console.WriteLine($"程序相对于屏幕：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
             Console.WriteLine($"鼠标相对于屏幕：({pt2.X}, {pt2.Y})。");
@@ -181,21 +193,21 @@ namespace ScrcpyEX.View
             //Console.WriteLine($"scrcpy句柄：{btnTest.Cursor}。");
 
             //await Task.Delay(3000);
-            
-            _isRecord = true;
 
-            if (_clickTimer.IsEnabled)
-            {
-                _clickTimer.Stop();
-            }
-            else
-            {
-                _clickTimer.Start();
-            }
+            //_isRecord = true;
 
-            System.Windows.Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置
-            DLL.SetCursorPos((int)(pt1.X + 5),(int)(pt1.Y + 70));
-
+            //if (_clickTimer.IsEnabled)
+            //{
+            //    _clickTimer.Stop();
+            //}
+            //else
+            //{
+            //    _clickTimer.Start();
+            //}
+            //
+            //System.Windows.Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置
+            //DLL.SetCursorPos((int)(pt1.X + 5),(int)(pt1.Y + 70));
+            //MyGM.POP("yesclick");
             //if (MouseHook.RegisterHook())
             //{
             //    Console.WriteLine("yes");
@@ -204,6 +216,24 @@ namespace ScrcpyEX.View
             //{
             //    Console.WriteLine("no");
             //}
+
+            //将窗口水平居中点转换为屏幕坐标，PointToScreen()转化出的结果已经乘以了缩放比例
+            //Point screenCenter = PointToScreen(new Point(ActualWidth / 2, 35));
+            //Console.WriteLine($"{screenCenter.X},{screenCenter.Y},{ActualWidth / 2},{ActualHeight / 2}");
+            
+            // 将弹出窗口的位置设置为窗口的中心
+            //pop.HorizontalOffset = (screenCenter.X / ScaleX - pop.Child.RenderSize.Width / 2) - ExtraWidthLeft;
+            //pop.VerticalOffset = (screenCenter.Y / ScaleY - pop.Child.RenderSize.Height / 2);
+            
+            //Console.WriteLine($"{pop.HorizontalOffset},{pop.VerticalOffset}");
+            //Console.WriteLine($"{pop.Child.RenderSize.Width},{pop.Child.RenderSize.Height}");
+            //pop.HorizontalOffset = 100;
+            //pop.VerticalOffset = ExtraHeightTop - (ActualHeight - ExtraHeightTop) / 2 + 5;
+
+            //Console.WriteLine($"{_scHeight},{ActualHeight}");
+
+            MyGM.POP("yesclick");
+            //MV.Pop.SHW("yesclick");
         }
 
         private void BtnTest_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)

@@ -27,6 +27,7 @@ namespace ScrcpyEX.View
             MV.Pop = pop;
             MV.MainWin = this;
 
+            SetControlEvent();
             SetProcess();
             SetTimer();
             ReadCfg();
@@ -313,7 +314,6 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Locate()
         {
-            Console.WriteLine($"左侧非工作区大小：{SystemParameters.WindowNonClientFrameThickness.Left}。");
             if ((bool)rdoLoc1.IsChecked)
             {
                 Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;

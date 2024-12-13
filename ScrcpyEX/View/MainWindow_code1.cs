@@ -28,10 +28,10 @@ namespace ScrcpyEX.View
         {
             System.Windows.Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置
             System.Drawing.Point pt2 = System.Windows.Forms.Control.MousePosition;//获取鼠标相对于屏幕的位置
-            DpiScale dpi = VisualTreeHelper.GetDpi(this);
+            //DpiScale dpi = VisualTreeHelper.GetDpi(this);
 
-            int x = (int)(pt2.X - pt1.X - ExtraWidthLeft * dpi.DpiScaleX + SystemParameters.WindowNonClientFrameThickness.Left * dpi.DpiScaleX);
-            int y = (int)(pt2.Y - pt1.Y - ExtraHeightTop * dpi.DpiScaleY);
+            int x = (int)(pt2.X - pt1.X - ExtraWidthLeft * ScaleX + SystemParameters.WindowNonClientFrameThickness.Left * ScaleX);
+            int y = (int)(pt2.Y - pt1.Y - ExtraHeightTop * ScaleY);
 
             Console.WriteLine($"程序相对于屏幕：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
             Console.WriteLine($"鼠标相对于屏幕：({pt2.X}, {pt2.Y})。");
@@ -45,6 +45,32 @@ namespace ScrcpyEX.View
             DpiScale dpi = VisualTreeHelper.GetDpi(this);
             Console.WriteLine($"DPI X: {dpi.PixelsPerInchX}, DPI Y: {dpi.PixelsPerInchY}");
             Console.WriteLine($"缩放比例: {dpi.DpiScaleX}，{dpi.DpiScaleY}");
+        }
+
+        private async void CenterPop(string str)
+        {
+            popMid.VerticalOffset = ExtraHeightTop - (ActualHeight - ExtraHeightTop) / 2 + 5 * ScaleX;
+            await popMid.SHW(str);
+        }
+
+        private void StartRecord()
+        {
+            if (MouseHook.HookID == IntPtr.Zero)
+            {
+                if (!MouseHook.RegisterHook())
+                {
+
+                }
+            }
+
+            if (MouseHook.RegisterHook())
+            {
+                Console.WriteLine("yes");
+            }
+            else
+            {
+                Console.WriteLine("no");
+            }
         }
 
 

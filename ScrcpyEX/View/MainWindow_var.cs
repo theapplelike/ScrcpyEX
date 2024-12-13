@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace ScrcpyEX.View
@@ -71,6 +72,17 @@ namespace ScrcpyEX.View
         /// 窗口除开scrcpy的额外上方高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
         private double ExtraHeightTop => dpl.ActualHeight + wfh.Margin.Top;
+
+        /// <summary>
+        /// X轴上的DPI比例。
+        /// </summary>
+        private double ScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;
+
+        /// <summary>
+        /// Y轴上的DPI比例。
+        /// </summary>
+        private double ScaleY => VisualTreeHelper.GetDpi(this).DpiScaleY;
+
 
     }
 }
