@@ -14,9 +14,6 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
 {
     internal class MouseHook
     {
-        // 定义一个委托来表示鼠标钩子回调函数
-        private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
-
         // 定义Windows API函数和常量
         private const int WH_KEYBOARD = 2;      //安装用于监视击键消息的hook过程
         private const int WH_KEYBOARD_LL = 13;  //安装监视低级别键盘输入事件的hook过程，获得的消息更全面
@@ -30,21 +27,56 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// </summary>
         public static IntPtr HookID { get; set; } = IntPtr.Zero;
 
+        /// <summary>
+        /// 定义一个委托来表示鼠标钩子回调函数。
+        /// </summary>
+        /// <param name="nCode">事件状态码，如果小于0则挂钩过程必须将消息传递给CallNextHookEx函数，而无需进一步处理，并且应返回CallNextHookEx返回的值。</param>
+        /// <param name="wParam">鼠标消息的标识符。例如WM_LBUTTONDOWN等常量。</param>
+        /// <param name="lParam">指向MSLLHOOKSTRUCT结构的指针。</param>
+        /// <returns>0--允许该事件继续传播；大于0--此事件到此为止，不再向下传播。建议使用CallNextHookEx函数的处理值。</returns>
+        private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
+
+        /// <summary>
+        /// 安装钩子来监听系统的某些类型的事件。 
+        /// </summary>
+        /// <param name="idHook">指定要监听的钩子类型。</param>
+        /// <param name="lpfn">指向钩子过程的指针，也就是钩子触发时要执行的委托。</param>
+        /// <param name="hMod">表示持有钩子函数的进程号。</param>
+        /// <param name="dwThreadId">要与之关联的钩子过程的线程的标识符。 </param>
+        /// <returns>函数成功，返回钩子过程的句柄；函数失败，返回null。</returns>
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
 
+        /// <summary>
+        /// 删除SetWindowsHookEx函数安装在挂钩链中的挂钩过程。
+        /// </summary>
+        /// <param name="hhk">要移除的挂钩的句柄。</param>
+        /// <returns>true--函数成功；false--函数失败。</returns>
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool UnhookWindowsHookEx(IntPtr hhk);
 
+        /// <summary>
+        /// 将挂钩信息传递给当前挂钩链中的下一个挂钩过程。
+        /// </summary>
+        /// <param name="hhk">挂钩句柄。</param>
+        /// <param name="nCode">传递给当前挂钩过程的事件状态码。</param>
+        /// <param name="wParam">传递给当前挂钩过程的wParam值。</param>
+        /// <param name="lParam">传递给当前挂钩过程的lParam值。</param>
+        /// <returns></returns>
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
 
+        /// <summary>
+        /// 检索指定模块的句柄，该模块必须由调用进程加载。
+        /// </summary>
+        /// <param name="lpModuleName">加载的模块的名称（.dll 或 .exe 文件）。</param>
+        /// <returns>函数成功，返回指定模块的句柄；函数失败，返回null。</returns>
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetModuleHandle(string lpModuleName);
 
         /// <summary>
-        /// POINT 结构定义点的 x 坐标和 y 坐标。
+        /// POINT结构定义点的x坐标和y坐标。
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
         private struct POINT
@@ -133,13 +165,10 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <summary>
         /// 注册监听鼠标消息的句柄。
         /// </summary>
-        /// <returns>是否注册成功。</returns>
+        /// <returns>true--注册成功；false--注册失败。</returns>
         public static bool RegisterHook()
         {
-            // 获取当前模块的句柄
             IntPtr hMod = GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName);
-
-            // 设置鼠标钩子
             HookID = SetWindowsHookEx(WH_MOUSE_LL, HookCallback, hMod, 0);
 
             return HookID != IntPtr.Zero;

@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -21,8 +22,7 @@ namespace ScrcpyEX.View
     public partial class MainWindow//code1
     {
         /// <summary>
-        /// 获得鼠标在scrcpy中的位置，需要额外减去坐标
-        /// （左额外距离*Dpi比例-左非工作区距离*Dpi比例，上额外距离*Dpi比例）。
+        /// 获得鼠标在scrcpy中的位置，需要额外减去Point(左额外距离*Dpi比例-左非工作区距离*Dpi比例，上额外距离*Dpi比例)。
         /// </summary>
         public System.Windows.Point GetMouseInScrcpy()
         {
@@ -39,37 +39,32 @@ namespace ScrcpyEX.View
             return new System.Windows.Point(x, y);
         }
 
-        private void GetDpi()
-        {
-            // 获取与当前窗口关联的 DPI 设置
-            DpiScale dpi = VisualTreeHelper.GetDpi(this);
-            Console.WriteLine($"DPI X: {dpi.PixelsPerInchX}, DPI Y: {dpi.PixelsPerInchY}");
-            Console.WriteLine($"缩放比例: {dpi.DpiScaleX}，{dpi.DpiScaleY}");
-        }
-
         private async void CenterPop(string str)
         {
-            popMid.VerticalOffset = ExtraHeightTop - (ActualHeight - ExtraHeightTop) / 2 + 5 * ScaleX;
             await popMid.SHW(str);
         }
 
-        private void StartRecord()
+        /// <summary>
+        /// 注册鼠标钩子进行录制操作。
+        /// </summary>
+        private async void StartRecord()
         {
+            //if (_scHandle == IntPtr.Zero)
+            //{
+            //    await popMid.SHW("未进行投屏，不能进行录制。");
+            //    return;
+            //}
+
             if (MouseHook.HookID == IntPtr.Zero)
             {
-                if (!MouseHook.RegisterHook())
+                if (MouseHook.RegisterHook())
                 {
-
+                    await popMid.SHW("已开启录制操作。");
                 }
-            }
-
-            if (MouseHook.RegisterHook())
-            {
-                Console.WriteLine("yes");
-            }
-            else
-            {
-                Console.WriteLine("no");
+                else
+                {
+                    await popMid.SHW("钩子注册失败，未能启动录制。");
+                }
             }
         }
 

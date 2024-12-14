@@ -132,11 +132,16 @@ namespace ScrcpyEX.View
 
         private void BtnRecord_Click(object sender, RoutedEventArgs e)
         {
-            CenterPop("hhhh");
+            StartRecord();
         }
         #endregion
 
         #region 弹出菜单事件
+        private void PopMid_Opened(object sender, EventArgs e)
+        {
+            popMid.VerticalOffset = (ExtraHeightTop + popMid.Child.RenderSize.Height) / 2 + wfh.Margin.Top;
+        }
+
         private void PopMenu_Closed(object sender, EventArgs e)
         {
             btnLocate.Background = btnOption.Background = Brushes.Transparent;

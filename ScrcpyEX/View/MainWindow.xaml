@@ -24,6 +24,8 @@
             <Setter Property="BorderThickness" Value="0,0,0,1"/>
             <Setter Property="Height" Value="30"/>
         </Style>
+        <SolidColorBrush x:Key="Scb1" Color="#D5EBFB" Opacity="0.6"/>
+        <SolidColorBrush x:Key="Scb2" Color="#5B9DF0" Opacity="0.5"/>
     </Window.Resources>
 
     <Grid x:Name="gMain" Background="LightSteelBlue">
@@ -41,12 +43,12 @@
         </Popup>
 
         <!--主界面使用的居中POP-->
-        <Popup x:Name="popMid" PopupAnimation="Slide" Placement="Center" StaysOpen="True" AllowsTransparency="True">
-            <Border MinHeight="100" MinWidth="100" CornerRadius="8" BorderThickness="10" BorderBrush="Black">
+        <Popup x:Name="popMid" PopupAnimation="Slide" Placement="Center" StaysOpen="True" AllowsTransparency="True"  PlacementTarget="{Binding ElementName=dpl}" Opened="PopMid_Opened">
+            <Border MinHeight="10" MinWidth="10" CornerRadius="10" BorderThickness="4" BorderBrush="{StaticResource Scb2}" Background="{StaticResource Scb1}" Margin="5">
                 <Border.Effect>
-                    <DropShadowEffect Direction="320" BlurRadius="20" ShadowDepth="10" Color="Black"/>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="0" Color="Gray"/>
                 </Border.Effect>
-                <TextBlock Background="White" Padding="10"/>
+                <TextBlock FontSize="20" Padding="10" Foreground="#3F6897"/>
             </Border>
         </Popup>
 
