@@ -14,6 +14,7 @@ using System.Threading;
 using System.Windows.Media;
 using System.Windows.Controls;
 using ScrcpyEX.MyDefinition;
+using ScrcpyEX.MyDefinition.WindowsAPI;
 
 namespace ScrcpyEX.View
 {
@@ -94,7 +95,7 @@ namespace ScrcpyEX.View
 
             SaveCfg();
             ClosePrc();
-            wfh.Dispose();
+            CloseOther();
         }
 
         /// <summary>
@@ -113,6 +114,18 @@ namespace ScrcpyEX.View
             _prc.Close();
             _prc.Dispose();
             Console.WriteLine("Main程序应用退出。");
+        }
+
+        /// <summary>
+        /// 关闭其他一些程序使用的资源。
+        /// </summary>
+        private void CloseOther()
+        {
+            if (MouseHook.HookID != IntPtr.Zero)
+            {
+                MouseHook.CancelHook();
+            }
+            wfh.Dispose();
         }
 
         /// <summary>

@@ -44,7 +44,7 @@ namespace ScrcpyEX.View
         private readonly DispatcherTimer _testTimer = new();
 
         /// <summary>
-        /// scrcpy的默认宽高（在100%缩放下），使用比例为15：7。
+        /// scrcpy的初始宽高（在100%缩放下），使用比例为15：7。
         /// </summary>
         private readonly int _scWidth = 960, _scHeight = 448;
 
@@ -83,6 +83,6 @@ namespace ScrcpyEX.View
         /// </summary>
         private double ScaleY => VisualTreeHelper.GetDpi(this).DpiScaleY;
 
-
+        
     }
 }

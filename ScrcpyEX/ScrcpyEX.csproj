@@ -63,6 +63,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\PointInfo.cs" />
     <Compile Include="MyDefinition\WindowsAPI\DLL.cs" />
     <Compile Include="MyDefinition\MV.cs" />
     <Compile Include="MyDefinition\MyAttribute\ArgumentsAttribute.cs" />
@@ -80,7 +81,7 @@
     <Compile Include="View\MainWindow_code1.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\MainWindow_code2.cs" >
+    <Compile Include="View\MainWindow_code2.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow_var.cs">

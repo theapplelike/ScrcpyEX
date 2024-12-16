@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using ScrcpyEX.ExtensionMethod.MyAttribute;
+using ScrcpyEX.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -70,6 +71,11 @@ namespace ScrcpyEX.ExtensionMethod
         /// 定位到右下角。
         /// </summary>
         public bool Locate4 { get; set; } = false;
+
+        /// <summary>
+        /// 录制操作信息的集合。
+        /// </summary>
+        public List<List<PointInfo>> RecordInfos { get; set; } = [];
 
         /// <summary>
         /// 保持清醒，防止设备进入休眠状态（无线连接时无效）。

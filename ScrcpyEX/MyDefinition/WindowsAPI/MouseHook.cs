@@ -1,9 +1,11 @@
 ﻿using Microsoft.Win32;
 using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +25,12 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         private const int WH_MOUSE_LL = 14;     //安装监视低级别鼠标输入事件的hook过程，获得的消息更全面
 
         /// <summary>
-        /// 钩子句柄。
+        /// 存储每一次有效的坐标点。
+        /// </summary>
+        private static readonly List<PointInfo> infos = [];
+
+        /// <summary>
+        /// 钩子句柄，为IntPtr.Zero时未注册鼠标钩子。
         /// </summary>
         public static IntPtr HookID { get; set; } = IntPtr.Zero;
 
@@ -133,7 +140,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
                 // 检查鼠标事件类型
                 switch ((uint)wParam)
                 {
-                    case MP.WM_LBUTTONDOWN: RecordPosition(lParam); break;
+                    case MP.WM_LBUTTONDOWN: RecordPosition(); break;
                     //case MP.WM_LBUTTONUP: break;
                     //case MP.WM_RBUTTONDOWN: break;
                     //case MP.WM_RBUTTONUP: break;
@@ -142,24 +149,19 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
             }
             return CallNextHookEx(HookID, nCode, wParam, lParam);
         }
-
-        private static void RecordPosition(IntPtr lParam)
-        {
-            Console.WriteLine("鼠标左键按下。");
-
-            Point pt = MV.MainWin.GetMouseInScrcpy();
-        }
-
+        
         /// <summary>
-        /// 获取鼠标位置。
+        /// 鼠标位置有效时，记录鼠标当前位置。
         /// </summary>
-        /// <param name="lParam">指向MSLLHOOKSTRUCT结构的指针。</param>
-        private void GetMouseLocation(IntPtr lParam)
+        private static void RecordPosition()
         {
-            MSLLHOOKSTRUCT mouseData = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
-            Point mPt = new(mouseData.pt.x, mouseData.pt.y);
+            
 
-            Console.WriteLine($"鼠标坐标1：{mPt.X},{mPt.Y}。");
+            Point? pt = MV.MainWin.GetMouseInScrcpy();
+            if (pt != null)
+            {
+                infos.Add(new PointInfo((Point)pt, 0));
+            }
         }
 
         /// <summary>
@@ -177,9 +179,25 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <summary>
         /// 注销钩子。
         /// </summary>
-        protected static void CancelHook()
+        public static void CancelHook()
         {
             UnhookWindowsHookEx(HookID);
+            HookID = IntPtr.Zero;
+            Console.WriteLine($"钩子句柄：{HookID}。");
+            MyCfg.Cfg.RecordInfos.Add(infos);
+            infos.Clear();
+        }
+
+        /// <summary>
+        /// 获取鼠标位置。
+        /// </summary>
+        /// <param name="lParam">指向MSLLHOOKSTRUCT结构的指针。</param>
+        private void GetMouseLocation(IntPtr lParam)
+        {
+            MSLLHOOKSTRUCT mouseData = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
+            Point mPt = new(mouseData.pt.x, mouseData.pt.y);
+
+            Console.WriteLine($"鼠标坐标1：{mPt.X},{mPt.Y}。");
         }
 
 

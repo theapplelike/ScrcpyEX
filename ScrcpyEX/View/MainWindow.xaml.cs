@@ -44,7 +44,7 @@ namespace ScrcpyEX.View
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Console.WriteLine($"窗体大小进行改变，scrcpy句柄：{IntPtr.Zero}。");
+            Console.WriteLine($"窗体大小进行改变，scrcpy句柄：{_scHandle}。");
 
             //第三方程序句柄不为空调整scrcpy大小
             if (_scHandle != IntPtr.Zero)
@@ -105,7 +105,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void BtnLocate_MouseEnter(object sender, MouseEventArgs e)
         {
-            btnLocate.Background = btnOption.Background = Brushes.LightBlue;
+            btnLocate.Background = btnLocOpt.Background = Brushes.LightBlue;
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void BtnLocate_MouseLeave(object sender, MouseEventArgs e)
         {
-            btnLocate.Background = btnOption.Background = Brushes.Transparent;
+            btnLocate.Background = btnLocOpt.Background = Brushes.Transparent;
         }
 
         private void BtnLocate_Click(object sender, RoutedEventArgs e)
@@ -121,18 +121,21 @@ namespace ScrcpyEX.View
             Locate();
         }
 
-        private void BtnOption_Click(object sender, RoutedEventArgs e)
+        private void BtnLocOpt_Click(object sender, RoutedEventArgs e)
         {
-            popMenu.IsOpen = false;
-            popMenu.IsOpen = true;
-
             //联动两个定位按钮，显示一致的背景色
-            btnLocate.Background = btnOption.Background = Brushes.LightBlue;
+            popMenu.IsOpen = true;
+            btnLocate.Background = btnLocOpt.Background = Brushes.LightBlue;
         }
 
         private void BtnRecord_Click(object sender, RoutedEventArgs e)
         {
             StartRecord();
+        }
+
+        private void BtnRecOpt_Click(object sender, RoutedEventArgs e)
+        {
+
         }
         #endregion
 
@@ -144,7 +147,7 @@ namespace ScrcpyEX.View
 
         private void PopMenu_Closed(object sender, EventArgs e)
         {
-            btnLocate.Background = btnOption.Background = Brushes.Transparent;
+            btnLocate.Background = btnLocOpt.Background = Brushes.Transparent;
         }
 
         private void BtnQuarterLoc_Click(object sender, RoutedEventArgs e)
@@ -163,27 +166,27 @@ namespace ScrcpyEX.View
 
         private void pnlShow_GotFocus(object sender, EventArgs e)
         {
-            Console.WriteLine("pnlShow获得焦点。");
+            //Console.WriteLine("pnlShow获得焦点。");
         }
 
         private void wfh_GotFocus(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("wfh获得焦点。");
+            //Console.WriteLine("wfh获得焦点。");
         }
 
         private void wfh_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            Console.WriteLine("鼠标在wfh按下。");
+            //Console.WriteLine("鼠标在wfh按下。");
         }
 
         private void PnlShow_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            Console.WriteLine("鼠标在pnlShow按下。");
+            //Console.WriteLine("鼠标在pnlShow按下。");
         }
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            Console.WriteLine("鼠标在窗体按下。");
+            //Console.WriteLine("鼠标在窗体按下。");
         }
 
         

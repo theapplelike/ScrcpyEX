@@ -22,26 +22,34 @@ namespace ScrcpyEX.View
     public partial class MainWindow//code1
     {
         /// <summary>
-        /// 获得鼠标在scrcpy中的位置，需要额外减去Point(左额外距离*Dpi比例-左非工作区距离*Dpi比例，上额外距离*Dpi比例)。
+        /// 获得鼠标在scrcpy中的位坐标，计算需要额外减去Point(左额外距离*Dpi比例-左非工作区距离*Dpi比例，上额外距离*Dpi比例)。
+        /// 计算最大宽度和高度时需要乘以Dpi比例。
         /// </summary>
-        public System.Windows.Point GetMouseInScrcpy()
+        /// <returns>如果鼠标在scrcpy中，返回鼠标在scrcpy中的坐标，否则返回null。</returns>
+        public System.Windows.Point? GetMouseInScrcpy()
         {
             System.Windows.Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置
             System.Drawing.Point pt2 = System.Windows.Forms.Control.MousePosition;//获取鼠标相对于屏幕的位置
-            //DpiScale dpi = VisualTreeHelper.GetDpi(this);
 
             int x = (int)(pt2.X - pt1.X - ExtraWidthLeft * ScaleX + SystemParameters.WindowNonClientFrameThickness.Left * ScaleX);
             int y = (int)(pt2.Y - pt1.Y - ExtraHeightTop * ScaleY);
+            double maxW = (ActualWidth - ExtraWidth) * ScaleX;
+            double maxH = (ActualHeight - ExtraHeight) * ScaleY;
 
-            Console.WriteLine($"程序相对于屏幕：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
-            Console.WriteLine($"鼠标相对于屏幕：({pt2.X}, {pt2.Y})。");
-            Console.WriteLine($"鼠标在程序中坐标：({x}, {y})。\n");
-            return new System.Windows.Point(x, y);
-        }
-
-        private async void CenterPop(string str)
-        {
-            await popMid.SHW(str);
+            Console.WriteLine($"程序相对于屏幕%：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
+            Console.WriteLine($"鼠标相对于屏幕%：({pt2.X}, {pt2.Y})。");
+            Console.WriteLine($"鼠标在程序中坐标%：({x}, {y})；scrcpy尺寸%：({maxW}, {maxH})。");
+            
+            if (x > 0 && x < maxW && y > 0 && y < maxH)
+            {
+                Console.WriteLine($"YES，鼠标在scrcpy中。");
+                Console.WriteLine($"////////////////////。\n");
+                return new System.Windows.Point(x, y);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -65,6 +73,11 @@ namespace ScrcpyEX.View
                 {
                     await popMid.SHW("钩子注册失败，未能启动录制。");
                 }
+            }
+            else
+            {
+                MouseHook.CancelHook();
+                await popMid.SHW("停止录制操作。");
             }
         }
 

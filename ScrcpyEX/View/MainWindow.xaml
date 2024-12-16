@@ -86,10 +86,11 @@
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
             <Button x:Name="btnLocate" Click="BtnLocate_Click" Style="{StaticResource MenuBtn}" Content="&#xe7f7;" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave" Width="40" ToolTip="快速定位"/>
-            <Button x:Name="btnOption" Click="BtnOption_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave" Width="22" ToolTip="定位与大小选项"/>
+            <Button x:Name="btnLocOpt" Click="BtnLocOpt_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave" Width="22" ToolTip="定位与大小选项"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
-            <Button x:Name="btnRecord" Style="{StaticResource MenuBtn}" Content="&#xe819;" Click="BtnRecord_Click" ToolTip="录制操作"/>
+            <Button x:Name="btnRecord" Click="BtnRecord_Click" Style="{StaticResource MenuBtn}" Content="&#xe819;" Width="40" ToolTip="进行录制"/>
+            <Button x:Name="btnRecOpt" Click="BtnRecOpt_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" Width="22" ToolTip="更多选项"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
             <Button x:Name="btnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
