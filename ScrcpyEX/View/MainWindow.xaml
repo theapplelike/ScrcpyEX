@@ -52,8 +52,8 @@
             </Border>
         </Popup>
 
-        <!--显示的菜单POP-->
-        <Popup x:Name="popMenu" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnLocate}" Closed="PopMenu_Closed">
+        <!--显示的POP定位菜单-->
+        <Popup x:Name="popMenu" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnLocate}" Tag="g1" Closed="Pop_Closed">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel>
                     <TextBlock Text="{Binding ResolutionDesc}" Background="White" Padding="10"/>
@@ -79,18 +79,31 @@
             </Border>
         </Popup>
 
+        <!--显示的POP录制菜单-->
+        <Popup x:Name="popRec" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnRecord}" Tag="g2" Closed="Pop_Closed">
+            <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
+                <StackPanel>
+                    <TextBlock Text="录制列表" Background="White" Padding="10"/>
+
+                    <Button x:Name="btnRecManage" Click="BtnRecManage_Click" Style="{StaticResource ItemBtn}" Content="⫱录制管理" BorderThickness="0,1"/>
+                    <Button x:Name="btnStartRec"  Click="BtnStartRec_Click"  Style="{StaticResource ItemBtn}" Content="开始录制"/>
+                    <Button Style="{StaticResource ItemBtn}" Content="⌂居中"/>
+                </StackPanel>
+            </Border>
+        </Popup>
+
         <DockPanel x:Name="dpl" Background="AliceBlue" MouseLeftButtonDown="Dpl_MouseLeftButtonDown">
             <Button x:Name="btnWired" Style="{StaticResource MenuBtn}" Content="&#xF0B9;" Click="BtnWired_Click" Margin="0" ToolTip="有线连接"/>
             <Button x:Name="btnWirel" Style="{StaticResource MenuBtn}" Content="&#xe952;" ToolTip="无线连接"/>
             <Button x:Name="btnStop"  Style="{StaticResource MenuBtn}" Content="&#xECCB;" Click="BtnStop_Click" ToolTip="停止投屏"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
-            <Button x:Name="btnLocate" Click="BtnLocate_Click" Style="{StaticResource MenuBtn}" Content="&#xe7f7;" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave" Width="40" ToolTip="快速定位"/>
-            <Button x:Name="btnLocOpt" Click="BtnLocOpt_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" MouseEnter="BtnLocate_MouseEnter" MouseLeave="BtnLocate_MouseLeave" Width="22" ToolTip="定位与大小选项"/>
+            <Button x:Name="btnLocate" Click="BtnLocate_Click" Style="{StaticResource MenuBtn}" Content="&#xe7f7;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g1" Width="40" ToolTip="快速定位"/>
+            <Button x:Name="btnLocOpt" Click="BtnLocOpt_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g1" Width="22" ToolTip="定位与大小选项"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
-            <Button x:Name="btnRecord" Click="BtnRecord_Click" Style="{StaticResource MenuBtn}" Content="&#xe819;" Width="40" ToolTip="进行录制"/>
-            <Button x:Name="btnRecOpt" Click="BtnRecOpt_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" Width="22" ToolTip="更多选项"/>
+            <Button x:Name="btnRecord" Click="BtnRecord_Click" Style="{StaticResource MenuBtn}" Content="&#xe819;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="40" ToolTip="录制开关"/>
+            <Button x:Name="btnRecOpt" Click="BtnRecOpt_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="22" ToolTip="更多选项" IsEnabled="False"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
             <Button x:Name="btnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>

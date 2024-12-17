@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
 using ScrcpyEX.ExtensionMethod;
+using System.Windows.Shapes;
 
 namespace ScrcpyEX.View
 {
@@ -231,8 +232,6 @@ namespace ScrcpyEX.View
             //pop.VerticalOffset = ExtraHeightTop - (ActualHeight - ExtraHeightTop) / 2 + 5;
 
             //Console.WriteLine($"{_scHeight},{ActualHeight}");
-
-            MyGM.POP("yesclick");
             //MV.Pop.SHW("yesclick");
         }
 
@@ -240,7 +239,5 @@ namespace ScrcpyEX.View
         {
             //MyGM.POP("yesclick");
         }
-
-
     }
 }

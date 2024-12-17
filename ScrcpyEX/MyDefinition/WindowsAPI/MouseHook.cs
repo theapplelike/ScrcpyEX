@@ -157,10 +157,11 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         {
             
 
-            Point? pt = MV.MainWin.GetMouseInScrcpy();
-            if (pt != null)
+            Point? point = MV.MainWin.GetMouseInScrcpy();
+            if (point is Point pt)
             {
-                infos.Add(new PointInfo((Point)pt, 0));
+                infos.Add(new PointInfo(pt, 0));
+                Console.WriteLine($"添加点：{pt.X},{pt.Y}。");
             }
         }
 
@@ -184,7 +185,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
             UnhookWindowsHookEx(HookID);
             HookID = IntPtr.Zero;
             Console.WriteLine($"钩子句柄：{HookID}。");
-            MyCfg.Cfg.RecordInfos.Add(infos);
+            MyCfg.Cfg.RecInfos.Add(new RecInfo() { Infos = new List<PointInfo>(infos) });
             infos.Clear();
         }
 

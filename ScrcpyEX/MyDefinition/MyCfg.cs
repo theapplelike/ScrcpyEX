@@ -75,7 +75,7 @@ namespace ScrcpyEX.ExtensionMethod
         /// <summary>
         /// 录制操作信息的集合。
         /// </summary>
-        public List<List<PointInfo>> RecordInfos { get; set; } = [];
+        public List<RecInfo> RecInfos { get; set; } = [];
 
         /// <summary>
         /// 保持清醒，防止设备进入休眠状态（无线连接时无效）。

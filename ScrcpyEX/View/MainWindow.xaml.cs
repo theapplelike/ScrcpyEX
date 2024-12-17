@@ -103,17 +103,17 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 定位的两个按钮颜色联动，鼠标进入时同时修改背景色。
         /// </summary>
-        private void BtnLocate_MouseEnter(object sender, MouseEventArgs e)
+        private void Btn_MouseEnter(object sender, MouseEventArgs e)
         {
-            btnLocate.Background = btnLocOpt.Background = Brushes.LightBlue;
+            MyGM.SetSameColor(dpl, Brushes.LightBlue, ((Button)sender).Tag);
         }
 
         /// <summary>
         /// 定位的两个按钮颜色联动，鼠标离开时同时修改背景色。
         /// </summary>
-        private void BtnLocate_MouseLeave(object sender, MouseEventArgs e)
+        private void Btn_MouseLeave(object sender, MouseEventArgs e)
         {
-            btnLocate.Background = btnLocOpt.Background = Brushes.Transparent;
+            MyGM.SetSameColor(dpl, Brushes.Transparent, ((Button)sender).Tag);
         }
 
         private void BtnLocate_Click(object sender, RoutedEventArgs e)
@@ -130,12 +130,13 @@ namespace ScrcpyEX.View
 
         private void BtnRecord_Click(object sender, RoutedEventArgs e)
         {
-            StartRecord();
+            popRec.IsOpen = true;
+            btnRecord.Background = btnRecOpt.Background = Brushes.LightBlue;
         }
 
         private void BtnRecOpt_Click(object sender, RoutedEventArgs e)
         {
-
+            StartRecord();
         }
         #endregion
 
@@ -145,9 +146,9 @@ namespace ScrcpyEX.View
             popMid.VerticalOffset = (ExtraHeightTop + popMid.Child.RenderSize.Height) / 2 + wfh.Margin.Top;
         }
 
-        private void PopMenu_Closed(object sender, EventArgs e)
+        private void Pop_Closed(object sender, EventArgs e)
         {
-            btnLocate.Background = btnLocOpt.Background = Brushes.Transparent;
+            MyGM.SetSameColor(dpl, Brushes.Transparent, ((Popup)sender).Tag);
         }
 
         private void BtnQuarterLoc_Click(object sender, RoutedEventArgs e)
@@ -161,6 +162,19 @@ namespace ScrcpyEX.View
             SetUISize();
             Locate();
             popMenu.IsOpen = false;
+        }
+
+        private void BtnRecManage_Click(object sender, RoutedEventArgs e)
+        {
+            RecManage rec = new();
+            rec.ShowDialog();
+        }
+
+        private void BtnStartRec_Click(object sender, RoutedEventArgs e)
+        {
+            StartRecord();
+            popRec.IsOpen = false;
+            btnRecOpt.IsEnabled = true;
         }
         #endregion
 
