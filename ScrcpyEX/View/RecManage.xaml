@@ -6,20 +6,41 @@
         xmlns:local="clr-namespace:ScrcpyEX.View"
         mc:Ignorable="d"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
-        Title="RecManage" Height="450" Width="800" 
-        WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+        Title="RecManage" Height="400" Width="560" x:Name="root"
+        WindowStartupLocation="CenterScreen" SizeToContent="Width"
+        Loaded="Window_Loaded" Closed="Root_Closed">
 
     <Window.DataContext>
         <ViewModel:RecManageVM/>
     </Window.DataContext>
 
+    <Window.Resources>
+        <Style x:Key="LstBtn" TargetType="Button" BasedOn="{StaticResource MenuBtn}">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Width" Value="40"/>
+        </Style>
+        <Style x:Key="Btn" TargetType="{x:Type Button}" BasedOn="{StaticResource MenuBtn}">
+            <Setter Property="FontFamily" Value="幼圆"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Background" Value="LightSteelBlue" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Focusable" Value="False" />
+        </Style>
+    </Window.Resources>
+
     <Grid>
-        <Grid.RowDefinitions>
+        <!--<Grid.RowDefinitions>
             <RowDefinition Height="200"/>
             <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        </Grid.RowDefinitions>-->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="280"/>
         </Grid.ColumnDefinitions>
 
         <Grid Margin="10">
@@ -27,25 +48,53 @@
                 <RowDefinition Height="20"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock x:Name="tbk1" Text="脚本列表：" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <ListBox x:Name="lst" ItemsSource="{Binding RecInfos}" Grid.Row="1">
+            <TextBlock Text="脚本列表：" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <ListBox x:Name="lst" ItemsSource="{Binding RecInfos}" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden" Height="100">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
+                        <Grid >
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="115" />
                                 <ColumnDefinition Width="10" />
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="40" />
+                                <ColumnDefinition Width="40" />
+                                <ColumnDefinition Width="40" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock x:Name="tbkEdit" Text="{Binding Name}" MaxWidth="100" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                            <TextBox x:Name="txtEdit" Text="{Binding Name}" Visibility="Hidden"/>
-                            <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="2" Content="编辑"/>
+                            <TextBlock x:Name="tbkEdit" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="10,0,0,0"/>
+                            <TextBox x:Name="txtEdit" Text="{Binding Name}" Visibility="Hidden" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="2" Content="&#xe8ac;" Style="{StaticResource LstBtn}"/>
+                            <Button x:Name="btnSet" Command="{Binding DataContext.SetParamCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="3" Content="&#xe713;" Style="{StaticResource LstBtn}"/>
+                            <Button x:Name="btnDel" Command="{Binding DataContext.DelRecCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="4" Content="&#xe74d;" Style="{StaticResource LstBtn}"/>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-        
+
+        <Grid Grid.Column="1" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="脚本列表：" VerticalAlignment="Center" Margin="10,0,0,0"/>
+
+            <DataGrid Grid.Row="1" ItemsSource="{Binding PtInfos}" AutoGenerateColumns="False" Margin="0,0,0,8">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="延时（秒）" Binding="{Binding LastTime}" Width="*" />
+                    <DataGridTextColumn Header="坐标点（x,y）" Binding="{Binding Pt}" Width="2*" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Content="保存" Style="{StaticResource Btn}"/>
+                <Button Content="取消" Style="{StaticResource Btn}" Grid.Column="1"/>
+            </Grid>
+        </Grid>
         
     </Grid>
 </Window>

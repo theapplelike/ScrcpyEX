@@ -76,7 +76,7 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
-        /// 获得元素的第一个指定父元素，未查找到时会继续向上查找。
+        /// 获得元素的第一个指定父元素，未查找到时会继续向上查找祖级元素。
         /// </summary>
         /// <typeparam name="T">指定的父元素类型。</typeparam>
         /// <param name="obj">要查找父元素的元素。</param>

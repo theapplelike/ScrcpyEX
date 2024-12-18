@@ -12,6 +12,9 @@ namespace ScrcpyEX.MyDefinition
         private readonly Action<object> _execute;
         private readonly Func<object, bool> _canExecute;
 
+        /// <summary>
+        /// 实现ICommand接口的中继命令类。
+        /// </summary>
         public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
         {
             _execute = execute;

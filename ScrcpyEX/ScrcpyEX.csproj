@@ -92,6 +92,15 @@
     <Compile Include="View\RecManage.xaml.cs">
       <DependentUpon>RecManage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\RecManage_code.cs" >
+      <DependentUpon>RecManage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\RecManage_code1.cs" >
+      <DependentUpon>RecManage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\RecManage_var.cs" >
+      <DependentUpon>RecManage.xaml</DependentUpon>
+    </Compile>
     <Page Include="Resource\Style\MenuButtonStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
