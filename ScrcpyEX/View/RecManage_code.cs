@@ -17,15 +17,6 @@ namespace ScrcpyEX.View
         private void MyInit()
         {
             _vm.RecInfos = new(MyCfg.Cfg.RecInfos);
-            foreach (RecInfo recInfo in MyCfg.Cfg.RecInfos)
-            {
-                Console.WriteLine($"///////////，{recInfo.Name}。");
-                foreach (PointInfo info in recInfo.Infos)
-                {
-                    Console.WriteLine($"{info.Pt.X},{info.Pt.Y},{info.LastTime}。");
-                }
-            }
-            Console.WriteLine($"list:{lst.ActualWidth}.");
         }
 
         /// <summary>

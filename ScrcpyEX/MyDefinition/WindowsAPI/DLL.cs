@@ -111,6 +111,5 @@ namespace ScrcpyEX.MyDefinition
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetForegroundWindow(IntPtr hWnd);
 
-
     }
 }

@@ -16,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace ScrcpyEX.View
 {
@@ -37,14 +38,12 @@ namespace ScrcpyEX.View
 
         private void Root_Closed(object sender, EventArgs e)
         {
-            _vm.SaveData();
+            MyCfg.Save();
         }
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             EditName(sender, e);
         }
-
-        
     }
 }

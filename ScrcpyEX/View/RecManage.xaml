@@ -49,23 +49,24 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <TextBlock Text="脚本列表：" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <ListBox x:Name="lst" ItemsSource="{Binding RecInfos}" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden" Height="100">
+            <ListBox x:Name="lst" ItemsSource="{Binding RecInfos}" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid >
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="115" />
-                                <ColumnDefinition Width="10" />
-                                <ColumnDefinition Width="40" />
-                                <ColumnDefinition Width="40" />
-                                <ColumnDefinition Width="40" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock x:Name="tbkEdit" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="10,0,0,0"/>
-                            <TextBox x:Name="txtEdit" Text="{Binding Name}" Visibility="Hidden" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                            <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="2" Content="&#xe8ac;" Style="{StaticResource LstBtn}"/>
-                            <Button x:Name="btnSet" Command="{Binding DataContext.SetParamCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="3" Content="&#xe713;" Style="{StaticResource LstBtn}"/>
-                            <Button x:Name="btnDel" Command="{Binding DataContext.DelRecCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="4" Content="&#xe74d;" Style="{StaticResource LstBtn}"/>
-                        </Grid>
+                        <Border BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="115" />
+                                    <ColumnDefinition Width="40" />
+                                    <ColumnDefinition Width="40" />
+                                    <ColumnDefinition Width="40" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="tbkEdit" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="10,0"/>
+                                <TextBox x:Name="txtEdit" Text="{Binding Name}" Visibility="Hidden" VerticalAlignment="Center" Margin="10,0"/>
+                                <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="1" Content="&#xe8ac;" Style="{StaticResource LstBtn}"/>
+                                <Button x:Name="btnSet" Command="{Binding DataContext.SetParamCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="2" Content="&#xe713;" Style="{StaticResource LstBtn}"/>
+                                <Button x:Name="btnDel" Command="{Binding DataContext.DelRecCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="3" Content="&#xe74d;" Style="{StaticResource LstBtn}"/>
+                            </Grid>
+                        </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -79,10 +80,11 @@
             </Grid.RowDefinitions>
             <TextBlock Text="脚本列表：" VerticalAlignment="Center" Margin="10,0,0,0"/>
 
-            <DataGrid Grid.Row="1" ItemsSource="{Binding PtInfos}" AutoGenerateColumns="False" Margin="0,0,0,8">
+            <DataGrid Grid.Row="1" ItemsSource="{Binding PointDt}" AutoGenerateColumns="False" Margin="0,0,0,8" CanUserSortColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="延时（秒）" Binding="{Binding LastTime}" Width="*" />
-                    <DataGridTextColumn Header="坐标点（x,y）" Binding="{Binding Pt}" Width="2*" />
+                    <DataGridTextColumn Header="坐标点X" Binding="{Binding XAxis}" Width="*" />
+                    <DataGridTextColumn Header="坐标点Y" Binding="{Binding YAxis}" Width="*" />
                 </DataGrid.Columns>
             </DataGrid>
 
@@ -91,8 +93,8 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Content="保存" Style="{StaticResource Btn}"/>
-                <Button Content="取消" Style="{StaticResource Btn}" Grid.Column="1"/>
+                <Button x:Name="btnSave" Command="{Binding DataContext.SaveCommand,ElementName=root}" Content="保存" Style="{StaticResource Btn}"/>
+                <Button x:Name="btnCanel" Command="{Binding DataContext.CanelCommand,ElementName=root}" Content="取消" Style="{StaticResource Btn}" Grid.Column="1"/>
             </Grid>
         </Grid>
         
