@@ -67,7 +67,8 @@ namespace ScrcpyEX.View
             {
                 if (MouseHook.RegisterHook())
                 {
-                    await popMid.SHW("已开启录制操作。");
+                    btnRecord.Content = "\ueb4a";
+                    await popMid.SHW("已开启录制操作，再次点击结束录制。");
                 }
                 else
                 {
@@ -77,7 +78,8 @@ namespace ScrcpyEX.View
             else
             {
                 MouseHook.CancelHook();
-                await popMid.SHW("停止录制操作。");
+                btnRecord.Content = "\ue819";
+                await popMid.SHW("已停止录制操作。");
             }
         }
 

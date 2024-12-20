@@ -1,4 +1,5 @@
-﻿using ScrcpyEX.ViewModel;
+﻿using ScrcpyEX.Model;
+using ScrcpyEX.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,11 @@ namespace ScrcpyEX.View
         /// 是否处于脚本名称的编辑状态。
         /// </summary>
         private bool _isEditing = false;
+
+        /// <summary>
+        /// 要播放的坐标点列表。
+        /// </summary>
+        public List<PointInfo> _pts;
 
 
     }

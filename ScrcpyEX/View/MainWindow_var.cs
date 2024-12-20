@@ -1,4 +1,5 @@
-﻿using ScrcpyEX.ViewModel;
+﻿using ScrcpyEX.Model;
+using ScrcpyEX.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -49,9 +50,9 @@ namespace ScrcpyEX.View
         private readonly int _scWidth = 960, _scHeight = 448;
 
         /// <summary>
-        /// 是否处于录制操作下。
+        /// 要播放的坐标点列表。
         /// </summary>
-        private bool _isRecord = false;
+        private List<PointInfo> _pts;
 
         /// <summary>
         /// 窗口除开scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。

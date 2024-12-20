@@ -18,7 +18,7 @@ namespace ScrcpyEX.ViewModel
         /// <summary>
         /// 临时存储正在编辑的坐标点信息列表。
         /// </summary>
-        private List<PointInfo> _tempInfo;
+        private List<PointInfo> _tempInfo = [];
 
         /// <summary>
         /// 说明当前正在编辑的坐标点实体类的索引。
@@ -35,7 +35,7 @@ namespace ScrcpyEX.ViewModel
         /// <summary>
         /// 录制操作信息的集合。
         /// </summary>
-        public List<RecInfo> RecInfos
+        public ObservableCollection<RecInfo> RecInfos
         {
             get { return recInfos; }
             set
@@ -44,7 +44,7 @@ namespace ScrcpyEX.ViewModel
                 RaisePropertyChanged();
             }
         }
-        private List<RecInfo> recInfos = [new() { Name="123"}, new() { Name = "223" }];
+        private ObservableCollection<RecInfo> recInfos = [new() { Name="123"}, new() { Name = "223" }];
 
         /// <summary>
         /// 坐标点的集合。
@@ -54,7 +54,6 @@ namespace ScrcpyEX.ViewModel
             get { return pointDt; }
             set
             {
-                Console.WriteLine($"设置：{value}。");
                 pointDt = value;
                 RaisePropertyChanged();
             }
@@ -144,6 +143,15 @@ namespace ScrcpyEX.ViewModel
                 _tempInfo.Add(new PointInfo(new Point(r1, r2), r3));
                 RecInfos[_index].Infos = _tempInfo;
             }
+        }
+
+        /// <summary>
+        /// 保存数据。
+        /// </summary>
+        public void SaveData()
+        {
+            MyCfg.Cfg.RecInfos = new(RecInfos);
+            MyCfg.Save();
         }
 
 

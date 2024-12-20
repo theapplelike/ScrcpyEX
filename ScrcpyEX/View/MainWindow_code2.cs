@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows;
 using ScrcpyEX.ExtensionMethod;
 using System.Windows.Shapes;
+using ScrcpyEX.Model;
 
 namespace ScrcpyEX.View
 {
@@ -113,7 +114,8 @@ namespace ScrcpyEX.View
             _resizeTimer.Tick += new EventHandler(Resize_Tick);
             _resizeTimer.Interval = TimeSpan.FromSeconds(0.1);//大小调整间隔
 
-            _clickTimer.Tick += new EventHandler(Click_Tick);
+            //_clickTimer.Tick += new EventHandler(Click_Tick);
+            _clickTimer.Tick += (sender, e) => Click_Tick(_pts);
             _clickTimer.Interval = TimeSpan.FromSeconds(1);
 
             _testTimer.Tick += new EventHandler(Test_Tick);
@@ -134,23 +136,20 @@ namespace ScrcpyEX.View
         /// <summary>
         /// PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
         /// </summary>
-        private void Click_Tick(object sender, EventArgs e)
+        private async void Click_Tick(List<PointInfo> _pts)
         {
-            System.Windows.Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置
-            System.Drawing.Point pt2 = System.Windows.Forms.Control.MousePosition;//获取鼠标相对于屏幕的位置
-            //DpiScale dpi = VisualTreeHelper.GetDpi(this);
+            foreach (PointInfo info in _pts)
+            {
+                Console.WriteLine($"点击：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
+                await Task.Delay((int)info.LastTime);
+                int x = (int)info.Pt.X;
+                int y = (int)info.Pt.Y;
 
-            int x = (int)(pt2.X - pt1.X - ExtraWidthLeft * ScaleX + SystemParameters.WindowNonClientFrameThickness.Left * ScaleX);
-            int y = (int)(pt2.Y - pt1.Y - ExtraHeightTop * ScaleY);
-
-            Console.WriteLine($"程序相对于屏幕：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
-            Console.WriteLine($"鼠标相对于屏幕：({pt2.X}, {pt2.Y})。");
-            Console.WriteLine($"鼠标在程序中坐标：({x}, {y})。\n");
-
-            IntPtr lp = new((y << 16) + x);
-            DLL.PostMessage(_scHandle, MP.WM_MOUSEMOVE, IntPtr.Zero, lp);
-            DLL.PostMessage(_scHandle, MP.WM_LBUTTONDOWN, (IntPtr)MP.MK_LBUTTON, lp);
-            DLL.PostMessage(_scHandle, MP.WM_LBUTTONUP, IntPtr.Zero, lp);
+                IntPtr lp = new((y << 16) + x);
+                DLL.PostMessage(_scHandle, MP.WM_MOUSEMOVE, IntPtr.Zero, lp);
+                DLL.PostMessage(_scHandle, MP.WM_LBUTTONDOWN, (IntPtr)MP.MK_LBUTTON, lp);
+                DLL.PostMessage(_scHandle, MP.WM_LBUTTONUP, IntPtr.Zero, lp);
+            }
         }
 
         /// <summary>

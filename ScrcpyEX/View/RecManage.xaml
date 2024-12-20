@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ScrcpyEX.View"
         mc:Ignorable="d"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
-        Title="RecManage" Height="400" Width="560" x:Name="root"
+        Title="RecManage" Height="400" Width="600" x:Name="root"
         WindowStartupLocation="CenterScreen" SizeToContent="Width"
         Loaded="Window_Loaded" Closed="Root_Closed">
 
@@ -39,7 +39,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>-->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="320"/>
             <ColumnDefinition Width="280"/>
         </Grid.ColumnDefinitions>
 
@@ -57,14 +57,19 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="115" />
                                     <ColumnDefinition Width="40" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="40" />
                                     <ColumnDefinition Width="40" />
                                     <ColumnDefinition Width="40" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock x:Name="tbkEdit" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="10,0"/>
                                 <TextBox x:Name="txtEdit" Text="{Binding Name}" Visibility="Hidden" VerticalAlignment="Center" Margin="10,0"/>
                                 <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="1" Content="&#xe8ac;" Style="{StaticResource LstBtn}"/>
-                                <Button x:Name="btnSet" Command="{Binding DataContext.SetParamCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="2" Content="&#xe713;" Style="{StaticResource LstBtn}"/>
-                                <Button x:Name="btnDel" Command="{Binding DataContext.DelRecCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="3" Content="&#xe74d;" Style="{StaticResource LstBtn}"/>
+                                <TextBlock Text="|" FontSize="20" Grid.Column="2" HorizontalAlignment="Center"/>
+
+                                <Button x:Name="btnPlay" Click="BtnPlay_Click" CommandParameter="{Binding}" Grid.Column="3" Content="&#xec57;" Style="{StaticResource LstBtn}"/>
+                                <Button x:Name="btnSet" Command="{Binding DataContext.SetParamCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="4" Content="&#xe713;" Style="{StaticResource LstBtn}"/>
+                                <Button x:Name="btnDel" Command="{Binding DataContext.DelRecCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="5" Content="&#xe74d;" Style="{StaticResource LstBtn}"/>
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -78,7 +83,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="脚本列表：" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <TextBlock Text="详细信息：" VerticalAlignment="Center" Margin="10,0,0,0"/>
 
             <DataGrid Grid.Row="1" ItemsSource="{Binding PointDt}" AutoGenerateColumns="False" Margin="0,0,0,8" CanUserSortColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
                 <DataGrid.Columns>

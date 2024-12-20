@@ -38,12 +38,27 @@ namespace ScrcpyEX.View
 
         private void Root_Closed(object sender, EventArgs e)
         {
-            MyCfg.Save();
+            _vm.SaveData();
+            Console.WriteLine("wxit");
         }
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             EditName(sender, e);
+        }
+
+        private void BtnPlay_Click(object sender, RoutedEventArgs e)
+        {
+            if (((Button)sender).CommandParameter is RecInfo recInfo)
+            {
+                foreach (var info in recInfo.Infos)
+                {
+                    Console.WriteLine($"{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
+                }
+                _pts = recInfo.Infos;
+            }
+
+            DialogResult = true;
         }
     }
 }

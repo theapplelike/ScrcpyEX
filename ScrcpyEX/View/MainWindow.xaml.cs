@@ -130,13 +130,23 @@ namespace ScrcpyEX.View
 
         private void BtnRecord_Click(object sender, RoutedEventArgs e)
         {
-            popRec.IsOpen = true;
-            btnRecord.Background = btnRecOpt.Background = Brushes.LightBlue;
+            //popRec.IsOpen = true;
+            //btnRecord.Background = btnRecOpt.Background = Brushes.LightBlue;
+            StartRecord();
         }
 
         private void BtnRecOpt_Click(object sender, RoutedEventArgs e)
         {
-            StartRecord();
+            //StartRecord();
+            //bool? reult = new RecManage().ShowDialog();
+            //Console.WriteLine($"结果:{reult}。");
+            RecManage rec = new();
+            if (rec.ShowDialog() == true)
+            {
+                _pts = rec._pts;
+                _clickTimer.Interval = TimeSpan.FromSeconds(10);
+                _clickTimer.Start();
+            }
         }
         #endregion
 
@@ -166,15 +176,15 @@ namespace ScrcpyEX.View
 
         private void BtnRecManage_Click(object sender, RoutedEventArgs e)
         {
-            RecManage rec = new();
-            rec.ShowDialog();
+            //RecManage rec = new();
+            //rec.ShowDialog();
         }
 
         private void BtnStartRec_Click(object sender, RoutedEventArgs e)
         {
-            StartRecord();
-            popRec.IsOpen = false;
-            btnRecOpt.IsEnabled = true;
+            //StartRecord();
+            //popRec.IsOpen = false;
+            //btnRecOpt.IsEnabled = true;
         }
         #endregion
 

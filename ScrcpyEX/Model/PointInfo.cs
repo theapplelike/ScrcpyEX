@@ -10,7 +10,7 @@ namespace ScrcpyEX.Model
     /// <summary>
     /// 录制的坐标点信息。
     /// </summary>
-    internal class PointInfo
+    public class PointInfo
     {
         public PointInfo() { }
 

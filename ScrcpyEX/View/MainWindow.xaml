@@ -85,9 +85,8 @@
                 <StackPanel>
                     <TextBlock Text="录制列表" Background="White" Padding="10"/>
 
-                    <Button x:Name="btnRecManage" Click="BtnRecManage_Click" Style="{StaticResource ItemBtn}" Content="⫱录制管理" BorderThickness="0,1"/>
+                    <Button x:Name="btnRecManage" Click="BtnRecManage_Click" Style="{StaticResource ItemBtn}" Content="录制管理" BorderThickness="0,1"/>
                     <Button x:Name="btnStartRec"  Click="BtnStartRec_Click"  Style="{StaticResource ItemBtn}" Content="开始录制"/>
-                    <Button Style="{StaticResource ItemBtn}" Content="⌂居中"/>
                 </StackPanel>
             </Border>
         </Popup>
@@ -102,8 +101,8 @@
             <Button x:Name="btnLocOpt" Click="BtnLocOpt_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g1" Width="22" ToolTip="定位与大小选项"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
-            <Button x:Name="btnRecord" Click="BtnRecord_Click" Style="{StaticResource MenuBtn}" Content="&#xe819;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="40" ToolTip="更多选项"/>
-            <Button x:Name="btnRecOpt" Click="BtnRecOpt_Click" Style="{StaticResource MenuBtn}" Content="&#xe81a;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="40" ToolTip="停止录制" IsEnabled="False"/>
+            <Button x:Name="btnRecord" Click="BtnRecord_Click" Style="{StaticResource MenuBtn}" Content="&#xe819;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="40" ToolTip="录制按钮"/>
+            <Button x:Name="btnRecOpt" Click="BtnRecOpt_Click" Style="{StaticResource MenuBtn}" Content="&#xea40;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="40" ToolTip="脚本管理"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
             <Button x:Name="btnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
