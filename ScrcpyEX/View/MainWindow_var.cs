@@ -40,6 +40,9 @@ namespace ScrcpyEX.View
         /// </summary>
         private readonly DispatcherTimer _resizeTimer = new();
 
+        /// <summary>
+        /// 脚本点击计时器，DispatcherTimer启动后会等待一个完整的间隔周期再执行Tick绑定的方法。
+        /// </summary>
         private readonly DispatcherTimer _clickTimer = new();
 
         private readonly DispatcherTimer _testTimer = new();

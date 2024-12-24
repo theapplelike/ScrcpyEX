@@ -78,7 +78,7 @@ namespace ScrcpyEX.View
 
             //MyCfg.Cfg.IP = txtIP.Text;
             MyCfg.Cfg.StayAwake = true;
-            MyCfg.Cfg.OffScreen = true;
+            MyCfg.Cfg.OffScreen = false;
             MyCfg.Cfg.ShowTouches = false;
             MyCfg.Cfg.DeviceSleep = false;
 

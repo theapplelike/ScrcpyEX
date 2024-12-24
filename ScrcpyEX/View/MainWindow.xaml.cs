@@ -85,7 +85,7 @@ namespace ScrcpyEX.View
             }
         }
 
-        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        private void BtnClosePrg_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
@@ -128,25 +128,15 @@ namespace ScrcpyEX.View
             btnLocate.Background = btnLocOpt.Background = Brushes.LightBlue;
         }
 
-        private void BtnRecord_Click(object sender, RoutedEventArgs e)
+        private void BtnRecManage_Click(object sender, RoutedEventArgs e)
         {
-            //popRec.IsOpen = true;
-            //btnRecord.Background = btnRecOpt.Background = Brushes.LightBlue;
-            StartRecord();
+            OpenRecordManage();
         }
 
-        private void BtnRecOpt_Click(object sender, RoutedEventArgs e)
+        private void BtnRecOption_Click(object sender, RoutedEventArgs e)
         {
-            //StartRecord();
-            //bool? reult = new RecManage().ShowDialog();
-            //Console.WriteLine($"结果:{reult}。");
-            RecManage rec = new();
-            if (rec.ShowDialog() == true)
-            {
-                _pts = rec._pts;
-                _clickTimer.Interval = TimeSpan.FromSeconds(10);
-                _clickTimer.Start();
-            }
+            popRec.IsOpen = true;
+            btnRecManage.Background = btnRecOption.Background = Brushes.LightBlue;
         }
         #endregion
 
@@ -174,17 +164,9 @@ namespace ScrcpyEX.View
             popMenu.IsOpen = false;
         }
 
-        private void BtnRecManage_Click(object sender, RoutedEventArgs e)
-        {
-            //RecManage rec = new();
-            //rec.ShowDialog();
-        }
-
         private void BtnStartRec_Click(object sender, RoutedEventArgs e)
         {
-            //StartRecord();
-            //popRec.IsOpen = false;
-            //btnRecOpt.IsEnabled = true;
+            StartRecord();
         }
         #endregion
 
@@ -213,6 +195,9 @@ namespace ScrcpyEX.View
             //Console.WriteLine("鼠标在窗体按下。");
         }
 
-        
+        private void BtnRecStop_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

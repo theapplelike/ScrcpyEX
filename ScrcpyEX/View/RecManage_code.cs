@@ -86,6 +86,18 @@ namespace ScrcpyEX.View
             }
         }
 
+        /// <summary>
+        /// 将指定脚本的数据赋值给界面。
+        /// </summary>
+        /// <param name="recInfo">指定的脚本实体类。</param>
+        private void ValToUI(RecInfo recInfo)
+        {
+            rdoLimited.IsChecked = recInfo.Limited;
+            rdoHandStop.IsChecked = recInfo.HandStop;
+            txtCycleNum.Text = recInfo.CycleNumber.ToString();
+            txtCycleInterval.Text = recInfo.CycleInterval.ToString();
+        }
+
 
     }
 }

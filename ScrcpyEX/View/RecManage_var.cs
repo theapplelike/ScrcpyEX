@@ -23,7 +23,12 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 要播放的坐标点列表。
         /// </summary>
-        public List<PointInfo> _pts;
+        //public List<PointInfo> _pts;
+
+        /// <summary>
+        /// 临时存储正在编辑的脚本信息。
+        /// </summary>
+        public RecInfo TempRecInfo { get; set; } = null;
 
 
     }

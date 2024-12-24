@@ -114,7 +114,6 @@ namespace ScrcpyEX.View
             _resizeTimer.Tick += new EventHandler(Resize_Tick);
             _resizeTimer.Interval = TimeSpan.FromSeconds(0.1);//大小调整间隔
 
-            //_clickTimer.Tick += new EventHandler(Click_Tick);
             _clickTimer.Tick += (sender, e) => Click_Tick(_pts);
             _clickTimer.Interval = TimeSpan.FromSeconds(1);
 
@@ -136,12 +135,12 @@ namespace ScrcpyEX.View
         /// <summary>
         /// PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
         /// </summary>
-        private async void Click_Tick(List<PointInfo> _pts)
+        private async void Click_Tick(List<PointInfo> pointInfos)
         {
-            foreach (PointInfo info in _pts)
+            foreach (PointInfo info in pointInfos)
             {
-                Console.WriteLine($"点击：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
-                await Task.Delay((int)info.LastTime);
+                await Task.Delay(TimeSpan.FromSeconds(info.LastTime));
+                Console.WriteLine($"Timer点击：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
                 int x = (int)info.Pt.X;
                 int y = (int)info.Pt.Y;
 
@@ -220,11 +219,11 @@ namespace ScrcpyEX.View
             //将窗口水平居中点转换为屏幕坐标，PointToScreen()转化出的结果已经乘以了缩放比例
             //Point screenCenter = PointToScreen(new Point(ActualWidth / 2, 35));
             //Console.WriteLine($"{screenCenter.X},{screenCenter.Y},{ActualWidth / 2},{ActualHeight / 2}");
-            
+
             // 将弹出窗口的位置设置为窗口的中心
             //pop.HorizontalOffset = (screenCenter.X / ScaleX - pop.Child.RenderSize.Width / 2) - ExtraWidthLeft;
             //pop.VerticalOffset = (screenCenter.Y / ScaleY - pop.Child.RenderSize.Height / 2);
-            
+
             //Console.WriteLine($"{pop.HorizontalOffset},{pop.VerticalOffset}");
             //Console.WriteLine($"{pop.Child.RenderSize.Width},{pop.Child.RenderSize.Height}");
             //pop.HorizontalOffset = 100;
@@ -232,6 +231,7 @@ namespace ScrcpyEX.View
 
             //Console.WriteLine($"{_scHeight},{ActualHeight}");
             //MV.Pop.SHW("yesclick");
+            await Task.Delay(1);
         }
 
         private void BtnTest_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)

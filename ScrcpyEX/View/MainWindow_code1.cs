@@ -53,7 +53,7 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 注册鼠标钩子进行录制操作。
+        /// 注册鼠标钩子进行录制脚本操作。
         /// </summary>
         private async void StartRecord()
         {
@@ -67,7 +67,7 @@ namespace ScrcpyEX.View
             {
                 if (MouseHook.RegisterHook())
                 {
-                    btnRecord.Content = "\ueb4a";
+                    //btnRecManage.Content = "\ueb4a";
                     await popMid.SHW("已开启录制操作，再次点击结束录制。");
                 }
                 else
@@ -78,8 +78,30 @@ namespace ScrcpyEX.View
             else
             {
                 MouseHook.CancelHook();
-                btnRecord.Content = "\ue819";
+                //btnRecManage.Content = "\uea40";
                 await popMid.SHW("已停止录制操作。");
+            }
+        }
+
+        /// <summary>
+        /// 打开录制管理界面，界面返回值为true时执行脚本。
+        /// </summary>
+        private async void OpenRecordManage()
+        {
+            RecManage rec = new();
+            if (rec.ShowDialog() == true)
+            {
+                if (_scHandle == IntPtr.Zero)
+                {
+                    await popMid.SHW("未进行投屏，不能执行脚本。");
+                }
+                else
+                {
+                    _pts = rec.TempRecInfo.Infos;
+                    _clickTimer.Interval = TimeSpan.FromSeconds(rec.TempRecInfo.CycleInterval);
+                    _clickTimer.Start();
+                    Click_Tick(_pts);
+                }
             }
         }
 

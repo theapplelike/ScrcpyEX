@@ -66,27 +66,27 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <RadioButton x:Name="rdoLoc1" Grid.Row="0" Grid.Column="0" Content="左上" Margin="0,10,0,5" HorizontalAlignment="Center"/>
-                        <RadioButton x:Name="rdoLoc2" Grid.Row="0" Grid.Column="1" Content="右上" Margin="0,10,0,5" HorizontalAlignment="Center"/>
-                        <RadioButton x:Name="rdoLoc3" Grid.Row="1" Grid.Column="0" Content="左下" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                        <RadioButton x:Name="rdoLoc4" Grid.Row="1" Grid.Column="1" Content="右下" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                        <RadioButton x:Name="rdoLoc1" Grid.Row="0" Grid.Column="0" Content="↖左上" Margin="0,10,0,5" HorizontalAlignment="Center"/>
+                        <RadioButton x:Name="rdoLoc2" Grid.Row="0" Grid.Column="1" Content="↗右上" Margin="0,10,0,5" HorizontalAlignment="Center"/>
+                        <RadioButton x:Name="rdoLoc3" Grid.Row="1" Grid.Column="0" Content="↙左下" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                        <RadioButton x:Name="rdoLoc4" Grid.Row="1" Grid.Column="1" Content="↘右下" Margin="0,0,0,10" HorizontalAlignment="Center"/>
                     </Grid>
 
                     <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并移动定位" BorderThickness="0,1"/>
-                    <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="⌂手机原始尺寸并移动定位"/>
+                    <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="▣手机原始尺寸并移动定位"/>
                     <Button Style="{StaticResource ItemBtn}" Content="⌂居中"/>
                 </StackPanel>
             </Border>
         </Popup>
 
         <!--显示的POP录制菜单-->
-        <Popup x:Name="popRec" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnRecord}" Tag="g2" Closed="Pop_Closed">
+        <Popup x:Name="popRec" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnRecManage}" Tag="g2" Closed="Pop_Closed">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel>
-                    <TextBlock Text="录制列表" Background="White" Padding="10"/>
+                    <TextBlock Text="录制菜单" Background="White" Padding="10"/>
 
-                    <Button x:Name="btnRecManage" Click="BtnRecManage_Click" Style="{StaticResource ItemBtn}" Content="录制管理" BorderThickness="0,1"/>
-                    <Button x:Name="btnStartRec"  Click="BtnStartRec_Click"  Style="{StaticResource ItemBtn}" Content="开始录制"/>
+                    <!--<Button Style="{StaticResource ItemBtn}" Content="录制管理" BorderThickness="0,1"/>-->
+                    <Button x:Name="btnStartRec" Click="BtnStartRec_Click" Style="{StaticResource ItemBtn}" Content="开始录制"/>
                 </StackPanel>
             </Border>
         </Popup>
@@ -101,8 +101,8 @@
             <Button x:Name="btnLocOpt" Click="BtnLocOpt_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g1" Width="22" ToolTip="定位与大小选项"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
-            <Button x:Name="btnRecord" Click="BtnRecord_Click" Style="{StaticResource MenuBtn}" Content="&#xe819;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="40" ToolTip="录制按钮"/>
-            <Button x:Name="btnRecOpt" Click="BtnRecOpt_Click" Style="{StaticResource MenuBtn}" Content="&#xea40;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="40" ToolTip="脚本管理"/>
+            <Button x:Name="btnRecManage" Click="BtnRecManage_Click" Style="{StaticResource MenuBtn}" Content="&#xea40;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="40" ToolTip="脚本管理"/>
+            <Button x:Name="btnRecOption" Click="BtnRecOption_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="22" ToolTip="录制菜单"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
             <Button x:Name="btnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
@@ -112,9 +112,10 @@
             <TextBlock Text="正在进行大小调整，调整完毕后请选择是否保存..." VerticalAlignment="Center" FontSize="12" />
             -->
 
-            <Button x:Name="btnClose"    Style="{StaticResource MenuBtn}" Content="&#xe711;" Click="BtnClose_Click" DockPanel.Dock="Right" Margin="0"/>
-            <Button x:Name="btnMaximize" Style="{StaticResource MenuBtn}" Content="&#xe923;" Click="BtnMaximize_Click" DockPanel.Dock="Right"/>
-            <Button x:Name="btnMinimize" Style="{StaticResource MenuBtn}" Content="&#xe73c;" Click="BtnMinimize_Click" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
+            <Button x:Name="btnClosePrg" Click="BtnClosePrg_Click" Style="{StaticResource MenuBtn}" Content="&#xe711;" DockPanel.Dock="Right" Margin="0"/>
+            <Button x:Name="btnMaximize" Click="BtnMaximize_Click" Style="{StaticResource MenuBtn}" Content="&#xe923;" DockPanel.Dock="Right"/>
+            <Button x:Name="btnMinimize" Click="BtnMinimize_Click" Style="{StaticResource MenuBtn}" Content="&#xe73c;" DockPanel.Dock="Right"/>
+            <Button x:Name="btnRecStop"  Click="BtnRecStop_Click"  Style="{StaticResource MenuBtn}" Content="&#xe73c;" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
         </DockPanel>
 
         <!--<Border x:Name="bd" Grid.Row="1" BorderBrush="Gray" BorderThickness="3" Width="1350" Height="630">

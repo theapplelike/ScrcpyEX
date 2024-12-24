@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -39,7 +40,6 @@ namespace ScrcpyEX.View
         private void Root_Closed(object sender, EventArgs e)
         {
             _vm.SaveData();
-            Console.WriteLine("wxit");
         }
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
@@ -53,12 +53,47 @@ namespace ScrcpyEX.View
             {
                 foreach (var info in recInfo.Infos)
                 {
-                    Console.WriteLine($"{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
+                    Console.WriteLine($"遍历：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
                 }
-                _pts = recInfo.Infos;
+                Console.WriteLine($"循环次数：{recInfo.CycleNumber}，循环间隔：{recInfo.CycleInterval}");
+                TempRecInfo = recInfo;
+                DialogResult = true;
             }
+        }
 
-            DialogResult = true;
+        private void BtnSet_Click(object sender, RoutedEventArgs e)
+        {
+            if (((Button)sender).CommandParameter is RecInfo recInfo)
+            {
+                ValToUI(recInfo);
+                TempRecInfo = recInfo;
+                _vm.SetParam(recInfo);
+            }
+        }
+
+        private void BtnSave_Click(object sender, RoutedEventArgs e)
+        {
+            int.TryParse(txtCycleNum.Text, out int num);
+            int.TryParse(txtCycleInterval.Text, out int interval);
+
+            RecInfo recInfo = new()
+            {
+                Limited = (bool)rdoLimited.IsChecked,
+                HandStop = (bool)rdoHandStop.IsChecked,
+                CycleNumber = num,
+                CycleInterval = interval,
+            };
+
+            _vm.Save(recInfo);
+        }
+
+        private void BtnCanel_Click(object sender, RoutedEventArgs e)
+        {
+            if (TempRecInfo != null)
+            {
+                ValToUI(TempRecInfo);
+                _vm.Canel();
+            }
         }
     }
 }

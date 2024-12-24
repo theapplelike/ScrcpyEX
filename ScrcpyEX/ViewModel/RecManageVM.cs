@@ -16,11 +16,6 @@ namespace ScrcpyEX.ViewModel
     internal class RecManageVM : NotificationObject
     {
         /// <summary>
-        /// 临时存储正在编辑的坐标点信息列表。
-        /// </summary>
-        private List<PointInfo> _tempInfo = [];
-
-        /// <summary>
         /// 说明当前正在编辑的坐标点实体类的索引。
         /// </summary>
         private int _index = -1;
@@ -44,7 +39,7 @@ namespace ScrcpyEX.ViewModel
                 RaisePropertyChanged();
             }
         }
-        private ObservableCollection<RecInfo> recInfos = [new() { Name="123"}, new() { Name = "223" }];
+        private ObservableCollection<RecInfo> recInfos = [new() { Name="1"}, new() { Name = "2" }];
 
         /// <summary>
         /// 坐标点的集合。
@@ -61,9 +56,6 @@ namespace ScrcpyEX.ViewModel
         private DataTable pointDt = new();
 
         public ICommand DelRecCommand => new RelayCommand(DelRec);
-        public ICommand SetParamCommand => new RelayCommand(SetParam);
-        public ICommand SaveCommand => new RelayCommand(Save);
-        public ICommand CanelCommand => new RelayCommand(Canel);
 
         /// <summary>
         /// 删除指定记录。
@@ -82,36 +74,35 @@ namespace ScrcpyEX.ViewModel
         }
 
         /// <summary>
-        /// 设置参数。
+        /// 显示坐标点参数到DataTable中。
         /// </summary>
-        /// <param name="parameter">坐标点的集合。</param>
-        private void SetParam(object parameter)
+        /// <param name="parameter">当前选中的脚本。</param>
+        public void SetParam(RecInfo info)
         {
-            if (parameter is RecInfo info)
-            {
-                _index = RecInfos.IndexOf(info);
-                _tempInfo = info.Infos;
-                CopyToDt(info.Infos);
-            }
+            _index = RecInfos.IndexOf(info);
+            CopyToDt(info.Infos);
         }
 
         /// <summary>
-        /// 保存修改的PointInfo类数据。
+        /// 保存修改的坐标点和脚本数据。
         /// </summary>
-        private void Save(object parameter)
+        public void Save(RecInfo recInfo)
         {
             if (_index != -1)
             {
-                CopyToClass(PointDt);
-            }  
+                CopyToClass(PointDt, recInfo);
+            }
         }
 
         /// <summary>
         /// 取消修改的PointInfo类数据。
         /// </summary>
-        private void Canel(object parameter)
+        public void Canel()
         {
-            CopyToDt(_tempInfo);
+            if (_index != -1)
+            {
+                CopyToDt(RecInfos[_index].Infos);
+            }
         }
 
         /// <summary>
@@ -131,18 +122,23 @@ namespace ScrcpyEX.ViewModel
         /// 将DataTable的值复制给实体类。
         /// </summary>
         /// <param name="dt">代表坐标点集合的DataTable。</param>
-        private void CopyToClass(DataTable dt)
+        /// <param name="recInfo">界面上的关于录制操作的信息。</param>
+        private void CopyToClass(DataTable dt, RecInfo recInfo)
         {
-            _tempInfo.Clear();
+            List<PointInfo> tempInfo = [];
             foreach (DataRow dr in dt.Rows)
             {
                 double r1 = double.Parse(dr["XAxis"].ToString());
                 double r2 = double.Parse(dr["YAxis"].ToString());
                 double r3 = double.Parse(dr["LastTime"].ToString());
 
-                _tempInfo.Add(new PointInfo(new Point(r1, r2), r3));
-                RecInfos[_index].Infos = _tempInfo;
+                tempInfo.Add(new PointInfo(new Point(r1, r2), r3));
             }
+            RecInfos[_index].Infos = tempInfo;
+            RecInfos[_index].Limited = recInfo.Limited;
+            RecInfos[_index].HandStop = recInfo.HandStop;
+            RecInfos[_index].CycleNumber = recInfo.CycleNumber;
+            RecInfos[_index].CycleInterval = recInfo.CycleInterval;
         }
 
         /// <summary>
@@ -150,7 +146,7 @@ namespace ScrcpyEX.ViewModel
         /// </summary>
         public void SaveData()
         {
-            MyCfg.Cfg.RecInfos = new(RecInfos);
+            //MyCfg.Cfg.RecInfos = new(RecInfos);
             MyCfg.Save();
         }
 

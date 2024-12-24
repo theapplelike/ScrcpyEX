@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ScrcpyEX.View"
         mc:Ignorable="d"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
-        Title="RecManage" Height="400" Width="600" x:Name="root"
+        Title="RecManage" Height="450" Width="640" x:Name="root"
         WindowStartupLocation="CenterScreen" SizeToContent="Width"
         Loaded="Window_Loaded" Closed="Root_Closed">
 
@@ -39,7 +39,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>-->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="320"/>
+            <ColumnDefinition Width="360"/>
             <ColumnDefinition Width="280"/>
         </Grid.ColumnDefinitions>
 
@@ -55,7 +55,7 @@
                         <Border BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="115" />
+                                    <ColumnDefinition Width="155" />
                                     <ColumnDefinition Width="40" />
                                     <ColumnDefinition Width="10" />
                                     <ColumnDefinition Width="40" />
@@ -68,7 +68,7 @@
                                 <TextBlock Text="|" FontSize="20" Grid.Column="2" HorizontalAlignment="Center"/>
 
                                 <Button x:Name="btnPlay" Click="BtnPlay_Click" CommandParameter="{Binding}" Grid.Column="3" Content="&#xec57;" Style="{StaticResource LstBtn}"/>
-                                <Button x:Name="btnSet" Command="{Binding DataContext.SetParamCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="4" Content="&#xe713;" Style="{StaticResource LstBtn}"/>
+                                <Button x:Name="btnSet" Click="BtnSet_Click" CommandParameter="{Binding}" Grid.Column="4" Content="&#xe713;" Style="{StaticResource LstBtn}"/>
                                 <Button x:Name="btnDel" Command="{Binding DataContext.DelRecCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="5" Content="&#xe74d;" Style="{StaticResource LstBtn}"/>
                             </Grid>
                         </Border>
@@ -81,11 +81,12 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="20"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="74"/>
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
             <TextBlock Text="详细信息：" VerticalAlignment="Center" Margin="10,0,0,0"/>
 
-            <DataGrid Grid.Row="1" ItemsSource="{Binding PointDt}" AutoGenerateColumns="False" Margin="0,0,0,8" CanUserSortColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
+            <DataGrid Grid.Row="1" ItemsSource="{Binding PointDt}" AutoGenerateColumns="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="延时（秒）" Binding="{Binding LastTime}" Width="*" />
                     <DataGridTextColumn Header="坐标点X" Binding="{Binding XAxis}" Width="*" />
@@ -93,13 +94,44 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <Grid Grid.Row="2">
+            <Grid Grid.Row="2"  Margin="0,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="4"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="执行循环" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <RadioButton x:Name="rdoLimited" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="执行" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtCycleNum" Width="40" Margin="5,0"/>
+                        <TextBlock Text="次" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="rdoHandStop" Grid.Row="1" Grid.Column="1" Content="手动停止" VerticalAlignment="Center"/>
+
+                <Border Grid.Row="2" Grid.ColumnSpan="2" BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2" Margin="0,0,0,2"/>
+
+                <TextBlock Text="循环间隔" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="1">
+                    <TextBox x:Name="txtCycleInterval" Width="40" Margin="0,0,5,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <TextBlock Text="秒" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+            
+            <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button x:Name="btnSave" Command="{Binding DataContext.SaveCommand,ElementName=root}" Content="保存" Style="{StaticResource Btn}"/>
-                <Button x:Name="btnCanel" Command="{Binding DataContext.CanelCommand,ElementName=root}" Content="取消" Style="{StaticResource Btn}" Grid.Column="1"/>
+                <Button x:Name="btnSave" Click="BtnSave_Click" Content="保存" Style="{StaticResource Btn}"/>
+                <Button x:Name="btnCanel" Click="BtnCanel_Click" Content="取消" Style="{StaticResource Btn}" Grid.Column="1"/>
             </Grid>
         </Grid>
         
