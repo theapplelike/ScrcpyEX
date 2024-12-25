@@ -36,14 +36,14 @@ namespace ScrcpyEX.View
             double maxW = (ActualWidth - ExtraWidth) * ScaleX;
             double maxH = (ActualHeight - ExtraHeight) * ScaleY;
 
-            Console.WriteLine($"程序相对于屏幕%：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
-            Console.WriteLine($"鼠标相对于屏幕%：({pt2.X}, {pt2.Y})。");
-            Console.WriteLine($"鼠标在程序中坐标%：({x}, {y})；scrcpy尺寸%：({maxW}, {maxH})。");
+            //Console.WriteLine($"程序相对于屏幕%：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
+            //Console.WriteLine($"鼠标相对于屏幕%：({pt2.X}, {pt2.Y})。");
+            //Console.WriteLine($"鼠标在程序中坐标%：({x}, {y})；scrcpy尺寸%：({maxW}, {maxH})。");
             
             if (x > 0 && x < maxW && y > 0 && y < maxH)
             {
-                Console.WriteLine($"YES，鼠标在scrcpy中。");
-                Console.WriteLine($"////////////////////。\n");
+                //Console.WriteLine($"YES，鼠标在scrcpy中。");
+                //Console.WriteLine($"////////////////////。\n");
                 return new System.Windows.Point(x, y);
             }
             else
@@ -53,32 +53,59 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 注册鼠标钩子进行录制脚本操作。
+        /// 停止录制操作或停止执行脚本的计时器。
         /// </summary>
-        private async void StartRecord()
+        private void RecordStop()
         {
-            //if (_scHandle == IntPtr.Zero)
-            //{
-            //    await popMid.SHW("未进行投屏，不能进行录制。");
-            //    return;
-            //}
+            if (_clickTimer.IsEnabled)
+            {
+                _clickTimer.Stop();
+                _countTimer.Stop();
+                bdRec.Visibility = Visibility.Hidden;
+                dplTip.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                StartRecord(false);
+            }
+        }
+
+        /// <summary>
+        /// 注册鼠标钩子进行录制脚本操作，如果已注册鼠标钩子，则注销鼠标钩子并保存录制的脚本。
+        /// </summary>
+        /// <param name="isCanRec">如果未进行录制，是否可以进行录制操作。</param>
+        private async void StartRecord(bool isCanRec)
+        {
+            if (_scHandle == IntPtr.Zero)
+            {
+                await popMid.SHW("未进行投屏，不能进行录制。");
+                return;
+            }
+            if (_clickTimer.IsEnabled)
+            {
+                await popMid.SHW("正在执行脚本，不能进行录制。");
+                return;
+            }
 
             if (MouseHook.HookID == IntPtr.Zero)
             {
-                if (MouseHook.RegisterHook())
+                if (isCanRec)
                 {
-                    //btnRecManage.Content = "\ueb4a";
-                    await popMid.SHW("已开启录制操作，再次点击结束录制。");
-                }
-                else
-                {
-                    await popMid.SHW("钩子注册失败，未能启动录制。");
+                    if (MouseHook.RegisterHook())
+                    {
+                        bdRec.Visibility = Visibility.Visible;
+                        await popMid.SHW("已开启录制操作，再次点击结束录制。");
+                    }
+                    else
+                    {
+                        await popMid.SHW("钩子注册失败，未能启动录制。");
+                    }
                 }
             }
             else
             {
                 MouseHook.CancelHook();
-                //btnRecManage.Content = "\uea40";
+                bdRec.Visibility = Visibility.Hidden;
                 await popMid.SHW("已停止录制操作。");
             }
         }
@@ -97,10 +124,21 @@ namespace ScrcpyEX.View
                 }
                 else
                 {
+                    if (MouseHook.HookID != IntPtr.Zero)
+                    {
+                        await popMid.SHW("已开启录制操作，不能执行脚本。");
+                        return;
+                    }
+
+                    bdRec.Visibility = Visibility.Visible;
+                    dplTip.Visibility = Visibility.Visible;
+                    _vm.CycleNum = 0;
+
                     _pts = rec.TempRecInfo.Infos;
                     _clickTimer.Interval = TimeSpan.FromSeconds(rec.TempRecInfo.CycleInterval);
                     _clickTimer.Start();
-                    Click_Tick(_pts);
+                    _countTimer.Start();
+                    Click_Tick(_pts);//立刻执行一次脚本
                 }
             }
         }

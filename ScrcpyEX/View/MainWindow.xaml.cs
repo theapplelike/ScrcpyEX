@@ -46,7 +46,7 @@ namespace ScrcpyEX.View
         {
             Console.WriteLine($"窗体大小进行改变，scrcpy句柄：{_scHandle}。");
 
-            //第三方程序句柄不为空调整scrcpy大小
+            //scrcpy程序句柄不为空调整scrcpy大小
             if (_scHandle != IntPtr.Zero)
             {
                 _resizeTimer.Start();
@@ -63,26 +63,15 @@ namespace ScrcpyEX.View
             DragMove();
         }
 
-        private async void BtnWired_Click(object sender, RoutedEventArgs e)
+        private void BtnWired_Click(object sender, RoutedEventArgs e)
         {
-            if (_scHandle == IntPtr.Zero)
-            {
-                btnWired.IsEnabled = false;
-                await ConnectScrcpy();
-                btnWired.IsEnabled = true;
-            }
+            WiredStart();
         }
 
-        /// <summary>
-        /// 外部程序被Kill()后，会执行Exited事件，前提是EnableRaisingEvents要设置为true。
-        /// </summary>
+        
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
-            if (_scHandle != IntPtr.Zero)
-            {
-                _prc.Kill();
-                Console.WriteLine("手动结束scrcpy程序。");
-            }
+            HandStopScrcpy();
         }
 
         private void BtnClosePrg_Click(object sender, RoutedEventArgs e)
@@ -138,6 +127,11 @@ namespace ScrcpyEX.View
             popRec.IsOpen = true;
             btnRecManage.Background = btnRecOption.Background = Brushes.LightBlue;
         }
+
+        private void BtnRecStop_Click(object sender, RoutedEventArgs e)
+        {
+            RecordStop();
+        }
         #endregion
 
         #region 弹出菜单事件
@@ -166,7 +160,8 @@ namespace ScrcpyEX.View
 
         private void BtnStartRec_Click(object sender, RoutedEventArgs e)
         {
-            StartRecord();
+            StartRecord(true);
+            popRec.IsOpen = false;
         }
         #endregion
 
@@ -195,9 +190,6 @@ namespace ScrcpyEX.View
             //Console.WriteLine("鼠标在窗体按下。");
         }
 
-        private void BtnRecStop_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
+        
     }
 }

@@ -216,8 +216,6 @@ namespace ScrcpyEX.View
             {
                 if (p.MainWindowTitle.Contains(_scName))
                 {
-                    //ShowWindow(p.MainWindowHandle, 0);
-                    //IntPtr pnl = pnlShow.Handle;
                     _scHandle = p.MainWindowHandle;
             
                     HideTitleBar(_scHandle);
@@ -254,12 +252,9 @@ namespace ScrcpyEX.View
         /// <param name="handle">窗口的句柄。</param>
         private void HideTitleBar(IntPtr handle)
         {
-            int GWL_STYLE = -16;//检索窗口样式
+            int GWL_STYLE = -16;//检索窗口的样式
             int WS_CAPTION = 0xC00000;//是窗口标题栏的样式标志
             int WS_THICKFRAME = 0x00040000;//允许通过拖动边缘来调整窗口大小
-            //在窗口的标题栏中添加“最大化”按钮
-            //int WS_MAXIMIZEBOX = 0x00010000;
-
             int style = DLL.GetWindowLong(handle, GWL_STYLE);
 
             //删除WS_CAPTION样式以隐藏标题栏  
@@ -358,6 +353,32 @@ namespace ScrcpyEX.View
             Height = (Width - ExtraWidth) * 1.0 / 15 * 7 + ExtraHeight;
             Locate();
             Console.WriteLine($"宽高：{Width},{Height}。");
+        }
+
+        /// <summary>
+        /// 以有线形式启动Scrcpy。
+        /// </summary>
+        private async void WiredStart()
+        {
+            if (_scHandle == IntPtr.Zero)
+            {
+                btnWired.IsEnabled = false;
+                await ConnectScrcpy();
+                btnWired.IsEnabled = true;
+            }
+        }
+
+        /// <summary>
+        /// 外部程序被Kill()后，会执行Exited事件，前提是EnableRaisingEvents要设置为true。
+        /// </summary>
+        private void HandStopScrcpy()
+        {
+            if (_scHandle != IntPtr.Zero)
+            {
+                _prc.Kill();
+                RecordStop();
+                Console.WriteLine("手动结束scrcpy程序。");
+            }
         }
 
 

@@ -158,7 +158,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
             Point? point = MV.MainWin.GetMouseInScrcpy();
             if (point is Point pt)
             {
-                infos.Add(new PointInfo(pt, 1));
+                infos.Add(new PointInfo(pt, 1.5));
                 Console.WriteLine($"添加点：{pt.X},{pt.Y}。");
             }
         }
@@ -181,10 +181,22 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         public static void CancelHook()
         {
             UnhookWindowsHookEx(HookID);
+            SaveRecordInfo();
             HookID = IntPtr.Zero;
             Console.WriteLine($"注销钩子句柄：{HookID}。");
-            MyCfg.Cfg.RecInfos.Add(new RecInfo() { Infos = new List<PointInfo>(infos) });
-            infos.Clear();
+        }
+
+        /// <summary>
+        /// 保存录制的信息。
+        /// </summary>
+        private static void SaveRecordInfo()
+        {
+            if (infos.Count > 0)
+            {
+                infos[0].LastTime = 0;
+                MyCfg.Cfg.RecInfos.Add(new RecInfo() { Infos = new List<PointInfo>(infos) });
+                infos.Clear();
+            }
         }
 
         /// <summary>

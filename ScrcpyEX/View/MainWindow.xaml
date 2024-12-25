@@ -86,7 +86,7 @@
                     <TextBlock Text="录制菜单" Background="White" Padding="10"/>
 
                     <!--<Button Style="{StaticResource ItemBtn}" Content="录制管理" BorderThickness="0,1"/>-->
-                    <Button x:Name="btnStartRec" Click="BtnStartRec_Click" Style="{StaticResource ItemBtn}" Content="开始录制"/>
+                    <Button x:Name="btnStartRec" Click="BtnStartRec_Click" Style="{StaticResource ItemBtn}" Content="开始录制" BorderThickness="0,1"/>
                 </StackPanel>
             </Border>
         </Popup>
@@ -107,15 +107,23 @@
 
             <Button x:Name="btnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
 
-            <!--<Button x:Name="BtnSave"  Content="保存" />
-            <Button x:Name="BtnCanel" Content="取消" />
-            <TextBlock Text="正在进行大小调整，调整完毕后请选择是否保存..." VerticalAlignment="Center" FontSize="12" />
-            -->
-
             <Button x:Name="btnClosePrg" Click="BtnClosePrg_Click" Style="{StaticResource MenuBtn}" Content="&#xe711;" DockPanel.Dock="Right" Margin="0"/>
             <Button x:Name="btnMaximize" Click="BtnMaximize_Click" Style="{StaticResource MenuBtn}" Content="&#xe923;" DockPanel.Dock="Right"/>
             <Button x:Name="btnMinimize" Click="BtnMinimize_Click" Style="{StaticResource MenuBtn}" Content="&#xe73c;" DockPanel.Dock="Right"/>
-            <Button x:Name="btnRecStop"  Click="BtnRecStop_Click"  Style="{StaticResource MenuBtn}" Content="&#xe73c;" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
+
+            <Border x:Name="bdRec" HorizontalAlignment="Right" BorderBrush="SteelBlue" BorderThickness="4" Visibility="Hidden">
+                <DockPanel>
+                    <DockPanel x:Name="dplTip" Visibility="Collapsed">
+                        <TextBlock Text="{Binding CycleNum}" VerticalAlignment="Center" FontSize="16" Margin="2,0,0,0"/>
+                        <TextBlock Text="次⊱⊰" VerticalAlignment="Center" FontSize="16"/>
+                        <TextBlock Text="{Binding Interval}" VerticalAlignment="Center" FontSize="16"/>
+                        <TextBlock Text="秒" VerticalAlignment="Center" FontSize="16" Margin="0,0,2,0"/>
+                        <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
+                    </DockPanel>
+                    <Button x:Name="btnRecStop" Click="BtnRecStop_Click" Style="{StaticResource MenuBtn}" Content="&#xe769;" Foreground="SteelBlue" Margin="0"/>
+                </DockPanel>
+            </Border>
+            
         </DockPanel>
 
         <!--<Border x:Name="bd" Grid.Row="1" BorderBrush="Gray" BorderThickness="3" Width="1350" Height="630">

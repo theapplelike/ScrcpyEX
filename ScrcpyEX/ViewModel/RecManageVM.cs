@@ -142,11 +142,11 @@ namespace ScrcpyEX.ViewModel
         }
 
         /// <summary>
-        /// 保存数据。
+        /// 保存被修改的数据。
         /// </summary>
         public void SaveData()
         {
-            //MyCfg.Cfg.RecInfos = new(RecInfos);
+            MyCfg.Cfg.RecInfos = new(RecInfos);
             MyCfg.Save();
         }
 

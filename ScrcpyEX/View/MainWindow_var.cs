@@ -45,6 +45,11 @@ namespace ScrcpyEX.View
         /// </summary>
         private readonly DispatcherTimer _clickTimer = new();
 
+        /// <summary>
+        /// 对每次脚本间隔进行计数。
+        /// </summary>
+        private readonly DispatcherTimer _countTimer = new();
+
         private readonly DispatcherTimer _testTimer = new();
 
         /// <summary>

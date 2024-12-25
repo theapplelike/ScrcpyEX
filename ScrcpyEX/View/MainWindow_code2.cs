@@ -117,6 +117,9 @@ namespace ScrcpyEX.View
             _clickTimer.Tick += (sender, e) => Click_Tick(_pts);
             _clickTimer.Interval = TimeSpan.FromSeconds(1);
 
+            _countTimer.Tick += (sender, e) => Count_Tick();
+            _countTimer.Interval = TimeSpan.FromSeconds(1);
+
             _testTimer.Tick += new EventHandler(Test_Tick);
             _testTimer.Interval = TimeSpan.FromSeconds(1);
         }
@@ -137,6 +140,8 @@ namespace ScrcpyEX.View
         /// </summary>
         private async void Click_Tick(List<PointInfo> pointInfos)
         {
+            _vm.CycleNum++;
+            _vm.Interval = 0;
             foreach (PointInfo info in pointInfos)
             {
                 await Task.Delay(TimeSpan.FromSeconds(info.LastTime));
@@ -149,6 +154,14 @@ namespace ScrcpyEX.View
                 DLL.PostMessage(_scHandle, MP.WM_LBUTTONDOWN, (IntPtr)MP.MK_LBUTTON, lp);
                 DLL.PostMessage(_scHandle, MP.WM_LBUTTONUP, IntPtr.Zero, lp);
             }
+        }
+
+        /// <summary>
+        /// 执行脚本时，说明已产生的间隔。
+        /// </summary>
+        private void Count_Tick()
+        {
+            _vm.Interval++;
         }
 
         /// <summary>
@@ -179,7 +192,7 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             //Console.WriteLine($"gMain的大小:{gMain.ActualWidth}，{gMain.ActualHeight}，{gMain.Width}，{gMain.Height}。");
-
+            
             //IntPtr intPtr = IntPtr.Zero;
 
             //DLL.SwitchToThisWindow(_scHandle, true);
