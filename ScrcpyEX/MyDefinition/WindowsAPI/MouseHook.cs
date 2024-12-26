@@ -193,7 +193,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         {
             if (infos.Count > 0)
             {
-                infos[0].LastTime = 0;
+                //infos[0].LastTime = 0;
                 MyCfg.Cfg.RecInfos.Add(new RecInfo() { Infos = new List<PointInfo>(infos) });
                 infos.Clear();
             }

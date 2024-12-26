@@ -25,8 +25,8 @@ namespace ScrcpyEX.View
         /// </summary>
         private void MyInit()
         {
-            MV.Pop = pop;
             MV.MainWin = this;
+            MV.Pop = pop;
 
             SetControlEvent();
             SetProcess();

@@ -1,4 +1,5 @@
-﻿using ScrcpyEX.View;
+﻿using ScrcpyEX.MyDefinition.MyControl;
+using ScrcpyEX.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,16 +15,15 @@ namespace ScrcpyEX.ExtensionMethod
     /// </summary>
     internal static class MV
     {
-        static MV()
-        {
-            PopTimer.Tick += new EventHandler(Pop_Tick);
-            PopTimer.Interval = TimeSpan.FromSeconds(3);
-        }
+        /// <summary>
+        /// Scrcpy的版本号。
+        /// </summary>
+        public static string ScrcpyVersion = "v3.1";
 
         /// <summary>
         /// Scrcpy的路径。
         /// </summary>
-        public static string ScrcpyPath { get; set; } = @".\scrcpy-win64-v3.0\scrcpy.exe";
+        public static string ScrcpyPath { get; set; } = @".\scrcpy-win64\scrcpy.exe";
 
         /// <summary>
         /// 主窗体的引用。
@@ -31,24 +31,10 @@ namespace ScrcpyEX.ExtensionMethod
         public static MainWindow MainWin { get; set; }
 
         /// <summary>
-        /// 全局提示控件。
+        /// 全局提示控件，在鼠标位置显示信息。
         /// </summary>
-        public static Popup Pop { get; set; } = new();
+        public static TimePopup Pop { get; set; }
 
-        /// <summary>
-        /// 全局提示控件的计时器，指定时间后消失。
-        /// </summary>
-        public static DispatcherTimer PopTimer = new();
 
-        /// <summary>
-        /// 提示控件显示指定时间后消失。
-        /// </summary>
-        private static void Pop_Tick(object sender, EventArgs e)
-        {
-            Console.WriteLine("**************");
-            Pop.IsOpen = false;
-            PopTimer.Stop();
-            Console.WriteLine("隐藏pop。");
-        }
     }
 }

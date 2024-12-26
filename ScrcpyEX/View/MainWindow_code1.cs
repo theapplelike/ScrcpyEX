@@ -74,16 +74,16 @@ namespace ScrcpyEX.View
         /// 注册鼠标钩子进行录制脚本操作，如果已注册鼠标钩子，则注销鼠标钩子并保存录制的脚本。
         /// </summary>
         /// <param name="isCanRec">如果未进行录制，是否可以进行录制操作。</param>
-        private async void StartRecord(bool isCanRec)
+        private void StartRecord(bool isCanRec)
         {
             if (_scHandle == IntPtr.Zero)
             {
-                await popMid.SHW("未进行投屏，不能进行录制。");
+                popMid.Show("未进行投屏，不能进行录制。");
                 return;
             }
             if (_clickTimer.IsEnabled)
             {
-                await popMid.SHW("正在执行脚本，不能进行录制。");
+                popMid.Show("正在执行脚本，不能进行录制。");
                 return;
             }
 
@@ -94,11 +94,11 @@ namespace ScrcpyEX.View
                     if (MouseHook.RegisterHook())
                     {
                         bdRec.Visibility = Visibility.Visible;
-                        await popMid.SHW("已开启录制操作，再次点击结束录制。");
+                        popMid.Show("已开启录制操作，再次点击结束录制。");
                     }
                     else
                     {
-                        await popMid.SHW("钩子注册失败，未能启动录制。");
+                        popMid.Show("钩子注册失败，未能启动录制。");
                     }
                 }
             }
@@ -106,27 +106,27 @@ namespace ScrcpyEX.View
             {
                 MouseHook.CancelHook();
                 bdRec.Visibility = Visibility.Hidden;
-                await popMid.SHW("已停止录制操作。");
+                popMid.Show("已停止录制操作。");
             }
         }
 
         /// <summary>
         /// 打开录制管理界面，界面返回值为true时执行脚本。
         /// </summary>
-        private async void OpenRecordManage()
+        private void OpenRecordManage()
         {
             RecManage rec = new();
             if (rec.ShowDialog() == true)
             {
                 if (_scHandle == IntPtr.Zero)
                 {
-                    await popMid.SHW("未进行投屏，不能执行脚本。");
+                    popMid.Show("未进行投屏，不能执行脚本。");
                 }
                 else
                 {
                     if (MouseHook.HookID != IntPtr.Zero)
                     {
-                        await popMid.SHW("已开启录制操作，不能执行脚本。");
+                        popMid.Show("已开启录制操作，不能执行脚本。");
                         return;
                     }
 

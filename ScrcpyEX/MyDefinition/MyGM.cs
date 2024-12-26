@@ -20,13 +20,10 @@ namespace ScrcpyEX.MyDefinition
         /// 在鼠标位置显示Popup提示，重复执行时可以显示到最新位置。
         /// </summary>
         /// <param name="text">要显示的文本。</param>
-        public static void POP(string text)
+        /// <param name="time">Popup控件显示的时间，单位s。</param>
+        public static void POP(string text, int time = 3)
         {
-            (MV.Pop.Child as TextBlock).Text = text;
-            
-            MV.Pop.IsOpen = false;
-            MV.Pop.IsOpen = true;
-            MV.PopTimer.Start();
+            MV.Pop.Show(text, time);
         }
 
         /// <summary>

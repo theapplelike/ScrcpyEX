@@ -192,7 +192,7 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             //Console.WriteLine($"gMain的大小:{gMain.ActualWidth}，{gMain.ActualHeight}，{gMain.Width}，{gMain.Height}。");
-            
+
             //IntPtr intPtr = IntPtr.Zero;
 
             //DLL.SwitchToThisWindow(_scHandle, true);
@@ -243,7 +243,6 @@ namespace ScrcpyEX.View
             //pop.VerticalOffset = ExtraHeightTop - (ActualHeight - ExtraHeightTop) / 2 + 5;
 
             //Console.WriteLine($"{_scHeight},{ActualHeight}");
-            //MV.Pop.SHW("yesclick");
             await Task.Delay(1);
         }
 

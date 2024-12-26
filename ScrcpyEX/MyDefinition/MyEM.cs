@@ -20,19 +20,19 @@ namespace ScrcpyEX.MyDefinition
         /// <param name="pop">Popup控件。</param>
         /// <param name="text">要显示的文本。</param>
         /// <param name="time">Popup控件显示的时间，单位ms。</param>
-        public static async Task SHW(this Popup pop, string text, int time = 3000)
-        {
-            if (pop.IsOpen)
-            {
-                return;
-            }
-
-            MyGM.FindVisualChild<TextBlock>(pop.Child).Text = text;
-            pop.IsOpen = true;
-            
-            await Task.Delay(time);
-            pop.IsOpen = false;
-        }
+        //public static async Task SHW(this Popup pop, string text, int time = 3000)
+        //{
+        //    if (pop.IsOpen)
+        //    {
+        //        return;
+        //    }
+        //
+        //    MyGM.FindVisualChild<TextBlock>(pop.Child).Text = text;
+        //    pop.IsOpen = true;
+        //    
+        //    await Task.Delay(time);
+        //    pop.IsOpen = false;
+        //}
 
     }
 }

@@ -65,14 +65,15 @@
     </ApplicationDefinition>
     <Compile Include="Model\PointInfo.cs" />
     <Compile Include="Model\RecInfo.cs" />
+    <Compile Include="MyDefinition\MyControl\TimePopup.cs" />
     <Compile Include="MyDefinition\WindowsAPI\DLL.cs" />
     <Compile Include="MyDefinition\MV.cs" />
     <Compile Include="MyDefinition\MyAttribute\ArgumentsAttribute.cs" />
     <Compile Include="MyDefinition\MyCfg.cs" />
     <Compile Include="MyDefinition\MyEM.cs" />
     <Compile Include="MyDefinition\MyGM.cs" />
-    <Compile Include="MyDefinition\NotificationObject.cs" />
-    <Compile Include="MyDefinition\RelayCommand.cs" />
+    <Compile Include="MyDefinition\MyClass\NotificationObject.cs" />
+    <Compile Include="MyDefinition\MyClass\RelayCommand.cs" />
     <Compile Include="MyDefinition\WindowsAPI\MouseHook.cs" />
     <Compile Include="MyDefinition\WindowsAPI\MP.cs" />
     <Compile Include="ViewModel\MainWindowVM.cs" />

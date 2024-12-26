@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:wfI="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
-        xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
+        xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel" 
+        xmlns:mycontrol="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
         Title="MainWindow" Height="600" Width="1200" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged" PreviewMouseDown="Window_PreviewMouseDown">
 
@@ -35,22 +36,22 @@
         </Grid.RowDefinitions>
 
         <!--程序通用的鼠标提示POP-->
-        <Popup x:Name="pop" PopupAnimation="Fade" Placement="Mouse" StaysOpen="True" AllowsTransparency="True">
+        <mycontrol:TimePopup x:Name="pop" PopupAnimation="Fade" Placement="Mouse" StaysOpen="True" AllowsTransparency="True">
             <TextBlock 
                 Text="提示：Hello？"
                 Background="White"
                 Padding="10"/>
-        </Popup>
+        </mycontrol:TimePopup>
 
         <!--主界面使用的居中POP-->
-        <Popup x:Name="popMid" PopupAnimation="Slide" Placement="Center" StaysOpen="True" AllowsTransparency="True"  PlacementTarget="{Binding ElementName=dpl}" Opened="PopMid_Opened">
+        <mycontrol:TimePopup x:Name="popMid" PopupAnimation="Slide" Placement="Center" StaysOpen="True" AllowsTransparency="True"  PlacementTarget="{Binding ElementName=dpl}" Opened="PopMid_Opened">
             <Border MinHeight="10" MinWidth="10" CornerRadius="10" BorderThickness="4" BorderBrush="{StaticResource Scb2}" Background="{StaticResource Scb1}" Margin="5">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="10" ShadowDepth="0" Color="Gray"/>
                 </Border.Effect>
                 <TextBlock FontSize="20" Padding="10" Foreground="#3F6897"/>
             </Border>
-        </Popup>
+        </mycontrol:TimePopup>
 
         <!--显示的POP定位菜单-->
         <Popup x:Name="popMenu" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnLocate}" Tag="g1" Closed="Pop_Closed">
