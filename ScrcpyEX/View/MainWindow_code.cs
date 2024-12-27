@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Controls;
 using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.WindowsAPI;
+using System.Drawing;
 
 namespace ScrcpyEX.View
 {
@@ -32,19 +33,30 @@ namespace ScrcpyEX.View
             SetProcess();
             SetTimer();
             ReadCfg();
-            SetUISize();
+            SetUISize(true);
         }
 
         /// <summary>
-        /// 设置整体的窗口大小并居中，宽=scrcpy宽+左右边距，高=scrcpy高+上下边距+标题栏高。
+        /// 如果不使用上一次的尺寸位置，则设置为默认初始大小并居中，
+        /// 宽=scrcpy宽+左右边距，高=scrcpy高+上下边距+标题栏高。
         /// </summary>
-        private void SetUISize()
+        /// <param name="isUseLastSize">是否使用上一次的大小和位置。</param>
+        private void SetUISize(bool isUseLastSize = false)
         {
-            Width = _scWidth + ExtraWidth;
-            Height = _scHeight + ExtraHeight;
-
-            Left = (SystemParameters.WorkArea.Width - ActualWidth) / 2;
-            Top = (SystemParameters.WorkArea.Height - ActualHeight) / 2;
+            if (isUseLastSize && MyCfg.Cfg.Size.IsRecord)
+            {
+                Width = MyCfg.Cfg.Size.Width;
+                Height = MyCfg.Cfg.Size.Height;
+                Left = MyCfg.Cfg.Size.Left;
+                Top = MyCfg.Cfg.Size.Top;
+            }
+            else
+            {
+                Width = _scWidth + ExtraWidth;
+                Height = _scHeight + ExtraHeight;
+                Left = (SystemParameters.WorkArea.Width - ActualWidth) / 2;
+                Top = (SystemParameters.WorkArea.Height - ActualHeight) / 2;
+            }
             //Console.WriteLine($"窗体尺寸：{Width},{Height}。");
         }
 
@@ -78,7 +90,7 @@ namespace ScrcpyEX.View
 
             //MyCfg.Cfg.IP = txtIP.Text;
             MyCfg.Cfg.StayAwake = true;
-            MyCfg.Cfg.OffScreen = false;
+            MyCfg.Cfg.OffScreen = true;
             MyCfg.Cfg.ShowTouches = false;
             MyCfg.Cfg.DeviceSleep = false;
 
@@ -86,6 +98,12 @@ namespace ScrcpyEX.View
             MyCfg.Cfg.Locate2 = (bool)rdoLoc2.IsChecked;
             MyCfg.Cfg.Locate3 = (bool)rdoLoc3.IsChecked;
             MyCfg.Cfg.Locate4 = (bool)rdoLoc4.IsChecked;
+
+            MyCfg.Cfg.Size.IsRecord = true;
+            MyCfg.Cfg.Size.Width = Width;
+            MyCfg.Cfg.Size.Height = Height;
+            MyCfg.Cfg.Size.Left = Left;
+            MyCfg.Cfg.Size.Top = Top;
             MyCfg.Save();
         }
 
@@ -376,8 +394,31 @@ namespace ScrcpyEX.View
             if (_scHandle != IntPtr.Zero)
             {
                 _prc.Kill();
-                RecordStop();
+                StopScriptAndRecord();
                 Console.WriteLine("手动结束scrcpy程序。");
+            }
+        }
+
+        /// <summary>
+        /// 消除投屏的黑边。
+        /// </summary>
+        private void RemoveBlack()
+        {
+            //Console.WriteLine($"窗体尺寸：{Width},{Height}-{ActualWidth},{ActualHeight}。");
+            //Console.WriteLine($"窗体尺寸：{ActualWidth - ExtraWidth},{_horizontalRatio},{_verticalRatio}。");
+            if (_scHandle == IntPtr.Zero)
+            {
+                popMid.Show("未进行投屏，不能进行调整。");
+                return;
+            }
+            
+            if (_isLandscape)
+            {
+                Height = (ActualWidth - ExtraWidth) / _horizontalRatio * _verticalRatio + ExtraHeight;
+            }
+            else
+            {
+                Width = (ActualHeight - ExtraHeight) / _verticalRatio * _horizontalRatio + ExtraWidth;
             }
         }
 

@@ -73,6 +73,11 @@ namespace ScrcpyEX.ExtensionMethod
         public bool Locate4 { get; set; } = false;
 
         /// <summary>
+        /// 记录窗体的位置、大小。
+        /// </summary>
+        public FormSize Size { get; set; } = new();
+
+        /// <summary>
         /// 录制操作信息的集合。
         /// </summary>
         public List<RecInfo> RecInfos { get; set; } = [];

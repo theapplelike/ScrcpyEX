@@ -63,6 +63,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\FormSize.cs" />
     <Compile Include="Model\PointInfo.cs" />
     <Compile Include="Model\RecInfo.cs" />
     <Compile Include="MyDefinition\MyControl\TimePopup.cs" />

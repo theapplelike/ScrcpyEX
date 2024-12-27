@@ -130,7 +130,7 @@ namespace ScrcpyEX.View
 
         private void BtnRecStop_Click(object sender, RoutedEventArgs e)
         {
-            RecordStop();
+            StopScriptAndRecord();
         }
         #endregion
 
@@ -158,9 +158,15 @@ namespace ScrcpyEX.View
             popMenu.IsOpen = false;
         }
 
+        private void BtnRemoveBlack_Click(object sender, RoutedEventArgs e)
+        {
+            RemoveBlack();
+            popMenu.IsOpen = false;
+        }
+
         private void BtnStartRec_Click(object sender, RoutedEventArgs e)
         {
-            StartRecord(true);
+            StartRecord();
             popRec.IsOpen = false;
         }
         #endregion

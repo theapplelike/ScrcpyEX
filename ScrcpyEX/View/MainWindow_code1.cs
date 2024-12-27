@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
@@ -53,9 +54,9 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 停止录制操作或停止执行脚本的计时器。
+        /// 停止执行脚本的计时器，如果当前正在录制，也会停止录制操作。
         /// </summary>
-        private void RecordStop()
+        private void StopScriptAndRecord()
         {
             if (_clickTimer.IsEnabled)
             {
@@ -64,17 +65,16 @@ namespace ScrcpyEX.View
                 bdRec.Visibility = Visibility.Hidden;
                 dplTip.Visibility = Visibility.Collapsed;
             }
-            else
+            if (MouseHook.HookID != IntPtr.Zero)
             {
-                StartRecord(false);
+                StopRecord();
             }
         }
 
         /// <summary>
         /// 注册鼠标钩子进行录制脚本操作，如果已注册鼠标钩子，则注销鼠标钩子并保存录制的脚本。
         /// </summary>
-        /// <param name="isCanRec">如果未进行录制，是否可以进行录制操作。</param>
-        private void StartRecord(bool isCanRec)
+        private void StartRecord()
         {
             if (_scHandle == IntPtr.Zero)
             {
@@ -89,25 +89,30 @@ namespace ScrcpyEX.View
 
             if (MouseHook.HookID == IntPtr.Zero)
             {
-                if (isCanRec)
+                if (MouseHook.RegisterHook())
                 {
-                    if (MouseHook.RegisterHook())
-                    {
-                        bdRec.Visibility = Visibility.Visible;
-                        popMid.Show("已开启录制操作，再次点击结束录制。");
-                    }
-                    else
-                    {
-                        popMid.Show("钩子注册失败，未能启动录制。");
-                    }
+                    bdRec.Visibility = Visibility.Visible;
+                    popMid.Show("已开启录制操作，再次点击结束录制。");
+                }
+                else
+                {
+                    popMid.Show("钩子注册失败，未能启动录制。");
                 }
             }
             else
             {
-                MouseHook.CancelHook();
-                bdRec.Visibility = Visibility.Hidden;
-                popMid.Show("已停止录制操作。");
+                StopRecord();
             }
+        }
+
+        /// <summary>
+        /// 停止录制操作。
+        /// </summary>
+        private void StopRecord()
+        {
+            MouseHook.CancelHook();
+            bdRec.Visibility = Visibility.Hidden;
+            popMid.Show("已停止录制操作。");
         }
 
         /// <summary>
@@ -130,15 +135,24 @@ namespace ScrcpyEX.View
                         return;
                     }
 
+                    //清除黑边，如果脚本已执行则关闭
+                    RemoveBlack();
+                    if (_clickTimer.IsEnabled)
+                    {
+                        _clickTimer.Stop();
+                        _countTimer.Stop();
+                    }
+
                     bdRec.Visibility = Visibility.Visible;
                     dplTip.Visibility = Visibility.Visible;
                     _vm.CycleNum = 0;
 
-                    _pts = rec.TempRecInfo.Infos;
-                    _clickTimer.Interval = TimeSpan.FromSeconds(rec.TempRecInfo.CycleInterval);
+                    //_pts = rec.TempRecInfo.Infos;
+                    _recInfo = rec.TempRecInfo;
+                    _clickTimer.Interval = TimeSpan.FromSeconds(_recInfo.CycleInterval);
                     _clickTimer.Start();
                     _countTimer.Start();
-                    Click_Tick(_pts);//立刻执行一次脚本
+                    Click_Tick(_recInfo);//立刻执行一次脚本
                 }
             }
         }

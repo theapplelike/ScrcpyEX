@@ -71,7 +71,7 @@ namespace ScrcpyEX.View
             }
             Console.WriteLine($"[I]{e.Data}。");
 
-            //获得当前分辨率
+            //获得当前分辨率，第一个参数是宽，第二个参数是高
             if (e.Data.Contains("Texture"))
             {
                 Regex reg = new("[0-9]+");
@@ -89,6 +89,10 @@ namespace ScrcpyEX.View
             int.TryParse(mc[0].Value, out int a);
             int.TryParse(mc[1].Value, out int b);
             int max = GetGreatestCommonDivisor(a, b);
+            _isLandscape = a > b;
+            _horizontalRatio = a / max;
+            _verticalRatio = b / max;
+
             return $"比例 {a / max}:{b / max}";
         }
 
@@ -114,7 +118,7 @@ namespace ScrcpyEX.View
             _resizeTimer.Tick += new EventHandler(Resize_Tick);
             _resizeTimer.Interval = TimeSpan.FromSeconds(0.1);//大小调整间隔
 
-            _clickTimer.Tick += (sender, e) => Click_Tick(_pts);
+            _clickTimer.Tick += (sender, e) => Click_Tick(_recInfo);
             _clickTimer.Interval = TimeSpan.FromSeconds(1);
 
             _countTimer.Tick += (sender, e) => Count_Tick();
@@ -137,17 +141,29 @@ namespace ScrcpyEX.View
 
         /// <summary>
         /// PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
+        /// 点击的实际位置会根据实际大小和scrcpy的初始大小的比值进行调整，但有黑边时仍会偏移。
         /// </summary>
-        private async void Click_Tick(List<PointInfo> pointInfos)
+        private async void Click_Tick(RecInfo recInfo)
         {
             _vm.CycleNum++;
             _vm.Interval = 0;
-            foreach (PointInfo info in pointInfos)
+
+            //如果为有限次循环，检查是否到循环次数
+            if (recInfo.Limited && recInfo.CycleNumber <= _vm.CycleNum)
+            {
+                StopScriptAndRecord();
+            }
+
+            foreach (PointInfo info in recInfo.Infos)
             {
                 await Task.Delay(TimeSpan.FromSeconds(info.LastTime));
-                Console.WriteLine($"Timer点击：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
-                int x = (int)info.Pt.X;
-                int y = (int)info.Pt.Y;
+                //Console.WriteLine($"Timer点击：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
+
+                double xRatio = (ActualWidth - ExtraWidth) / _scWidth;
+                double yRatio = (ActualHeight - ExtraHeight) / _scHeight;
+                int x = (int)(info.Pt.X * xRatio);
+                int y = (int)(info.Pt.Y * yRatio);
+                //Console.WriteLine($"比例：（{xRatio},{yRatio}），实际点击：（{x},{y}）。");
 
                 IntPtr lp = new((y << 16) + x);
                 DLL.PostMessage(_scHandle, MP.WM_MOUSEMOVE, IntPtr.Zero, lp);
@@ -192,6 +208,7 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             //Console.WriteLine($"gMain的大小:{gMain.ActualWidth}，{gMain.ActualHeight}，{gMain.Width}，{gMain.Height}。");
+            Console.WriteLine($"pnlShow的大小:{pnlShow.Width}，{pnlShow.Height}。");
 
             //IntPtr intPtr = IntPtr.Zero;
 

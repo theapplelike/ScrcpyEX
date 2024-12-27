@@ -58,9 +58,24 @@ namespace ScrcpyEX.View
         private readonly int _scWidth = 960, _scHeight = 448;
 
         /// <summary>
-        /// 要播放的坐标点列表。
+        /// true--横屏；false--竖屏。
         /// </summary>
-        private List<PointInfo> _pts;
+        private bool _isLandscape = false;
+
+        /// <summary>
+        /// 横向比例。
+        /// </summary>
+        private int _horizontalRatio;
+
+        /// <summary>
+        /// 纵向比例。
+        /// </summary>
+        private int _verticalRatio;
+
+        /// <summary>
+        /// 保存已选中的脚本。
+        /// </summary>
+        private RecInfo _recInfo = null;
 
         /// <summary>
         /// 窗口除开scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。

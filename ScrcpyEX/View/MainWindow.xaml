@@ -74,7 +74,8 @@
                     </Grid>
 
                     <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并移动定位" BorderThickness="0,1"/>
-                    <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="▣手机原始尺寸并移动定位"/>
+                    <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="▣默认原始尺寸并移动定位"/>
+                    <Button x:Name="btnRemoveBlack" Click="BtnRemoveBlack_Click" Style="{StaticResource ItemBtn}" Content="消除投屏黑边"/>
                     <Button Style="{StaticResource ItemBtn}" Content="⌂居中"/>
                 </StackPanel>
             </Border>
