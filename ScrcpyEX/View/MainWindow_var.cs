@@ -53,12 +53,12 @@ namespace ScrcpyEX.View
         private readonly DispatcherTimer _testTimer = new();
 
         /// <summary>
-        /// scrcpy的初始宽高（在100%缩放下），使用比例为15：7。
+        /// scrcpy的默认初始宽高（在100%缩放下），使用比例为15：7。
         /// </summary>
         private readonly int _scWidth = 960, _scHeight = 448;
 
         /// <summary>
-        /// true--横屏；false--竖屏。
+        /// 说明当前投屏的状态，true--横屏；false--竖屏。
         /// </summary>
         private bool _isLandscape = false;
 

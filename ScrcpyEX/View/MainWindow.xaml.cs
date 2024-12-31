@@ -169,6 +169,11 @@ namespace ScrcpyEX.View
             StartRecord();
             popRec.IsOpen = false;
         }
+
+        private void BtnSetup_Click(object sender, RoutedEventArgs e)
+        {
+            new Setup().ShowDialog();
+        }
         #endregion
 
         private void pnlShow_GotFocus(object sender, EventArgs e)

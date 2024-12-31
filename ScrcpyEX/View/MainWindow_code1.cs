@@ -135,8 +135,9 @@ namespace ScrcpyEX.View
                         return;
                     }
 
-                    //清除黑边，如果脚本已执行则关闭
                     RemoveBlack();
+
+                    //如果脚本已执行则关闭
                     if (_clickTimer.IsEnabled)
                     {
                         _clickTimer.Stop();
@@ -147,7 +148,6 @@ namespace ScrcpyEX.View
                     dplTip.Visibility = Visibility.Visible;
                     _vm.CycleNum = 0;
 
-                    //_pts = rec.TempRecInfo.Infos;
                     _recInfo = rec.TempRecInfo;
                     _clickTimer.Interval = TimeSpan.FromSeconds(_recInfo.CycleInterval);
                     _clickTimer.Start();

@@ -90,7 +90,7 @@ namespace ScrcpyEX.View
 
             //MyCfg.Cfg.IP = txtIP.Text;
             MyCfg.Cfg.StayAwake = true;
-            MyCfg.Cfg.OffScreen = true;
+            MyCfg.Cfg.OffScreen = false;
             MyCfg.Cfg.ShowTouches = false;
             MyCfg.Cfg.DeviceSleep = false;
 
@@ -161,7 +161,7 @@ namespace ScrcpyEX.View
                 //RedirectStandardInput = true,
             };
             _prc.StartInfo = info;
-            
+
             if (_prc.Start())
             {
                 _prc.BeginOutputReadLine();
@@ -404,21 +404,30 @@ namespace ScrcpyEX.View
         /// </summary>
         private void RemoveBlack()
         {
-            //Console.WriteLine($"窗体尺寸：{Width},{Height}-{ActualWidth},{ActualHeight}。");
-            //Console.WriteLine($"窗体尺寸：{ActualWidth - ExtraWidth},{_horizontalRatio},{_verticalRatio}。");
             if (_scHandle == IntPtr.Zero)
             {
                 popMid.Show("未进行投屏，不能进行调整。");
                 return;
             }
-            
-            if (_isLandscape)
-            {
-                Height = (ActualWidth - ExtraWidth) / _horizontalRatio * _verticalRatio + ExtraHeight;
-            }
-            else
+
+            int scWidth = (int)(ActualWidth - ExtraWidth);
+            int scHeight = (int)(ActualHeight - ExtraHeight);
+            int max = GetGreatestCommonDivisor(scWidth, scHeight);
+
+            int xProportion = scWidth / max;
+            int yProportion = scHeight / max;
+            Console.WriteLine($"当前Scrcpy的比例：({scWidth / max}，{scHeight / max})，期望比例:({_horizontalRatio},{_verticalRatio})。");
+
+            //计算通分后的分子，如果标准分子大，应以宽为准，调整高度；反之调整宽度
+            int currentNumerator = xProportion * _verticalRatio;
+            int standardNumerator = yProportion * _horizontalRatio;
+            if (currentNumerator > standardNumerator)
             {
                 Width = (ActualHeight - ExtraHeight) / _verticalRatio * _horizontalRatio + ExtraWidth;
+            }
+            else if (currentNumerator < standardNumerator)
+            {
+                Height = (ActualWidth - ExtraWidth) / _horizontalRatio * _verticalRatio + ExtraHeight;
             }
         }
 

@@ -82,7 +82,7 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 获得分辨率的最小比例值。
+        /// 获得分辨率的最小比例值、宽和高的比例。
         /// </summary>
         private string GetRatio(MatchCollection mc)
         {
@@ -148,12 +148,6 @@ namespace ScrcpyEX.View
             _vm.CycleNum++;
             _vm.Interval = 0;
 
-            //如果为有限次循环，检查是否到循环次数
-            if (recInfo.Limited && recInfo.CycleNumber <= _vm.CycleNum)
-            {
-                StopScriptAndRecord();
-            }
-
             foreach (PointInfo info in recInfo.Infos)
             {
                 await Task.Delay(TimeSpan.FromSeconds(info.LastTime));
@@ -169,6 +163,12 @@ namespace ScrcpyEX.View
                 DLL.PostMessage(_scHandle, MP.WM_MOUSEMOVE, IntPtr.Zero, lp);
                 DLL.PostMessage(_scHandle, MP.WM_LBUTTONDOWN, (IntPtr)MP.MK_LBUTTON, lp);
                 DLL.PostMessage(_scHandle, MP.WM_LBUTTONUP, IntPtr.Zero, lp);
+            }
+
+            //如果为有限次循环，检查是否到循环次数
+            if (recInfo.Limited && recInfo.CycleNumber <= _vm.CycleNum)
+            {
+                StopScriptAndRecord();
             }
         }
 
@@ -208,7 +208,31 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             //Console.WriteLine($"gMain的大小:{gMain.ActualWidth}，{gMain.ActualHeight}，{gMain.Width}，{gMain.Height}。");
-            Console.WriteLine($"pnlShow的大小:{pnlShow.Width}，{pnlShow.Height}。");
+            //Console.WriteLine($"pnlShow的大小:{pnlShow.Width}，{pnlShow.Height}。");
+
+            int w = (int)(ActualWidth - ExtraWidth);
+            int h = (int)(ActualHeight - ExtraHeight);
+            int max = GetGreatestCommonDivisor(w, h);
+
+            int xProportion = w / max;
+            int yProportion = h / max;
+            Console.WriteLine($"当前Scrcpy的比例：（{w / max}，{h / max}），横屏期望（{_horizontalRatio},{_verticalRatio}）。");
+
+            int currentNumerator = xProportion * _verticalRatio;
+            int standardNumerator = yProportion * _horizontalRatio;
+            if (currentNumerator == standardNumerator)
+            {
+                Console.WriteLine("没有黑边。");
+            }
+            else if (currentNumerator > standardNumerator)
+            {
+                Console.WriteLine("黑边在左右，应调整宽度，高度不变。");
+            }
+            else
+            {
+                Console.WriteLine("黑边在上下，应调整高度，宽度不变。");
+            }
+
 
             //IntPtr intPtr = IntPtr.Zero;
 

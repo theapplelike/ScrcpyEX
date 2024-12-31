@@ -29,10 +29,10 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// </summary>
         private void Pop_Tick(object sender, EventArgs e)
         {
-            Console.WriteLine("**************");
+            //Console.WriteLine("**************");
             IsOpen = false;
             popTimer.Stop();
-            Console.WriteLine("隐藏pop。");
+            //Console.WriteLine("隐藏pop。");
         }
 
         /// <summary>
