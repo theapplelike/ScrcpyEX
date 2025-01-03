@@ -17,9 +17,9 @@
                 <!--使用按钮原来的样式，不做更改-->
                 <ControlTemplate TargetType="Button">
                     <Border Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="4">
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <!-- 禁用焦点视觉样式 -->
@@ -43,5 +43,50 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
+    <Style x:Key="BigBtn" TargetType="Button">
+        <!--<Setter Property="Width" Value="50"/>-->
+        <Setter Property="Height" Value="50"/>
+        <Setter Property="FontFamily" Value="幼圆"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="Background" Value="WhiteSmoke"/>
+        <Setter Property="BorderBrush" Value="Gainsboro"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
+
+        <!--隐藏鼠标悬停在按钮上显示的蓝色边框-->
+        <Setter Property="Template">
+            <Setter.Value>
+                <!--使用按钮原来的样式，不做更改-->
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6,6,0,0">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <!-- 禁用焦点视觉样式 -->
+                    <ControlTemplate.Triggers>
+                        <!--鼠标悬停时只显示背景颜色，这里不需要设置BorderBrush为Transparent，因为已经移除了焦点视觉样式-->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#EEEEEE"/>
+                        </Trigger>
+                        <!--鼠标按下时的样式-->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Foreground" Value="#696969"/>
+                        </Trigger>
+                        <!--鼠标禁用时的样式-->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="#EEEEEE"/>
+                            <Setter Property="Foreground" Value="#AAAAAA"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="txtIcon" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="/ScrcpyEX;component/Resource/IconFont/SegoeFluentIcons.ttf#Segoe Fluent Icons"/>
+    </Style>
+
 </ResourceDictionary>

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ScrcpyEX.ExtensionMethod.MyAttribute
 {
+    /// <summary>
+    /// 自定义的命令行参数属性。
+    /// </summary>
     internal class ArgumentsAttribute : Attribute
     {
         /// <summary>

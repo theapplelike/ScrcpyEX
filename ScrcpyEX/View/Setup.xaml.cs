@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScrcpyEX.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,19 @@ namespace ScrcpyEX.View
         public Setup()
         {
             InitializeComponent();
+            _vm = (SetupVM)DataContext;
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Init();
+        }
+
+        private void BtnScrcpy_Click(object sender, RoutedEventArgs e)
+        {
+            MenuStateTransition(stp1);
+        }
+
+        
     }
 }

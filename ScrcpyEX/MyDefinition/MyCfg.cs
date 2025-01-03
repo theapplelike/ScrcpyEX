@@ -10,9 +10,14 @@ using System.Threading.Tasks;
 
 namespace ScrcpyEX.ExtensionMethod
 {
+    /// <summary>
+    /// 自定义的配置参数类。
+    /// </summary>
     internal class MyCfg
     {
-        //配置在程序中的静态实例
+        /// <summary>
+        /// 全局配置类在程序中的静态实例。
+        /// </summary>
         public static MyCfg Cfg { get; set; } = null;
 
         //全局配置保存路径
@@ -89,7 +94,7 @@ namespace ScrcpyEX.ExtensionMethod
         public bool StayAwake { get; set; }
 
         /// <summary>
-        /// 关闭屏幕，镜像时关闭设备屏幕。
+        /// 关闭屏幕，镜像时关闭设备屏幕，但不会进入休眠。
         /// </summary>
         [Arguments("--turn-screen-off")]
         public bool OffScreen { get; set; }

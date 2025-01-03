@@ -209,31 +209,7 @@ namespace ScrcpyEX.View
         {
             //Console.WriteLine($"gMain的大小:{gMain.ActualWidth}，{gMain.ActualHeight}，{gMain.Width}，{gMain.Height}。");
             //Console.WriteLine($"pnlShow的大小:{pnlShow.Width}，{pnlShow.Height}。");
-
-            int w = (int)(ActualWidth - ExtraWidth);
-            int h = (int)(ActualHeight - ExtraHeight);
-            int max = GetGreatestCommonDivisor(w, h);
-
-            int xProportion = w / max;
-            int yProportion = h / max;
-            Console.WriteLine($"当前Scrcpy的比例：（{w / max}，{h / max}），横屏期望（{_horizontalRatio},{_verticalRatio}）。");
-
-            int currentNumerator = xProportion * _verticalRatio;
-            int standardNumerator = yProportion * _horizontalRatio;
-            if (currentNumerator == standardNumerator)
-            {
-                Console.WriteLine("没有黑边。");
-            }
-            else if (currentNumerator > standardNumerator)
-            {
-                Console.WriteLine("黑边在左右，应调整宽度，高度不变。");
-            }
-            else
-            {
-                Console.WriteLine("黑边在上下，应调整高度，宽度不变。");
-            }
-
-
+            Test1();
             //IntPtr intPtr = IntPtr.Zero;
 
             //DLL.SwitchToThisWindow(_scHandle, true);
@@ -244,10 +220,6 @@ namespace ScrcpyEX.View
             //System.Windows.Forms.SendKeys.SendWait("+K");
             //System.Windows.Forms.SendKeys.SendWait("{ENTER}");
             //Console.WriteLine($"scrcpy句柄：{btnTest.Cursor}。");
-
-            //await Task.Delay(3000);
-
-            //_isRecord = true;
 
             //if (_clickTimer.IsEnabled)
             //{
@@ -261,14 +233,6 @@ namespace ScrcpyEX.View
             //System.Windows.Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置
             //DLL.SetCursorPos((int)(pt1.X + 5),(int)(pt1.Y + 70));
             //MyGM.POP("yesclick");
-            //if (MouseHook.RegisterHook())
-            //{
-            //    Console.WriteLine("yes");
-            //}
-            //else
-            //{
-            //    Console.WriteLine("no");
-            //}
 
             //将窗口水平居中点转换为屏幕坐标，PointToScreen()转化出的结果已经乘以了缩放比例
             //Point screenCenter = PointToScreen(new Point(ActualWidth / 2, 35));
@@ -290,6 +254,43 @@ namespace ScrcpyEX.View
         private void BtnTest_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             //MyGM.POP("yesclick");
+        }
+
+        private void Test1()
+        {
+            // 要点击的屏幕坐标
+            int x = 500;
+            int y = 1070;
+
+            // 构建ADB命令字符串
+            string adbClickCommand = $"\"{MV.ADB_Path}\" shell wm size";
+            //string adbClickCommand = $"\"{MV.ADB_Path}\" shell input tap {x} {y}";
+
+            // 创建一个新的进程启动信息
+            ProcessStartInfo processStartInfo = new ProcessStartInfo
+            {
+                FileName = "cmd.exe", // 使用命令提示符来执行ADB命令
+                Arguments = $"/c {adbClickCommand}", // /c 表示执行完命令后关闭命令行窗口
+                RedirectStandardOutput = true, // 可选：重定向标准输出，用于读取命令执行结果
+                UseShellExecute = false, // 必须设置为false才能重定向输出
+                CreateNoWindow = true // 可选：不创建命令行窗口
+            };
+
+            // 启动进程并执行命令
+            using (Process process = Process.Start(processStartInfo))
+            {
+                if (process != null)
+                {
+                    // 读取命令执行结果（如果需要）
+                    string output = process.StandardOutput.ReadToEnd();
+                    Console.WriteLine($"adb执行结果：{output}。");
+
+                    // 等待进程退出
+                    process.WaitForExit();
+                }
+            }
+
+            Console.WriteLine("点击命令已发送");
         }
     }
 }

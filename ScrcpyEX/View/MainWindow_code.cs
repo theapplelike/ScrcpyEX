@@ -89,21 +89,25 @@ namespace ScrcpyEX.View
             //MyCfg.Cfg.DeviceSleep = chkDeviceSleep.Checked;
 
             //MyCfg.Cfg.IP = txtIP.Text;
-            MyCfg.Cfg.StayAwake = true;
-            MyCfg.Cfg.OffScreen = false;
-            MyCfg.Cfg.ShowTouches = false;
-            MyCfg.Cfg.DeviceSleep = false;
+            //MyCfg.Cfg.StayAwake = true;
+            //MyCfg.Cfg.OffScreen = false;
+            //MyCfg.Cfg.ShowTouches = false;
+            //MyCfg.Cfg.DeviceSleep = false;
 
             MyCfg.Cfg.Locate1 = (bool)rdoLoc1.IsChecked;
             MyCfg.Cfg.Locate2 = (bool)rdoLoc2.IsChecked;
             MyCfg.Cfg.Locate3 = (bool)rdoLoc3.IsChecked;
             MyCfg.Cfg.Locate4 = (bool)rdoLoc4.IsChecked;
 
-            MyCfg.Cfg.Size.IsRecord = true;
-            MyCfg.Cfg.Size.Width = Width;
-            MyCfg.Cfg.Size.Height = Height;
-            MyCfg.Cfg.Size.Left = Left;
-            MyCfg.Cfg.Size.Top = Top;
+            //窗体在正常状态下才记录其尺寸位置信息
+            if (WindowState == WindowState.Normal)
+            {
+                MyCfg.Cfg.Size.IsRecord = true;
+                MyCfg.Cfg.Size.Width = Width;
+                MyCfg.Cfg.Size.Height = Height;
+                MyCfg.Cfg.Size.Left = Left;
+                MyCfg.Cfg.Size.Top = Top;
+            }
             MyCfg.Save();
         }
 
@@ -187,7 +191,6 @@ namespace ScrcpyEX.View
         /// </summary>
         private string GetAllArguments()
         {
-            SaveCfg();
             StringBuilder sb = new();
 
             foreach (PropertyInfo prop in typeof(MyCfg).GetProperties())

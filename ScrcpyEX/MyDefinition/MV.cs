@@ -26,6 +26,11 @@ namespace ScrcpyEX.ExtensionMethod
         public static string ScrcpyPath { get; set; } = @".\scrcpy-win64\scrcpy.exe";
 
         /// <summary>
+        /// adb的路径。
+        /// </summary>
+        public static string ADB_Path { get; set; } = @".\scrcpy-win64\adb.exe";
+
+        /// <summary>
         /// 主窗体的引用。
         /// </summary>
         public static MainWindow MainWin { get; set; }
