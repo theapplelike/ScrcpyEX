@@ -75,8 +75,10 @@
     <Compile Include="MyDefinition\MyGM.cs" />
     <Compile Include="MyDefinition\MyClass\NotificationObject.cs" />
     <Compile Include="MyDefinition\MyClass\RelayCommand.cs" />
+    <Compile Include="MyDefinition\WindowsAPI\HookDLL.cs" />
+    <Compile Include="MyDefinition\WindowsAPI\KeyboardMapping.cs" />
     <Compile Include="MyDefinition\WindowsAPI\MouseHook.cs" />
-    <Compile Include="MyDefinition\WindowsAPI\MP.cs" />
+    <Compile Include="MyDefinition\WindowsAPI\WM.cs" />
     <Compile Include="ViewModel\MainWindowVM.cs" />
     <Compile Include="ViewModel\RecManageVM.cs" />
     <Compile Include="ViewModel\SetupVM.cs" />

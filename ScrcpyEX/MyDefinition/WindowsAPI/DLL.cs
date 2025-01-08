@@ -89,27 +89,30 @@ namespace ScrcpyEX.MyDefinition
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern IntPtr SetFocus(IntPtr hWnd);
-
-        [DllImport("User32.dll", EntryPoint = "SendMessage", SetLastError = true)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern bool PostThreadMessage(uint idThread, uint Msg, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("user32.dll")] 
-        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, uint dwExtraInfo);
-
         [DllImport("user32.dll")]
-        public static extern int SetCursorPos(int x, int y);//让鼠标移动到指定位置
+        public static extern IntPtr GetForegroundWindow();
 
-        [DllImport("user32.dll")]
-        public static extern int mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);//控制鼠标执行点击操作
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);
+        //[DllImport("user32.dll", SetLastError = true)]
+        //public static extern IntPtr SetFocus(IntPtr hWnd);
+        //
+        //[DllImport("User32.dll", EntryPoint = "SendMessage", SetLastError = true)]
+        //public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+        //
+        //[DllImport("user32.dll", CharSet = CharSet.Auto)]
+        //public static extern bool PostThreadMessage(uint idThread, uint Msg, IntPtr wParam, IntPtr lParam);
+        //
+        //[DllImport("user32.dll")] 
+        //public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, uint dwExtraInfo);
+        //
+        //[DllImport("user32.dll")]
+        //public static extern int SetCursorPos(int x, int y);//让鼠标移动到指定位置
+        //
+        //[DllImport("user32.dll")]
+        //public static extern int mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);//控制鼠标执行点击操作
+        //
+        //[DllImport("user32.dll")]
+        //[return: MarshalAs(UnmanagedType.Bool)]
+        //public static extern bool SetForegroundWindow(IntPtr hWnd);
 
     }
 }

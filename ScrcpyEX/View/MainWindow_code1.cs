@@ -59,6 +59,23 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
+        /// 当前窗口或Scrcpy是否为活动窗口。
+        /// </summary>
+        /// <returns>true--拥有焦点；false--没有焦点。</returns>
+        public bool IsActiveWindow()
+        {
+            if (IsActive)
+            {
+                return true;
+            }
+            else
+            {
+                IntPtr intPtr = DLL.GetForegroundWindow();
+                return intPtr == _scHandle;
+            }
+        }
+
+        /// <summary>
         /// 停止执行脚本的计时器，如果当前正在录制，也会停止录制操作。
         /// </summary>
         private void StopScriptAndRecord()
@@ -70,7 +87,7 @@ namespace ScrcpyEX.View
                 bdRec.Visibility = Visibility.Hidden;
                 dplTip.Visibility = Visibility.Collapsed;
             }
-            if (MouseHook.HookID != IntPtr.Zero)
+            if (MouseScript.HookID != IntPtr.Zero)
             {
                 StopRecord();
             }
@@ -92,12 +109,13 @@ namespace ScrcpyEX.View
                 return;
             }
 
-            if (MouseHook.HookID == IntPtr.Zero)
+            if (MouseScript.HookID == IntPtr.Zero)
             {
-                if (MouseHook.RegisterHook())
+                if (MouseScript.RegisterHook())
                 {
+                    RemoveBlack();
                     bdRec.Visibility = Visibility.Visible;
-                    popMid.Show("已开启录制操作，录制脚本时不能有黑边。");
+                    popMid.Show("已开启录制操作，录制时会自动消除黑边。");
                 }
                 else
                 {
@@ -115,7 +133,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void StopRecord()
         {
-            MouseHook.CancelHook();
+            MouseScript.CancelHook();
             bdRec.Visibility = Visibility.Hidden;
             popMid.Show("已停止录制操作。");
         }
@@ -134,7 +152,7 @@ namespace ScrcpyEX.View
                 }
                 else
                 {
-                    if (MouseHook.HookID != IntPtr.Zero)
+                    if (MouseScript.HookID != IntPtr.Zero)
                     {
                         popMid.Show("已开启录制操作，不能执行脚本。");
                         return;

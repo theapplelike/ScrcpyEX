@@ -11,6 +11,19 @@ namespace ScrcpyEX.Model
     /// </summary>
     internal class FormSize
     {
+        public FormSize() { }
+
+        /// <summary>
+        /// 初始化时提供尺寸和位置的值。
+        /// </summary>
+        public FormSize(double width, double height, double left, double top)
+        {
+            Width = width;
+            Height = height;
+            Left = left;
+            Top = top;
+        }
+
         /// <summary>
         /// 是否记录的有窗体的尺寸、位置信息。
         /// </summary>

@@ -85,7 +85,7 @@
                         <Button x:Name="btnReduce"  Click="BtnReduce_Click"  Style="{StaticResource ItemBtn}" Grid.Column="0" Content="缩小尺寸"/>
                         <Button x:Name="btnAmplify" Click="BtnAmplify_Click" Style="{StaticResource ItemBtn}" Grid.Column="1" Content="放大尺寸" BorderThickness="1,0,0,1"/>
                     </Grid>
-                    <Button Style="{StaticResource ItemBtn}" Content="⌂居中"/>
+                    <!--<Button Style="{StaticResource ItemBtn}" Content="⌂居中"/>-->
                 </StackPanel>
             </Border>
         </Popup>
@@ -119,7 +119,7 @@
             <Button x:Name="btnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
 
             <Button x:Name="btnClosePrg" Click="BtnClosePrg_Click" Style="{StaticResource MenuBtn}" Content="&#xe711;" DockPanel.Dock="Right" Margin="0"/>
-            <Button x:Name="btnMaximize" Click="BtnMaximize_Click" Style="{StaticResource MenuBtn}" Content="&#xe923;" DockPanel.Dock="Right"/>
+            <Button x:Name="btnMaximize" Click="BtnMaximize_Click" Style="{StaticResource MenuBtn}" Content="&#xe922;" DockPanel.Dock="Right"/>
             <Button x:Name="btnMinimize" Click="BtnMinimize_Click" Style="{StaticResource MenuBtn}" Content="&#xe73c;" DockPanel.Dock="Right"/>
 
             <Border x:Name="bdRec" HorizontalAlignment="Right" BorderBrush="SteelBlue" BorderThickness="4" Visibility="Hidden">

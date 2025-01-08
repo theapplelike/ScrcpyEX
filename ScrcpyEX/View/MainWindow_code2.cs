@@ -49,6 +49,11 @@ namespace ScrcpyEX.View
             _prc.CancelOutputRead();
             _prc.CancelErrorRead();
             _scHandle = IntPtr.Zero;
+            if (KeyboardMapping.HookID != IntPtr.Zero)
+            {
+                KeyboardMapping.CancelHook();
+            }
+
             Console.WriteLine($"scrcpy程序已关闭。");
         }
 
@@ -159,9 +164,9 @@ namespace ScrcpyEX.View
                 //Console.WriteLine($"比例：（{ScRatioX},{ScRatioY}），实际点击：（{x},{y}）。");
 
                 IntPtr lp = new((y << 16) + x);
-                DLL.PostMessage(_scHandle, MP.WM_MOUSEMOVE, IntPtr.Zero, lp);
-                DLL.PostMessage(_scHandle, MP.WM_LBUTTONDOWN, (IntPtr)MP.MK_LBUTTON, lp);
-                DLL.PostMessage(_scHandle, MP.WM_LBUTTONUP, IntPtr.Zero, lp);
+                DLL.PostMessage(_scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
+                DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
+                DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
             }
 
             //如果为有限次循环，检查是否到循环次数
@@ -174,45 +179,23 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 执行脚本时，说明已产生的间隔。
         /// </summary>
-        private void Count_Tick()
-        {
-            _vm.Interval++;
-        }
+        private void Count_Tick() => _vm.Interval++;
 
         /// <summary>
         /// 测试专用。
         /// </summary>
         private void Test_Tick(object sender, EventArgs e)
         {
-            //Point point = Mouse.GetPosition(wfh);
-            //Console.WriteLine($"wfh相对于与鼠标：({point.X}, {point.Y})");
-            //
-            //Window window = Window.GetWindow(wfh);
-            //Point point1 = wfh.TransformToAncestor(window).Transform(new Point(0, 0));
-            //Console.WriteLine($"相对于屏幕：({point1.X}, {point1.Y})");
-
-            Point point2 = PointToScreen(new Point(0, 0));
-            Console.WriteLine($"程序相对于屏幕：({point2.X}, {point2.Y})");
-
-            //Point point3 = PointFromScreen(new Point(0, 0));
-            //Console.WriteLine($"：({point3.X}, {point3.Y})");
-
-            // 获取鼠标相对于屏幕的位置
-            System.Drawing.Point point4 = System.Windows.Forms.Control.MousePosition;
-            Console.WriteLine($"鼠标相对于屏幕：({point4.X}, {point4.Y})");
-
-            Console.WriteLine($"鼠标在程序中坐标：({point4.X - point2.X}, {point4.Y - point2.Y})\n");
+            IntPtr intPtr = DLL.GetForegroundWindow();
+            Console.WriteLine($"窗体/SC：{IsActive}，{intPtr == _scHandle}。");
         }
 
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
-            //Console.WriteLine($"gMain的大小:{gMain.ActualWidth}，{gMain.ActualHeight}，{gMain.Width}，{gMain.Height}。");
-            //Console.WriteLine($"pnlShow的大小:{pnlShow.Width}，{pnlShow.Height}。");
             //Test1();
-            Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
-            Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
-
-
+            //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
+            //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
+            
             //IntPtr intPtr = IntPtr.Zero;
 
             //DLL.SwitchToThisWindow(_scHandle, true);
@@ -224,31 +207,14 @@ namespace ScrcpyEX.View
             //System.Windows.Forms.SendKeys.SendWait("{ENTER}");
             //Console.WriteLine($"scrcpy句柄：{btnTest.Cursor}。");
 
-            //if (_clickTimer.IsEnabled)
+            //if (_testTimer.IsEnabled)
             //{
-            //    _clickTimer.Stop();
+            //    _testTimer.Stop();
             //}
             //else
             //{
-            //    _clickTimer.Start();
+            //    _testTimer.Start();
             //}
-            //
-            //System.Windows.Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置
-            //DLL.SetCursorPos((int)(pt1.X + 5),(int)(pt1.Y + 70));
-            //MyGM.POP("yesclick");
-
-            //将窗口水平居中点转换为屏幕坐标，PointToScreen()转化出的结果已经乘以了缩放比例
-            //Point screenCenter = PointToScreen(new Point(ActualWidth / 2, 35));
-            //Console.WriteLine($"{screenCenter.X},{screenCenter.Y},{ActualWidth / 2},{ActualHeight / 2}");
-
-            // 将弹出窗口的位置设置为窗口的中心
-            //pop.HorizontalOffset = (screenCenter.X / ScaleX - pop.Child.RenderSize.Width / 2) - ExtraWidthLeft;
-            //pop.VerticalOffset = (screenCenter.Y / ScaleY - pop.Child.RenderSize.Height / 2);
-
-            //Console.WriteLine($"{pop.HorizontalOffset},{pop.VerticalOffset}");
-            //Console.WriteLine($"{pop.Child.RenderSize.Width},{pop.Child.RenderSize.Height}");
-            //pop.HorizontalOffset = 100;
-            //pop.VerticalOffset = ExtraHeightTop - (ActualHeight - ExtraHeightTop) / 2 + 5;
 
             //Console.WriteLine($"{_scHeight},{ActualHeight}");
             await Task.Delay(1);

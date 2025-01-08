@@ -95,6 +95,9 @@ namespace ScrcpyEX.View
             MyCfg.Save();
         }
 
+        /// <summary>
+        /// 保存数据、清理使用的系统资源。
+        /// </summary>
         private void MyClose()
         {
             _resizeTimer.Stop();
@@ -114,12 +117,12 @@ namespace ScrcpyEX.View
             {
                 _prc.Kill();
                 _prc.WaitForExit();
-                Console.WriteLine("Main程序应用退出时关闭scrcpy。");
+                Console.WriteLine("Main程序应用退出时关闭Scrcpy。");
             }
 
             _prc.Close();
             _prc.Dispose();
-            Console.WriteLine("Main程序应用退出。");
+            Console.WriteLine("Scrcpy已清理完毕。");
         }
 
         /// <summary>
@@ -127,9 +130,9 @@ namespace ScrcpyEX.View
         /// </summary>
         private void CloseOther()
         {
-            if (MouseHook.HookID != IntPtr.Zero)
+            if (MouseScript.HookID != IntPtr.Zero)
             {
-                MouseHook.CancelHook();
+                MouseScript.CancelHook();
             }
             wfh.Dispose();
         }
@@ -161,6 +164,7 @@ namespace ScrcpyEX.View
                     await Task.Delay(500);
                     if (EmbeddedForm())
                     {
+                        KeyboardMapping.RegisterHook();
                         return;
                     }
                     Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}，{_prc.HasExited}。");
@@ -206,10 +210,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 获得指定值是否可以转化为bool，不能返回false，如果可以返回其bool值。
         /// </summary>
-        private bool ConvToBool(object val)
-        {
-            return val is bool result && result;
-        }
+        private bool ConvToBool(object val) => val is bool result && result;
 
         /// <summary>
         /// 获得scrcpy的句柄，并将scrcpy放到panel中。
@@ -227,7 +228,7 @@ namespace ScrcpyEX.View
                     DLL.SetParent(_scHandle, pnlShow.Handle);
                     DLL.ShowWindow(_scHandle, 3);
 
-                    Console.WriteLine($"程序信息：{_scHandle},{p.MainWindowTitle}。");
+                    Console.WriteLine($"Scrcpy句柄：{_scHandle}，名称：{p.MainWindowTitle}。");
                     return true;
                 }
             }
@@ -263,10 +264,10 @@ namespace ScrcpyEX.View
             int style = DLL.GetWindowLong(handle, GWL_STYLE);
 
             //删除WS_CAPTION样式以隐藏标题栏  
-            style = style & ~WS_CAPTION;
+            style &= ~WS_CAPTION;
 
             //删除WS_THICKFRAME样式以隐藏窗体可以调整大小的边框
-            style = style & ~WS_THICKFRAME;
+            style &= ~WS_THICKFRAME;
 
             //设置为新的窗口样式
             DLL.SetWindowLong(handle, GWL_STYLE, style);
@@ -282,7 +283,7 @@ namespace ScrcpyEX.View
             if (Width >= wd && Height >= ht)
             {
                 LoadTempSize();
-                btnMaximize.Content = "\ue923";
+                btnMaximize.Content = "\ue922";
             }
             else
             {
@@ -290,30 +291,31 @@ namespace ScrcpyEX.View
                 Width = wd; 
                 Height = ht;
                 Left = Top = 0;
-                btnMaximize.Content = "\ue922";
+                btnMaximize.Content = "\ue923";
             }
         }
 
         /// <summary>
         /// 保存当前窗体的尺寸和位置到临时变量中。
         /// </summary>
-        private void SaveTempSize()
-        {
-            _tempSize.Width = Width;
-            _tempSize.Height = Height;
-            _tempSize.Left = Left;
-            _tempSize.Top = Top;
-        }
+        private void SaveTempSize() => _tempSize = new(Width, Height, Left, Top);
 
         /// <summary>
         /// 获得临时变量中的窗体尺寸和位置。
         /// </summary>
         private void LoadTempSize()
         {
-            Width = _tempSize.Width;
-            Height = _tempSize.Height;
-            Left = _tempSize.Left;
-            Top = _tempSize.Top;
+            if (_tempSize == null)
+            {
+                SetUISize();
+            }
+            else
+            {
+                Width = _tempSize.Width;
+                Height = _tempSize.Height;
+                Left = _tempSize.Left;
+                Top = _tempSize.Top;
+            }
         }
 
         /// <summary>

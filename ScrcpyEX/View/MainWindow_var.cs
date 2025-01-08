@@ -38,7 +38,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 保存窗体的临时尺寸、位置。
         /// </summary>
-        private FormSize _tempSize = new();
+        private FormSize _tempSize = null;
 
         /// <summary>
         /// 调整scrcpy窗口大小的计时器。
