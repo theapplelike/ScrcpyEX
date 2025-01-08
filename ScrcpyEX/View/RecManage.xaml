@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ScrcpyEX.View"
         mc:Ignorable="d"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
-        Title="RecManage" Height="450" Width="640" x:Name="root"
+        Title="脚本管理" Height="450" Width="640" x:Name="root"
         WindowStartupLocation="CenterScreen" SizeToContent="Width"
         Loaded="Window_Loaded" Closed="Root_Closed">
 
@@ -48,7 +48,7 @@
                 <RowDefinition Height="20"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="脚本列表：" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <TextBlock Text="脚本列表（有黑边时执行脚本会导致错位）：" VerticalAlignment="Center" Margin="10,0,0,0"/>
             <ListBox x:Name="lst" ItemsSource="{Binding RecInfos}" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                 <ListBox.ItemTemplate>
                     <DataTemplate>

@@ -44,7 +44,7 @@ namespace ScrcpyEX.View
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Console.WriteLine($"窗体大小进行改变，scrcpy句柄：{_scHandle}。");
+            Console.WriteLine($"窗体大小进行改变，Scrcpy当前：（{ActualWidth - ExtraWidth}，{ActualHeight - ExtraHeight}），比例：（{ScRatioX}，{ScRatioY}）。");
 
             //scrcpy程序句柄不为空调整scrcpy大小
             if (_scHandle != IntPtr.Zero)
@@ -67,7 +67,6 @@ namespace ScrcpyEX.View
         {
             WiredStart();
         }
-
         
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
@@ -162,6 +161,16 @@ namespace ScrcpyEX.View
         {
             RemoveBlack();
             popMenu.IsOpen = false;
+        }
+
+        private void BtnReduce_Click(object sender, RoutedEventArgs e)
+        {
+            ReduceSize();
+        }
+
+        private void BtnAmplify_Click(object sender, RoutedEventArgs e)
+        {
+            AmplifySize();
         }
 
         private void BtnStartRec_Click(object sender, RoutedEventArgs e)

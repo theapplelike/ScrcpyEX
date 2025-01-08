@@ -54,6 +54,35 @@ namespace ScrcpyEX.ViewModel
         }
         private string charBtn1 = "\ue70e";
 
+        /// <summary>
+        /// 绑定第二个菜单的显示属性，需要双向绑定。
+        /// </summary>
+        public Visibility VisibleStp2
+        {
+            get { return visibleStp2; }
+            set
+            {
+                visibleStp2 = value;
+                CharBtn2 = visibleStp2 == Visibility.Visible ? "\ue70e" : "\ue70d";
+                RaisePropertyChanged();
+            }
+        }
+        private Visibility visibleStp2;
+
+        /// <summary>
+        /// 第二个菜单按钮右边的字符，通过第二个菜单的显示属性控制。
+        /// </summary>
+        public string CharBtn2
+        {
+            get { return charBtn2; }
+            set
+            {
+                charBtn2 = value;
+                RaisePropertyChanged();
+            }
+        }
+        private string charBtn2 = "\ue70e";
+
 
     }
 }

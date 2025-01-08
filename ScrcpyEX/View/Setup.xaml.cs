@@ -36,6 +36,9 @@ namespace ScrcpyEX.View
             MenuStateTransition(stp1);
         }
 
-        
+        private void BtnProg_Click(object sender, RoutedEventArgs e)
+        {
+            MenuStateTransition(stp2);
+        }
     }
 }

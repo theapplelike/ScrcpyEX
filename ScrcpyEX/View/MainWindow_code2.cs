@@ -153,11 +153,10 @@ namespace ScrcpyEX.View
                 await Task.Delay(TimeSpan.FromSeconds(info.LastTime));
                 //Console.WriteLine($"Timer点击：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
 
-                double xRatio = (ActualWidth - ExtraWidth) / _scWidth;
-                double yRatio = (ActualHeight - ExtraHeight) / _scHeight;
-                int x = (int)(info.Pt.X * xRatio);
-                int y = (int)(info.Pt.Y * yRatio);
-                //Console.WriteLine($"比例：（{xRatio},{yRatio}），实际点击：（{x},{y}）。");
+                //保存的坐标数据都是以默认尺寸为准，使用时需要乘以当前尺寸和默认尺寸的比例
+                int x = (int)(info.Pt.X * ScRatioX);
+                int y = (int)(info.Pt.Y * ScRatioY);
+                //Console.WriteLine($"比例：（{ScRatioX},{ScRatioY}），实际点击：（{x},{y}）。");
 
                 IntPtr lp = new((y << 16) + x);
                 DLL.PostMessage(_scHandle, MP.WM_MOUSEMOVE, IntPtr.Zero, lp);
@@ -209,7 +208,11 @@ namespace ScrcpyEX.View
         {
             //Console.WriteLine($"gMain的大小:{gMain.ActualWidth}，{gMain.ActualHeight}，{gMain.Width}，{gMain.Height}。");
             //Console.WriteLine($"pnlShow的大小:{pnlShow.Width}，{pnlShow.Height}。");
-            Test1();
+            //Test1();
+            Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
+            Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
+
+
             //IntPtr intPtr = IntPtr.Zero;
 
             //DLL.SwitchToThisWindow(_scHandle, true);
@@ -258,13 +261,13 @@ namespace ScrcpyEX.View
 
         private void Test1()
         {
-            // 要点击的屏幕坐标
+            // 要点击的屏幕坐标.指定好的位置，
             int x = 500;
-            int y = 1070;
+            int y = 300;
 
             // 构建ADB命令字符串
-            string adbClickCommand = $"\"{MV.ADB_Path}\" shell wm size";
-            //string adbClickCommand = $"\"{MV.ADB_Path}\" shell input tap {x} {y}";
+            //string adbClickCommand = $"\"{MV.ADB_Path}\" shell wm size";
+            string adbClickCommand = $"\"{MV.ADB_Path}\" shell input tap {x} {y}";
 
             // 创建一个新的进程启动信息
             ProcessStartInfo processStartInfo = new ProcessStartInfo

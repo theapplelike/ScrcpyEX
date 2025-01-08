@@ -9,7 +9,7 @@
         xmlns:wfI="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel" 
         xmlns:mycontrol="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
-        Title="MainWindow" Height="600" Width="1200" WindowStartupLocation="CenterScreen"
+        Title="MainWindow" Height="488" Width="970" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged" 
         PreviewMouseDown="Window_PreviewMouseDown">
 
@@ -74,9 +74,17 @@
                         <RadioButton x:Name="rdoLoc4" Grid.Row="1" Grid.Column="1" Content="↘右下" Margin="0,0,0,10" HorizontalAlignment="Center"/>
                     </Grid>
 
-                    <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并移动定位" BorderThickness="0,1"/>
-                    <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="▣默认原始尺寸并移动定位"/>
+                    <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并定位" BorderThickness="0,1"/>
+                    <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="▣默认原始尺寸并定位"/>
                     <Button x:Name="btnRemoveBlack" Click="BtnRemoveBlack_Click" Style="{StaticResource ItemBtn}" Content="消除投屏黑边"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="btnReduce"  Click="BtnReduce_Click"  Style="{StaticResource ItemBtn}" Grid.Column="0" Content="缩小尺寸"/>
+                        <Button x:Name="btnAmplify" Click="BtnAmplify_Click" Style="{StaticResource ItemBtn}" Grid.Column="1" Content="放大尺寸" BorderThickness="1,0,0,1"/>
+                    </Grid>
                     <Button Style="{StaticResource ItemBtn}" Content="⌂居中"/>
                 </StackPanel>
             </Border>

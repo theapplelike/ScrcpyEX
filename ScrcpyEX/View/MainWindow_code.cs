@@ -15,7 +15,6 @@ using System.Windows.Media;
 using System.Windows.Controls;
 using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.WindowsAPI;
-using System.Drawing;
 
 namespace ScrcpyEX.View
 {
@@ -37,7 +36,7 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 如果不使用上一次的尺寸位置，则设置为默认初始大小并居中，
+        /// 如果不使用上一次的尺寸位置，则设置为默认初始大小，
         /// 宽=scrcpy宽+左右边距，高=scrcpy高+上下边距+标题栏高。
         /// </summary>
         /// <param name="isUseLastSize">是否使用上一次的大小和位置。</param>
@@ -66,10 +65,6 @@ namespace ScrcpyEX.View
         private void ReadCfg()
         {
             //txtIP.Text = MyCfg.Cfg.IP;
-            //chkStayAwake.Checked = MyCfg.Cfg.StayAwake;
-            //chkOffScreen.Checked = MyCfg.Cfg.OffScreen;
-            //chkShowTouches.Checked = MyCfg.Cfg.ShowTouches;
-            //chkDeviceSleep.Checked = MyCfg.Cfg.DeviceSleep;
 
             rdoLoc1.IsChecked = MyCfg.Cfg.Locate1;
             rdoLoc2.IsChecked = MyCfg.Cfg.Locate2;
@@ -83,16 +78,6 @@ namespace ScrcpyEX.View
         private void SaveCfg()
         {
             //MyCfg.Cfg.IP = txtIP.Text;
-            //MyCfg.Cfg.StayAwake = chkStayAwake.Checked;
-            //MyCfg.Cfg.OffScreen = chkOffScreen.Checked;
-            //MyCfg.Cfg.ShowTouches = chkShowTouches.Checked;
-            //MyCfg.Cfg.DeviceSleep = chkDeviceSleep.Checked;
-
-            //MyCfg.Cfg.IP = txtIP.Text;
-            //MyCfg.Cfg.StayAwake = true;
-            //MyCfg.Cfg.OffScreen = false;
-            //MyCfg.Cfg.ShowTouches = false;
-            //MyCfg.Cfg.DeviceSleep = false;
 
             MyCfg.Cfg.Locate1 = (bool)rdoLoc1.IsChecked;
             MyCfg.Cfg.Locate2 = (bool)rdoLoc2.IsChecked;
@@ -102,7 +87,6 @@ namespace ScrcpyEX.View
             //窗体在正常状态下才记录其尺寸位置信息
             if (WindowState == WindowState.Normal)
             {
-                MyCfg.Cfg.Size.IsRecord = true;
                 MyCfg.Cfg.Size.Width = Width;
                 MyCfg.Cfg.Size.Height = Height;
                 MyCfg.Cfg.Size.Left = Left;
@@ -196,7 +180,7 @@ namespace ScrcpyEX.View
             foreach (PropertyInfo prop in typeof(MyCfg).GetProperties())
             {
                 string str = GetArg(prop.Name);
-                if (str != null && GetVal(prop.GetValue(MyCfg.Cfg)))
+                if (str != null && ConvToBool(prop.GetValue(MyCfg.Cfg)))
                 {
                     sb.Append($"{str} ");
                 }
@@ -222,7 +206,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 获得指定值是否可以转化为bool，不能返回false，如果可以返回其bool值。
         /// </summary>
-        private bool GetVal(object val)
+        private bool ConvToBool(object val)
         {
             return val is bool result && result;
         }
@@ -289,22 +273,47 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 最大化或者还原窗口，最大化时增加6的边距。
+        /// 最大化或者还原窗口。
         /// </summary>
         private void Maximize()
         {
-            if (WindowState == WindowState.Maximized)
+            double wd = SystemParameters.WorkArea.Width;
+            double ht = SystemParameters.WorkArea.Height;
+            if (Width >= wd && Height >= ht)
             {
-                WindowState = WindowState.Normal;
+                LoadTempSize();
                 btnMaximize.Content = "\ue923";
-                gMain.Margin = new Thickness(0);
             }
             else
             {
-                WindowState = WindowState.Maximized;
+                SaveTempSize();
+                Width = wd; 
+                Height = ht;
+                Left = Top = 0;
                 btnMaximize.Content = "\ue922";
-                gMain.Margin = new Thickness(6);
             }
+        }
+
+        /// <summary>
+        /// 保存当前窗体的尺寸和位置到临时变量中。
+        /// </summary>
+        private void SaveTempSize()
+        {
+            _tempSize.Width = Width;
+            _tempSize.Height = Height;
+            _tempSize.Left = Left;
+            _tempSize.Top = Top;
+        }
+
+        /// <summary>
+        /// 获得临时变量中的窗体尺寸和位置。
+        /// </summary>
+        private void LoadTempSize()
+        {
+            Width = _tempSize.Width;
+            Height = _tempSize.Height;
+            Left = _tempSize.Left;
+            Top = _tempSize.Top;
         }
 
         /// <summary>
@@ -434,6 +443,67 @@ namespace ScrcpyEX.View
             }
         }
 
+        /// <summary>
+        /// 缩小指定步长的尺寸，以15:7为标准。
+        /// </summary>
+        /// <param name="step">步长，默认为8。</param>
+        private void ReduceSize(int step = 8)
+        {
+            if (_scHandle == IntPtr.Zero)
+            {
+                popMid.Show("未进行投屏，不能缩放尺寸。");
+                return;
+            }
+            if (ScRatioX <= 0.25 || ScRatioY <= 0.25)
+            {
+                popMid.Show("不能再继续缩小。");
+                return;
+            }
+
+            Width -= _horizontalRatio * step;
+            Height -= _verticalRatio * step;
+            Locate();
+        }
+
+        /// <summary>
+        /// 放大指定步长的尺寸，以15:7为标准。
+        /// </summary>
+        /// <param name="step">步长，默认为8。</param>
+        private void AmplifySize(int step = 8)
+        {
+            if (_scHandle == IntPtr.Zero)
+            {
+                popMid.Show("未进行投屏，不能缩放尺寸。");
+                return;
+            }
+            if (ScRatioX >= 1.5)
+            {
+                //X轴不能再放大
+            }
+            else if (Width + _horizontalRatio * step > SystemParameters.WorkArea.Width)
+            {
+                Width = SystemParameters.WorkArea.Width;
+            }
+            else
+            {
+                Width += _horizontalRatio * step;
+            }
+
+            if (ScRatioY >= 1.5)
+            {
+                //Y轴不能再放大
+            }
+            else if (Height + _verticalRatio * step > SystemParameters.WorkArea.Height)
+            {
+                Height = SystemParameters.WorkArea.Height;
+            }
+            else
+            {
+                Height += _verticalRatio * step;
+            }
+
+            Locate();
+        }
 
     }
 }

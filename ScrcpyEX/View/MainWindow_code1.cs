@@ -32,20 +32,25 @@ namespace ScrcpyEX.View
             System.Windows.Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置
             System.Drawing.Point pt2 = System.Windows.Forms.Control.MousePosition;//获取鼠标相对于屏幕的位置
 
-            int x = (int)(pt2.X - pt1.X - ExtraWidthLeft * ScaleX + SystemParameters.WindowNonClientFrameThickness.Left * ScaleX);
-            int y = (int)(pt2.Y - pt1.Y - ExtraHeightTop * ScaleY);
-            double maxW = (ActualWidth - ExtraWidth) * ScaleX;
-            double maxH = (ActualHeight - ExtraHeight) * ScaleY;
+            double x = pt2.X - pt1.X - ExtraWidthLeft * DpiScaleX + SystemParameters.WindowNonClientFrameThickness.Left * DpiScaleX;
+            double y = pt2.Y - pt1.Y - ExtraHeightTop * DpiScaleY;
+            double maxW = (ActualWidth - ExtraWidth) * DpiScaleX;
+            double maxH = (ActualHeight - ExtraHeight) * DpiScaleY;
+            
+            //最后实际保存的坐标要以默认尺寸为准，需要除以当前尺寸和默认尺寸的比例，
+            //这样可以让用户在任意尺寸下录制的脚本在任意尺寸下都可以正确播放
+            double actuclX = x / ScRatioX;
+            double actuclY = y / ScRatioY;
 
             //Console.WriteLine($"程序相对于屏幕%：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
             //Console.WriteLine($"鼠标相对于屏幕%：({pt2.X}, {pt2.Y})。");
-            //Console.WriteLine($"鼠标在程序中坐标%：({x}, {y})；scrcpy尺寸%：({maxW}, {maxH})。");
+            //Console.WriteLine($"鼠标在程序中坐标%：({x}, {y})；scrcpy尺寸%：({maxW}, {maxH})，和初始尺寸的比例：（{ScRatioX},{ScRatioY}），实际保存点：（{actuclX},{actuclY}）");
             
             if (x > 0 && x < maxW && y > 0 && y < maxH)
             {
                 //Console.WriteLine($"YES，鼠标在scrcpy中。");
                 //Console.WriteLine($"////////////////////。\n");
-                return new System.Windows.Point(x, y);
+                return new System.Windows.Point(actuclX, actuclY);
             }
             else
             {
@@ -92,7 +97,7 @@ namespace ScrcpyEX.View
                 if (MouseHook.RegisterHook())
                 {
                     bdRec.Visibility = Visibility.Visible;
-                    popMid.Show("已开启录制操作，再次点击结束录制。");
+                    popMid.Show("已开启录制操作，录制脚本时不能有黑边。");
                 }
                 else
                 {

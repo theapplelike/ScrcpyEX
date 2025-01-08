@@ -14,6 +14,7 @@ namespace ScrcpyEX.View
         private void Init()
         {
             stp1.Visibility = Visibility.Collapsed;
+            stp2.Visibility = Visibility.Collapsed;
             _vm.Cfg = MyCfg.Cfg;
         }
 

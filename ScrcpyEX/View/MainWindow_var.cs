@@ -36,6 +36,11 @@ namespace ScrcpyEX.View
         private string _scName;
 
         /// <summary>
+        /// 保存窗体的临时尺寸、位置。
+        /// </summary>
+        private FormSize _tempSize = new();
+
+        /// <summary>
         /// 调整scrcpy窗口大小的计时器。
         /// </summary>
         private readonly DispatcherTimer _resizeTimer = new();
@@ -63,12 +68,12 @@ namespace ScrcpyEX.View
         private bool _isLandscape = false;
 
         /// <summary>
-        /// 横向比例。
+        /// 投屏分辨率的横向比例。
         /// </summary>
         private int _horizontalRatio;
 
         /// <summary>
-        /// 纵向比例。
+        /// 投屏分辨率的纵向比例。
         /// </summary>
         private int _verticalRatio;
 
@@ -100,13 +105,23 @@ namespace ScrcpyEX.View
         /// <summary>
         /// X轴上的DPI比例。
         /// </summary>
-        private double ScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;
+        private double DpiScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;
 
         /// <summary>
         /// Y轴上的DPI比例。
         /// </summary>
-        private double ScaleY => VisualTreeHelper.GetDpi(this).DpiScaleY;
+        private double DpiScaleY => VisualTreeHelper.GetDpi(this).DpiScaleY;
 
-        
+        /// <summary>
+        /// scrcpy当前宽度和默认宽度的比值。
+        /// </summary>
+        double ScRatioX => (ActualWidth - ExtraWidth) / _scWidth;
+
+        /// <summary>
+        /// scrcpy当前高度和默认高度的比值。
+        /// </summary>
+        double ScRatioY => (ActualHeight - ExtraHeight) / _scHeight;
+
+
     }
 }
