@@ -14,6 +14,9 @@ using System.Windows;
 using ScrcpyEX.ExtensionMethod;
 using System.Windows.Shapes;
 using ScrcpyEX.Model;
+using System.Windows.Controls.Primitives;
+using System.Windows.Controls;
+using ScrcpyEX.MyDefinition.MyClass;
 
 namespace ScrcpyEX.View
 {
@@ -94,7 +97,7 @@ namespace ScrcpyEX.View
             int.TryParse(mc[0].Value, out int a);
             int.TryParse(mc[1].Value, out int b);
             int max = GetGreatestCommonDivisor(a, b);
-            _isLandscape = a > b;
+            //_isLandscape = a > b;
             _horizontalRatio = a / max;
             _verticalRatio = b / max;
 
@@ -195,7 +198,7 @@ namespace ScrcpyEX.View
             //Test1();
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
-            
+
             //IntPtr intPtr = IntPtr.Zero;
 
             //DLL.SwitchToThisWindow(_scHandle, true);
@@ -216,6 +219,9 @@ namespace ScrcpyEX.View
             //    _testTimer.Start();
             //}
 
+            CreatePop();
+
+            //Content = pop;
             //Console.WriteLine($"{_scHeight},{ActualHeight}");
             await Task.Delay(1);
         }

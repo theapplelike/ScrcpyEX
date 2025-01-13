@@ -44,7 +44,7 @@ namespace ScrcpyEX.View
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Console.WriteLine($"窗体大小进行改变，Scrcpy当前：（{ActualWidth - ExtraWidth}，{ActualHeight - ExtraHeight}），比例：（{ScRatioX}，{ScRatioY}）。");
+            Console.WriteLine($"窗体大小进行改变，Scrcpy当前：（{ScActualWidth}，{ScActualHeight}），比例：（{ScRatioX}，{ScRatioY}）。");
 
             //scrcpy程序句柄不为空调整scrcpy大小
             if (_scHandle != IntPtr.Zero)
@@ -203,6 +203,9 @@ namespace ScrcpyEX.View
         private void PnlShow_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             //Console.WriteLine("鼠标在pnlShow按下。");
+
+            Point point = MyGM.GetPosition();//现在的坐标
+            Console.WriteLine($"panel的MouseDown事件：（{point.X},{point.Y}）.");
         }
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -210,6 +213,6 @@ namespace ScrcpyEX.View
             //Console.WriteLine("鼠标在窗体按下。");
         }
 
-        
+
     }
 }

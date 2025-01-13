@@ -2,6 +2,7 @@
 using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition;
+using ScrcpyEX.MyDefinition.MyClass;
 using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
@@ -24,18 +25,18 @@ namespace ScrcpyEX.View
     {
         /// <summary>
         /// 获得鼠标在scrcpy中的位坐标，计算需要额外减去Point(左额外距离*Dpi比例-左非工作区距离*Dpi比例，上额外距离*Dpi比例)。
-        /// 计算最大宽度和高度时需要乘以Dpi比例。
+        /// 计算最大宽度和高度时需要乘以Dpi比例，Point的参数已经乘了Dpi比例，其他参数没有。
         /// </summary>
         /// <returns>如果鼠标在scrcpy中，返回鼠标在scrcpy中的坐标，否则返回null。</returns>
-        public System.Windows.Point? GetMouseInScrcpy()
+        public Point? GetMouseInScrcpy()
         {
-            System.Windows.Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置
-            System.Drawing.Point pt2 = System.Windows.Forms.Control.MousePosition;//获取鼠标相对于屏幕的位置
+            Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置，获得的值与DPI相关
+            Point pt2 = MyGM.GetPosition();//获取鼠标相对于屏幕的位置
 
             double x = pt2.X - pt1.X - ExtraWidthLeft * DpiScaleX + SystemParameters.WindowNonClientFrameThickness.Left * DpiScaleX;
             double y = pt2.Y - pt1.Y - ExtraHeightTop * DpiScaleY;
-            double maxW = (ActualWidth - ExtraWidth) * DpiScaleX;
-            double maxH = (ActualHeight - ExtraHeight) * DpiScaleY;
+            double maxW = ScActualWidth * DpiScaleX;
+            double maxH = ScActualHeight * DpiScaleY;
             
             //最后实际保存的坐标要以默认尺寸为准，需要除以当前尺寸和默认尺寸的比例，
             //这样可以让用户在任意尺寸下录制的脚本在任意尺寸下都可以正确播放
@@ -50,7 +51,7 @@ namespace ScrcpyEX.View
             {
                 //Console.WriteLine($"YES，鼠标在scrcpy中。");
                 //Console.WriteLine($"////////////////////。\n");
-                return new System.Windows.Point(actuclX, actuclY);
+                return new Point(actuclX, actuclY);
             }
             else
             {
@@ -178,6 +179,62 @@ namespace ScrcpyEX.View
                     Click_Tick(_recInfo);//立刻执行一次脚本
                 }
             }
+        }
+
+        /// <summary>
+        /// 在窗体中创建一个可以移动的Popup。
+        /// </summary>
+        private void CreatePop()
+        {
+            Popup pop = new()
+            {
+                Placement = PlacementMode.Relative,
+                PlacementTarget = gMain,
+                AllowsTransparency = true,
+                Height = 50,
+                Width = 50,
+                IsOpen = true,
+            };
+
+            //提供边框
+            Border border = new()
+            {
+                Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
+                BorderBrush = Brushes.Black,
+                BorderThickness = new(1),
+                CornerRadius = new(50),
+            };
+
+            //提供装多个控件的容器
+            Grid grid = new();
+
+            //提供输入
+            TextBox txt = new()
+            {
+                Text = "hello",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                //Visibility = Visibility.Collapsed,
+            };
+
+            //提供定位点
+            TextBlock tbk = new()
+            {
+                Width = 1,
+                Height = 1,
+                //Background= Brushes.Red,
+            };
+
+            //确定层次关系
+            grid.Children.Add(txt);
+            grid.Children.Add(tbk);
+            border.Child = grid;
+            pop.Child = border;
+            gMain.Children.Add(pop);
+
+            //设置Popup可以移动
+            _dragMove ??= new DragMove();
+            _dragMove.SetMove(pop);
         }
 
 

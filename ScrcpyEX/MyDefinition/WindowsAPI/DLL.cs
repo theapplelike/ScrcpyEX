@@ -89,6 +89,10 @@ namespace ScrcpyEX.MyDefinition
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
+        /// <summary>
+        /// 检索前台窗口的句柄， 即用户当前正在使用的窗口。
+        /// </summary>
+        /// <returns>返回值是前台窗口的句柄。在某些情况下（例如，当窗口丢失激活时），前台窗口可以为NULL。</returns>
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
 

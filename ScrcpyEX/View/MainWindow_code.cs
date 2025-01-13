@@ -424,8 +424,8 @@ namespace ScrcpyEX.View
                 return;
             }
 
-            int scWidth = (int)(ActualWidth - ExtraWidth);
-            int scHeight = (int)(ActualHeight - ExtraHeight);
+            int scWidth = (int)ScActualWidth;
+            int scHeight = (int)ScActualHeight;
             int max = GetGreatestCommonDivisor(scWidth, scHeight);
 
             int xProportion = scWidth / max;
@@ -437,11 +437,11 @@ namespace ScrcpyEX.View
             int standardNumerator = yProportion * _horizontalRatio;
             if (currentNumerator > standardNumerator)
             {
-                Width = (ActualHeight - ExtraHeight) / _verticalRatio * _horizontalRatio + ExtraWidth;
+                Width = ScActualHeight / _verticalRatio * _horizontalRatio + ExtraWidth;
             }
             else if (currentNumerator < standardNumerator)
             {
-                Height = (ActualWidth - ExtraWidth) / _horizontalRatio * _verticalRatio + ExtraHeight;
+                Height = ScActualWidth / _horizontalRatio * _verticalRatio + ExtraHeight;
             }
         }
 

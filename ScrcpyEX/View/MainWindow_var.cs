@@ -1,4 +1,5 @@
 ﻿using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition.MyClass;
 using ScrcpyEX.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -41,6 +42,11 @@ namespace ScrcpyEX.View
         private FormSize _tempSize = null;
 
         /// <summary>
+        /// 能给控件赋予移动功能的类。
+        /// </summary>
+        private DragMove _dragMove = null;
+
+        /// <summary>
         /// 调整scrcpy窗口大小的计时器。
         /// </summary>
         private readonly DispatcherTimer _resizeTimer = new();
@@ -65,7 +71,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 说明当前投屏的状态，true--横屏；false--竖屏。
         /// </summary>
-        private bool _isLandscape = false;
+        //private bool _isLandscape = false;
 
         /// <summary>
         /// 投屏分辨率的横向比例。
@@ -95,33 +101,42 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 窗口除开scrcpy的额外左侧宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
-        private double ExtraWidthLeft => wfh.Margin.Left;
+        public double ExtraWidthLeft => wfh.Margin.Left;
 
         /// <summary>
         /// 窗口除开scrcpy的额外上方高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
-        private double ExtraHeightTop => dpl.ActualHeight + wfh.Margin.Top;
+        public double ExtraHeightTop => dpl.ActualHeight + wfh.Margin.Top;
 
         /// <summary>
         /// X轴上的DPI比例。
         /// </summary>
-        private double DpiScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;
+        public double DpiScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;
 
         /// <summary>
         /// Y轴上的DPI比例。
         /// </summary>
-        private double DpiScaleY => VisualTreeHelper.GetDpi(this).DpiScaleY;
+        public double DpiScaleY => VisualTreeHelper.GetDpi(this).DpiScaleY;
 
         /// <summary>
-        /// scrcpy当前宽度和默认宽度的比值。
+        /// Scrcpy当前宽度和默认宽度的比值。
         /// </summary>
-        double ScRatioX => (ActualWidth - ExtraWidth) / _scWidth;
+        private double ScRatioX => ScActualWidth / _scWidth;
 
         /// <summary>
-        /// scrcpy当前高度和默认高度的比值。
+        /// Scrcpy当前高度和默认高度的比值。
         /// </summary>
-        double ScRatioY => (ActualHeight - ExtraHeight) / _scHeight;
+        private double ScRatioY => ScActualHeight / _scHeight;
 
+        /// <summary>
+        /// Scrcpy当前的实际宽度。
+        /// </summary>
+        public double ScActualWidth => ActualWidth - ExtraWidth;
+
+        /// <summary>
+        /// Scrcpy当前的实际高度。
+        /// </summary>
+        public double ScActualHeight => ActualHeight - ExtraHeight;
 
     }
 }

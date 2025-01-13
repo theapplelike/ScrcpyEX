@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 using System.Windows.Controls;
 using ScrcpyEX.ExtensionMethod;
 using System.Windows.Media;
@@ -93,57 +92,13 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
-        /// 获得指定元素的所有子元素
+        /// 获得光标的当前坐标，以屏幕为基准，且此值已乘以了Dpi比例。
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public List<T> GetChildObjects<T>(DependencyObject obj) where T : FrameworkElement
+        /// <returns>一个System.Windows.Point类型的值。</returns>
+        public static Point GetPosition()
         {
-            DependencyObject child;
-            List<T> childList = [];
-
-            for (int i = 0; i <= VisualTreeHelper.GetChildrenCount(obj) - 1; i++)
-            {
-                child = VisualTreeHelper.GetChild(obj, i);
-
-                if (child is T t)
-                {
-                    childList.Add(t);
-                }
-                childList.AddRange(GetChildObjects<T>(child));
-            }
-            return childList;
-        }
-
-        /// <summary>
-        /// 查找子元素
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public T GetChildObject<T>(DependencyObject obj, string name) where T : FrameworkElement
-        {
-            DependencyObject child = null;
-            T grandChild = null;
-
-            for (int i = 0; i <= VisualTreeHelper.GetChildrenCount(obj) - 1; i++)
-            {
-                child = VisualTreeHelper.GetChild(obj, i);
-
-                if (child is T && (((T)child).Name == name | string.IsNullOrEmpty(name)))
-                {
-                    return (T)child;
-                }
-                else
-                {
-                    grandChild = GetChildObject<T>(child, name);
-                    if (grandChild != null)
-                        return grandChild;
-                }
-            }
-            return null;
+            System.Drawing.Point point = System.Windows.Forms.Cursor.Position;
+            return new Point(point.X, point.Y);
         }
 
 

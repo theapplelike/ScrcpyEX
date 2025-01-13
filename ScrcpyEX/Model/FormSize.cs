@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ScrcpyEX.Model
 {
     /// <summary>
-    /// 保存窗体尺寸、位置信息。
+    /// 该类描述窗体尺寸、位置信息。
     /// </summary>
     internal class FormSize
     {

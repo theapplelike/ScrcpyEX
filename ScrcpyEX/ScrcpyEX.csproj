@@ -66,6 +66,7 @@
     <Compile Include="Model\FormSize.cs" />
     <Compile Include="Model\PointInfo.cs" />
     <Compile Include="Model\RecInfo.cs" />
+    <Compile Include="MyDefinition\MyClass\DragMove.cs" />
     <Compile Include="MyDefinition\MyControl\TimePopup.cs" />
     <Compile Include="MyDefinition\WindowsAPI\DLL.cs" />
     <Compile Include="MyDefinition\MV.cs" />
@@ -157,6 +158,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
