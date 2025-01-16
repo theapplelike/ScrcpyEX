@@ -165,6 +165,7 @@ namespace ScrcpyEX.View
                     if (EmbeddedForm())
                     {
                         KeyboardMapping.RegisterHook();
+                        CreateAllPop();
                         return;
                     }
                     Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}，{_prc.HasExited}。");
@@ -339,12 +340,12 @@ namespace ScrcpyEX.View
         /// 重新设置scrcpy窗口的大小，以完全贴合父级panel，需要先最小化再最大化，防止相对坐标错误。
         /// 如果相对坐标仍然错误，两次操作间需要增加延时，给系统足够的处理时间。
         /// </summary>
-        private void ResizeSC()
+        private async void ResizeSC()
         {
             Console.WriteLine($"重新设置scrcpy大小。");
 
             DLL.ShowWindow(_scHandle, 1);
-            //await Task.Delay(100);
+            await Task.Delay(100);
             DLL.ShowWindow(_scHandle, 3);
         }
 

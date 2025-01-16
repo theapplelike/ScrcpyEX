@@ -62,17 +62,17 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 当前窗口或Scrcpy是否为活动窗口。
         /// </summary>
-        /// <returns>true--拥有焦点；false--没有焦点。</returns>
-        public bool IsActiveWindow()
+        /// <returns>0--窗口拥有焦点；1--Scrcpy拥有焦点；2--窗口或Scrcpy都没有焦点。</returns>
+        public int IsActiveWindow()
         {
             if (IsActive)
             {
-                return true;
+                return 0;
             }
             else
             {
                 IntPtr intPtr = DLL.GetForegroundWindow();
-                return intPtr == _scHandle;
+                return intPtr == _scHandle ? 1 : 2;
             }
         }
 
@@ -184,7 +184,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 在窗体中创建一个可以移动的Popup。
         /// </summary>
-        private void CreatePop()
+        private Popup CreatePop(KeyMapping mapping)
         {
             Popup pop = new()
             {
@@ -194,6 +194,8 @@ namespace ScrcpyEX.View
                 Height = 50,
                 Width = 50,
                 IsOpen = true,
+                HorizontalOffset = mapping.OffsetX,
+                VerticalOffset = mapping.OffsetY,
             };
 
             //提供边框
@@ -211,7 +213,10 @@ namespace ScrcpyEX.View
             //提供输入
             TextBox txt = new()
             {
-                Text = "hello",
+                Text = mapping.Key,
+                Width = 15,
+                FontSize = 16,
+                FontFamily = new FontFamily("Consolas"),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
                 //Visibility = Visibility.Collapsed,
@@ -225,16 +230,86 @@ namespace ScrcpyEX.View
                 //Background= Brushes.Red,
             };
 
+            //提供删除功能
+            Button btn = new()
+            {
+                FontSize = 8,
+                Content = "X",
+                Height = 14,
+                Width = 14,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+
             //确定层次关系
             grid.Children.Add(txt);
             grid.Children.Add(tbk);
+            grid.Children.Add(btn);
             border.Child = grid;
             pop.Child = border;
             gMain.Children.Add(pop);
 
             //设置Popup可以移动
-            _dragMove ??= new DragMove();
-            _dragMove.SetMove(pop);
+            _ = new MyDragMove(pop);
+            return pop;
+        }
+
+        /// <summary>
+        /// 进行按键映射的编辑，或保存编辑。
+        /// </summary>
+        /// <param name="desc">说明当前状态的字符串。</param>
+        private void MappingEdit(string desc)
+        {
+            if (desc == "进行映射编辑")
+            {
+                btnMappingEdit.Content = "保存编辑";
+                btnMappingAdd.IsEnabled = true;
+            }
+            else
+            {
+                MappingSave();
+                btnMappingEdit.Content = "进行映射编辑";
+                btnMappingAdd.IsEnabled = false;
+            }
+        }
+
+        /// <summary>
+        /// 添加一个映射Popup到界面上。
+        /// </summary>
+        private void MappingAdd()
+        {
+            MV.TempPopups.Add(CreatePop(new KeyMapping()));
+        }
+
+        /// <summary>
+        /// 保存界面上存在的映射Popup。
+        /// </summary>
+        private void MappingSave()
+        {
+            MyCfg.Cfg.KeyMappings.Clear();
+
+            foreach (var pop in MV.TempPopups)
+            {
+                string key = MyGM.FindVisualChild<TextBox>(pop.Child).Text;
+                MyCfg.Cfg.KeyMappings.Add(new KeyMapping(key, pop.HorizontalOffset, pop.VerticalOffset));
+
+                Console.WriteLine($"映射内容：{key}。");
+            }
+
+            Console.WriteLine($"已有映射：{MyCfg.Cfg.KeyMappings.Count}。");
+        }
+
+        /// <summary>
+        /// 创建已保存的所有映射Popup。
+        /// </summary>
+        private void CreateAllPop()
+        {
+            MV.TempPopups.Clear();
+
+            foreach (KeyMapping mapping in MyCfg.Cfg.KeyMappings)
+            {
+                MV.TempPopups.Add(CreatePop(mapping));
+            }
         }
 
 

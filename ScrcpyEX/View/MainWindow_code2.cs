@@ -193,22 +193,16 @@ namespace ScrcpyEX.View
             Console.WriteLine($"窗体/SC：{IsActive}，{intPtr == _scHandle}。");
         }
 
+        
+        
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             //Test1();
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
 
-            //IntPtr intPtr = IntPtr.Zero;
-
-            //DLL.SwitchToThisWindow(_scHandle, true);
-            //IntPtr intPtr = DLL.SetFocus(_scHandle);
-
-            //Console.WriteLine($"焦点：{Keyboard.FocusedElement}，{_scHandle}，{intPtr}。");
-
-            //System.Windows.Forms.SendKeys.SendWait("+K");
-            //System.Windows.Forms.SendKeys.SendWait("{ENTER}");
-            //Console.WriteLine($"scrcpy句柄：{btnTest.Cursor}。");
+            //KeyMappings.Add(new KeyMapping("A", CreatePop()));
+            //CreatePop();
 
             //if (_testTimer.IsEnabled)
             //{
@@ -218,11 +212,6 @@ namespace ScrcpyEX.View
             //{
             //    _testTimer.Start();
             //}
-
-            CreatePop();
-
-            //Content = pop;
-            //Console.WriteLine($"{_scHeight},{ActualHeight}");
             await Task.Delay(1);
         }
 

@@ -1,4 +1,5 @@
-﻿using ScrcpyEX.MyDefinition.MyControl;
+﻿using ScrcpyEX.MyDefinition.MyClass;
+using ScrcpyEX.MyDefinition.MyControl;
 using ScrcpyEX.View;
 using System;
 using System.Collections.Generic;
@@ -40,6 +41,11 @@ namespace ScrcpyEX.ExtensionMethod
         /// </summary>
         public static TimePopup Pop { get; set; }
 
+        /// <summary>
+        /// 编辑键盘映射时使用的临时Popup列表。
+        /// </summary>
+        public static List<Popup> TempPopups = [];
+        
 
     }
 }

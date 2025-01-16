@@ -183,6 +183,16 @@ namespace ScrcpyEX.View
         {
             new Setup().ShowDialog();
         }
+
+        private void BtnMappingEdit_Click(object sender, RoutedEventArgs e)
+        {
+            MappingEdit(btnMappingEdit.Content.ToString());
+        }
+
+        private void BtnMappingAdd_Click(object sender, RoutedEventArgs e)
+        {
+            MappingAdd();
+        }
         #endregion
 
         private void pnlShow_GotFocus(object sender, EventArgs e)

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,9 +15,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
     /// <summary>
     /// 拖拽移动类。
     /// </summary>
-    internal class DragMove
+    internal class MyDragMove
     {
-        private Popup _pop;
+        private readonly Popup _pop;
         private Point _lastPoint;           //上一次的鼠标坐标
         private Point _nowPoint;            //当前鼠标的坐标
 
@@ -26,14 +27,20 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// 设置指定的Popup可以进行拖拽。
         /// </summary>
         /// <param name="pop">要添加拖拽功能的Popup。</param>
-        /// <param name="parentRect">逻辑父级的宽高和位置。</param>
         /// <param name="isLeaveParent">是否可以移出逻辑父级。</param>
-        public void SetMove(Popup pop, bool isLeaveParent = false)
+        public MyDragMove(Popup pop, bool isLeaveParent = false)
         {
             _pop = pop;
             _pop.MouseDown += (s, e) => Pop_MouseDown();
             _pop.MouseMove += (s, e) => Pop_MouseMove(isLeaveParent);
             _pop.MouseUp += (s, e) => Pop_MouseUp();
+
+            TextBox txt = MyGM.FindVisualChild<TextBox>(pop.Child);
+            txt.PreviewTextInput += TextBox_PreviewTextInput;
+            txt.TextChanged += TextBox_TextChanged;
+
+            Button btn = MyGM.FindVisualChild<Button>(pop.Child);
+            btn.Click += Button_Click;
         }
 
         /// <summary>
@@ -90,6 +97,59 @@ namespace ScrcpyEX.MyDefinition.MyClass
         {
             Mouse.Capture(null);
             _isDragging = false;
+        }
+
+        /// <summary>
+        /// 键盘的输入会触发此事件，只允许输入一个字符，且只能为字母数字。
+        /// </summary>
+        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                if (textBox.Text.Length >= 1)
+                {
+                    e.Handled = true;//如果已经有一个字符，阻止进一步输入
+                }
+                else
+                {
+                    if (!Regex.IsMatch(e.Text, "^[a-zA-Z0-9]{1}$"))
+                    {
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 文本框文本的任何更改都会触发此事件，处理粘贴时多余的文本、小写转大写。
+        /// </summary>
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                if (textBox.Text.Length > 1)
+                {
+                    textBox.Text = textBox.Text.Substring(0, 1);//如果长度超过一，只保留第一个
+                    textBox.CaretIndex = 1;
+                }
+                else if (textBox.Text.Length == 1)
+                {
+                    if (char.IsLower(textBox.Text[0]))
+                    {
+                        textBox.Text = textBox.Text.ToUpper();
+                        textBox.CaretIndex = 1;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 删除当前的Popup。
+        /// </summary>
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            MV.TempPopups.Remove(_pop);
+            _pop.IsOpen = false;
         }
 
         /// <summary>

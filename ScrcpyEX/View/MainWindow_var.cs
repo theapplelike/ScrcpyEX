@@ -42,11 +42,6 @@ namespace ScrcpyEX.View
         private FormSize _tempSize = null;
 
         /// <summary>
-        /// 能给控件赋予移动功能的类。
-        /// </summary>
-        private DragMove _dragMove = null;
-
-        /// <summary>
         /// 调整scrcpy窗口大小的计时器。
         /// </summary>
         private readonly DispatcherTimer _resizeTimer = new();
@@ -61,6 +56,9 @@ namespace ScrcpyEX.View
         /// </summary>
         private readonly DispatcherTimer _countTimer = new();
 
+        /// <summary>
+        /// 测试用计时器。
+        /// </summary>
         private readonly DispatcherTimer _testTimer = new();
 
         /// <summary>

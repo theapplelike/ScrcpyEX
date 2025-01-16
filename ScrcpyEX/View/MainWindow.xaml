@@ -98,6 +98,15 @@
                     
                     <Button x:Name="btnStartRec" Click="BtnStartRec_Click" Style="{StaticResource ItemBtn}" Content="开始录制" BorderThickness="0,1"/>
                     <Button x:Name="btnSetup" Click="BtnSetup_Click" Style="{StaticResource ItemBtn}" Content="功能设置"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="btnMappingEdit" Click="BtnMappingEdit_Click" Style="{StaticResource ItemBtn}" Grid.Column="0" Content="进行映射编辑"/>
+                        <Button x:Name="btnMappingAdd" Click="BtnMappingAdd_Click" Style="{StaticResource ItemBtn}" Grid.Column="1" Content="添加映射按钮" BorderThickness="1,0,0,1" IsEnabled="False"/>
+                    </Grid>
                 </StackPanel>
             </Border>
         </Popup>

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using ScrcpyEX.ExtensionMethod.MyAttribute;
 using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition.MyClass;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -86,6 +87,11 @@ namespace ScrcpyEX.ExtensionMethod
         /// 录制操作信息的集合。
         /// </summary>
         public List<RecInfo> RecInfos { get; set; } = [];
+
+        /// <summary>
+        /// 按键映射类的列表。
+        /// </summary>
+        public List<KeyMapping> KeyMappings = [];
 
         /// <summary>
         /// 保持清醒，防止设备进入休眠状态（无线连接时无效）。

@@ -1,10 +1,12 @@
 ﻿using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.MyDefinition.MyClass;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -37,10 +39,16 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
             {
                 if ((int)wParam == WM.WM_KEYDOWN)
                 {
-                    if (MV.MainWin.IsActiveWindow())
+                    int focus = MV.MainWin.IsActiveWindow();
+                    if (focus != 2)
                     {
+                        if (focus == 1)
+                        {
+                            MV.MainWin.Activate();//将窗口带到前台
+                        }
+
                         int vkCode = Marshal.ReadInt32(lParam);
-                        Console.WriteLine($"Key: {(Keys)vkCode}, wParam: {(int)wParam:X}。");
+                        Console.WriteLine($"Key: {(Keys)vkCode}/{vkCode:X}, wParam: {(int)wParam:X}。");
                     }
                     else
                     {
@@ -71,6 +79,19 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
             HookDLL.UnhookWindowsHookEx(HookID);
             HookID = IntPtr.Zero;
             //Console.WriteLine($"注销钩子句柄：{HookID}。");
+        }
+
+        private void DoKeyMapping(string key)
+        {
+            foreach (KeyMapping mapping in MyCfg.Cfg.KeyMappings)
+            {
+                if (Regex.IsMatch(key, @"^[0-9]$"))//如果包含数字
+                {
+                    key = Regex.Replace(key, @"[A-Za-z]", "");
+                }
+                Console.WriteLine($"字符：{key}。");//应只剩字母或数字
+                //mapping.Key
+            }
         }
 
 
