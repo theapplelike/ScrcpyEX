@@ -20,12 +20,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <summary>
         /// Popup控件的X轴偏移。
         /// </summary>
-        public double OffsetX { get; set; } = 100;
+        public double OffsetX { get; set; } = 0;
 
         /// <summary>
         /// Popup控件的Y轴偏移。
         /// </summary>
-        public double OffsetY { get; set; } = 100;
+        public double OffsetY { get; set; } = 0;
 
         /// <summary>
         /// Popup控件的半径。

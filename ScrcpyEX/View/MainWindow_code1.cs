@@ -159,6 +159,7 @@ namespace ScrcpyEX.View
                         return;
                     }
 
+                    //消除黑边，有黑边时会有偏移
                     RemoveBlack();
 
                     //如果脚本已执行则关闭
@@ -182,21 +183,26 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 在窗体中创建一个可以移动的Popup。
+        /// 在窗体中创建一个可以移动的Popup，Popup为圆形，直径默认为50，会根据比例放大缩小。
+        /// 有黑边时会导致Popup的位置有偏移。
         /// </summary>
         private Popup CreatePop(KeyMapping mapping)
         {
+            double radius = 50 * ScRatioX;
+
             Popup pop = new()
             {
                 Placement = PlacementMode.Relative,
-                PlacementTarget = gMain,
+                PlacementTarget = gShow,//这里需要指明父级
                 AllowsTransparency = true,
-                Height = 50,
-                Width = 50,
+                Height = radius,
+                Width = radius,
                 IsOpen = true,
-                HorizontalOffset = mapping.OffsetX,
-                VerticalOffset = mapping.OffsetY,
+                HorizontalOffset = mapping.OffsetX * ScRatioX,
+                VerticalOffset = mapping.OffsetY * ScRatioY,
             };
+
+            Console.WriteLine($"原始左上:({mapping.OffsetX},{mapping.OffsetY}),比例:({ScRatioX},{ScRatioY}),最终左上:({pop.HorizontalOffset},{pop.VerticalOffset})。");
 
             //提供边框
             Border border = new()
@@ -204,7 +210,7 @@ namespace ScrcpyEX.View
                 Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
                 BorderBrush = Brushes.Black,
                 BorderThickness = new(1),
-                CornerRadius = new(50),
+                CornerRadius = new(radius),
             };
 
             //提供装多个控件的容器
@@ -239,6 +245,7 @@ namespace ScrcpyEX.View
                 Width = 14,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Top,
+                //Visibility = Visibility.Collapsed,
             };
 
             //确定层次关系
@@ -247,7 +254,7 @@ namespace ScrcpyEX.View
             grid.Children.Add(btn);
             border.Child = grid;
             pop.Child = border;
-            gMain.Children.Add(pop);
+            gShow.Children.Add(pop);//这里的父级要和pop.PlacementTarget属性一致
 
             //设置Popup可以移动
             _ = new MyDragMove(pop);
@@ -291,24 +298,96 @@ namespace ScrcpyEX.View
             foreach (var pop in MV.TempPopups)
             {
                 string key = MyGM.FindVisualChild<TextBox>(pop.Child).Text;
-                MyCfg.Cfg.KeyMappings.Add(new KeyMapping(key, pop.HorizontalOffset, pop.VerticalOffset));
+                double offsetX = pop.HorizontalOffset / ScRatioX;
+                double offsetY = pop.VerticalOffset / ScRatioY;
 
-                Console.WriteLine($"映射内容：{key}。");
+                MyCfg.Cfg.KeyMappings.Add(new KeyMapping(key, offsetX, offsetY));
+                Console.WriteLine($"映射内容：{key}，保存偏移：（{offsetX}，{offsetY}）。");
             }
 
             Console.WriteLine($"已有映射：{MyCfg.Cfg.KeyMappings.Count}。");
         }
 
         /// <summary>
-        /// 创建已保存的所有映射Popup。
+        /// 创建已保存的所有映射Popup，并保存到临时Popup列表，保存前会清空列表。
         /// </summary>
-        private void CreateAllPop()
+        private void CreateSavedPop()
         {
             MV.TempPopups.Clear();
 
             foreach (KeyMapping mapping in MyCfg.Cfg.KeyMappings)
             {
                 MV.TempPopups.Add(CreatePop(mapping));
+            }
+        }
+
+        /// <summary>
+        /// 键盘输入映射为点击操作。
+        /// </summary>
+        /// <param name="key">捕获的键盘字符。</param>
+        public void KeyboardMapping11(string key)
+        {
+            int focus = IsActiveWindow();
+            if (focus != 2)
+            {
+                if (focus == 1)
+                {
+                    Activate();//将窗口带到前台
+                }
+                DoKeyMapping(key, ScRatioX);
+            }
+            else
+            {
+                Console.WriteLine("不为活动窗口。");
+            }
+        }
+
+        /// <summary>
+        /// 如果键入的字符在映射列表中，则映射为单击操作。
+        /// </summary>
+        /// <param name="key">捕获的键盘字符。</param>
+        /// <param name="ratio">Scrcpy当前宽度和默认宽度的比值。</param>
+        private void DoKeyMapping(string key, double ratio)
+        {
+            //如果包含数字
+            if (Regex.IsMatch(key, @"[0-9]"))
+            {
+                key = Regex.Replace(key, @"[A-Za-z]", "");
+            }
+            Console.WriteLine($"映射字符：{key}。");//应只剩字母或数字
+
+            //bool result = MyCfg.Cfg.KeyMappings.Any(a => a.Key == key);
+            //if (result)
+            //{
+            //    Console.WriteLine("列表中存在项。");
+            //}
+            //else
+            //{
+            //    Console.WriteLine("不存在。");
+            //}
+
+            List<KeyMapping> mappings = MyCfg.Cfg.KeyMappings.Where(a => a.Key == key).ToList();
+            //if (mappings.Count > 0)
+            //{
+            //    Console.WriteLine("列表中存在项。");
+            //}
+
+
+            foreach (KeyMapping m in mappings)
+            {
+                //根据现在的比例计算半径
+                double radius = 50 * ratio / 2;
+                
+                //获得圆心坐标
+                double centreX = m.OffsetX * ratio + radius;
+                double centreY = m.OffsetY * ratio + radius;
+
+                //获得对应的安卓坐标
+                double x = centreX / ScActualWidth * 2312;
+                double y = centreY / ScActualHeight * 1080;
+
+                Console.WriteLine($"圆心点：（{centreX}，{centreY}），安卓点：（{x}，{y}）。");
+                Test1(x, y);
             }
         }
 

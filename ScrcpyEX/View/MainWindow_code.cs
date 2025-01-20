@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Controls;
 using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.WindowsAPI;
+using System.Windows.Controls.Primitives;
 
 namespace ScrcpyEX.View
 {
@@ -56,7 +57,7 @@ namespace ScrcpyEX.View
                 Left = (SystemParameters.WorkArea.Width - ActualWidth) / 2;
                 Top = (SystemParameters.WorkArea.Height - ActualHeight) / 2;
             }
-            //Console.WriteLine($"窗体尺寸：{Width},{Height}。");
+            Console.WriteLine($"窗体尺寸：{Width},{Height}。");
         }
 
         /// <summary>
@@ -165,7 +166,7 @@ namespace ScrcpyEX.View
                     if (EmbeddedForm())
                     {
                         KeyboardMapping.RegisterHook();
-                        CreateAllPop();
+                        CreateSavedPop();
                         return;
                     }
                     Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}，{_prc.HasExited}。");
@@ -347,6 +348,15 @@ namespace ScrcpyEX.View
             DLL.ShowWindow(_scHandle, 1);
             await Task.Delay(100);
             DLL.ShowWindow(_scHandle, 3);
+
+            Dispatcher.Invoke(() =>
+            {
+                foreach (Popup pop in MV.TempPopups)
+                {
+                    pop.IsOpen = false;
+                }
+                CreateSavedPop();
+            });
         }
 
         /// <summary>
@@ -466,6 +476,7 @@ namespace ScrcpyEX.View
             Width -= _horizontalRatio * step;
             Height -= _verticalRatio * step;
             Locate();
+            RemoveBlack();
         }
 
         /// <summary>
@@ -506,6 +517,7 @@ namespace ScrcpyEX.View
             }
 
             Locate();
+            RemoveBlack();
         }
 
     }

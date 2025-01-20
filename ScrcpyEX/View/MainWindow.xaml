@@ -156,9 +156,11 @@
             </WindowsFormsHost>
         </Grid>-->
 
-        <WindowsFormsHost x:Name="wfh" Grid.Row="1" Background="Gray" Margin="5" GotFocus="wfh_GotFocus" PreviewMouseDown="wfh_PreviewMouseDown" >
-            <wf:Panel x:Name="pnlShow" GotFocus="pnlShow_GotFocus" Dock="Fill" AutoSize="True" MouseDown="PnlShow_MouseDown"/>
-        </WindowsFormsHost>
+        <Grid x:Name="gShow" Grid.Row="1" Margin="5">
+            <WindowsFormsHost x:Name="wfh" Background="Gray" GotFocus="wfh_GotFocus" PreviewMouseDown="wfh_PreviewMouseDown" >
+                <wf:Panel x:Name="pnlShow" GotFocus="pnlShow_GotFocus" Dock="Fill" AutoSize="True" MouseDown="PnlShow_MouseDown"/>
+            </WindowsFormsHost>
+        </Grid>
 
     </Grid>
 </Window>

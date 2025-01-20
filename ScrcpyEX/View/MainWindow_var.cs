@@ -89,22 +89,22 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 窗口除开scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
-        private double ExtraWidth => wfh.Margin.Left + wfh.Margin.Right;
+        private double ExtraWidth => gShow.Margin.Left + gShow.Margin.Right;
 
         /// <summary>
         /// 窗口除开scrcpy的额外高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
-        private double ExtraHeight => dpl.ActualHeight + wfh.Margin.Top + wfh.Margin.Bottom;
+        private double ExtraHeight => dpl.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom;
 
         /// <summary>
         /// 窗口除开scrcpy的额外左侧宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
-        public double ExtraWidthLeft => wfh.Margin.Left;
+        public double ExtraWidthLeft => gShow.Margin.Left;
 
         /// <summary>
         /// 窗口除开scrcpy的额外上方高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
-        public double ExtraHeightTop => dpl.ActualHeight + wfh.Margin.Top;
+        public double ExtraHeightTop => dpl.ActualHeight + gShow.Margin.Top;
 
         /// <summary>
         /// X轴上的DPI比例。

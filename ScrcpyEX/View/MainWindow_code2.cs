@@ -220,11 +220,8 @@ namespace ScrcpyEX.View
             //MyGM.POP("yesclick");
         }
 
-        private void Test1()
+        private void Test1(double x, double y)
         {
-            // 要点击的屏幕坐标.指定好的位置，
-            int x = 500;
-            int y = 300;
 
             // 构建ADB命令字符串
             //string adbClickCommand = $"\"{MV.ADB_Path}\" shell wm size";

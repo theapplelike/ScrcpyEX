@@ -56,7 +56,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
             //记录当前坐标为上一次的坐标
             _lastPoint = MyGM.GetPosition();
 
-            Console.WriteLine($"popup中心点：（{_pop.HorizontalOffset + 25 - 5}，{_pop.VerticalOffset + 25 - 35}）。");
+            //double radius = 50 * MV.MainWin.ScRatioX / 2;//根据现在的比例计算半径
+            double radius = 50 / 2;//根据现在的比例计算半径
+            Console.WriteLine($"popup中心点：（{_pop.HorizontalOffset + radius}，{_pop.VerticalOffset + radius}），左上角：（{_pop.HorizontalOffset}，{_pop.VerticalOffset}）。");
             Console.WriteLine($"当前鼠标坐标：（{_lastPoint.X},{_lastPoint.Y}）,{_isDragging}.");
         }
 
@@ -159,22 +161,20 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <param name="newY">上边距＜newY＜上边距+父级高度。</param>
         private void LimitToParent(ref double newX, ref double newY)
         {
-            double left = MV.MainWin.ExtraWidthLeft;
-            double maxLeft = MV.MainWin.ExtraWidthLeft + MV.MainWin.ScActualWidth;
-            double top = MV.MainWin.ExtraHeightTop;
-            double maxTop = MV.MainWin.ExtraHeightTop + MV.MainWin.ScActualHeight;
+            double maxLeft = MV.MainWin.ScActualWidth;
+            double maxTop = MV.MainWin.ScActualHeight;
 
-            if (newX < left)
+            if (newX < 0)
             {
-                newX = left;
+                newX = 0;
             }
             else if (newX + _pop.Width > maxLeft)
             {
                 newX = maxLeft - _pop.Width;
             }
-            if (newY < top)
+            if (newY < 0)
             {
-                newY = top;
+                newY = 0;
             }
             else if (newY + _pop.Height > maxTop)
             {
