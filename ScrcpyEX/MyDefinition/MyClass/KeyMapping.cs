@@ -27,16 +27,6 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         public double OffsetY { get; set; } = 0;
 
-        /// <summary>
-        /// Popup控件的半径。
-        /// </summary>
-        //public double Radius { get; set; }
-
-        /// <summary>
-        /// 映射显示在界面上的图形界面。
-        /// </summary>
-        //public Popup Pop { get; set; }
-
         public KeyMapping() { }
 
         public KeyMapping(string key, double offsetX, double offsetY)

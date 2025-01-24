@@ -52,9 +52,9 @@ namespace ScrcpyEX.View
             _prc.CancelOutputRead();
             _prc.CancelErrorRead();
             _scHandle = IntPtr.Zero;
-            if (KeyboardMapping.HookID != IntPtr.Zero)
+            if (KeyboardHook.HookID != IntPtr.Zero)
             {
-                KeyboardMapping.CancelHook();
+                KeyboardHook.CancelHook();
             }
 
             Console.WriteLine($"scrcpy程序已关闭。");
@@ -193,16 +193,15 @@ namespace ScrcpyEX.View
             Console.WriteLine($"窗体/SC：{IsActive}，{intPtr == _scHandle}。");
         }
 
-        
-        
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
-            //Test1();
+            //Point pt1 = PointToScreen(new Point(0, 0));
+            //int x = (int)(pt1.X + (_limitPop.HorizontalOffset + ExtraWidthLeft + 50) * DpiScaleX);
+            //int y = (int)(pt1.Y + (_limitPop.VerticalOffset + ExtraHeightTop + 50) * DpiScaleY);
+            //DLL.SetCursorPos(x, y);
+
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
-
-            //KeyMappings.Add(new KeyMapping("A", CreatePop()));
-            //CreatePop();
 
             //if (_testTimer.IsEnabled)
             //{
@@ -220,38 +219,26 @@ namespace ScrcpyEX.View
             //MyGM.POP("yesclick");
         }
 
-        private void Test1(double x, double y)
+        private void AdbTest1(double x, double y)
         {
-
-            // 构建ADB命令字符串
-            //string adbClickCommand = $"\"{MV.ADB_Path}\" shell wm size";
-            string adbClickCommand = $"\"{MV.ADB_Path}\" shell input tap {x} {y}";
+            string adbClickCommand = $"shell input tap {x} {y}";
+            //string adbClickCommand = $"{MV.ADB_Path} shell input touchscreen swipe {x} {y} {x} {y} 5000";
+            //string command = $"{MV.ADB_Path} shell input touchscreen swipe 100 101 100 100 10";
 
             // 创建一个新的进程启动信息
-            ProcessStartInfo processStartInfo = new ProcessStartInfo
+            ProcessStartInfo processStartInfo = new()
             {
-                FileName = "cmd.exe", // 使用命令提示符来执行ADB命令
-                Arguments = $"/c {adbClickCommand}", // /c 表示执行完命令后关闭命令行窗口
-                RedirectStandardOutput = true, // 可选：重定向标准输出，用于读取命令执行结果
-                UseShellExecute = false, // 必须设置为false才能重定向输出
-                CreateNoWindow = true // 可选：不创建命令行窗口
+                FileName = MV.ADB_Path,         //使用命令提示符来执行ADB命令
+                Arguments = adbClickCommand,    //(/c)表示执行完命令后关闭命令行窗口
+                RedirectStandardOutput = false, // 不需要重定向输出
+                RedirectStandardError = false,  // 不需要重定向错误
+                UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
+                CreateNoWindow = true,          // 不创建窗口
             };
-
-            // 启动进程并执行命令
-            using (Process process = Process.Start(processStartInfo))
-            {
-                if (process != null)
-                {
-                    // 读取命令执行结果（如果需要）
-                    string output = process.StandardOutput.ReadToEnd();
-                    Console.WriteLine($"adb执行结果：{output}。");
-
-                    // 等待进程退出
-                    process.WaitForExit();
-                }
-            }
-
+            Process.Start(processStartInfo);
             Console.WriteLine("点击命令已发送");
         }
+
+
     }
 }

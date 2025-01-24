@@ -57,7 +57,7 @@ namespace ScrcpyEX.View
                 Left = (SystemParameters.WorkArea.Width - ActualWidth) / 2;
                 Top = (SystemParameters.WorkArea.Height - ActualHeight) / 2;
             }
-            Console.WriteLine($"窗体尺寸：{Width},{Height}。");
+            //Console.WriteLine($"窗体尺寸：{Width},{Height}。");
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace ScrcpyEX.View
                     await Task.Delay(500);
                     if (EmbeddedForm())
                     {
-                        KeyboardMapping.RegisterHook();
+                        KeyboardHook.RegisterHook();
                         CreateSavedPop();
                         return;
                     }
@@ -318,23 +318,6 @@ namespace ScrcpyEX.View
                 Left = _tempSize.Left;
                 Top = _tempSize.Top;
             }
-        }
-
-        /// <summary>
-        /// 2024.11.15
-        /// 改变scrcpy窗口的大小，以完全贴合父级panel，需要先最小化再最大化，防止相对坐标错误。
-        /// </summary>
-        private async Task ChgScrcpySize()
-        {
-            //Console.WriteLine($"stp大小变更:{Stp.ActualWidth}，{Stp.ActualHeight}，{Stp.Width}，{Stp.Height}。");
-            //gShow.Width = Stp.ActualWidth - 50;
-            //gShow.Height = Stp.ActualHeight - 70;
-            //Console.WriteLine($"差:{Stp.ActualWidth - gShow.ActualWidth}，{Stp.ActualHeight - gShow.ActualHeight}。");
-            Console.WriteLine($"panel的大小：{pnlShow.Width}，{pnlShow.Height}。");
-
-            DLL.ShowWindow(_scHandle, 2);
-            await Task.Delay(100);
-            DLL.ShowWindow(_scHandle, 3);
         }
 
         /// <summary>

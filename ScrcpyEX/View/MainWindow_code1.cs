@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -186,7 +187,7 @@ namespace ScrcpyEX.View
         /// 在窗体中创建一个可以移动的Popup，Popup为圆形，直径默认为50，会根据比例放大缩小。
         /// 有黑边时会导致Popup的位置有偏移。
         /// </summary>
-        private Popup CreatePop(KeyMapping mapping)
+        private Popup CreatePop(KeyMapping mapping, bool popIsOpen)
         {
             double radius = 50 * ScRatioX;
 
@@ -197,7 +198,7 @@ namespace ScrcpyEX.View
                 AllowsTransparency = true,
                 Height = radius,
                 Width = radius,
-                IsOpen = true,
+                IsOpen = popIsOpen,
                 HorizontalOffset = mapping.OffsetX * ScRatioX,
                 VerticalOffset = mapping.OffsetY * ScRatioY,
             };
@@ -269,6 +270,11 @@ namespace ScrcpyEX.View
         {
             if (desc == "进行映射编辑")
             {
+                foreach (Popup pop in MV.TempPopups)
+                {
+                    pop.IsOpen = true;
+                }
+
                 btnMappingEdit.Content = "保存编辑";
                 btnMappingAdd.IsEnabled = true;
             }
@@ -285,7 +291,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void MappingAdd()
         {
-            MV.TempPopups.Add(CreatePop(new KeyMapping()));
+            MV.TempPopups.Add(CreatePop(new KeyMapping(), true));
         }
 
         /// <summary>
@@ -295,11 +301,12 @@ namespace ScrcpyEX.View
         {
             MyCfg.Cfg.KeyMappings.Clear();
 
-            foreach (var pop in MV.TempPopups)
+            foreach (Popup pop in MV.TempPopups)
             {
                 string key = MyGM.FindVisualChild<TextBox>(pop.Child).Text;
                 double offsetX = pop.HorizontalOffset / ScRatioX;
                 double offsetY = pop.VerticalOffset / ScRatioY;
+                pop.IsOpen = false;
 
                 MyCfg.Cfg.KeyMappings.Add(new KeyMapping(key, offsetX, offsetY));
                 Console.WriteLine($"映射内容：{key}，保存偏移：（{offsetX}，{offsetY}）。");
@@ -317,7 +324,7 @@ namespace ScrcpyEX.View
 
             foreach (KeyMapping mapping in MyCfg.Cfg.KeyMappings)
             {
-                MV.TempPopups.Add(CreatePop(mapping));
+                MV.TempPopups.Add(CreatePop(mapping, false));
             }
         }
 
@@ -325,7 +332,8 @@ namespace ScrcpyEX.View
         /// 键盘输入映射为点击操作。
         /// </summary>
         /// <param name="key">捕获的键盘字符。</param>
-        public void KeyboardMapping11(string key)
+        /// <param name="isDown">当前按键是否为按下状态。</param>
+        public void KeyboardMapping(string key, bool isDown)
         {
             int focus = IsActiveWindow();
             if (focus != 2)
@@ -334,12 +342,41 @@ namespace ScrcpyEX.View
                 {
                     Activate();//将窗口带到前台
                 }
-                DoKeyMapping(key, ScRatioX);
+
+                if (key =="Q")//按下Q使用鼠标控制方向
+                {
+                    PressMouse(isDown);
+                }
+
+                //if (isDown)
+                {
+                    DoKeyMapping(key, ScRatioX);
+                }
             }
-            else
+        }
+
+        /// <summary>
+        /// 如果按键处于按下状态，则让鼠标左键在按下和抬起间转化。
+        /// </summary>
+        /// <param name="isDown">当前按键是否为按下状态。</param>
+        private void PressMouse(bool isDown)
+        {
+            if (isDown)
             {
-                Console.WriteLine("不为活动窗口。");
+                if (_isPressMouse)
+                {
+                    _isPressMouse = false;
+                    //DLL.mouse_event(0x04, 0, 0, 0, 0);
+                    DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero);
+                }
+                else
+                {
+                    _isPressMouse = true;
+                    //DLL.mouse_event(0x02, 0, 0, 0, 0);//按下
+                    DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, IntPtr.Zero);
+                }
             }
+            //Console.WriteLine($"开启鼠标移动,{_isPressMouse}。");
         }
 
         /// <summary>
@@ -349,45 +386,35 @@ namespace ScrcpyEX.View
         /// <param name="ratio">Scrcpy当前宽度和默认宽度的比值。</param>
         private void DoKeyMapping(string key, double ratio)
         {
-            //如果包含数字
+            //让字符只剩字母或数字
             if (Regex.IsMatch(key, @"[0-9]"))
             {
                 key = Regex.Replace(key, @"[A-Za-z]", "");
             }
-            Console.WriteLine($"映射字符：{key}。");//应只剩字母或数字
-
-            //bool result = MyCfg.Cfg.KeyMappings.Any(a => a.Key == key);
-            //if (result)
-            //{
-            //    Console.WriteLine("列表中存在项。");
-            //}
-            //else
-            //{
-            //    Console.WriteLine("不存在。");
-            //}
 
             List<KeyMapping> mappings = MyCfg.Cfg.KeyMappings.Where(a => a.Key == key).ToList();
-            //if (mappings.Count > 0)
-            //{
-            //    Console.WriteLine("列表中存在项。");
-            //}
-
-
             foreach (KeyMapping m in mappings)
             {
                 //根据现在的比例计算半径
-                double radius = 50 * ratio / 2;
+                double radius = 50 * ratio * DpiScaleX / 2;
                 
                 //获得圆心坐标
-                double centreX = m.OffsetX * ratio + radius;
-                double centreY = m.OffsetY * ratio + radius;
+                int centreX = (int)(m.OffsetX * ratio * DpiScaleX + radius);
+                int centreY = (int)(m.OffsetY * ratio * DpiScaleY + radius);
 
-                //获得对应的安卓坐标
-                double x = centreX / ScActualWidth * 2312;
-                double y = centreY / ScActualHeight * 1080;
+                IntPtr lp = new((centreY << 16) + centreX);
+                DLL.PostMessage(_scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
+                DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
+                DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
 
-                Console.WriteLine($"圆心点：（{centreX}，{centreY}），安卓点：（{x}，{y}）。");
-                Test1(x, y);
+                //如果标志位为true，则让鼠标左键处于按下状态
+                if (_isPressMouse)
+                {
+                    DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
+                    //Console.WriteLine("继续让鼠标左键处于按下状态。");
+                }
+
+                Console.WriteLine($"圆心点:({centreX},{centreY})，鼠标移动标志位：{_isPressMouse}。");
             }
         }
 

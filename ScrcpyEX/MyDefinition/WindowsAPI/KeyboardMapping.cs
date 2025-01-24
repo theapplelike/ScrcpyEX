@@ -15,9 +15,9 @@ using System.Windows.Forms;
 namespace ScrcpyEX.MyDefinition.WindowsAPI
 {
     /// <summary>
-    /// 键盘映射类，使用钩子实现。
+    /// 键盘钩子。
     /// </summary>
-    internal class KeyboardMapping
+    internal class KeyboardHook
     {
         // 定义Windows API函数和常量
         private const int WH_KEYBOARD = 2;      //安装用于监视击键消息的hook过程
@@ -39,12 +39,12 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         {
             if (nCode >= 0)
             {
-                if ((int)wParam == WM.WM_KEYDOWN)
+                if ((int)wParam == WM.WM_KEYDOWN || (int)wParam == WM.WM_KEYUP)
                 {
                     int vkCode = Marshal.ReadInt32(lParam);
-                    Console.WriteLine($"Key: {(Keys)vkCode}/{vkCode:X}, wParam: {(int)wParam:X}。");
+                    //Console.WriteLine($"Key: {(Keys)vkCode}/{vkCode:X}, wParam: {(int)wParam:X}。");
 
-                    MV.MainWin.KeyboardMapping11(((Keys)vkCode).ToString());
+                    MV.MainWin.KeyboardMapping(((Keys)vkCode).ToString(), (int)wParam == WM.WM_KEYDOWN);
                 }
             }
             return HookDLL.CallNextHookEx(HookID, nCode, wParam, lParam);
@@ -58,7 +58,8 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         {
             IntPtr hMod = HookDLL.GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName);
             HookID = HookDLL.SetKeyboardHook(WH_KEYBOARD_LL, HookCallback, hMod, 0);
-            Console.WriteLine("注册键盘钩子。");
+            //Console.WriteLine("注册键盘钩子。");
+
             return HookID != IntPtr.Zero;
         }
 
