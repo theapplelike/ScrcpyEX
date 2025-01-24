@@ -17,6 +17,7 @@ using ScrcpyEX.Model;
 using System.Windows.Controls.Primitives;
 using System.Windows.Controls;
 using ScrcpyEX.MyDefinition.MyClass;
+using System.IO;
 
 namespace ScrcpyEX.View
 {
@@ -199,6 +200,7 @@ namespace ScrcpyEX.View
             //int x = (int)(pt1.X + (_limitPop.HorizontalOffset + ExtraWidthLeft + 50) * DpiScaleX);
             //int y = (int)(pt1.Y + (_limitPop.VerticalOffset + ExtraHeightTop + 50) * DpiScaleY);
             //DLL.SetCursorPos(x, y);
+            AdbTest1(500, 500);
 
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
@@ -222,21 +224,60 @@ namespace ScrcpyEX.View
         private void AdbTest1(double x, double y)
         {
             string adbClickCommand = $"shell input tap {x} {y}";
-            //string adbClickCommand = $"{MV.ADB_Path} shell input touchscreen swipe {x} {y} {x} {y} 5000";
-            //string command = $"{MV.ADB_Path} shell input touchscreen swipe 100 101 100 100 10";
 
             // 创建一个新的进程启动信息
             ProcessStartInfo processStartInfo = new()
             {
-                FileName = MV.ADB_Path,         //使用命令提示符来执行ADB命令
-                Arguments = adbClickCommand,    //(/c)表示执行完命令后关闭命令行窗口
-                RedirectStandardOutput = false, // 不需要重定向输出
-                RedirectStandardError = false,  // 不需要重定向错误
+                FileName = MV.ADB_Path,         //adb的路径
+                Arguments = adbClickCommand,    //执行完命令后adb会直接关闭
                 UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
                 CreateNoWindow = true,          // 不创建窗口
             };
             Process.Start(processStartInfo);
             Console.WriteLine("点击命令已发送");
+        }
+
+        Process _adbPrc = null;
+        private void AdbTest2(double x, double y)
+        {
+            string adbClickCommand = $"shell input tap {x} {y}";
+            //string adbClickCommand = $"{MV.ADB_Path} shell input tap {x} {y}";
+            //string command = $"{MV.ADB_Path} shell input touchscreen swipe 100 101 100 100 10";
+
+            if (_adbPrc == null)
+            {
+                // 创建一个新的进程启动信息
+                ProcessStartInfo processStartInfo = new()
+                {
+                    FileName = MV.ADB_Path,         //使用命令提示符来执行ADB命令
+                    Arguments = $" {adbClickCommand}",    //(/c)表示执行完命令后关闭命令行窗口
+                    RedirectStandardOutput = true, // 不需要重定向输出
+                    RedirectStandardError = true,  // 不需要重定向错误
+                    RedirectStandardInput = true,
+                    UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
+                    CreateNoWindow = true,          // 不创建窗口
+                };
+                _adbPrc = Process.Start(processStartInfo);
+
+                //_adbPrc = new();
+                //_adbPrc.StartInfo = processStartInfo;
+                //_adbPrc.Start();
+
+                //StreamWriter sw = _adbPrc.StandardInput;
+                //sw.WriteLine(adbClickCommand);
+            }
+            else
+            {
+                StreamWriter sw = _adbPrc.StandardInput;
+                sw.WriteLine(adbClickCommand);
+            }
+
+            string output = _adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
+            string Error = _adbPrc.StandardError.ReadToEnd();
+            //string input = _adbPrc.StandardInput
+            
+            Console.WriteLine($"输出：{output}。  错误：{Error}。{_adbPrc.HasExited}。");
+            //Console.WriteLine("点击命令已发送");
         }
 
 
