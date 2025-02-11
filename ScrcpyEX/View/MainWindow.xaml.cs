@@ -65,9 +65,14 @@ namespace ScrcpyEX.View
 
         private void BtnWired_Click(object sender, RoutedEventArgs e)
         {
-            WiredStart();
+            WiredStart(true);
         }
-        
+
+        private void BtnWirel_Click(object sender, RoutedEventArgs e)
+        {
+            WiredStart(false);
+        }
+
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
             HandStopScrcpy();
@@ -223,6 +228,9 @@ namespace ScrcpyEX.View
             //Console.WriteLine("鼠标在窗体按下。");
         }
 
+        private void PnlShow_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
 
+        }
     }
 }

@@ -139,13 +139,14 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 启动scrcpy并以有线方式连接手机。
+        /// 启动Scrcpy并以指定方式连接手机。
         /// </summary>
-        private async Task ConnectScrcpy()
+        /// <param name="isWired">是否使用有线形式启动。</param>
+        private async Task ConnectScrcpy(bool isWired)
         {
             ProcessStartInfo info = new(MV.ScrcpyPath)
             {
-                Arguments = $"{GetAllArguments()} --select-usb",
+                Arguments = GetCommandLine(isWired),
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -177,12 +178,14 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 获得所有用户选择的命令行参数。
+        /// 获得Scrcpy启动时附带的命令行参数。
         /// </summary>
-        private string GetAllArguments()
+        /// <param name="isWired">是否使用有线形式启动。</param>
+        private string GetCommandLine(bool isWired)
         {
             StringBuilder sb = new();
 
+            //根据用户设置获得的命令行参数
             foreach (PropertyInfo prop in typeof(MyCfg).GetProperties())
             {
                 string str = GetArg(prop.Name);
@@ -193,8 +196,19 @@ namespace ScrcpyEX.View
                 //Console.WriteLine($"属性{prop.Name}：{prop.GetValue(MyCfg.Cfg)}，{GetArg(prop.Name)}。");
             }
 
+            //键盘使用UHID可以输入中文，对设备输入中文时电脑输入法必须为英文
             _scName = $"{DateTime.Now:HHmmss}mook";
             sb.Append($"--keyboard=uhid --window-title={_scName} ");
+
+            if (isWired)
+            {
+                sb.Append("--select-usb");
+            }
+            else
+            {
+                sb.Append($"--tcpip={MyCfg.Cfg.IP}:{MyCfg.Cfg.Port}");
+            }
+
             //Console.WriteLine($"命令行：{sb}。");
             return sb.ToString();
         }
@@ -205,12 +219,12 @@ namespace ScrcpyEX.View
         /// <param name="Prop">属性（Property）的名称。</param>
         private string GetArg(string Prop)
         {
-            var info = typeof(MyCfg).GetProperty(Prop).GetCustomAttribute<ArgumentsAttribute>();
+            var info = typeof(MyCfg).GetProperty(Prop).GetCustomAttribute<CommandLineAttribute>();
             return info?.Arguments ?? null;
         }
 
         /// <summary>
-        /// 获得指定值是否可以转化为bool，不能返回false，如果可以返回其bool值。
+        /// 判断传入的对象是否可以转化为bool，不能返回false，如果可以返回其bool值。
         /// </summary>
         private bool ConvToBool(object val) => val is bool result && result;
 
@@ -384,13 +398,14 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 以有线形式启动Scrcpy。
         /// </summary>
-        private async void WiredStart()
+        /// <param name="isWired">是否使用有线形式启动。</param>
+        private async void WiredStart(bool isWired)
         {
             if (_scHandle == IntPtr.Zero)
             {
-                btnWired.IsEnabled = false;
-                await ConnectScrcpy();
-                btnWired.IsEnabled = true;
+                btnWired.IsEnabled = btnWirel.IsEnabled = false;
+                await ConnectScrcpy(isWired);
+                btnWired.IsEnabled = btnWirel.IsEnabled = true;
             }
         }
 

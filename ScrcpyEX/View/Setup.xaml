@@ -29,6 +29,22 @@
             <Setter Property="BorderBrush" Value="Gainsboro"/>
             <Setter Property="BorderThickness" Value="0,0,0,1"/>
         </Style>
+        <Style x:Key="stpBox" TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Horizontal"/>
+            <Setter Property="Margin" Value="65,5"/>
+            <Setter Property="Height" Value="55"/>
+        </Style>
+        <Style x:Key="tbkDesc" TargetType="TextBlock">
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
+        </Style>
+        <Style x:Key="txt" TargetType="TextBox">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Width" Value="200"/>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -75,10 +91,6 @@
                 <Border/>
 
                 <CheckBox IsChecked="{Binding Cfg.DeviceSleep}" Content="设备停止投屏时进入休眠" Padding="10"/>
-                <!--<Grid Height="35">
-                        <TextBlock Text="设备停止投屏时进入休眠" FontSize="15" VerticalAlignment="Center"/>
-                    </Grid>
-                </CheckBox>-->
                 <Border/>
             </StackPanel>
 
@@ -100,6 +112,18 @@
             </Button>
             <StackPanel x:Name="stp2" Visibility="{Binding VisibleStp2,Mode=TwoWay}">
                 <CheckBox IsChecked="{Binding Cfg.Size.IsRecord}" Content="记住上一次退出时的位置和大小" Padding="10"/>
+                <Border/>
+
+                <StackPanel Style="{StaticResource stpBox}">
+                    <TextBlock Text="无线连接-IP地址" Style="{StaticResource tbkDesc}"/>
+                    <TextBox Text="{Binding Cfg.IP}" Style="{StaticResource txt}"/>
+                </StackPanel>
+                <Border/>
+
+                <StackPanel Style="{StaticResource stpBox}">
+                    <TextBlock Text="无线连接-端口号" Style="{StaticResource tbkDesc}"/>
+                    <TextBox Text="{Binding Cfg.Port}" Style="{StaticResource txt}"/>
+                </StackPanel>
                 <Border/>
             </StackPanel>
 

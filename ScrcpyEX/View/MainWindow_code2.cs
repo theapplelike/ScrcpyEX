@@ -200,7 +200,7 @@ namespace ScrcpyEX.View
             //int x = (int)(pt1.X + (_limitPop.HorizontalOffset + ExtraWidthLeft + 50) * DpiScaleX);
             //int y = (int)(pt1.Y + (_limitPop.VerticalOffset + ExtraHeightTop + 50) * DpiScaleY);
             //DLL.SetCursorPos(x, y);
-            AdbTest1(500, 500);
+            await AdbTest3(500, 500);
 
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
@@ -238,10 +238,10 @@ namespace ScrcpyEX.View
         }
 
         Process _adbPrc = null;
-        private void AdbTest2(double x, double y)
+        private async Task AdbTest2(double x, double y)
         {
-            string adbClickCommand = $"shell input tap {x} {y}";
-            //string adbClickCommand = $"{MV.ADB_Path} shell input tap {x} {y}";
+            //string adbClickCommand = $"shell input tap {x} {y}";
+            string adbClickCommand = $"{MV.ADB_Path} shell input tap {x} {y}";
             //string command = $"{MV.ADB_Path} shell input touchscreen swipe 100 101 100 100 10";
 
             if (_adbPrc == null)
@@ -249,35 +249,53 @@ namespace ScrcpyEX.View
                 // 创建一个新的进程启动信息
                 ProcessStartInfo processStartInfo = new()
                 {
-                    FileName = MV.ADB_Path,         //使用命令提示符来执行ADB命令
-                    Arguments = $" {adbClickCommand}",    //(/c)表示执行完命令后关闭命令行窗口
-                    RedirectStandardOutput = true, // 不需要重定向输出
-                    RedirectStandardError = true,  // 不需要重定向错误
+                    FileName = "cmd.exe",         //使用命令提示符来执行ADB命令
+                    Arguments = $"/c {adbClickCommand}",    //(/c)表示执行完命令后关闭命令行窗口
+                    RedirectStandardOutput = true, // 重定向输出
+                    RedirectStandardError = true,  // 重定向错误
                     RedirectStandardInput = true,
                     UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
                     CreateNoWindow = true,          // 不创建窗口
                 };
                 _adbPrc = Process.Start(processStartInfo);
 
-                //_adbPrc = new();
-                //_adbPrc.StartInfo = processStartInfo;
-                //_adbPrc.Start();
-
-                //StreamWriter sw = _adbPrc.StandardInput;
-                //sw.WriteLine(adbClickCommand);
+                StreamWriter sw = _adbPrc.StandardInput;
+                await sw.WriteAsync(adbClickCommand);
+                Console.WriteLine("创建adb");
             }
             else
             {
                 StreamWriter sw = _adbPrc.StandardInput;
-                sw.WriteLine(adbClickCommand);
+                await sw.WriteAsync(adbClickCommand);
+                Console.WriteLine("对adb发送命令");
             }
 
             string output = _adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
             string Error = _adbPrc.StandardError.ReadToEnd();
-            //string input = _adbPrc.StandardInput
             
             Console.WriteLine($"输出：{output}。  错误：{Error}。{_adbPrc.HasExited}。");
-            //Console.WriteLine("点击命令已发送");
+        }
+
+        //ADBSocketCommunicator communicator = null;
+        private async Task AdbTest3(double x, double y)
+        {
+            string adbClickCommand = $"shell input tap {x} {y}";
+
+            //if (communicator == null)
+            //{
+            //    ADBSocketCommunicator communicator = new ADBSocketCommunicator();
+            //    await communicator.ConnectAsync("127.0.0.1");
+            //}
+
+            ADBSocketCommunicator communicator = new ADBSocketCommunicator();
+            await communicator.ConnectAsync();
+
+            // 发送"help"命令以获取支持的ADB命令列表
+            string helpResponse = await communicator.SendCommandAsync(adbClickCommand);
+            Console.WriteLine("重定向输出:");
+            Console.WriteLine(helpResponse);
+
+            communicator.Disconnect();
         }
 
 

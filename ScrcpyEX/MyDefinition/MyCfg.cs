@@ -59,6 +59,11 @@ namespace ScrcpyEX.ExtensionMethod
         public string IP { get; set; }
 
         /// <summary>
+        /// 无线连接的端口号。
+        /// </summary>
+        public string Port { get; set; }
+
+        /// <summary>
         /// 定位到左上角。
         /// </summary>
         public bool Locate1 { get; set; } = false;
@@ -96,25 +101,25 @@ namespace ScrcpyEX.ExtensionMethod
         /// <summary>
         /// 保持清醒，防止设备进入休眠状态（无线连接时无效）。
         /// </summary>
-        [Arguments("--stay-awake")]
+        [CommandLine("--stay-awake")]
         public bool StayAwake { get; set; }
 
         /// <summary>
         /// 关闭屏幕，镜像时关闭设备屏幕，但不会进入休眠。
         /// </summary>
-        [Arguments("--turn-screen-off")]
+        [CommandLine("--turn-screen-off")]
         public bool OffScreen { get; set; }
 
         /// <summary>
         /// 显示触控，镜像时手指在触碰设备的地方显示接触点。
         /// </summary>
-        [Arguments("--show-touches")]
+        [CommandLine("--show-touches")]
         public bool ShowTouches { get; set; }
 
         /// <summary>
         /// 停止镜像时关闭设备屏幕，让设备进入休眠状态。
         /// </summary>
-        [Arguments("--power-off-on-close")]
+        [CommandLine("--power-off-on-close")]
         public bool DeviceSleep { get; set; }
 
 

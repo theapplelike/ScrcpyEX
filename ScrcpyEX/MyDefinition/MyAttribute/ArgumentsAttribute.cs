@@ -9,14 +9,14 @@ namespace ScrcpyEX.ExtensionMethod.MyAttribute
     /// <summary>
     /// 自定义的命令行参数属性。
     /// </summary>
-    internal class ArgumentsAttribute : Attribute
+    internal class CommandLineAttribute : Attribute
     {
         /// <summary>
         /// 命令行参数。
         /// </summary>
         public string Arguments { get; set; }
 
-        public ArgumentsAttribute(string Arguments)
+        public CommandLineAttribute(string Arguments)
         {
             this.Arguments = Arguments;
         }

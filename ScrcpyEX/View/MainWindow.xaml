@@ -113,7 +113,7 @@
 
         <DockPanel x:Name="dpl" Background="AliceBlue" MouseLeftButtonDown="Dpl_MouseLeftButtonDown">
             <Button x:Name="btnWired" Style="{StaticResource MenuBtn}" Content="&#xF0B9;" Click="BtnWired_Click" Margin="0" ToolTip="有线连接"/>
-            <Button x:Name="btnWirel" Style="{StaticResource MenuBtn}" Content="&#xe952;" ToolTip="无线连接"/>
+            <Button x:Name="btnWirel" Style="{StaticResource MenuBtn}" Content="&#xe952;" Click="BtnWirel_Click" ToolTip="无线连接"/>
             <Button x:Name="btnStop"  Style="{StaticResource MenuBtn}" Content="&#xECCB;" Click="BtnStop_Click" ToolTip="停止投屏"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
@@ -158,7 +158,7 @@
 
         <Grid x:Name="gShow" Grid.Row="1" Margin="5">
             <WindowsFormsHost x:Name="wfh" Background="Gray" GotFocus="wfh_GotFocus" PreviewMouseDown="wfh_PreviewMouseDown">
-                <wf:Panel x:Name="pnlShow" GotFocus="pnlShow_GotFocus" Dock="Fill" AutoSize="True" MouseDown="PnlShow_MouseDown"/>
+                <wf:Panel x:Name="pnlShow" GotFocus="pnlShow_GotFocus" Dock="Fill" AutoSize="True" MouseDown="PnlShow_MouseDown" MouseMove="PnlShow_MouseMove"/>
             </WindowsFormsHost>
         </Grid>
 

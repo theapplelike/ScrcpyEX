@@ -338,11 +338,6 @@ namespace ScrcpyEX.View
             int focus = IsActiveWindow();
             if (focus != 2)
             {
-                if (focus == 1)
-                {
-                    Activate();//将窗口带到前台
-                }
-
                 if (key =="Q")//按下Q使用鼠标控制方向
                 {
                     PressMouse(isDown);
@@ -363,18 +358,20 @@ namespace ScrcpyEX.View
         {
             if (isDown)
             {
-                if (_isPressMouse)
-                {
-                    _isPressMouse = false;
-                    //DLL.mouse_event(0x04, 0, 0, 0, 0);
-                    DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero);
-                }
-                else
-                {
-                    _isPressMouse = true;
-                    //DLL.mouse_event(0x02, 0, 0, 0, 0);//按下
-                    DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, IntPtr.Zero);
-                }
+                //if (_isPressMouse)
+                //{
+                //    _isPressMouse = false;
+                //    //DLL.mouse_event(0x04, 0, 0, 0, 0);
+                //    //DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero);
+                //}
+                //else
+                //{
+                //    _isPressMouse = true;
+                //    //DLL.mouse_event(0x02, 0, 0, 0, 0);//按下
+                //    //DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, IntPtr.Zero);
+                //}
+
+                DLL.mouse_event(0x02, 0, 0, 0, 0);//按下
             }
             //Console.WriteLine($"开启鼠标移动,{_isPressMouse}。");
         }
@@ -406,16 +403,28 @@ namespace ScrcpyEX.View
                 DLL.PostMessage(_scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
                 DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
                 DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
-
+                
                 //如果标志位为true，则让鼠标左键处于按下状态
                 if (_isPressMouse)
                 {
-                    DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
+                    //DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
+                    DLL.mouse_event(0x02, 0, 0, 0, 0);//按下
                     //Console.WriteLine("继续让鼠标左键处于按下状态。");
                 }
 
+                //ADB_Click(centreX, centreY);
+
                 Console.WriteLine($"圆心点:({centreX},{centreY})，鼠标移动标志位：{_isPressMouse}。");
             }
+        }
+
+        private void ADB_Click(int centreX, int centreY)
+        {
+            double x = centreX / ScActualWidth * 2312/ DpiScaleX;
+            double y = centreY / ScActualHeight * 1080/ DpiScaleY;
+            AdbTest1(x, y);
+
+            Console.WriteLine($"安卓坐标:({x},{y})，程序实际宽高：({ScActualWidth},{ScActualHeight})，");
         }
 
 

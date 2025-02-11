@@ -66,7 +66,8 @@
     <Compile Include="Model\FormSize.cs" />
     <Compile Include="Model\PointInfo.cs" />
     <Compile Include="Model\RecInfo.cs" />
-    <Compile Include="MyDefinition\MyClass\DragMove.cs" />
+    <Compile Include="MyDefinition\MyClass\ADBSocketCommunicator.cs" />
+    <Compile Include="MyDefinition\MyClass\MyDragMove.cs" />
     <Compile Include="MyDefinition\MyClass\KeyMapping.cs" />
     <Compile Include="MyDefinition\MyControl\TimePopup.cs" />
     <Compile Include="MyDefinition\WindowsAPI\DLL.cs" />
@@ -78,7 +79,7 @@
     <Compile Include="MyDefinition\MyClass\NotificationObject.cs" />
     <Compile Include="MyDefinition\MyClass\RelayCommand.cs" />
     <Compile Include="MyDefinition\WindowsAPI\HookDLL.cs" />
-    <Compile Include="MyDefinition\WindowsAPI\KeyboardMapping.cs" />
+    <Compile Include="MyDefinition\WindowsAPI\KeyboardHook.cs" />
     <Compile Include="MyDefinition\WindowsAPI\MouseHook.cs" />
     <Compile Include="MyDefinition\WindowsAPI\WM.cs" />
     <Compile Include="ViewModel\MainWindowVM.cs" />
