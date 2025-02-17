@@ -332,21 +332,17 @@ namespace ScrcpyEX.View
         /// 键盘输入映射为点击操作。
         /// </summary>
         /// <param name="key">捕获的键盘字符。</param>
-        /// <param name="isDown">当前按键是否为按下状态。</param>
-        public void KeyboardMapping(string key, bool isDown)
+        public void KeyboardMapping(string key)
         {
             int focus = IsActiveWindow();
             if (focus != 2)
             {
                 if (key =="Q")//按下Q使用鼠标控制方向
                 {
-                    PressMouse(isDown);
+                    PressMouse();
                 }
 
-                //if (isDown)
-                {
-                    DoKeyMapping(key, ScRatioX);
-                }
+                DoKeyMapping(key, ScRatioX);
             }
         }
 
@@ -354,7 +350,7 @@ namespace ScrcpyEX.View
         /// 如果按键处于按下状态，则让鼠标左键在按下和抬起间转化。
         /// </summary>
         /// <param name="isDown">当前按键是否为按下状态。</param>
-        private void PressMouse(bool isDown)
+        private void PressMouse(bool isDown = true)
         {
             if (isDown)
             {
@@ -405,24 +401,27 @@ namespace ScrcpyEX.View
                 DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
                 
                 //如果标志位为true，则让鼠标左键处于按下状态
-                if (_isPressMouse)
-                {
-                    //DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
-                    DLL.mouse_event(0x02, 0, 0, 0, 0);//按下
-                    //Console.WriteLine("继续让鼠标左键处于按下状态。");
-                }
+                //if (_isPressMouse)
+                //{
+                //    DLL.mouse_event(0x02, 0, 0, 0, 0);//按下
+                //    //Console.WriteLine("继续让鼠标左键处于按下状态。");
+                //}
 
                 //ADB_Click(centreX, centreY);
-
                 Console.WriteLine($"圆心点:({centreX},{centreY})，鼠标移动标志位：{_isPressMouse}。");
             }
         }
 
-        private void ADB_Click(int centreX, int centreY)
+        /// <summary>
+        /// 使用adb发送点击命令。
+        /// </summary>
+        /// <param name="centreX">映射控件的圆心X坐标。</param>
+        /// <param name="centreY">映射控件的圆心Y坐标。</param>
+        private async void ADB_Click(int centreX, int centreY)
         {
             double x = centreX / ScActualWidth * 2312/ DpiScaleX;
             double y = centreY / ScActualHeight * 1080/ DpiScaleY;
-            AdbTest1(x, y);
+            await AdbTest1(x, y);
 
             Console.WriteLine($"安卓坐标:({x},{y})，程序实际宽高：({ScActualWidth},{ScActualHeight})，");
         }

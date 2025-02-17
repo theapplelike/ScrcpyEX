@@ -65,8 +65,6 @@ namespace ScrcpyEX.View
         /// </summary>
         private void ReadCfg()
         {
-            //txtIP.Text = MyCfg.Cfg.IP;
-
             rdoLoc1.IsChecked = MyCfg.Cfg.Locate1;
             rdoLoc2.IsChecked = MyCfg.Cfg.Locate2;
             rdoLoc3.IsChecked = MyCfg.Cfg.Locate3;
@@ -78,8 +76,6 @@ namespace ScrcpyEX.View
         /// </summary>
         private void SaveCfg()
         {
-            //MyCfg.Cfg.IP = txtIP.Text;
-
             MyCfg.Cfg.Locate1 = (bool)rdoLoc1.IsChecked;
             MyCfg.Cfg.Locate2 = (bool)rdoLoc2.IsChecked;
             MyCfg.Cfg.Locate3 = (bool)rdoLoc3.IsChecked;
@@ -151,7 +147,6 @@ namespace ScrcpyEX.View
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                //RedirectStandardInput = true,
             };
             _prc.StartInfo = info;
 

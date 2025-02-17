@@ -98,7 +98,6 @@ namespace ScrcpyEX.View
             int.TryParse(mc[0].Value, out int a);
             int.TryParse(mc[1].Value, out int b);
             int max = GetGreatestCommonDivisor(a, b);
-            //_isLandscape = a > b;
             _horizontalRatio = a / max;
             _verticalRatio = b / max;
 
@@ -200,7 +199,7 @@ namespace ScrcpyEX.View
             //int x = (int)(pt1.X + (_limitPop.HorizontalOffset + ExtraWidthLeft + 50) * DpiScaleX);
             //int y = (int)(pt1.Y + (_limitPop.VerticalOffset + ExtraHeightTop + 50) * DpiScaleY);
             //DLL.SetCursorPos(x, y);
-            await AdbTest3(500, 500);
+            await AdbTest4(500, 500);
 
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
@@ -221,9 +220,13 @@ namespace ScrcpyEX.View
             //MyGM.POP("yesclick");
         }
 
-        private void AdbTest1(double x, double y)
+        /// <summary>
+        /// 启动adb发送命令。
+        /// </summary>
+        private async Task AdbTest1(double x, double y)
         {
-            string adbClickCommand = $"shell input tap {x} {y}";
+            //string adbClickCommand = $"shell input tap {x} {y}";
+            string adbClickCommand = $"shell input tap";
 
             // 创建一个新的进程启动信息
             ProcessStartInfo processStartInfo = new()
@@ -234,10 +237,15 @@ namespace ScrcpyEX.View
                 CreateNoWindow = true,          // 不创建窗口
             };
             Process.Start(processStartInfo);
-            Console.WriteLine("点击命令已发送");
+            Console.WriteLine($"点击命令已发送。");
+            await Task.Delay(1);
         }
 
-        Process _adbPrc = null;
+        static Process _adbPrc = null;
+        static StreamWriter sw = null;
+        /// <summary>
+        /// 启动cmd再启动adb发送命令，只有第一次会相应，之后不能响应可能是写入流第一次后就关闭了。
+        /// </summary>
         private async Task AdbTest2(double x, double y)
         {
             //string adbClickCommand = $"shell input tap {x} {y}";
@@ -253,39 +261,35 @@ namespace ScrcpyEX.View
                     Arguments = $"/c {adbClickCommand}",    //(/c)表示执行完命令后关闭命令行窗口
                     RedirectStandardOutput = true, // 重定向输出
                     RedirectStandardError = true,  // 重定向错误
-                    RedirectStandardInput = true,
+                    RedirectStandardInput = true,  //重定向输入
                     UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
                     CreateNoWindow = true,          // 不创建窗口
                 };
                 _adbPrc = Process.Start(processStartInfo);
 
-                StreamWriter sw = _adbPrc.StandardInput;
-                await sw.WriteAsync(adbClickCommand);
-                Console.WriteLine("创建adb");
+                sw = _adbPrc.StandardInput;
+                sw.Write(adbClickCommand);
+                Console.WriteLine($"创建adb,{sw.BaseStream.CanWrite}.");
             }
             else
             {
-                StreamWriter sw = _adbPrc.StandardInput;
-                await sw.WriteAsync(adbClickCommand);
-                Console.WriteLine("对adb发送命令");
+                sw = _adbPrc.StandardInput;
+                sw.Write(adbClickCommand);
+                Console.WriteLine($"对adb发送命令,{sw.BaseStream.CanWrite}.");
             }
 
             string output = _adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
             string Error = _adbPrc.StandardError.ReadToEnd();
-            
+            await Task.Delay(1);
             Console.WriteLine($"输出：{output}。  错误：{Error}。{_adbPrc.HasExited}。");
         }
 
-        //ADBSocketCommunicator communicator = null;
+        /// <summary>
+        /// 通过端口发送命令。
+        /// </summary>
         private async Task AdbTest3(double x, double y)
         {
             string adbClickCommand = $"shell input tap {x} {y}";
-
-            //if (communicator == null)
-            //{
-            //    ADBSocketCommunicator communicator = new ADBSocketCommunicator();
-            //    await communicator.ConnectAsync("127.0.0.1");
-            //}
 
             ADBSocketCommunicator communicator = new ADBSocketCommunicator();
             await communicator.ConnectAsync();
@@ -296,6 +300,43 @@ namespace ScrcpyEX.View
             Console.WriteLine(helpResponse);
 
             communicator.Disconnect();
+        }
+
+        /// <summary>
+        /// 据说可以降低延迟，但权限被拒绝：sendevent: /dev/input/event2: Permission denied。
+        /// </summary>
+        private async Task AdbTest4(double x, double y)
+        {
+            StringBuilder sb = new();
+            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 1 $((0x14a)) 1");
+            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x30)) $((0x15))");
+            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x39)) 0");
+            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x35)) {x}");
+            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x36)) {y}");
+            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 2 0");
+            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 0 0");
+            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 1 $((0x14a)) 0");
+            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 2 0");
+            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 0 0");
+
+            // 创建一个新的进程启动信息
+            ProcessStartInfo processStartInfo = new()
+            {
+                FileName = "cmd.exe",         //使用命令提示符来执行ADB命令
+                Arguments = $"/c {sb}",    //(/c)表示执行完命令后关闭命令行窗口
+                RedirectStandardOutput = true, // 重定向输出
+                RedirectStandardError = true,  // 重定向错误
+                RedirectStandardInput = true,  //重定向输入
+                UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
+                CreateNoWindow = true,          // 不创建窗口
+            };
+            _adbPrc = Process.Start(processStartInfo);
+            Console.WriteLine($"创建adb.");
+
+            string output = _adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
+            string Error = _adbPrc.StandardError.ReadToEnd();
+            await Task.Delay(1);
+            Console.WriteLine($"输出：{output}。  错误：{Error}。{_adbPrc.HasExited}。");
         }
 
 

@@ -44,7 +44,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
                     int vkCode = Marshal.ReadInt32(lParam);
                     //Console.WriteLine($"Key: {(Keys)vkCode}/{vkCode:X}, wParam: {(int)wParam:X}。");
 
-                    MV.MainWin.KeyboardMapping(((Keys)vkCode).ToString(), (int)wParam == WM.WM_KEYDOWN);
+                    MV.MainWin.KeyboardMapping(((Keys)vkCode).ToString());
                 }
             }
             return HookDLL.CallNextHookEx(HookID, nCode, wParam, lParam);
