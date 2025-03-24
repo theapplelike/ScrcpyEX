@@ -199,7 +199,7 @@ namespace ScrcpyEX.View
             //int x = (int)(pt1.X + (_limitPop.HorizontalOffset + ExtraWidthLeft + 50) * DpiScaleX);
             //int y = (int)(pt1.Y + (_limitPop.VerticalOffset + ExtraHeightTop + 50) * DpiScaleY);
             //DLL.SetCursorPos(x, y);
-            await AdbTest4(500, 500);
+            await AdbTest1(500, 500);
 
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
@@ -226,18 +226,21 @@ namespace ScrcpyEX.View
         private async Task AdbTest1(double x, double y)
         {
             //string adbClickCommand = $"shell input tap {x} {y}";
-            string adbClickCommand = $"shell input tap";
+            string adbClickCommand = $"shell dumpsys power | grep \"mStayOn\"";
 
             // 创建一个新的进程启动信息
             ProcessStartInfo processStartInfo = new()
             {
                 FileName = MV.ADB_Path,         //adb的路径
                 Arguments = adbClickCommand,    //执行完命令后adb会直接关闭
+                RedirectStandardOutput = true, // 重定向输出
                 UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
                 CreateNoWindow = true,          // 不创建窗口
             };
-            Process.Start(processStartInfo);
-            Console.WriteLine($"点击命令已发送。");
+            Process adbPrc = Process.Start(processStartInfo);
+            string output = adbPrc.StandardOutput.ReadToEnd();
+
+            Console.WriteLine($"{adbClickCommand}，命令已发送，命令结果：{output}。");
             await Task.Delay(1);
         }
 

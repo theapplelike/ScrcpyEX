@@ -187,6 +187,9 @@ namespace ScrcpyEX.View
         /// 在窗体中创建一个可以移动的Popup，Popup为圆形，直径默认为50，会根据比例放大缩小。
         /// 有黑边时会导致Popup的位置有偏移。
         /// </summary>
+        /// <param name="mapping">按键映射类。</param>
+        /// <param name="popIsOpen">创建的Popup是否可见。</param>
+        /// <returns>创建的Popup对象。</returns>
         private Popup CreatePop(KeyMapping mapping, bool popIsOpen)
         {
             double radius = 50 * ScRatioX;
@@ -268,6 +271,12 @@ namespace ScrcpyEX.View
         /// <param name="desc">说明当前状态的字符串。</param>
         private void MappingEdit(string desc)
         {
+            if (_scHandle == IntPtr.Zero)
+            {
+                popMid.Show("未进行投屏，不能进行映射编辑。");
+                return;
+            }
+
             if (desc == "进行映射编辑")
             {
                 foreach (Popup pop in MV.TempPopups)

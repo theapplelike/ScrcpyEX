@@ -44,7 +44,7 @@ namespace ScrcpyEX.ExtensionMethod
         /// <summary>
         /// 编辑键盘映射时使用的临时Popup列表。
         /// </summary>
-        public static List<Popup> TempPopups = [];
+        public static List<Popup> TempPopups { get; set; } = [];
         
 
     }

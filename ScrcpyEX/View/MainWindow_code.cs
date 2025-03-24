@@ -165,9 +165,9 @@ namespace ScrcpyEX.View
                         CreateSavedPop();
                         return;
                     }
-                    Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}，{_prc.HasExited}。");
+                    Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}，程序是否被关闭：{_prc.HasExited}。");
                 }
-                while (!_prc.HasExited);
+                while (!_prc.HasExited || i < 50);
                 MessageBox.Show("未能成功启动程序，请重试。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
