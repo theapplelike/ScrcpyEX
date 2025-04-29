@@ -94,5 +94,16 @@ namespace ScrcpyEX.View
                 _vm.Canel();
             }
         }
+
+        private void BtnScreenshot_Click(object sender, RoutedEventArgs e)
+        {
+            DoScreenshot();
+        }
+
+        private void Img_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ShowImg showImg = new(img.Source);
+            showImg.ShowDialog();
+        }
     }
 }

@@ -109,6 +109,18 @@
     <Compile Include="View\RecManage_var.cs">
       <DependentUpon>RecManage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Screenshot.xaml.cs">
+      <DependentUpon>Screenshot.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Screenshot_code.cs">
+      <DependentUpon>Screenshot.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Screenshot_code1.cs">
+      <DependentUpon>Screenshot.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Screenshot_var.cs">
+      <DependentUpon>Screenshot.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -118,7 +130,10 @@
     <Compile Include="View\Setup_var.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
-    <Page Include="Resource\Style\MenuButtonStyle.xaml">
+    <Compile Include="View\ShowImg.xaml.cs">
+      <DependentUpon>ShowImg.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Resource\Style\MyStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -138,7 +153,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\Screenshot.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Setup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ShowImg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

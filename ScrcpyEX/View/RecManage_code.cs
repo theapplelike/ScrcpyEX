@@ -9,6 +9,10 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows;
 using ScrcpyEX.MyDefinition;
+using System.Drawing.Imaging;
+using System.Drawing;
+using System.IO;
+using System.Windows.Media.Imaging;
 
 namespace ScrcpyEX.View
 {
@@ -96,6 +100,73 @@ namespace ScrcpyEX.View
             rdoHandStop.IsChecked = recInfo.HandStop;
             txtCycleNum.Text = recInfo.CycleNumber.ToString();
             txtCycleInterval.Text = recInfo.CycleInterval.ToString();
+        }
+
+        /// <summary>
+        /// 进行截图。
+        /// </summary>
+        private async void DoScreenshot()
+        {
+            Hide();
+            await Task.Delay(500);//让当前窗体有足够时间隐藏
+
+            Screenshot screen = new();
+            if (screen.ShowDialog() == true)
+            {
+                img.Source = screen.Crop;
+                //CaptureRegion(screen.SelectedRegion);
+
+                using (FileStream fs = new FileStream("screenshot.png", FileMode.Create))
+                {
+                    PngBitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(screen.Crop));
+                    encoder.Save(fs);
+                }
+            }
+
+            ShowDialog();
+        }
+
+        private void CaptureRegion(Rect region)
+        {
+            // 转换为整数像素坐标
+            int x = (int)region.X*2;
+            int y = (int)region.Y*2;
+            int width = (int)region.Width * 2;
+            int height = (int)region.Height * 2;
+
+            // 使用System.Drawing截屏
+            using (Bitmap bmp = new Bitmap(width, height))
+            {
+                using (Graphics g = Graphics.FromImage(bmp))
+                {
+                    g.CopyFromScreen(x, y, 0, 0, new System.Drawing.Size(width, height));
+                }
+
+                // 转换为WPF BitmapSource
+                BitmapImage bitmapImage;
+                using (MemoryStream memory = new MemoryStream())
+                {
+                    bmp.Save(memory, ImageFormat.Png);
+                    memory.Position = 0;
+                    bitmapImage = new BitmapImage();
+                    bitmapImage.BeginInit();
+                    bitmapImage.StreamSource = memory;
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.EndInit();
+                }
+
+                // 显示或保存截图
+                img.Source = bitmapImage;
+
+                // 保存到文件
+                using (FileStream fs = new FileStream("screenshot.png", FileMode.Create))
+                {
+                    PngBitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(bitmapImage));
+                    encoder.Save(fs);
+                }
+            }
         }
 
 

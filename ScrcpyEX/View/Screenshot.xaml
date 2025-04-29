@@ -1,0 +1,45 @@
+﻿<Window x:Class="ScrcpyEX.View.Screenshot"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScrcpyEX.View"
+        mc:Ignorable="d"
+        Title="Screenshot" Height="450" Width="800" 
+        MouseDown="Window_MouseDown" MouseMove="Window_MouseMove"
+        MouseLeftButtonUp="Window_MouseLeftButtonUp" MouseRightButtonUp="Window_MouseRightButtonUp"
+        Loaded="Window_Loaded" Unloaded="Window_Unloaded">
+
+    <Grid>
+
+        <!-- 背景层（将被捕获用于放大镜） -->
+        <Grid x:Name="gBack"></Grid>
+        
+        <Canvas x:Name="cnv">
+            <!--半透明黑色遮罩-->
+            <Rectangle x:Name="rctMask" Fill="#80000000" Width="{Binding ActualWidth,ElementName=cnv}" Height="{Binding ActualHeight,ElementName=cnv}" Visibility="Hidden"/>
+
+            <!--说明截图区域大小的提示标签-->
+            <TextBlock x:Name="tbk" Foreground="White" FontSize="15"/>
+
+            <!--用户截图区域-->
+            <Rectangle x:Name="rct" Stroke="Green" StrokeThickness="2" Visibility="Hidden"/>
+
+            <!--截图完成后显示的操作菜单-->
+            <StackPanel x:Name="stp" Orientation="Horizontal" Visibility="Hidden">
+                <Button x:Name="btnNo" Click="BtnNo_Click" Content="&#xe947;" Style="{StaticResource WhiteBtn}" Foreground="Red"/>
+                <Button x:Name="btnYes" Click="BtnYes_Click" Content="&#xe94b;" Style="{StaticResource WhiteBtn}" Foreground="Green"/>
+            </StackPanel>
+
+            <!--放大镜控件-->
+            <Grid x:Name="gMagnifier" Width="150" Height="150">
+                <Image x:Name="img"/>
+
+                <!--放大镜边框和绿色十字线-->
+                <Border BorderBrush="Green" BorderThickness="1"/>
+                <Path Stroke="Green" StrokeThickness="1" Data="M75,0 L75,150 M0,75 L150,75"/>
+            </Grid>
+        </Canvas>
+        
+    </Grid>
+</Window>

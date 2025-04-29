@@ -6,7 +6,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/ScrcpyEX;component/Resource/Style/MenuButtonStyle.xaml"/>
+                <ResourceDictionary Source="/ScrcpyEX;component/Resource/Style/MyStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
