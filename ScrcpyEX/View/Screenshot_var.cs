@@ -24,19 +24,19 @@ namespace ScrcpyEX.View
         private Point _endPoint;
 
         /// <summary>
-        /// 鼠标在窗体上的当前坐标。
-        /// </summary>
-        private Point _curPoint;
-
-        /// <summary>
-        /// 更新放大镜的计时器。
-        /// </summary>
-        private readonly DispatcherTimer _timerUpdateMagnifier = new();
-
-        /// <summary>
         /// 要放大区域的直径。
         /// </summary>
-        private int _enlargeDiameter = 50;
+        private readonly static int _d = 50;
+
+        /// <summary>
+        /// 保存背景层的静态快照。
+        /// </summary>
+        private WriteableBitmap _sourceBitmap;
+
+        /// <summary>
+        /// 用于放大镜显示的像素区域，DPI固定为96，节约性能。
+        /// </summary>
+        private readonly WriteableBitmap _magnifierBitmap = new(_d, _d, 96, 96, PixelFormats.Pbgra32, null);
 
         /// <summary>
         /// 最后的截图结果。
@@ -63,49 +63,6 @@ namespace ScrcpyEX.View
         /// </summary>
         private double PixelsPerInchY => VisualTreeHelper.GetDpi(this).PixelsPerInchY;
 
-        
 
-        private WriteableBitmap sourceBitmap;
-        private WriteableBitmap magnifierBitmap;
-        //private Point lastMousePos;
-        //private bool isCapturing;
-
-        private void UpdateMagnifier(Point curPoint)
-        {
-            //if ( sourceBitmap == null) return;
-
-            int sourceX = (int)(curPoint.X - _enlargeDiameter / 2);
-            int sourceY = (int)(curPoint.Y - _enlargeDiameter / 2);
-
-            // 边界检查
-            //sourceX = Math.Clamp(sourceX, 0, sourceBitmap.PixelWidth - 100);
-            //sourceY = Math.Clamp(sourceY, 0, sourceBitmap.PixelHeight - 100);
-
-            sourceX = sourceX < 0 ? 0 : sourceX;
-            sourceY = sourceY < 0 ? 0 : sourceY;
-
-            try
-            {
-                magnifierBitmap.Lock();
-
-                // 直接复制像素数据
-                sourceBitmap.CopyPixels(
-                    new Int32Rect(sourceX, sourceY, _enlargeDiameter, _enlargeDiameter),
-                    magnifierBitmap.BackBuffer,
-                    magnifierBitmap.BackBufferStride * _enlargeDiameter,
-                    magnifierBitmap.BackBufferStride);
-
-                magnifierBitmap.AddDirtyRect(new Int32Rect(0, 0, _enlargeDiameter, _enlargeDiameter));
-            }
-            finally
-            {
-                magnifierBitmap.Unlock();
-            }
-
-            // 更新截图框位置（如果需要）
-            //Canvas.SetLeft(rct, lastMousePos.X);
-            //Canvas.SetTop(rct, lastMousePos.Y);
-            gMagnifier.Margin = new Thickness(curPoint.X + 25, curPoint.Y + 25, 0, 0);
-        }
     }
 }

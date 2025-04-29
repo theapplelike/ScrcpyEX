@@ -23,7 +23,7 @@
             <TextBlock x:Name="tbk" Foreground="White" FontSize="15"/>
 
             <!--用户截图区域-->
-            <Rectangle x:Name="rct" Stroke="Green" StrokeThickness="2" Visibility="Hidden"/>
+            <Rectangle x:Name="rct" Stroke="Green" StrokeThickness="1" Visibility="Hidden"/>
 
             <!--截图完成后显示的操作菜单-->
             <StackPanel x:Name="stp" Orientation="Horizontal" Visibility="Hidden">

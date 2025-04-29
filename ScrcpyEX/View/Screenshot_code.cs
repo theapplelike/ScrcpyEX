@@ -13,11 +13,43 @@ using System.Windows.Media;
 using System.Security.Cryptography;
 using System.Net;
 using System.Windows.Interop;
+using System.Windows.Input;
 
 namespace ScrcpyEX.View
 {
     public partial class Screenshot//code
     {
+        private void MyInit()
+        {
+            //捕获背景层的快照，存储在一个WriteableBitmap中，直接操作WriteableBitmap可以提高性能
+            RenderTargetBitmap rtb = new(
+                (int)gBack.ActualWidth,
+                (int)gBack.ActualHeight,
+                96, 96, PixelFormats.Pbgra32);
+            rtb.Render(gBack);
+
+            _sourceBitmap = new WriteableBitmap(rtb);
+            img.Source = _magnifierBitmap;
+
+            //每一帧都将触发的事件
+            CompositionTarget.Rendering += OnRendering;
+        }
+
+        /// <summary>
+        /// 界面渲染的每一帧都将触发的事件。
+        /// </summary>
+        private void OnRendering(object sender, EventArgs e)
+        {
+            if (stp.Visibility != Visibility.Visible)
+            {
+                //if (i%2 == 0)
+                {
+                    UpdateMagnifier(Mouse.GetPosition(gBack));
+                }
+                //i++;
+            }
+        }
+
         /// <summary>
         /// 获取当前截屏。
         /// </summary>
@@ -25,8 +57,8 @@ namespace ScrcpyEX.View
         public BitmapImage CaptureCurrentScreen()
         {
             //创建与屏幕大小相同的位图对象，SystemParameters与DPI无关，需要乘以DPI系数
-            //Bitmap bmp = new((int)(SystemParameters.VirtualScreenWidth * DpiScaleX), (int)(SystemParameters.VirtualScreenHeight * DpiScaleY), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            Bitmap bmp = new((int)(SystemParameters.PrimaryScreenWidth * DpiScaleX), (int)(SystemParameters.PrimaryScreenHeight * DpiScaleY), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            Bitmap bmp = new((int)(SystemParameters.VirtualScreenWidth * DpiScaleX), (int)(SystemParameters.VirtualScreenHeight * DpiScaleY), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            //Bitmap bmp = new((int)(SystemParameters.PrimaryScreenWidth * DpiScaleX), (int)(SystemParameters.PrimaryScreenHeight * DpiScaleY), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
             //使用位图对象来创建Graphics的对象
             using (Graphics g = Graphics.FromImage(bmp))
@@ -67,27 +99,6 @@ namespace ScrcpyEX.View
             }
 
             return bitmapImage;
-        }
-
-        /// <summary>
-        /// 更新遮罩区域。
-        /// </summary>
-        private void UpdateMask()
-        {
-            //获取Canvas的实际尺寸，设置遮罩矩形
-            double cnvWd = cnv.ActualWidth;
-            double cnvHt = cnv.ActualHeight;
-            RectangleGeometry canvasArea = new(new Rect(0, 0, cnvWd, cnvHt));
-
-            //获取截图区域的位置和尺寸，设置非遮罩矩形
-            double rectX = rct.Margin.Left;
-            double rectY = rct.Margin.Top;
-            double rectWd = rct.Width;
-            double rectHt = rct.Height;
-            RectangleGeometry excludeArea = new(new Rect(rectX, rectY, rectWd, rectHt));
-
-            //设置覆盖层的Clip
-            rctMask.Clip = new CombinedGeometry(GeometryCombineMode.Exclude, canvasArea, excludeArea);
         }
 
         /// <summary>
@@ -140,27 +151,6 @@ namespace ScrcpyEX.View
             
             render.Render(e);
             Crop = new CroppedBitmap(render, cropRect);
-            //Console.WriteLine($"dpi:{PixelsPerInchX},{PixelsPerInchY}");
-        }
-
-        private BitmapImage CaptureScreen(Int32Rect rect)
-        {
-            using Bitmap bmp = new(rect.Width, rect.Height);
-            using Graphics g = Graphics.FromImage(bmp);
-
-            // 截屏
-            g.CopyFromScreen(rect.X, rect.Y, 0, 0, new System.Drawing.Size(rect.Width, rect.Height));
-
-            return BitmapConvert(bmp);
-
-            // 转换为 WPF BitmapSource 并放大
-            //return Imaging.CreateBitmapSourceFromHBitmap(
-            //    bmp.GetHbitmap(),
-            //    IntPtr.Zero,
-            //    Int32Rect.Empty,
-            //    BitmapSizeOptions.FromWidthAndHeight(
-            //        rect.Width * MagnifyScale,
-            //        rect.Height * MagnifyScale));
         }
 
 

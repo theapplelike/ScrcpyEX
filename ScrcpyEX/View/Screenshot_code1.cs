@@ -8,6 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using ScrcpyEX.MyDefinition;
+using System.Windows.Forms;
 
 namespace ScrcpyEX.View
 {
@@ -21,7 +23,6 @@ namespace ScrcpyEX.View
         {
             _startPoint = point;
 
-            //Cursor = Cursors.Cross;
             rct.Width = 0;
             rct.Height = 0;
             rct.Visibility = Visibility.Visible;
@@ -65,9 +66,29 @@ namespace ScrcpyEX.View
             tbk.Margin = new Thickness(x, y - 20, 0, 0);
             tbk.Text = $"{wd}×{ht}";
 
-            //UpdateMagnifier_Tick(curPoint);
             UpdateMask();
             Console.WriteLine("截图中...");
+        }
+
+        /// <summary>
+        /// 更新遮罩区域。
+        /// </summary>
+        private void UpdateMask()
+        {
+            //获取Canvas的实际尺寸，设置遮罩矩形
+            double cnvWd = cnv.ActualWidth;
+            double cnvHt = cnv.ActualHeight;
+            RectangleGeometry canvasArea = new(new Rect(0, 0, cnvWd, cnvHt));
+
+            //获取截图区域的位置和尺寸，设置非遮罩矩形
+            double rectX = rct.Margin.Left;
+            double rectY = rct.Margin.Top;
+            double rectWd = rct.Width;
+            double rectHt = rct.Height;
+            RectangleGeometry excludeArea = new(new Rect(rectX, rectY, rectWd, rectHt));
+
+            //设置覆盖层的Clip
+            rctMask.Clip = new CombinedGeometry(GeometryCombineMode.Exclude, canvasArea, excludeArea);
         }
 
         /// <summary>
@@ -78,7 +99,20 @@ namespace ScrcpyEX.View
         {
             _endPoint = endPoint;
             double y = endPoint.Y + stp.ActualHeight > GetMaxHeigth(endPoint) ? endPoint.Y - stp.ActualHeight : endPoint.Y;
-            //Console.WriteLine($"当前y轴：{endPoint.Y},{stp.ActualHeight},当前屏幕高度：{GetMaxHeigth(endPoint)}。");
+            Console.WriteLine($"当前y轴：{endPoint.Y},{stp.ActualHeight},当前屏幕高度：{GetMaxHeigth(endPoint)}。");
+
+            foreach (Screen screen in Screen.AllScreens)
+            {
+                // 检查鼠标坐标是否在显示器范围内
+                if (screen.Bounds.Contains(new System.Drawing.Point((int)endPoint.X*2, (int)endPoint.Y*2)))
+                {
+                    bool isPrimary = screen.Primary;
+                    string info = $"{(isPrimary ? "主显示器" : "副显示器")}，" +
+                                         $"分辨率：{screen.Bounds.Width}x{screen.Bounds.Height}";
+                    Console.WriteLine(info);
+                    break;
+                }
+            }
 
             stp.Margin = new Thickness(endPoint.X - stp.ActualWidth, y, 0, 0);
             stp.Visibility = Visibility.Visible;
@@ -100,100 +134,37 @@ namespace ScrcpyEX.View
             }
         }
 
-        RenderTargetBitmap rtb;
-        private WriteableBitmap _wb;
-        int i = 0;
         /// <summary>
-        /// 更新放大镜，放大比例为：放大镜控件尺寸/放大区域直径。
-        /// 为了性能，放大镜使用的图片统一为96DPI，不根据屏幕DPI放大。
+        /// 更新放大镜内容和位置。
         /// </summary>
         /// <param name="curPoint">鼠标的当前位置。</param>
-        private void UpdateMagnifier_Tick(Point curPoint)
+        private void UpdateMagnifier(Point curPoint)
         {
-            int size = 50;//需要放大区域的直径
-            Int32Rect rect = new(
-                (int)(curPoint.X ) - size / 2,
-                (int)(curPoint.Y ) - size / 2,
-                size, size);
-            rect.X = rect.X < 0 ? 0 : rect.X;
-            rect.Y = rect.Y < 0 ? 0 : rect.Y;
+            int sourceX = (int)(curPoint.X - _d / 2);
+            int sourceY = (int)(curPoint.Y - _d / 2);
 
-            //创建渲染目标，只渲染背景层内容，防止添加边框线
-            rtb = new RenderTargetBitmap(
-                (int)(gBack.ActualWidth ),
-                (int)(gBack.ActualHeight ),
-                96, 96, PixelFormats.Pbgra32);
-            rtb.Render(gBack);
+            // 边界检查
+            sourceX = MyGM.Clamp(sourceX, 0, _sourceBitmap.PixelWidth - _d);
+            sourceY = MyGM.Clamp(sourceY, 0, _sourceBitmap.PixelHeight - _d);
+            try
+            {
+                _magnifierBitmap.Lock();
 
-            Console.WriteLine($"更新放大镜:{(int)(gBack.ActualWidth * DpiScaleX)},{(int)(gBack.ActualHeight * DpiScaleY)}");
+                // 将源背景图的指定像素直接复制给放大镜位图
+                _sourceBitmap.CopyPixels(
+                    new Int32Rect(sourceX, sourceY, _d, _d),
+                    _magnifierBitmap.BackBuffer,
+                    _magnifierBitmap.BackBufferStride * _d,
+                    _magnifierBitmap.BackBufferStride);
 
-            // 裁剪目标区域
-            img.Source= new CroppedBitmap(rtb, rect);
+                _magnifierBitmap.AddDirtyRect(new Int32Rect(0, 0, _d, _d));
+            }
+            finally
+            {
+                _magnifierBitmap.Unlock();
+            }
+
             gMagnifier.Margin = new Thickness(curPoint.X + 25, curPoint.Y + 25, 0, 0);
-
-        }
-
-        // 初始化方法（在窗口加载或内容层尺寸变化时调用）
-        private void InitializeWriteableBitmap()
-        {
-            _wb = new WriteableBitmap(
-                (int)gBack.ActualWidth,
-                (int)gBack.ActualHeight,
-                96,  // DPI X
-                96,  // DPI Y
-                PixelFormats.Bgra32, // 必须与像素数据格式匹配
-                null // 调色板（不需要时设为 null）
-            );
-        }
-
-        private void UpdateMagnifierWithWriteableBitmap(Point curPoint)
-        {
-            // 确保 WriteableBitmap 已初始化
-            if (_wb == null) InitializeWriteableBitmap();
-
-            int size = 50;//需要放大区域的直径
-            Int32Rect rect = new(
-                (int)(curPoint.X) - size / 2,
-                (int)(curPoint.Y) - size / 2,
-                size, size);
-            rect.X = rect.X < 0 ? 0 : rect.X;
-            rect.Y = rect.Y < 0 ? 0 : rect.Y;
-
-            // 定义像素数据缓冲区
-            int bytesPerPixel = (_wb.Format.BitsPerPixel + 7) / 8; // 每个像素的字节数
-            int stride = _wb.PixelWidth * bytesPerPixel; // 计算步长（每行字节数）
-            byte[] pixels = new byte[_wb.PixelHeight * stride];
-
-            // 从 WriteableBitmap 复制像素数据
-            _wb.CopyPixels(pixels, stride, 0);
-
-            // ----------------------------
-            // 在此处处理像素数据（例如放大、修改颜色等）
-            // 示例：将中心区域像素放大（伪代码）
-            // ----------------------------
-
-            // 将修改后的数据写回 WriteableBitmap
-            _wb.WritePixels(
-                new Int32Rect(0, 0, _wb.PixelWidth, _wb.PixelHeight), // 目标区域
-                pixels,        // 像素数据
-                stride,        // 步长
-                0              // 偏移量
-            );
-
-            img.Source= new CroppedBitmap(_wb, rect);
-            gMagnifier.Margin = new Thickness(curPoint.X + 25, curPoint.Y + 25, 0, 0);
-        }
-
-        private void UpdateMagnifier_Tick1(Point curPoint)
-        {
-            _wb = new WriteableBitmap(
-                    (int)gBack.ActualWidth,
-                    (int)gBack.ActualHeight,
-                    96, 96, PixelFormats.Bgra32, null);
-
-            // 使用 CopyPixels 直接获取像素数据
-            byte[] pixels = new byte[_wb.PixelWidth * _wb.PixelHeight * 4];
-            _wb.CopyPixels(pixels, _wb.BackBufferStride, 0);
         }
 
 

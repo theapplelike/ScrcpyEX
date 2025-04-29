@@ -101,6 +101,28 @@ namespace ScrcpyEX.MyDefinition
             return new Point(point.X, point.Y);
         }
 
+        /// <summary>
+        /// 如果min≤value≤max，则为value。value＜min，则为min。max＜value，则为max。
+        /// </summary>
+        /// <param name="value">要判定范围的值。</param>
+        /// <param name="min">结果的下限。</param>
+        /// <param name="max">结果的上限。</param>
+        public static int Clamp(int value, int min, int max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+            else if (value > max)
+            {
+                return max;
+            }
+            else
+            {
+                return value;
+            }
+        }
+
 
     }
 }
