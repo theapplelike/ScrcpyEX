@@ -26,7 +26,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 要放大区域的直径。
         /// </summary>
-        private readonly static int _d = 50;
+        private readonly int _d;
 
         /// <summary>
         /// 保存背景层的静态快照。
@@ -34,9 +34,9 @@ namespace ScrcpyEX.View
         private WriteableBitmap _sourceBitmap;
 
         /// <summary>
-        /// 用于放大镜显示的像素区域，DPI固定为96，节约性能。
+        /// 用于放大镜显示的像素区域。
         /// </summary>
-        private readonly WriteableBitmap _magnifierBitmap = new(_d, _d, 96, 96, PixelFormats.Pbgra32, null);
+        private readonly WriteableBitmap _magnifierBitmap;
 
         /// <summary>
         /// 最后的截图结果。

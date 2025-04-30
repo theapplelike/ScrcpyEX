@@ -23,9 +23,9 @@ namespace ScrcpyEX.View
         {
             //捕获背景层的快照，存储在一个WriteableBitmap中，直接操作WriteableBitmap可以提高性能
             RenderTargetBitmap rtb = new(
-                (int)gBack.ActualWidth,
-                (int)gBack.ActualHeight,
-                96, 96, PixelFormats.Pbgra32);
+                (int)(gBack.ActualWidth * DpiScaleX),
+                (int)(gBack.ActualHeight * DpiScaleY),
+                96 * DpiScaleX, 96 * DpiScaleY, PixelFormats.Pbgra32);
             rtb.Render(gBack);
 
             _sourceBitmap = new WriteableBitmap(rtb);

@@ -141,13 +141,13 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 更新放大镜内容和位置。
+        /// 更新放大镜内容和位置。放大比例为：放大镜控件宽/放大区域直径，不计算DPI系数。
         /// </summary>
         /// <param name="curPoint">鼠标的当前位置。</param>
         private void UpdateMagnifier(Point curPoint)
         {
-            int sourceX = (int)(curPoint.X - _d / 2);
-            int sourceY = (int)(curPoint.Y - _d / 2);
+            int sourceX = (int)(curPoint.X * DpiScaleX - _d / 2);
+            int sourceY = (int)(curPoint.Y * DpiScaleY - _d / 2);
 
             // 边界检查
             sourceX = MyGM.Clamp(sourceX, 0, _sourceBitmap.PixelWidth - _d);

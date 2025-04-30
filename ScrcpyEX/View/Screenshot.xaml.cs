@@ -48,6 +48,10 @@ namespace ScrcpyEX.View
             {
                 Stretch = Stretch.Fill
             };
+
+            //放大镜根据DPI缩放
+            _d = (int)(50 * DpiScaleX);
+            _magnifierBitmap = new(_d, _d, 96 * DpiScaleX, 96 * DpiScaleY, PixelFormats.Pbgra32, null);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
