@@ -42,11 +42,7 @@ namespace ScrcpyEX.View
         {
             if (stp.Visibility != Visibility.Visible)
             {
-                //if (i%2 == 0)
-                {
-                    UpdateMagnifier(Mouse.GetPosition(gBack));
-                }
-                //i++;
+                UpdateMagnifier(Mouse.GetPosition(gBack));
             }
         }
 
@@ -121,7 +117,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void CaptureComplete()
         {
-            Console.WriteLine($"开始点：{_startPoint.X}，{_startPoint.Y}，结束点：{_endPoint.X}，{_endPoint.Y}。");
+            //Console.WriteLine($"开始点：{_startPoint.X}，{_startPoint.Y}，结束点：{_endPoint.X}，{_endPoint.Y}。");
 
             Int32Rect cropRect = new(
                 (int)(Math.Min(_startPoint.X, _endPoint.X) * DpiScaleX),

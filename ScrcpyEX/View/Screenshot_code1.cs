@@ -67,7 +67,7 @@ namespace ScrcpyEX.View
             tbk.Text = $"{wd}×{ht}";
 
             UpdateMask();
-            Console.WriteLine("截图中...");
+            //Console.WriteLine("截图中...");
         }
 
         /// <summary>
@@ -92,45 +92,51 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 显示用户的截图和操作栏。
+        /// 显示工具栏。
         /// </summary>
         /// <param name="endPoint">截图结束时的坐标点。</param>
-        private void ShowCapture(Point endPoint)
+        private void ShowToolBar(Point endPoint)
         {
             _endPoint = endPoint;
-            double y = endPoint.Y + stp.ActualHeight > GetMaxHeigth(endPoint) ? endPoint.Y - stp.ActualHeight : endPoint.Y;
-            Console.WriteLine($"当前y轴：{endPoint.Y},{stp.ActualHeight},当前屏幕高度：{GetMaxHeigth(endPoint)}。");
 
-            foreach (Screen screen in Screen.AllScreens)
-            {
-                // 检查鼠标坐标是否在显示器范围内
-                if (screen.Bounds.Contains(new System.Drawing.Point((int)endPoint.X*2, (int)endPoint.Y*2)))
-                {
-                    bool isPrimary = screen.Primary;
-                    string info = $"{(isPrimary ? "主显示器" : "副显示器")}，" +
-                                         $"分辨率：{screen.Bounds.Width}x{screen.Bounds.Height}";
-                    Console.WriteLine(info);
-                    break;
-                }
-            }
-
-            stp.Margin = new Thickness(endPoint.X - stp.ActualWidth, y, 0, 0);
+            stp.Margin = new Thickness(endPoint.X - stp.ActualWidth, GetY(endPoint), 0, 0);
             stp.Visibility = Visibility.Visible;
+            //Console.WriteLine($"stp的位置：{endPoint.X}，{endPoint.Y}。");
         }
 
         /// <summary>
-        /// 获得指定坐标所在显示屏的高度，用于多显示屏的情况。
+        /// 获得工具栏的y轴坐标，对于多屏幕的情况，副屏会和主屏的DPI保持一致，如果副屏DPI比主屏小，
+        /// 获得的副屏分辨率会乘上主屏的DPI（比如2），这样会导致鼠标已经到副屏的底部，但参数计算
+        /// 出来鼠标在屏幕垂直一半的位置上，所有副屏上菜单始终向上靠拢。
         /// </summary>
-        /// <param name="point">指定的坐标点。</param>
-        private double GetMaxHeigth(Point point)
+        /// <param name="endPoint">截图结束时的坐标点。</param>
+        private double GetY(Point endPoint)
         {
-            if (point.X < SystemParameters.PrimaryScreenWidth)
+            if (endPoint.X < SystemParameters.PrimaryScreenWidth)
             {
-                return SystemParameters.PrimaryScreenHeight;//主显示屏高度
+                if (endPoint.Y + stp.ActualHeight > SystemParameters.PrimaryScreenHeight)
+                {
+                    return endPoint.Y - stp.ActualHeight;
+                }
+                else
+                {
+                    return endPoint.Y;
+                }
             }
             else
             {
-                return SystemParameters.VirtualScreenHeight;//虚拟屏幕高度
+                if (_startPoint.Y > stp.ActualWidth)
+                {
+                    return _startPoint.Y - stp.ActualHeight;
+                }
+                else if (_startPoint.Y < stp.ActualWidth && rct.ActualHeight > stp.ActualWidth * 2)
+                {
+                    return endPoint.Y - stp.ActualHeight;
+                }
+                else
+                {
+                    return endPoint.Y;
+                }
             }
         }
 

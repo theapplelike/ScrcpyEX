@@ -78,7 +78,7 @@ namespace ScrcpyEX.View
 
         private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            ShowCapture(e.GetPosition(this));
+            ShowToolBar(e.GetPosition(this));
         }
 
         private void Window_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
