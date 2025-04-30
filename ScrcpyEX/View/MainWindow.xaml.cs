@@ -44,7 +44,7 @@ namespace ScrcpyEX.View
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Console.WriteLine($"窗体大小进行改变，Scrcpy当前：（{ScActualWidth}，{ScActualHeight}），比例：（{ScRatioX}，{ScRatioY}）。");
+            //Console.WriteLine($"窗体大小进行改变，Scrcpy当前：（{ScActualWidth}，{ScActualHeight}），比例：（{ScRatioX}，{ScRatioY}）。");
 
             //scrcpy程序句柄不为空调整scrcpy大小
             if (_scHandle != IntPtr.Zero)

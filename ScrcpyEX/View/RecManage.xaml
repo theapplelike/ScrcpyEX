@@ -34,6 +34,9 @@
         <Style TargetType="RadioButton">
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -51,8 +54,8 @@
                 <RowDefinition Height="20"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="脚本列表（有黑边时执行脚本会导致错位）：" VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <ListBox x:Name="lst" ItemsSource="{Binding RecInfos}" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden" Visibility="Hidden">
+            <TextBlock Text="脚本列表（有黑边时执行脚本会导致错位）：" Margin="10,0,0,0"/>
+            <ListBox x:Name="lst" ItemsSource="{Binding RecInfos}" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2">
@@ -65,10 +68,10 @@
                                     <ColumnDefinition Width="40" />
                                     <ColumnDefinition Width="40" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock x:Name="tbkEdit" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="10,0"/>
+                                <TextBlock x:Name="tbkEdit" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="10,0"/>
                                 <TextBox x:Name="txtEdit" Text="{Binding Name}" Visibility="Hidden" VerticalAlignment="Center" Margin="10,0"/>
                                 <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="1" Content="&#xe8ac;" Style="{StaticResource LstBtn}"/>
-                                <TextBlock Text="|" FontSize="20" Grid.Column="2" HorizontalAlignment="Center"/>
+                                <TextBlock Text="|" FontSize="20" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
 
                                 <Button x:Name="btnPlay" Click="BtnPlay_Click" CommandParameter="{Binding}" Grid.Column="3" Content="&#xec57;" Style="{StaticResource LstBtn}"/>
                                 <Button x:Name="btnSet" Click="BtnSet_Click" CommandParameter="{Binding}" Grid.Column="4" Content="&#xe713;" Style="{StaticResource LstBtn}"/>
@@ -89,7 +92,7 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="详细信息：" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            <TextBlock Text="详细信息：" Margin="10,0,0,0"/>
 
             <DataGrid Grid.Row="1" ItemsSource="{Binding PointDt}" AutoGenerateColumns="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
                 <DataGrid.Columns>
@@ -112,39 +115,31 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="执行循环" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                <RadioButton x:Name="rdoLimited" Grid.Row="0" Grid.Column="1">
+                <TextBlock Text="执行循环" HorizontalAlignment="Center"/>
+                <RadioButton x:Name="rdoLimited" Grid.Row="0" Grid.Column="1" GroupName="num">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="执行" VerticalAlignment="Center"/>
+                        <TextBlock Text="执行"/>
                         <TextBox x:Name="txtCycleNum" Width="40" Margin="5,0"/>
-                        <TextBlock Text="次" VerticalAlignment="Center"/>
+                        <TextBlock Text="次"/>
                     </StackPanel>
                 </RadioButton>
-                <RadioButton x:Name="rdoHandStop" Grid.Row="1" Grid.Column="1" Content="手动停止" />
+                <RadioButton x:Name="rdoHandStop" Grid.Row="1" Grid.Column="1" Content="手动停止" GroupName="num"/>
 
                 <Border Grid.Row="2" Grid.ColumnSpan="2" BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2" Margin="0,0,0,2"/>
 
-                <TextBlock Text="循环条件" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                <RadioButton x:Name="rdoTime" Grid.Row="3" Grid.Column="1">
+                <TextBlock Text="循环条件" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center"/>
+                <RadioButton x:Name="rdoTime" Grid.Row="3" Grid.Column="1" GroupName="cond">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="时间间隔" VerticalAlignment="Center"/>
+                        <TextBlock Text="时间间隔"/>
                         <TextBox x:Name="txtCycleInterval" Width="40" Margin="5,0"/>
-                        <TextBlock Text="次" VerticalAlignment="Center"/>
+                        <TextBlock Text="次"/>
                     </StackPanel>
                 </RadioButton>
-                <RadioButton x:Name="rdoImage" Grid.Row="4" Grid.Column="1">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="局部图片" VerticalAlignment="Center"/>
-                        <Image x:Name="img" Width="40" Margin="5,0" MouseLeftButtonDown="Img_MouseLeftButtonDown"/>
-                        <Button x:Name="btnScreenshot" Click="BtnScreenshot_Click" Content="截图" Style="{StaticResource Btn}"/>
-                    </StackPanel>
-                </RadioButton>
-
-                <!--<StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="1">
-                    <TextBox x:Name="txtCycleInterval" Width="40" Margin="0,0,5,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <TextBlock Text="秒" VerticalAlignment="Center"/>
-                    <Button x:Name="btnScreenshot" Click="BtnScreenshot_Click" Content="截图" Style="{StaticResource Btn}"/>
-                </StackPanel>-->
+                <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
+                    <RadioButton x:Name="rdoImage" Content="局部图片" GroupName="cond"/>
+                    <Image x:Name="img" Width="40" Margin="5,0" MouseLeftButtonDown="Img_MouseLeftButtonDown"/>
+                    <Button x:Name="btnScreenshot" Click="BtnScreenshot_Click" Content="截图" Style="{StaticResource Btn}" Width="60"/>
+                </StackPanel>
             </Grid>
             
             <Grid Grid.Row="3">

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ScrcpyEX.View"
         mc:Ignorable="d"
         Title="" Height="450" Width="800" WindowStartupLocation="CenterScreen">
-    <Grid>
+    <Grid Background="WhiteSmoke">
         <Image x:Name="img"/>
     </Grid>
 </Window>
