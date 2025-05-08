@@ -5,6 +5,7 @@ using ScrcpyEX.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -77,13 +78,14 @@ namespace ScrcpyEX.View
 
             RecInfo recInfo = new()
             {
-                Limited = (bool)rdoLimited.IsChecked,
-                HandStop = (bool)rdoHandStop.IsChecked,
+                IsLimited = (bool)rdoLimited.IsChecked,
                 CycleNumber = num,
+                IsTime = (bool)rdoTime.IsChecked,
                 CycleInterval = interval,
+                ImgName = img.Source == null ? "" : $"Pic{DateTime.Now:yyMMddhhmmss}.png"
             };
-
-            _vm.Save(recInfo);
+            
+            _vm.Save(recInfo, (BitmapSource)img.Source);
         }
 
         private void BtnCanel_Click(object sender, RoutedEventArgs e)

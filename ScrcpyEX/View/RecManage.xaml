@@ -68,7 +68,7 @@
                                     <ColumnDefinition Width="40" />
                                     <ColumnDefinition Width="40" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock x:Name="tbkEdit" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="10,0"/>
+                                <TextBlock x:Name="tbkEdit" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="10,0" VerticalAlignment="Center"/>
                                 <TextBox x:Name="txtEdit" Text="{Binding Name}" Visibility="Hidden" VerticalAlignment="Center" Margin="10,0"/>
                                 <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="1" Content="&#xe8ac;" Style="{StaticResource LstBtn}"/>
                                 <TextBlock Text="|" FontSize="20" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
@@ -81,8 +81,6 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-
-            <Image x:Name="img1"  Grid.Row="1"/>
         </Grid>
 
         <Grid Grid.Column="1" Margin="10">
@@ -137,7 +135,9 @@
                 </RadioButton>
                 <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
                     <RadioButton x:Name="rdoImage" Content="局部图片" GroupName="cond"/>
-                    <Image x:Name="img" Width="40" Margin="5,0" MouseLeftButtonDown="Img_MouseLeftButtonDown"/>
+                    <Grid Width="40" Margin="5,0" Background="Gainsboro">
+                        <Image x:Name="img" MouseLeftButtonDown="Img_MouseLeftButtonDown"/>
+                    </Grid>
                     <Button x:Name="btnScreenshot" Click="BtnScreenshot_Click" Content="截图" Style="{StaticResource Btn}" Width="60"/>
                 </StackPanel>
             </Grid>

@@ -13,6 +13,7 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using System.IO;
 using System.Windows.Media.Imaging;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ScrcpyEX.View
 {
@@ -65,7 +66,7 @@ namespace ScrcpyEX.View
 
             if (txt.Visibility == Visibility.Hidden)
             {
-                Console.WriteLine("进行编辑");
+                //Console.WriteLine("进行编辑");
                 //如果当前项要变成编辑状态，但已有其他项为编辑状态，则初始化所有项
                 if (_isEditing)
                 {
@@ -82,7 +83,7 @@ namespace ScrcpyEX.View
             }
             else
             {
-                Console.WriteLine("编辑完成");
+                //Console.WriteLine("编辑完成");
                 _isEditing = false;
                 ((Button)sender).Content = "\ue8ac";
                 txt.Visibility = Visibility.Hidden;
@@ -96,10 +97,15 @@ namespace ScrcpyEX.View
         /// <param name="recInfo">指定的脚本实体类。</param>
         private void ValToUI(RecInfo recInfo)
         {
-            rdoLimited.IsChecked = recInfo.Limited;
-            rdoHandStop.IsChecked = recInfo.HandStop;
+            rdoLimited.IsChecked = recInfo.IsLimited;
+            rdoHandStop.IsChecked = !recInfo.IsLimited;
             txtCycleNum.Text = recInfo.CycleNumber.ToString();
+            rdoTime.IsChecked = recInfo.IsTime;
+            rdoImage.IsChecked = !recInfo.IsTime;
             txtCycleInterval.Text = recInfo.CycleInterval.ToString();
+            img.Source = GetImage(recInfo.ImgName);
+
+            Console.WriteLine($"图片名：{recInfo.ImgName}。");
         }
 
         /// <summary>
@@ -116,56 +122,44 @@ namespace ScrcpyEX.View
                 img.Source = screen.Crop;
                 //CaptureRegion(screen.SelectedRegion);
 
-                using (FileStream fs = new FileStream("screenshot.png", FileMode.Create))
-                {
-                    PngBitmapEncoder encoder = new PngBitmapEncoder();
-                    encoder.Frames.Add(BitmapFrame.Create(screen.Crop));
-                    encoder.Save(fs);
-                }
+                //using (FileStream fs = new FileStream(@".\main\screenshot.png", FileMode.Create))
+                //{
+                //    PngBitmapEncoder encoder = new PngBitmapEncoder();
+                //    encoder.Frames.Add(BitmapFrame.Create(screen.Crop));
+                //    encoder.Save(fs);
+                //}
             }
 
             ShowDialog();
         }
 
-        private void CaptureRegion(Rect region)
+        /// <summary>
+        /// 获得指定名称的脚本图片。
+        /// </summary>
+        /// <param name="imgName">图片的名称。</param>
+        /// <returns>返回一个位图源，名称为空时返回null。</returns>
+        private BitmapImage GetImage(string imgName)
         {
-            // 转换为整数像素坐标
-            int x = (int)region.X*2;
-            int y = (int)region.Y*2;
-            int width = (int)region.Width * 2;
-            int height = (int)region.Height * 2;
-
-            // 使用System.Drawing截屏
-            using (Bitmap bmp = new Bitmap(width, height))
+            if (imgName == "")
             {
-                using (Graphics g = Graphics.FromImage(bmp))
-                {
-                    g.CopyFromScreen(x, y, 0, 0, new System.Drawing.Size(width, height));
-                }
+                return null;
+            }
 
-                // 转换为WPF BitmapSource
-                BitmapImage bitmapImage;
-                using (MemoryStream memory = new MemoryStream())
-                {
-                    bmp.Save(memory, ImageFormat.Png);
-                    memory.Position = 0;
-                    bitmapImage = new BitmapImage();
-                    bitmapImage.BeginInit();
-                    bitmapImage.StreamSource = memory;
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmapImage.EndInit();
-                }
+            try
+            {
+                //创建BitmapImage并设置Source
+                BitmapImage bitmap = new();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri($@"{_vm.Path}\{imgName}", UriKind.Relative);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;//强制立即加载
+                bitmap.EndInit();
 
-                // 显示或保存截图
-                img.Source = bitmapImage;
-
-                // 保存到文件
-                using (FileStream fs = new FileStream("screenshot.png", FileMode.Create))
-                {
-                    PngBitmapEncoder encoder = new PngBitmapEncoder();
-                    encoder.Frames.Add(BitmapFrame.Create(bitmapImage));
-                    encoder.Save(fs);
-                }
+                return  bitmap;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"加载脚本图片失败: {ex.Message}");
+                return null;
             }
         }
 

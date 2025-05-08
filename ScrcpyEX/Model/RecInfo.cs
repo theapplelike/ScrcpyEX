@@ -17,14 +17,9 @@ namespace ScrcpyEX.Model
         public string Name { get; set; } = $"脚本{DateTime.Now:yyMMddhhmmss}";
 
         /// <summary>
-        /// 进行有限次的循环。
+        /// true--进行有限次的循环；false--进行无限次的循环，直到手动停止。
         /// </summary>
-        public bool Limited { get; set; } = false;
-
-        /// <summary>
-        /// 进行无限次的循环，直到手动停止。
-        /// </summary>
-        public bool HandStop { get; set; } = true;
+        public bool IsLimited { get; set; } = false;
 
         /// <summary>
         /// 指定有限次循环的次数。
@@ -32,9 +27,19 @@ namespace ScrcpyEX.Model
         public int CycleNumber { get; set; } = 10;
 
         /// <summary>
+        /// true--指定时间后进行下一次脚本；false--指定区域出现相似图片后进行下一次脚本。
+        /// </summary>
+        public bool IsTime { get; set; } = true;
+
+        /// <summary>
         /// 指定每次循环的间隔。
         /// </summary>
         public int CycleInterval { get; set; } = 100;
+
+        /// <summary>
+        /// 局部图片的路径，默认为空字符串。
+        /// </summary>
+        public string ImgName { get; set; } = "";
 
         /// <summary>
         /// 录制的坐标点信息列表。

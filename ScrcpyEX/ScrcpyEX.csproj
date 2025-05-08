@@ -84,6 +84,7 @@
     <Compile Include="MyDefinition\WindowsAPI\WM.cs" />
     <Compile Include="ViewModel\MainWindowVM.cs" />
     <Compile Include="ViewModel\RecManageVM.cs" />
+    <Compile Include="ViewModel\ScreenshotVM.cs" />
     <Compile Include="ViewModel\SetupVM.cs" />
     <Compile Include="View\MainWindow_code.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

@@ -173,7 +173,7 @@ namespace ScrcpyEX.View
             }
 
             //如果为有限次循环，检查是否到循环次数
-            if (recInfo.Limited && recInfo.CycleNumber <= _vm.CycleNum)
+            if (recInfo.IsLimited && recInfo.CycleNumber <= _vm.CycleNum)
             {
                 StopScriptAndRecord();
             }

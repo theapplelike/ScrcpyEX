@@ -5,11 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using System.Xml.Linq;
 
 namespace ScrcpyEX.ViewModel
 {
@@ -20,8 +25,18 @@ namespace ScrcpyEX.ViewModel
         /// </summary>
         private int _index = -1;
 
+        /// <summary>
+        /// 脚本图片的保存路径。
+        /// </summary>
+        public string Path { get; set; } = @".\main\Local\Script";
+
         public RecManageVM()
         {
+            if (!Directory.Exists(Path))
+            {
+                Directory.CreateDirectory(Path);
+            }
+
             PointDt.Columns.Add("LastTime", typeof(double));
             PointDt.Columns.Add("XAxis", typeof(double));
             PointDt.Columns.Add("YAxis", typeof(double));
@@ -55,6 +70,9 @@ namespace ScrcpyEX.ViewModel
         }
         private DataTable pointDt = new();
 
+        /// <summary>
+        /// 删除指定的脚本信息。
+        /// </summary>
         public ICommand DelRecCommand => new RelayCommand(DelRec);
 
         /// <summary>
@@ -86,11 +104,15 @@ namespace ScrcpyEX.ViewModel
         /// <summary>
         /// 保存修改的坐标点和脚本数据。
         /// </summary>
-        public void Save(RecInfo recInfo)
+        public void Save(RecInfo recInfo, BitmapSource source)
         {
             if (_index != -1)
             {
                 CopyToClass(PointDt, recInfo);
+                if (source != null)
+                {
+                    SavaImg(recInfo.ImgName, source);
+                }
             }
         }
 
@@ -135,10 +157,39 @@ namespace ScrcpyEX.ViewModel
                 tempInfo.Add(new PointInfo(new Point(r1, r2), r3));
             }
             RecInfos[_index].Infos = tempInfo;
-            RecInfos[_index].Limited = recInfo.Limited;
-            RecInfos[_index].HandStop = recInfo.HandStop;
+            RecInfos[_index].IsLimited = recInfo.IsLimited;
             RecInfos[_index].CycleNumber = recInfo.CycleNumber;
+            RecInfos[_index].IsTime = recInfo.IsTime;
             RecInfos[_index].CycleInterval = recInfo.CycleInterval;
+
+            ReplaceImg(RecInfos[_index].ImgName, recInfo.ImgName);
+            RecInfos[_index].ImgName = recInfo.ImgName;
+        }
+
+        /// <summary>
+        /// 如果有新的图片，删除旧图片。
+        /// </summary>
+        /// <param name="oldName">旧的图片名。</param>
+        /// <param name="newName">新的图片名。</param>
+        private void ReplaceImg(string oldName, string newName)
+        {
+            if (oldName != newName && oldName != "")
+            {
+                File.Delete(@$"{Path}\{oldName}");
+            }
+        }
+
+        /// <summary>
+        /// 保持脚本图片到本地。
+        /// </summary>
+        /// <param name="name">图片名称。</param>
+        /// <param name="source">图片的源。</param>
+        private void SavaImg(string name, BitmapSource source)
+        {
+            using FileStream fs = new(@$"{Path}\{name}", FileMode.Create);
+            PngBitmapEncoder encoder = new();
+            encoder.Frames.Add(BitmapFrame.Create(source));
+            encoder.Save(fs);
         }
 
         /// <summary>
