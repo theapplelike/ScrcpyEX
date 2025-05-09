@@ -103,7 +103,7 @@ namespace ScrcpyEX.View
             rdoTime.IsChecked = recInfo.IsTime;
             rdoImage.IsChecked = !recInfo.IsTime;
             txtCycleInterval.Text = recInfo.CycleInterval.ToString();
-            img.Source = GetImage(recInfo.ImgName);
+            img.Source = MyGM.GetImage(recInfo.ImgName);
 
             Console.WriteLine($"图片名：{recInfo.ImgName}。");
         }
@@ -120,47 +120,10 @@ namespace ScrcpyEX.View
             if (screen.ShowDialog() == true)
             {
                 img.Source = screen.Crop;
-                //CaptureRegion(screen.SelectedRegion);
-
-                //using (FileStream fs = new FileStream(@".\main\screenshot.png", FileMode.Create))
-                //{
-                //    PngBitmapEncoder encoder = new PngBitmapEncoder();
-                //    encoder.Frames.Add(BitmapFrame.Create(screen.Crop));
-                //    encoder.Save(fs);
-                //}
+                _cropRect = screen.CropRect;
             }
 
             ShowDialog();
-        }
-
-        /// <summary>
-        /// 获得指定名称的脚本图片。
-        /// </summary>
-        /// <param name="imgName">图片的名称。</param>
-        /// <returns>返回一个位图源，名称为空时返回null。</returns>
-        private BitmapImage GetImage(string imgName)
-        {
-            if (imgName == "")
-            {
-                return null;
-            }
-
-            try
-            {
-                //创建BitmapImage并设置Source
-                BitmapImage bitmap = new();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri($@"{_vm.Path}\{imgName}", UriKind.Relative);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;//强制立即加载
-                bitmap.EndInit();
-
-                return  bitmap;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"加载脚本图片失败: {ex.Message}");
-                return null;
-            }
         }
 
 

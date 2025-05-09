@@ -101,7 +101,7 @@ namespace ScrcpyEX.View
 
             stp.Margin = new Thickness(endPoint.X - stp.ActualWidth, GetY(endPoint), 0, 0);
             stp.Visibility = Visibility.Visible;
-            //Console.WriteLine($"stp的位置：{endPoint.X}，{endPoint.Y}。");
+            //Console.WriteLine($"截图结束位置：{endPoint.X}，{endPoint.Y}。");
         }
 
         /// <summary>

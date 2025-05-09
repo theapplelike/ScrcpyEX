@@ -147,6 +147,7 @@ namespace ScrcpyEX.View
             
             render.Render(e);
             Crop = new CroppedBitmap(render, cropRect);
+            CropRect = cropRect;
         }
 
 

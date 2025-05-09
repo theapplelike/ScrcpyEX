@@ -18,6 +18,11 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Controls;
 using ScrcpyEX.MyDefinition.MyClass;
 using System.IO;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
+using System.Drawing;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
 
 namespace ScrcpyEX.View
 {
@@ -126,8 +131,11 @@ namespace ScrcpyEX.View
             _resizeTimer.Tick += new EventHandler(Resize_Tick);
             _resizeTimer.Interval = TimeSpan.FromSeconds(0.1);//大小调整间隔
 
-            _clickTimer.Tick += (sender, e) => Click_Tick(_recInfo);
-            _clickTimer.Interval = TimeSpan.FromSeconds(1);
+            _scriptTimer.Tick += (sender, e) => Script_Tick(_recInfo);
+            _scriptTimer.Interval = TimeSpan.FromSeconds(1);
+
+            _imageScriptTimer.Tick += (sender, e) => ImageScript_Tick(_recInfo);
+            _imageScriptTimer.Interval = TimeSpan.FromSeconds(1);
 
             _countTimer.Tick += (sender, e) => Count_Tick();
             _countTimer.Interval = TimeSpan.FromSeconds(1);
@@ -151,11 +159,26 @@ namespace ScrcpyEX.View
         /// PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
         /// 点击的实际位置会根据实际大小和scrcpy的初始大小的比值进行调整，但有黑边时仍会偏移。
         /// </summary>
-        private async void Click_Tick(RecInfo recInfo)
+        private async void Script_Tick(RecInfo recInfo)
         {
             _vm.CycleNum++;
             _vm.Interval = 0;
 
+            await ExecuteClickScript(recInfo);
+
+            //如果为有限次循环，检查是否到循环次数
+            if (recInfo.IsLimited && recInfo.CycleNumber <= _vm.CycleNum)
+            {
+                StopScriptAndRecord();
+            }
+        }
+
+        /// <summary>
+        /// 执行点击脚本。
+        /// </summary>
+        /// <param name="recInfo">当前要执行的脚本。</param>
+        private async Task ExecuteClickScript(RecInfo recInfo)
+        {
             foreach (PointInfo info in recInfo.Infos)
             {
                 await Task.Delay(TimeSpan.FromSeconds(info.LastTime));
@@ -171,12 +194,14 @@ namespace ScrcpyEX.View
                 DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
                 DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
             }
+        }
 
-            //如果为有限次循环，检查是否到循环次数
-            if (recInfo.IsLimited && recInfo.CycleNumber <= _vm.CycleNum)
-            {
-                StopScriptAndRecord();
-            }
+        private async void ImageScript_Tick(RecInfo recInfo)
+        {
+            BitmapSource source = MyGM.CaptureProcessArea(DpiScaleX, DpiScaleY);
+            CroppedBitmap croppedBitmap = new(source, recInfo.CropRect);
+
+            BitmapSource old = MyGM.GetImage(recInfo.ImgName);
         }
 
         /// <summary>
@@ -195,11 +220,19 @@ namespace ScrcpyEX.View
 
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
+            System.Windows.Point pt1 = PointToScreen(new System.Windows.Point(0, 0));
+
+            Console.WriteLine($"结束点：{MyGM.ConvertDesktopPointToWindow(pt1)}");
+
+            //BitmapSource source = MyGM.CaptureProcessArea(DpiScaleX, DpiScaleY);
+            //CroppedBitmap croppedBitmap = new CroppedBitmap(source, MV.CropRect);
+            //SavaImg("loop.png", croppedBitmap);
+
             //Point pt1 = PointToScreen(new Point(0, 0));
             //int x = (int)(pt1.X + (_limitPop.HorizontalOffset + ExtraWidthLeft + 50) * DpiScaleX);
             //int y = (int)(pt1.Y + (_limitPop.VerticalOffset + ExtraHeightTop + 50) * DpiScaleY);
             //DLL.SetCursorPos(x, y);
-            await AdbTest1(500, 500);
+            //await AdbTest1(500, 500);
 
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
@@ -340,6 +373,14 @@ namespace ScrcpyEX.View
             string Error = _adbPrc.StandardError.ReadToEnd();
             await Task.Delay(1);
             Console.WriteLine($"输出：{output}。  错误：{Error}。{_adbPrc.HasExited}。");
+        }
+
+        private void SavaImg(string name, BitmapSource source)
+        {
+            using FileStream fs = new(@$"{name}", FileMode.Create);
+            PngBitmapEncoder encoder = new();
+            encoder.Frames.Add(BitmapFrame.Create(source));
+            encoder.Save(fs);
         }
 
 

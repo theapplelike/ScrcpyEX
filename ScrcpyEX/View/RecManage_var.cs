@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ScrcpyEX.View
 {
@@ -19,6 +20,11 @@ namespace ScrcpyEX.View
         /// 是否处于脚本名称的编辑状态。
         /// </summary>
         private bool _isEditing = false;
+
+        /// <summary>
+        /// 说明截图结果位置大小的矩形。
+        /// </summary>
+        public Int32Rect _cropRect;
 
         /// <summary>
         /// 临时存储正在编辑的脚本信息。

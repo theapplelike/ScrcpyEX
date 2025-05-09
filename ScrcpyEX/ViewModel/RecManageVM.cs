@@ -25,18 +25,8 @@ namespace ScrcpyEX.ViewModel
         /// </summary>
         private int _index = -1;
 
-        /// <summary>
-        /// 脚本图片的保存路径。
-        /// </summary>
-        public string Path { get; set; } = @".\main\Local\Script";
-
         public RecManageVM()
         {
-            if (!Directory.Exists(Path))
-            {
-                Directory.CreateDirectory(Path);
-            }
-
             PointDt.Columns.Add("LastTime", typeof(double));
             PointDt.Columns.Add("XAxis", typeof(double));
             PointDt.Columns.Add("YAxis", typeof(double));
@@ -164,6 +154,7 @@ namespace ScrcpyEX.ViewModel
 
             ReplaceImg(RecInfos[_index].ImgName, recInfo.ImgName);
             RecInfos[_index].ImgName = recInfo.ImgName;
+            RecInfos[_index].CropRect = recInfo.CropRect;
         }
 
         /// <summary>
@@ -175,7 +166,7 @@ namespace ScrcpyEX.ViewModel
         {
             if (oldName != newName && oldName != "")
             {
-                File.Delete(@$"{Path}\{oldName}");
+                File.Delete(@$"{MV.ScriptPath}\{oldName}");
             }
         }
 
@@ -186,7 +177,7 @@ namespace ScrcpyEX.ViewModel
         /// <param name="source">图片的源。</param>
         private void SavaImg(string name, BitmapSource source)
         {
-            using FileStream fs = new(@$"{Path}\{name}", FileMode.Create);
+            using FileStream fs = new(@$"{MV.ScriptPath}\{name}", FileMode.Create);
             PngBitmapEncoder encoder = new();
             encoder.Frames.Add(BitmapFrame.Create(source));
             encoder.Save(fs);

@@ -10,8 +10,7 @@
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel" 
         xmlns:mycontrol="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
         Title="MainWindow" Height="488" Width="970" WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged" 
-        PreviewMouseDown="Window_PreviewMouseDown">
+        Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged">
 
     <Window.DataContext>
         <ViewModel:MainWindowVM/>
@@ -143,22 +142,12 @@
                     <Button x:Name="btnRecStop" Click="BtnRecStop_Click" Style="{StaticResource MenuBtn}" Content="&#xe769;" Foreground="SteelBlue" Margin="0"/>
                 </DockPanel>
             </Border>
-            
+
         </DockPanel>
 
-        <!--<Border x:Name="bd" Grid.Row="1" BorderBrush="Gray" BorderThickness="3" Width="1350" Height="630">
-            
-        </Border>
-
-        <Grid x:Name="gShow" Grid.Row="1"  Background="Gray">
-            <WindowsFormsHost x:Name="wfh" Margin="5" GotFocus="wfh_GotFocus">
-                <wf:Panel x:Name="pnlShow" GotFocus="pnlShow_GotFocus" />
-            </WindowsFormsHost>
-        </Grid>-->
-
         <Grid x:Name="gShow" Grid.Row="1" Margin="5">
-            <WindowsFormsHost x:Name="wfh" Background="Gray" GotFocus="wfh_GotFocus" PreviewMouseDown="wfh_PreviewMouseDown">
-                <wf:Panel x:Name="pnlShow" GotFocus="pnlShow_GotFocus" Dock="Fill" AutoSize="True" MouseDown="PnlShow_MouseDown" MouseMove="PnlShow_MouseMove"/>
+            <WindowsFormsHost x:Name="wfh" Background="Gray">
+                <wf:Panel x:Name="pnlShow" Dock="Fill" AutoSize="True"/>
             </WindowsFormsHost>
         </Grid>
 

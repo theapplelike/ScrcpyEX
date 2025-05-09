@@ -82,9 +82,9 @@ namespace ScrcpyEX.View
         /// </summary>
         private void StopScriptAndRecord()
         {
-            if (_clickTimer.IsEnabled)
+            if (_countTimer.IsEnabled)
             {
-                _clickTimer.Stop();
+                _scriptTimer.Stop();
                 _countTimer.Stop();
                 bdRec.Visibility = Visibility.Hidden;
                 dplTip.Visibility = Visibility.Collapsed;
@@ -105,7 +105,7 @@ namespace ScrcpyEX.View
                 popMid.Show("未进行投屏，不能进行录制。");
                 return;
             }
-            if (_clickTimer.IsEnabled)
+            if (_countTimer.IsEnabled)
             {
                 popMid.Show("正在执行脚本，不能进行录制。");
                 return;
@@ -164,9 +164,9 @@ namespace ScrcpyEX.View
                     RemoveBlack();
 
                     //如果脚本已执行则关闭
-                    if (_clickTimer.IsEnabled)
+                    if (_countTimer.IsEnabled)
                     {
-                        _clickTimer.Stop();
+                        _scriptTimer.Stop();
                         _countTimer.Stop();
                     }
 
@@ -175,10 +175,10 @@ namespace ScrcpyEX.View
                     _vm.CycleNum = 0;
 
                     _recInfo = rec.TempRecInfo;
-                    _clickTimer.Interval = TimeSpan.FromSeconds(_recInfo.CycleInterval);
-                    _clickTimer.Start();
+                    _scriptTimer.Interval = TimeSpan.FromSeconds(_recInfo.CycleInterval);
+                    _scriptTimer.Start();
                     _countTimer.Start();
-                    Click_Tick(_recInfo);//立刻执行一次脚本
+                    Script_Tick(_recInfo);//立刻执行一次脚本
                 }
             }
         }

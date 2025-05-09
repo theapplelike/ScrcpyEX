@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ScrcpyEX.Model
 {
@@ -40,6 +41,11 @@ namespace ScrcpyEX.Model
         /// 局部图片的路径，默认为空字符串。
         /// </summary>
         public string ImgName { get; set; } = "";
+
+        /// <summary>
+        /// 说明局部图片位置大小的矩形。
+        /// </summary>
+        public Int32Rect CropRect { get; set; }
 
         /// <summary>
         /// 录制的坐标点信息列表。

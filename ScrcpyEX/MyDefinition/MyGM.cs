@@ -7,6 +7,10 @@ using System.Windows.Controls;
 using ScrcpyEX.ExtensionMethod;
 using System.Windows.Media;
 using System.Windows;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
 
 namespace ScrcpyEX.MyDefinition
 {
@@ -143,6 +147,114 @@ namespace ScrcpyEX.MyDefinition
             {
                 return value;
             }
+        }
+
+        /// <summary>
+        /// 捕获主程序区域的截图。
+        /// </summary>
+        /// <param name="DpiScaleX">X轴上的DPI比例。</param>
+        /// <param name="DpiScaleY">Y轴上的DPI比例。</param>
+        /// <returns>主程序区域的截图。</returns>
+        public static CroppedBitmap CaptureProcessArea(double DpiScaleX, double DpiScaleY)
+        {
+            //创建与屏幕大小相同的位图对象，SystemParameters与DPI无关，需要乘以DPI系数
+            System.Drawing.Bitmap bmp = new((int)(SystemParameters.VirtualScreenWidth * DpiScaleX), (int)(SystemParameters.VirtualScreenHeight * DpiScaleY), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+            //使用位图对象来创建Graphics的对象
+            using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;                  //设置平滑模式，抗锯齿
+                g.CompositingQuality = CompositingQuality.HighQuality;      //设置合成质量
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic; //设置插值模式
+                g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;   //设置文本呈现的质量
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;            //设置呈现期间，像素偏移的方式
+
+                //利用CopyFromScreen将当前屏幕截图内容存储在位图中
+                g.CopyFromScreen(0, 0, 0, 0, bmp.Size, System.Drawing.CopyPixelOperation.SourceCopy);
+            }
+
+            //将Bitmap转化为BitmapSource
+            BitmapSource source = Imaging.CreateBitmapSourceFromHBitmap(
+                bmp.GetHbitmap(),
+                IntPtr.Zero,
+                Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions()
+            );
+
+            //定义要截取的矩形区域，主程序左上角的坐标和宽高
+            Point pt = MV.MainWin.PointToScreen(new Point(0, 0));
+            Int32Rect cropRect = new(
+                (int)pt.X,
+                (int)pt.Y,
+                (int)(MV.MainWin.Width * DpiScaleX),
+                (int)(MV.MainWin.Height * DpiScaleY));
+
+            CroppedBitmap croppedBitmap = new(source, cropRect);
+            return croppedBitmap;
+        }
+
+        /// <summary>
+        /// 获得指定名称的脚本图片。
+        /// </summary>
+        /// <param name="imgName">图片的名称。</param>
+        /// <returns>返回一个位图源，名称为空时返回null。</returns>
+        public static BitmapImage GetImage(string imgName)
+        {
+            if (imgName == "")
+            {
+                return null;
+            }
+
+            try
+            {
+                //创建BitmapImage并设置Source
+                BitmapImage bitmap = new();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri($@"{MV.ScriptPath}\{imgName}", UriKind.Relative);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;//强制立即加载
+                bitmap.EndInit();
+
+                return bitmap;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"加载脚本图片失败: {ex.Message}");
+                return null;
+            }
+        }
+
+        public static Point? ConvertDesktopPointToWindow(Point desktopPoint)
+        {
+            // 获取当前主窗口
+            Window window = Application.Current.MainWindow;
+
+            // 如果窗口不存在或最小化，返回null
+            if (window == null || window.WindowState == WindowState.Minimized)
+                return null;
+            Point point = new Point(desktopPoint.X * 2, desktopPoint.Y * 2);
+
+            try
+            {
+                // 将桌面坐标转换为窗口相对坐标
+                Point windowPoint = window.PointFromScreen(point);
+
+                Point windowPoint1 = window.PointFromScreen(new Point(0,0));
+                Point windowPoint2 = window.PointFromScreen(new Point(100, 100));
+                Console.WriteLine($"转化：{windowPoint},{windowPoint1},{windowPoint2}");
+
+                // 检查坐标是否在窗口范围内
+                if (windowPoint.X >= 0 && windowPoint.X <= window.ActualWidth &&
+                    windowPoint.Y >= 0 && windowPoint.Y <= window.ActualHeight)
+                {
+                    return windowPoint;
+                }
+            }
+            catch (ArgumentException)
+            {
+                // 当点无法转换时（例如窗口未加载），返回null
+            }
+
+            return null;
         }
 
 

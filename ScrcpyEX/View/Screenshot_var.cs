@@ -44,6 +44,11 @@ namespace ScrcpyEX.View
         public CroppedBitmap Crop { get; set; }
 
         /// <summary>
+        /// 说明截图结果位置大小的矩形。
+        /// </summary>
+        public Int32Rect CropRect { get; set; }
+
+        /// <summary>
         /// X轴上的DPI比例。
         /// </summary>
         private double DpiScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;

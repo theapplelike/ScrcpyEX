@@ -82,7 +82,8 @@ namespace ScrcpyEX.View
                 CycleNumber = num,
                 IsTime = (bool)rdoTime.IsChecked,
                 CycleInterval = interval,
-                ImgName = img.Source == null ? "" : $"Pic{DateTime.Now:yyMMddhhmmss}.png"
+                ImgName = img.Source == null ? "" : $"Pic{DateTime.Now:yyMMddhhmmss}.png",
+                CropRect = _cropRect,
             };
             
             _vm.Save(recInfo, (BitmapSource)img.Source);

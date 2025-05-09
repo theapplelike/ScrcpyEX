@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.MyDefinition;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,25 +32,35 @@ namespace ScrcpyEX.View
             ShowInTaskbar = false;
             Topmost = true;
 
-            //覆盖整个屏幕，使用VirtualScreenWidth会覆盖所有显示器，PrimaryScreenWidth只能覆盖主显示器
-            Left = 0;
-            Top = 0;
-            Width = SystemParameters.VirtualScreenWidth;
-            Height = SystemParameters.VirtualScreenHeight;
-            //Width = SystemParameters.PrimaryScreenWidth;
-            //Height = SystemParameters.PrimaryScreenHeight;
+            Left = MV.MainWin.Left;
+            Top = MV.MainWin.Top;
+            Width = MV.MainWin.Width;
+            Height = MV.MainWin.Height;
 
-            Console.WriteLine($"主屏幕：" +
-                $"{SystemParameters.PrimaryScreenWidth}，" +
-                $"{SystemParameters.PrimaryScreenHeight}," +
-                $"{SystemParameters.VirtualScreenWidth}," +
-                $"{SystemParameters.VirtualScreenHeight}");
-
-            gBack.Background = new ImageBrush(CaptureCurrentScreen())
+            gBack.Background = new ImageBrush(MyGM.CaptureProcessArea(DpiScaleX, DpiScaleY))
             {
                 Stretch = Stretch.Fill
             };
 
+            //覆盖整个屏幕，使用VirtualScreenWidth会覆盖所有显示器，PrimaryScreenWidth只能覆盖主显示器
+            //Left = 0;
+            //Top = 0;
+            //Width = SystemParameters.VirtualScreenWidth;
+            //Height = SystemParameters.VirtualScreenHeight;
+            //Width = SystemParameters.PrimaryScreenWidth;
+            //Height = SystemParameters.PrimaryScreenHeight;
+
+            //Console.WriteLine($"主屏幕：" +
+            //    $"{SystemParameters.PrimaryScreenWidth}，" +
+            //    $"{SystemParameters.PrimaryScreenHeight}," +
+            //    $"{SystemParameters.VirtualScreenWidth}," +
+            //    $"{SystemParameters.VirtualScreenHeight}");
+            //
+            //gBack.Background = new ImageBrush(CaptureCurrentScreen())
+            //{
+            //    Stretch = Stretch.Fill
+            //};
+            
             //放大镜根据DPI缩放
             _d = (int)(50 * DpiScaleX);
             _magnifierBitmap = new(_d, _d, 96 * DpiScaleX, 96 * DpiScaleY, PixelFormats.Pbgra32, null);

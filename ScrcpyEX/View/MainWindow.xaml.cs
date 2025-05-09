@@ -199,38 +199,5 @@ namespace ScrcpyEX.View
             MappingAdd();
         }
         #endregion
-
-        private void pnlShow_GotFocus(object sender, EventArgs e)
-        {
-            //Console.WriteLine("pnlShow获得焦点。");
-        }
-
-        private void wfh_GotFocus(object sender, RoutedEventArgs e)
-        {
-            //Console.WriteLine("wfh获得焦点。");
-        }
-
-        private void wfh_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            //Console.WriteLine("鼠标在wfh按下。");
-        }
-
-        private void PnlShow_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            //Console.WriteLine("鼠标在pnlShow按下。");
-
-            Point point = MyGM.GetPosition();//现在的坐标
-            Console.WriteLine($"panel的MouseDown事件：（{point.X},{point.Y}）.");
-        }
-
-        private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            //Console.WriteLine("鼠标在窗体按下。");
-        }
-
-        private void PnlShow_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-
-        }
     }
 }
