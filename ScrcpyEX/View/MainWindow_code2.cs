@@ -11,18 +11,18 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
-using ScrcpyEX.ExtensionMethod;
 using System.Windows.Shapes;
 using ScrcpyEX.Model;
 using System.Windows.Controls.Primitives;
 using System.Windows.Controls;
-using ScrcpyEX.MyDefinition.MyClass;
 using System.IO;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Drawing;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.MyDefinition.MyClass;
 
 namespace ScrcpyEX.View
 {
@@ -124,7 +124,7 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 设置计时器，在其中进行第三方程序的大小调整。
+        /// 设置计时器。
         /// </summary>
         private void SetTimer()
         {
@@ -173,6 +173,27 @@ namespace ScrcpyEX.View
             }
         }
 
+        private async void ImageScript_Tick(RecInfo recInfo)
+        {
+            BitmapSource area = MyGM.CaptureProcessArea(DpiScaleX, DpiScaleY);
+            CroppedBitmap temp = new(area, recInfo.CropRect);
+            MyGM.SavaImg("tempPic.png", temp);
+
+            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", $@"{MV.ScriptPath}\tempPic.png");
+            Console.WriteLine($"相似度：{ssim:F8}");
+            if (ssim > 0.9)
+            {
+                _vm.CycleNum++;
+                _vm.Interval = 0;
+                await ExecuteClickScript(recInfo);
+            }
+        }
+
+        /// <summary>
+        /// 执行脚本时，说明已产生的间隔。
+        /// </summary>
+        private void Count_Tick() => _vm.Interval++;
+
         /// <summary>
         /// 执行点击脚本。
         /// </summary>
@@ -194,193 +215,6 @@ namespace ScrcpyEX.View
                 DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
                 DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
             }
-        }
-
-        private async void ImageScript_Tick(RecInfo recInfo)
-        {
-            BitmapSource source = MyGM.CaptureProcessArea(DpiScaleX, DpiScaleY);
-            CroppedBitmap croppedBitmap = new(source, recInfo.CropRect);
-
-            BitmapSource old = MyGM.GetImage(recInfo.ImgName);
-        }
-
-        /// <summary>
-        /// 执行脚本时，说明已产生的间隔。
-        /// </summary>
-        private void Count_Tick() => _vm.Interval++;
-
-        /// <summary>
-        /// 测试专用。
-        /// </summary>
-        private void Test_Tick(object sender, EventArgs e)
-        {
-            IntPtr intPtr = DLL.GetForegroundWindow();
-            Console.WriteLine($"窗体/SC：{IsActive}，{intPtr == _scHandle}。");
-        }
-
-        private async void BtnTest_Click(object sender, RoutedEventArgs e)
-        {
-            System.Windows.Point pt1 = PointToScreen(new System.Windows.Point(0, 0));
-
-            Console.WriteLine($"结束点：{MyGM.ConvertDesktopPointToWindow(pt1)}");
-
-            //BitmapSource source = MyGM.CaptureProcessArea(DpiScaleX, DpiScaleY);
-            //CroppedBitmap croppedBitmap = new CroppedBitmap(source, MV.CropRect);
-            //SavaImg("loop.png", croppedBitmap);
-
-            //Point pt1 = PointToScreen(new Point(0, 0));
-            //int x = (int)(pt1.X + (_limitPop.HorizontalOffset + ExtraWidthLeft + 50) * DpiScaleX);
-            //int y = (int)(pt1.Y + (_limitPop.VerticalOffset + ExtraHeightTop + 50) * DpiScaleY);
-            //DLL.SetCursorPos(x, y);
-            //await AdbTest1(500, 500);
-
-            //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
-            //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
-
-            //if (_testTimer.IsEnabled)
-            //{
-            //    _testTimer.Stop();
-            //}
-            //else
-            //{
-            //    _testTimer.Start();
-            //}
-            await Task.Delay(1);
-        }
-
-        private void BtnTest_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            //MyGM.POP("yesclick");
-        }
-
-        /// <summary>
-        /// 启动adb发送命令。
-        /// </summary>
-        private async Task AdbTest1(double x, double y)
-        {
-            //string adbClickCommand = $"shell input tap {x} {y}";
-            string adbClickCommand = $"shell dumpsys power | grep \"mStayOn\"";
-
-            // 创建一个新的进程启动信息
-            ProcessStartInfo processStartInfo = new()
-            {
-                FileName = MV.ADB_Path,         //adb的路径
-                Arguments = adbClickCommand,    //执行完命令后adb会直接关闭
-                RedirectStandardOutput = true, // 重定向输出
-                UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
-                CreateNoWindow = true,          // 不创建窗口
-            };
-            Process adbPrc = Process.Start(processStartInfo);
-            string output = adbPrc.StandardOutput.ReadToEnd();
-
-            Console.WriteLine($"{adbClickCommand}，命令已发送，命令结果：{output}。");
-            await Task.Delay(1);
-        }
-
-        static Process _adbPrc = null;
-        static StreamWriter sw = null;
-        /// <summary>
-        /// 启动cmd再启动adb发送命令，只有第一次会相应，之后不能响应可能是写入流第一次后就关闭了。
-        /// </summary>
-        private async Task AdbTest2(double x, double y)
-        {
-            //string adbClickCommand = $"shell input tap {x} {y}";
-            string adbClickCommand = $"{MV.ADB_Path} shell input tap {x} {y}";
-            //string command = $"{MV.ADB_Path} shell input touchscreen swipe 100 101 100 100 10";
-
-            if (_adbPrc == null)
-            {
-                // 创建一个新的进程启动信息
-                ProcessStartInfo processStartInfo = new()
-                {
-                    FileName = "cmd.exe",         //使用命令提示符来执行ADB命令
-                    Arguments = $"/c {adbClickCommand}",    //(/c)表示执行完命令后关闭命令行窗口
-                    RedirectStandardOutput = true, // 重定向输出
-                    RedirectStandardError = true,  // 重定向错误
-                    RedirectStandardInput = true,  //重定向输入
-                    UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
-                    CreateNoWindow = true,          // 不创建窗口
-                };
-                _adbPrc = Process.Start(processStartInfo);
-
-                sw = _adbPrc.StandardInput;
-                sw.Write(adbClickCommand);
-                Console.WriteLine($"创建adb,{sw.BaseStream.CanWrite}.");
-            }
-            else
-            {
-                sw = _adbPrc.StandardInput;
-                sw.Write(adbClickCommand);
-                Console.WriteLine($"对adb发送命令,{sw.BaseStream.CanWrite}.");
-            }
-
-            string output = _adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
-            string Error = _adbPrc.StandardError.ReadToEnd();
-            await Task.Delay(1);
-            Console.WriteLine($"输出：{output}。  错误：{Error}。{_adbPrc.HasExited}。");
-        }
-
-        /// <summary>
-        /// 通过端口发送命令。
-        /// </summary>
-        private async Task AdbTest3(double x, double y)
-        {
-            string adbClickCommand = $"shell input tap {x} {y}";
-
-            ADBSocketCommunicator communicator = new ADBSocketCommunicator();
-            await communicator.ConnectAsync();
-
-            // 发送"help"命令以获取支持的ADB命令列表
-            string helpResponse = await communicator.SendCommandAsync(adbClickCommand);
-            Console.WriteLine("重定向输出:");
-            Console.WriteLine(helpResponse);
-
-            communicator.Disconnect();
-        }
-
-        /// <summary>
-        /// 据说可以降低延迟，但权限被拒绝：sendevent: /dev/input/event2: Permission denied。
-        /// </summary>
-        private async Task AdbTest4(double x, double y)
-        {
-            StringBuilder sb = new();
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 1 $((0x14a)) 1");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x30)) $((0x15))");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x39)) 0");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x35)) {x}");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x36)) {y}");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 2 0");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 0 0");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 1 $((0x14a)) 0");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 2 0");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 0 0");
-
-            // 创建一个新的进程启动信息
-            ProcessStartInfo processStartInfo = new()
-            {
-                FileName = "cmd.exe",         //使用命令提示符来执行ADB命令
-                Arguments = $"/c {sb}",    //(/c)表示执行完命令后关闭命令行窗口
-                RedirectStandardOutput = true, // 重定向输出
-                RedirectStandardError = true,  // 重定向错误
-                RedirectStandardInput = true,  //重定向输入
-                UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
-                CreateNoWindow = true,          // 不创建窗口
-            };
-            _adbPrc = Process.Start(processStartInfo);
-            Console.WriteLine($"创建adb.");
-
-            string output = _adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
-            string Error = _adbPrc.StandardError.ReadToEnd();
-            await Task.Delay(1);
-            Console.WriteLine($"输出：{output}。  错误：{Error}。{_adbPrc.HasExited}。");
-        }
-
-        private void SavaImg(string name, BitmapSource source)
-        {
-            using FileStream fs = new(@$"{name}", FileMode.Create);
-            PngBitmapEncoder encoder = new();
-            encoder.Frames.Add(BitmapFrame.Create(source));
-            encoder.Save(fs);
         }
 
 

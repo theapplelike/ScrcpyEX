@@ -101,7 +101,7 @@ namespace ScrcpyEX.ViewModel
                 CopyToClass(PointDt, recInfo);
                 if (source != null)
                 {
-                    SavaImg(recInfo.ImgName, source);
+                    MyGM.SavaImg(recInfo.ImgName, source);
                 }
             }
         }
@@ -168,19 +168,6 @@ namespace ScrcpyEX.ViewModel
             {
                 File.Delete(@$"{MV.ScriptPath}\{oldName}");
             }
-        }
-
-        /// <summary>
-        /// 保持脚本图片到本地。
-        /// </summary>
-        /// <param name="name">图片名称。</param>
-        /// <param name="source">图片的源。</param>
-        private void SavaImg(string name, BitmapSource source)
-        {
-            using FileStream fs = new(@$"{MV.ScriptPath}\{name}", FileMode.Create);
-            PngBitmapEncoder encoder = new();
-            encoder.Frames.Add(BitmapFrame.Create(source));
-            encoder.Save(fs);
         }
 
         /// <summary>

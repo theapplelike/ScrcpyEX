@@ -11,6 +11,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using System.IO;
 
 namespace ScrcpyEX.MyDefinition
 {
@@ -223,38 +224,17 @@ namespace ScrcpyEX.MyDefinition
             }
         }
 
-        public static Point? ConvertDesktopPointToWindow(Point desktopPoint)
+        /// <summary>
+        /// 保存脚本图片到本地。
+        /// </summary>
+        /// <param name="name">图片名称，不包括路径。</param>
+        /// <param name="source">图片的源。</param>
+        public static void SavaImg(string name, BitmapSource source)
         {
-            // 获取当前主窗口
-            Window window = Application.Current.MainWindow;
-
-            // 如果窗口不存在或最小化，返回null
-            if (window == null || window.WindowState == WindowState.Minimized)
-                return null;
-            Point point = new Point(desktopPoint.X * 2, desktopPoint.Y * 2);
-
-            try
-            {
-                // 将桌面坐标转换为窗口相对坐标
-                Point windowPoint = window.PointFromScreen(point);
-
-                Point windowPoint1 = window.PointFromScreen(new Point(0,0));
-                Point windowPoint2 = window.PointFromScreen(new Point(100, 100));
-                Console.WriteLine($"转化：{windowPoint},{windowPoint1},{windowPoint2}");
-
-                // 检查坐标是否在窗口范围内
-                if (windowPoint.X >= 0 && windowPoint.X <= window.ActualWidth &&
-                    windowPoint.Y >= 0 && windowPoint.Y <= window.ActualHeight)
-                {
-                    return windowPoint;
-                }
-            }
-            catch (ArgumentException)
-            {
-                // 当点无法转换时（例如窗口未加载），返回null
-            }
-
-            return null;
+            using FileStream fs = new(@$"{MV.ScriptPath}\{name}", FileMode.Create);
+            PngBitmapEncoder encoder = new();
+            encoder.Frames.Add(BitmapFrame.Create(source));
+            encoder.Save(fs);
         }
 
 

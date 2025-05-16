@@ -421,19 +421,7 @@ namespace ScrcpyEX.View
             }
         }
 
-        /// <summary>
-        /// 使用adb发送点击命令。
-        /// </summary>
-        /// <param name="centreX">映射控件的圆心X坐标。</param>
-        /// <param name="centreY">映射控件的圆心Y坐标。</param>
-        private async void ADB_Click(int centreX, int centreY)
-        {
-            double x = centreX / ScActualWidth * 2312/ DpiScaleX;
-            double y = centreY / ScActualHeight * 1080/ DpiScaleY;
-            await AdbTest1(x, y);
-
-            Console.WriteLine($"安卓坐标:({x},{y})，程序实际宽高：({ScActualWidth},{ScActualHeight})，");
-        }
+        
 
 
     }
