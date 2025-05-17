@@ -131,11 +131,11 @@ namespace ScrcpyEX.View
             _resizeTimer.Tick += new EventHandler(Resize_Tick);
             _resizeTimer.Interval = TimeSpan.FromSeconds(0.1);//大小调整间隔
 
-            _scriptTimer.Tick += (sender, e) => Script_Tick(_recInfo);
-            _scriptTimer.Interval = TimeSpan.FromSeconds(1);
-
-            _imageScriptTimer.Tick += (sender, e) => ImageScript_Tick(_recInfo);
-            _imageScriptTimer.Interval = TimeSpan.FromSeconds(1);
+            //_scriptTimer.Tick += (sender, e) => Script_Tick(_recInfo);
+            //_scriptTimer.Interval = TimeSpan.FromSeconds(1);
+            //
+            //_imageScriptTimer.Tick += (sender, e) => ImageScript_Tick(_recInfo);
+            //_imageScriptTimer.Interval = TimeSpan.FromSeconds(1);
 
             _countTimer.Tick += (sender, e) => Count_Tick();
             _countTimer.Interval = TimeSpan.FromSeconds(1);
@@ -156,23 +156,20 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
-        /// 点击的实际位置会根据实际大小和scrcpy的初始大小的比值进行调整，但有黑边时仍会偏移。
+        /// 执行计时脚本。
         /// </summary>
-        private async void Script_Tick(RecInfo recInfo)
+        private async void TimedScript_Tick(RecInfo recInfo)
         {
             _vm.CycleNum++;
             _vm.Interval = 0;
 
             await ExecuteClickScript(recInfo);
-
-            //如果为有限次循环，检查是否到循环次数
-            if (recInfo.IsLimited && recInfo.CycleNumber <= _vm.CycleNum)
-            {
-                StopScriptAndRecord();
-            }
+            Console.WriteLine("计时脚本执行完毕...");
         }
 
+        /// <summary>
+        /// 执行图像脚本。
+        /// </summary>
         private async void ImageScript_Tick(RecInfo recInfo)
         {
             BitmapSource area = MyGM.CaptureProcessArea(DpiScaleX, DpiScaleY);
@@ -180,13 +177,13 @@ namespace ScrcpyEX.View
             MyGM.SavaImg("tempPic.png", temp);
 
             double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", $@"{MV.ScriptPath}\tempPic.png");
-            Console.WriteLine($"相似度：{ssim:F8}");
             if (ssim > 0.9)
             {
                 _vm.CycleNum++;
                 _vm.Interval = 0;
                 await ExecuteClickScript(recInfo);
             }
+            Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
         }
 
         /// <summary>
@@ -195,7 +192,8 @@ namespace ScrcpyEX.View
         private void Count_Tick() => _vm.Interval++;
 
         /// <summary>
-        /// 执行点击脚本。
+        /// 执行点击脚本，PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
+        /// 点击的实际位置会根据实际大小和scrcpy的初始大小的比值进行调整，但有黑边时仍会偏移。
         /// </summary>
         /// <param name="recInfo">当前要执行的脚本。</param>
         private async Task ExecuteClickScript(RecInfo recInfo)
@@ -214,6 +212,12 @@ namespace ScrcpyEX.View
                 DLL.PostMessage(_scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
                 DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
                 DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
+            }
+
+            //如果为有限次循环，检查是否到循环次数
+            if (recInfo.IsLimited && recInfo.CycleNumber <= _vm.CycleNum)
+            {
+                StopScriptAndRecord();
             }
         }
 

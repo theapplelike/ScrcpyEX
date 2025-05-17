@@ -28,7 +28,7 @@ namespace ScrcpyEX.Model
         public int CycleNumber { get; set; } = 10;
 
         /// <summary>
-        /// true--指定时间后进行下一次脚本；false--指定区域出现相似图片后进行下一次脚本。
+        /// 是否为计时脚本，true--指定时间后进行下一次脚本（计时脚本）；false--指定区域出现相似图片后进行下一次脚本（图像脚本）。
         /// </summary>
         public bool IsTime { get; set; } = true;
 

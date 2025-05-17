@@ -145,8 +145,8 @@ namespace ScrcpyEX.View
         /// </summary>
         private void OpenRecordManage()
         {
-            RecManage rec = new();
-            if (rec.ShowDialog() == true)
+            RecManage manage = new();
+            if (manage.ShowDialog() == true)
             {
                 if (_scHandle == IntPtr.Zero)
                 {
@@ -161,26 +161,90 @@ namespace ScrcpyEX.View
                     }
 
                     //消除黑边，有黑边时会有偏移
-                    RemoveBlack();
+                    //RemoveBlack();
+                    //
+                    ////如果脚本已执行则关闭
+                    //if (_countTimer.IsEnabled)
+                    //{
+                    //    _scriptTimer.Stop();
+                    //    _countTimer.Stop();
+                    //}
+                    //
+                    //bdRec.Visibility = Visibility.Visible;
+                    //dplTip.Visibility = Visibility.Visible;
+                    //_vm.CycleNum = 0;
+                    //
+                    //_recInfo = manage.TempRecInfo;
 
-                    //如果脚本已执行则关闭
-                    if (_countTimer.IsEnabled)
+                    //_scriptTimer.Interval = TimeSpan.FromSeconds(_recInfo.CycleInterval);
+                    //_scriptTimer.Start();
+                    //_countTimer.Start();
+                    //TimedScript_Tick(_recInfo);//立刻执行一次脚本
+
+                    ScriptBefore(manage.TempRecInfo);
+                    if (manage.TempRecInfo.IsTime)
                     {
-                        _scriptTimer.Stop();
-                        _countTimer.Stop();
+                        Console.WriteLine("注册计时脚本*****************************");
+                        TimedScript();
                     }
-
-                    bdRec.Visibility = Visibility.Visible;
-                    dplTip.Visibility = Visibility.Visible;
-                    _vm.CycleNum = 0;
-
-                    _recInfo = rec.TempRecInfo;
-                    _scriptTimer.Interval = TimeSpan.FromSeconds(_recInfo.CycleInterval);
-                    _scriptTimer.Start();
-                    _countTimer.Start();
-                    Script_Tick(_recInfo);//立刻执行一次脚本
+                    else
+                    {
+                        Console.WriteLine("注册图像脚本/////////////////////////////");
+                        ImageScript();
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// 脚本执行前要执行的操作。
+        /// </summary>
+        /// <param name="recInfo">要执行的脚本信息。</param>
+        private void ScriptBefore(RecInfo recInfo)
+        {
+            //消除黑边，有黑边时会有偏移
+            RemoveBlack();
+
+            //UI和变量初始化
+            bdRec.Visibility = Visibility.Visible;
+            dplTip.Visibility = Visibility.Visible;
+            _vm.CycleNum = 0;
+            _recInfo = recInfo;
+
+            //如果脚本已执行则关闭
+            if (_countTimer.IsEnabled)
+            {
+                _scriptTimer.Stop();
+                _countTimer.Stop();
+            }
+
+            //移除计时脚本和图像脚本，避免重复注册
+            _scriptTimer.Tick -= (sender, e) => TimedScript_Tick(_recInfo);
+            _scriptTimer.Tick -= (sender, e) => ImageScript_Tick(_recInfo);
+        }
+
+        /// <summary>
+        /// 注册计时脚本并执行。
+        /// </summary>
+        private void TimedScript()
+        {
+            _scriptTimer.Tick += (sender, e) => TimedScript_Tick(_recInfo);
+            _scriptTimer.Interval = TimeSpan.FromSeconds(_recInfo.CycleInterval);
+            _scriptTimer.Start();
+            _countTimer.Start();
+            TimedScript_Tick(_recInfo);//立刻执行一次脚本
+        }
+
+        /// <summary>
+        /// 注册图像脚本并执行。
+        /// </summary>
+        private void ImageScript()
+        {
+            _scriptTimer.Tick += (sender, e) => ImageScript_Tick(_recInfo);
+            _scriptTimer.Interval = TimeSpan.FromSeconds(1);
+            _scriptTimer.Start();
+            _countTimer.Start();
+            ImageScript_Tick(_recInfo);//立刻执行一次脚本
         }
 
         /// <summary>
