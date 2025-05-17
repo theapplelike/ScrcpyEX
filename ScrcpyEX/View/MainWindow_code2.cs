@@ -128,14 +128,11 @@ namespace ScrcpyEX.View
         /// </summary>
         private void SetTimer()
         {
+            _timedHandler = (sender, e) => TimedScript_Tick(_recInfo);
+            _imageHandler = (sender, e) => ImageScript_Tick(_recInfo);
+
             _resizeTimer.Tick += new EventHandler(Resize_Tick);
             _resizeTimer.Interval = TimeSpan.FromSeconds(0.1);//大小调整间隔
-
-            //_scriptTimer.Tick += (sender, e) => Script_Tick(_recInfo);
-            //_scriptTimer.Interval = TimeSpan.FromSeconds(1);
-            //
-            //_imageScriptTimer.Tick += (sender, e) => ImageScript_Tick(_recInfo);
-            //_imageScriptTimer.Interval = TimeSpan.FromSeconds(1);
 
             _countTimer.Tick += (sender, e) => Count_Tick();
             _countTimer.Interval = TimeSpan.FromSeconds(1);
@@ -149,7 +146,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Resize_Tick(object sender, EventArgs e)
         {
-            Console.WriteLine("正在timer中修改scrcpy大小。");
+            //Console.WriteLine("正在timer中修改scrcpy大小。");
 
             new Thread(ResizeSC).Start();
             _resizeTimer.Stop();

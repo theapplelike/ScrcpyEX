@@ -52,9 +52,14 @@ namespace ScrcpyEX.View
         private readonly DispatcherTimer _scriptTimer = new();
 
         /// <summary>
-        /// 图像脚本计时器。
+        /// 计时脚本对应的委托。
         /// </summary>
-        //private readonly DispatcherTimer _imageScriptTimer = new();
+        private EventHandler _timedHandler;
+
+        /// <summary>
+        /// 图像脚本对应的委托。
+        /// </summary>
+        private EventHandler _imageHandler;
 
         /// <summary>
         /// 对每次脚本间隔进行计数。

@@ -160,36 +160,13 @@ namespace ScrcpyEX.View
                         return;
                     }
 
-                    //消除黑边，有黑边时会有偏移
-                    //RemoveBlack();
-                    //
-                    ////如果脚本已执行则关闭
-                    //if (_countTimer.IsEnabled)
-                    //{
-                    //    _scriptTimer.Stop();
-                    //    _countTimer.Stop();
-                    //}
-                    //
-                    //bdRec.Visibility = Visibility.Visible;
-                    //dplTip.Visibility = Visibility.Visible;
-                    //_vm.CycleNum = 0;
-                    //
-                    //_recInfo = manage.TempRecInfo;
-
-                    //_scriptTimer.Interval = TimeSpan.FromSeconds(_recInfo.CycleInterval);
-                    //_scriptTimer.Start();
-                    //_countTimer.Start();
-                    //TimedScript_Tick(_recInfo);//立刻执行一次脚本
-
                     ScriptBefore(manage.TempRecInfo);
                     if (manage.TempRecInfo.IsTime)
                     {
-                        Console.WriteLine("注册计时脚本*****************************");
                         TimedScript();
                     }
                     else
                     {
-                        Console.WriteLine("注册图像脚本/////////////////////////////");
                         ImageScript();
                     }
                 }
@@ -219,8 +196,8 @@ namespace ScrcpyEX.View
             }
 
             //移除计时脚本和图像脚本，避免重复注册
-            _scriptTimer.Tick -= (sender, e) => TimedScript_Tick(_recInfo);
-            _scriptTimer.Tick -= (sender, e) => ImageScript_Tick(_recInfo);
+            _scriptTimer.Tick -= _timedHandler;
+            _scriptTimer.Tick -= _imageHandler;
         }
 
         /// <summary>
@@ -228,7 +205,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void TimedScript()
         {
-            _scriptTimer.Tick += (sender, e) => TimedScript_Tick(_recInfo);
+            _scriptTimer.Tick += _timedHandler;
             _scriptTimer.Interval = TimeSpan.FromSeconds(_recInfo.CycleInterval);
             _scriptTimer.Start();
             _countTimer.Start();
@@ -240,8 +217,8 @@ namespace ScrcpyEX.View
         /// </summary>
         private void ImageScript()
         {
-            _scriptTimer.Tick += (sender, e) => ImageScript_Tick(_recInfo);
-            _scriptTimer.Interval = TimeSpan.FromSeconds(1);
+            _scriptTimer.Tick += _imageHandler;
+            _scriptTimer.Interval = TimeSpan.FromSeconds(5);
             _scriptTimer.Start();
             _countTimer.Start();
             ImageScript_Tick(_recInfo);//立刻执行一次脚本

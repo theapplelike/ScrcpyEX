@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:ScrcpyEX.View"
         mc:Ignorable="d"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
-        Title="脚本管理" Height="450" Width="640" x:Name="root"
+        Title="脚本管理" Height="450" Width="640" x:Name="root" 
+        AllowsTransparency="True" WindowStyle="None"
         WindowStartupLocation="CenterScreen" SizeToContent="Width"
         Loaded="Window_Loaded" Closed="Root_Closed">
 
@@ -148,7 +149,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button x:Name="btnSave" Click="BtnSave_Click" Content="保存" Style="{StaticResource Btn}"/>
-                <Button x:Name="btnCanel" Click="BtnCanel_Click" Content="取消" Style="{StaticResource Btn}" Grid.Column="1"/>
+                <Button x:Name="btnCancel" Click="BtnCancel_Click" Content="取消" Style="{StaticResource Btn}" Grid.Column="1"/>
             </Grid>
         </Grid>
         

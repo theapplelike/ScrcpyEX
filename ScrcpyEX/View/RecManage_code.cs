@@ -14,6 +14,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Media.Imaging;
 using static System.Net.Mime.MediaTypeNames;
+using System.IO.Ports;
 
 namespace ScrcpyEX.View
 {
@@ -113,7 +114,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private async void DoScreenshot()
         {
-            Hide();
+            Opacity = 0;
             await Task.Delay(500);//让当前窗体有足够时间隐藏
 
             Screenshot screen = new();
@@ -123,7 +124,7 @@ namespace ScrcpyEX.View
                 _cropRect = screen.CropRect;
             }
 
-            ShowDialog();
+            Opacity = 1;
         }
 
 
