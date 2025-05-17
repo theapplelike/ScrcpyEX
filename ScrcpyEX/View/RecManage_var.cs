@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace ScrcpyEX.View
 {
@@ -24,7 +25,12 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 说明截图结果位置大小的矩形。
         /// </summary>
-        public Int32Rect _cropRect;
+        private Int32Rect _cropRect;
+
+        /// <summary>
+        /// 存储当前编辑脚本的UI对象的引用。
+        /// </summary>
+        private Grid _g = null;
 
         /// <summary>
         /// 临时存储正在编辑的脚本信息。

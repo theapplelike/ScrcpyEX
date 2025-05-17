@@ -117,7 +117,7 @@
     <Compile Include="View\MainWindow_code2.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\MainWindow_test.cs" >
+    <Compile Include="View\MainWindow_test.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow_var.cs">
@@ -130,9 +130,6 @@
       <DependentUpon>RecManage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\RecManage_code1.cs">
-      <DependentUpon>RecManage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\RecManage_test.cs">
       <DependentUpon>RecManage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\RecManage_var.cs">

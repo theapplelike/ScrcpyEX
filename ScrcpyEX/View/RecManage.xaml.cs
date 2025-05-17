@@ -49,44 +49,17 @@ namespace ScrcpyEX.View
 
         private void BtnPlay_Click(object sender, RoutedEventArgs e)
         {
-            if (((Button)sender).CommandParameter is RecInfo recInfo)
-            {
-                foreach (var info in recInfo.Infos)
-                {
-                    Console.WriteLine($"遍历：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
-                }
-                Console.WriteLine($"循环次数：{recInfo.CycleNumber}，循环间隔：{recInfo.CycleInterval}");
-                TempRecInfo = recInfo;
-                DialogResult = true;
-            }
+            ExecuteScript((Button)sender);
         }
 
         private void BtnSet_Click(object sender, RoutedEventArgs e)
         {
-            if (((Button)sender).CommandParameter is RecInfo recInfo)
-            {
-                ValToUI(recInfo);
-                TempRecInfo = recInfo;
-                _vm.SetParam(recInfo);
-            }
+            EditScript((Button)sender);
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            int.TryParse(txtCycleNum.Text, out int num);
-            int.TryParse(txtCycleInterval.Text, out int interval);
-
-            RecInfo recInfo = new()
-            {
-                IsLimited = (bool)rdoLimited.IsChecked,
-                CycleNumber = num,
-                IsTime = (bool)rdoTime.IsChecked,
-                CycleInterval = interval,
-                ImgName = img.Source == null ? "" : $"Pic{DateTime.Now:yyMMddhhmmss}.png",
-                CropRect = _cropRect,
-            };
-            
-            _vm.Save(recInfo, (BitmapSource)img.Source);
+            SaveScript();
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)

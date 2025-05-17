@@ -117,7 +117,7 @@
                 <TextBlock Text="执行循环" HorizontalAlignment="Center"/>
                 <RadioButton x:Name="rdoLimited" Grid.Row="0" Grid.Column="1" GroupName="num">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="执行"/>
+                        <TextBlock Text="指定执行"/>
                         <TextBox x:Name="txtCycleNum" Width="40" Margin="5,0"/>
                         <TextBlock Text="次"/>
                     </StackPanel>
@@ -131,7 +131,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="时间间隔"/>
                         <TextBox x:Name="txtCycleInterval" Width="40" Margin="5,0"/>
-                        <TextBlock Text="次"/>
+                        <TextBlock Text="秒"/>
                     </StackPanel>
                 </RadioButton>
                 <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">

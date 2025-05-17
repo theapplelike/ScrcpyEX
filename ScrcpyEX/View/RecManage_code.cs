@@ -105,8 +105,9 @@ namespace ScrcpyEX.View
             rdoImage.IsChecked = !recInfo.IsTime;
             txtCycleInterval.Text = recInfo.CycleInterval.ToString();
             img.Source = MyGM.GetImage(recInfo.ImgName);
+            _cropRect = recInfo.CropRect;
 
-            Console.WriteLine($"图片名：{recInfo.ImgName}。");
+            Console.WriteLine($"图片名：{recInfo.ImgName}，范围：{recInfo.CropRect}。");
         }
 
         /// <summary>

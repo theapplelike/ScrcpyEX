@@ -155,6 +155,7 @@ namespace ScrcpyEX.ViewModel
             ReplaceImg(RecInfos[_index].ImgName, recInfo.ImgName);
             RecInfos[_index].ImgName = recInfo.ImgName;
             RecInfos[_index].CropRect = recInfo.CropRect;
+            Console.WriteLine($"保存信息：{recInfo.CropRect}。");
         }
 
         /// <summary>
