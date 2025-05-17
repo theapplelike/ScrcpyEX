@@ -170,7 +170,25 @@ namespace ScrcpyEX.View
                 _magnifierBitmap.Unlock();
             }
 
-            gMagnifier.Margin = new Thickness(curPoint.X + 25, curPoint.Y + 25, 0, 0);
+            double left, top;
+            if (curPoint.X + 25 + gMagnifier.Width > Width)
+            {
+                left = curPoint.X - 25 - gMagnifier.Width;
+            }
+            else
+            {
+                left = curPoint.X + 25;
+            }
+            if (curPoint.Y + 25 + gMagnifier.Height > Height)
+            {
+                top = curPoint.Y - 25 - gMagnifier.Height;
+            }
+            else
+            {
+                top = curPoint.Y + 25;
+            }
+
+            gMagnifier.Margin = new Thickness(left, top, 0, 0);
         }
 
 
