@@ -103,6 +103,7 @@
     <Compile Include="MyDefinition\WindowsAPI\HookDLL.cs" />
     <Compile Include="MyDefinition\WindowsAPI\KeyboardHook.cs" />
     <Compile Include="MyDefinition\WindowsAPI\MouseHook.cs" />
+    <Compile Include="MyDefinition\WindowsAPI\SW.cs" />
     <Compile Include="MyDefinition\WindowsAPI\WM.cs" />
     <Compile Include="ViewModel\MainWindowVM.cs" />
     <Compile Include="ViewModel\RecManageVM.cs" />

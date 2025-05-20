@@ -32,7 +32,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             double sigma = 1.5;
 
             // 计算均值 mu1 和 mu2
-            Mat mu1 = new Mat(), mu2 = new Mat();
+            Mat mu1 = new(), mu2 = new();
             Cv2.GaussianBlur(img1, mu1, gaussianSize, sigma);
             Cv2.GaussianBlur(img2, mu2, gaussianSize, sigma);
 
@@ -41,7 +41,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             Mat mu2Sq = mu2.Mul(mu2);
             Mat mu1Mu2 = mu1.Mul(mu2);
 
-            Mat sigma1Sq = new Mat(), sigma2Sq = new Mat(), sigma12 = new Mat();
+            Mat sigma1Sq = new(), sigma2Sq = new(), sigma12 = new();
             Cv2.GaussianBlur(img1.Mul(img1), sigma1Sq, gaussianSize, sigma);
             sigma1Sq -= mu1Sq; // σ1² = E(img1²) - μ1²
 
@@ -60,14 +60,14 @@ namespace ScrcpyEX.MyDefinition.MyClass
             Mat denominator = (mu1Sq + mu2Sq + new Scalar(c1)).Mul(sigma1Sq + sigma2Sq + new Scalar(c2));
 
             // 计算 SSIM 均值
-            Mat ssimMap = new Mat();
+            Mat ssimMap = new();
             Cv2.Divide(numerator, denominator, ssimMap);
             Scalar ssimScalar = Cv2.Mean(ssimMap);
 
             return ssimScalar.Val0; // 返回 SSIM 平均值
         }
 
-        public Scalar Compare_SSIM(string imgFile1, string imgFile2)
+        public static Scalar Compare_SSIM(string imgFile1, string imgFile2)
         {
             var image1 = Cv2.ImRead(imgFile1);
             var image2Tmp = Cv2.ImRead(imgFile2);
@@ -85,17 +85,17 @@ namespace ScrcpyEX.MyDefinition.MyClass
             Mat image2_2 = validImage2.Mul(validImage2);
             Mat image1_2 = validImage1.Mul(validImage2);
 
-            Mat gausBlur1 = new Mat(), gausBlur2 = new Mat(), gausBlur12 = new Mat();
+            Mat gausBlur1 = new(), gausBlur2 = new(), gausBlur12 = new();
             Cv2.GaussianBlur(validImage1, gausBlur1, new OpenCvSharp.Size(11, 11), 1.5); //高斯卷积核计算图像均值
             Cv2.GaussianBlur(validImage2, gausBlur2, new OpenCvSharp.Size(11, 11), 1.5);
             Cv2.GaussianBlur(image1_2, gausBlur12, new OpenCvSharp.Size(11, 11), 1.5);
 
-            Mat imageAvgProduct = gausBlur1.Mul(gausBlur2); //均值乘积
+            //Mat imageAvgProduct = gausBlur1.Mul(gausBlur2); //均值乘积
             Mat u1Squre = gausBlur1.Mul(gausBlur1); //各自均值的平方
             Mat u2Squre = gausBlur2.Mul(gausBlur2);
 
-            Mat imageConvariance = new Mat(), imageVariance1 = new Mat(), imageVariance2 = new Mat();
-            Mat squreAvg1 = new Mat(), squreAvg2 = new Mat();
+            Mat imageConvariance, imageVariance1, imageVariance2;
+            Mat squreAvg1 = new(), squreAvg2 = new();
             Cv2.GaussianBlur(image1_1, squreAvg1, new OpenCvSharp.Size(11, 11), 1.5); //图像平方的均值
             Cv2.GaussianBlur(image2_2, squreAvg2, new OpenCvSharp.Size(11, 11), 1.5);
 
@@ -106,11 +106,10 @@ namespace ScrcpyEX.MyDefinition.MyClass
             var member = ((2 * gausBlur1.Mul(gausBlur2) + new Scalar(C1)).Mul(2 * imageConvariance + new Scalar(C2)));
             var denominator = ((u1Squre + u2Squre + new Scalar(C1)).Mul(imageVariance1 + imageVariance2 + new Scalar(C2)));
 
-            Mat ssim = new Mat();
+            Mat ssim = new();
             Cv2.Divide(member, denominator, ssim);
 
             var sclar = Cv2.Mean(ssim);
-
             return sclar;  // 变化率，即差异
         }
 

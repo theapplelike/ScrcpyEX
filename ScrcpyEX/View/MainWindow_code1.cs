@@ -247,7 +247,7 @@ namespace ScrcpyEX.View
                 VerticalOffset = mapping.OffsetY * ScRatioY,
             };
 
-            Console.WriteLine($"原始左上:({mapping.OffsetX},{mapping.OffsetY}),比例:({ScRatioX},{ScRatioY}),最终左上:({pop.HorizontalOffset},{pop.VerticalOffset})。");
+            //Console.WriteLine($"映射Popup原始左上:({mapping.OffsetX},{mapping.OffsetY}),比例:({ScRatioX},{ScRatioY}),最终左上:({pop.HorizontalOffset},{pop.VerticalOffset})。");
 
             //提供边框
             Border border = new()

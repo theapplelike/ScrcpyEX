@@ -218,6 +218,39 @@ namespace ScrcpyEX.View
             }
         }
 
+        public async Task<Bitmap> CaptureScrcpyWindow(IntPtr scHandle, IntPtr mainHandle)
+        {
+            //Scrcpy嵌入在WPF窗体中，所以要判断主窗体是否最小化
+            bool isIcon = DLL.IsIconic(mainHandle);
+            Console.WriteLine($"是否最小化:{isIcon}。");
+            if (isIcon)
+            {
+                DLL.ShowWindow(mainHandle, SW.SW_SHOWNOACTIVATE);
+                await Task.Delay(50);
+            }
+
+            DLL.GetWindowRect(scHandle, out DLL.LpRect rc);
+            if (rc.Width <= 0 || rc.Height <= 0)
+            {
+                return null;
+            }
+            Console.WriteLine($"Scrcpy窗口尺寸：{rc.Left},{rc.Top},{rc.Right},{rc.Bottom},{rc.Width},{rc.Height}");
+
+            Bitmap bmp = new(rc.Width, rc.Height);
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                IntPtr hdc = g.GetHdc();
+                bool success = DLL.PrintWindow(scHandle, hdc, 0x2);//PW_RENDERFULLCONTENT
+                g.ReleaseHdc(hdc);
+                if (!success)
+                {
+                    Console.WriteLine("截图获取失败");
+                    return null;
+                }
+            }
+            return bmp;
+        }
+
 
     }
 }

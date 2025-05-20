@@ -65,12 +65,12 @@ namespace ScrcpyEX.View
 
         private void BtnWired_Click(object sender, RoutedEventArgs e)
         {
-            WiredStart(true);
+            StartScrcpy(true);
         }
 
         private void BtnWirel_Click(object sender, RoutedEventArgs e)
         {
-            WiredStart(false);
+            StartScrcpy(false);
         }
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)

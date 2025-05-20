@@ -96,6 +96,55 @@ namespace ScrcpyEX.MyDefinition
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
 
+        /// <summary>
+        /// 指向RECT结构的指针，该结构接收窗口左上角和右下角的屏幕坐标。
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct LpRect
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+            public readonly int Width => Right - Left;
+            public readonly int Height => Bottom - Top;
+        }
+
+        /// <summary>
+        /// 检索指定窗口的边界矩形的尺寸。尺寸以相对于屏幕左上角的屏幕坐标提供。
+        /// </summary>
+        /// <param name="hWnd">窗口的句柄。</param>
+        /// <param name="lpRect">指向RECT结构的指针，该结构接收窗口左上角和右下角的屏幕坐标。</param>
+        /// <returns>true--函数成功；false--函数失败，若要获取扩展的错误信息，请调用GetLastError。</returns>
+        [DllImport("user32.dll")]
+        public static extern bool GetWindowRect(IntPtr hWnd, out LpRect lpRect);
+
+        /// <summary>
+        /// 确定指定的窗口是否最小化。
+        /// </summary>
+        /// <param name="hWnd">窗口的句柄。</param>
+        /// <returns>true--指定窗口为最小化；false--指定窗口不为最小化。</returns>
+        [DllImport("user32.dll")]
+        public static extern bool IsIconic(IntPtr hWnd);
+
+        /// <summary>
+        /// PrintWindow 函数将可视窗口复制到指定的设备上下文。
+        /// </summary>
+        /// <param name="hwnd">要复制的窗口的句柄。</param>
+        /// <param name="hdcBlt">设备上下文的句柄。</param>
+        /// <param name="nFlags">绘图选项。0x1，捕获窗口的客户区，即窗口内部内容，排除标题栏、边框等非客户区。0x2，捕获窗口的完整内容，包括非客户区（标题栏、边框等）</param>
+        /// <returns>true--函数成功；false--函数失败。</returns>
+        [DllImport("user32.dll")]
+        public static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
+
+        /// <summary>
+        /// 删除逻辑笔、画笔、字体、位图、区域或调色板，从而释放与对象关联的所有系统资源。删除对象后，指定的句柄不再有效。
+        /// </summary>
+        /// <param name="hObject">逻辑笔、画笔、字体、位图、区域或调色板的句柄。</param>
+        /// <returns>true--函数执行成功；false--指定的句柄无效或当前已选择到DC中。</returns>
+        [DllImport("gdi32.dll")]
+        public static extern bool DeleteObject(IntPtr hObject);
+
         //[DllImport("user32.dll", SetLastError = true)]
         //public static extern IntPtr SetFocus(IntPtr hWnd);
         //

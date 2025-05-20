@@ -10,6 +10,15 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
 using System.Reflection;
+using ScrcpyEX.Model;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Windows.Interop;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.Xml;
+using OpenCvSharp;
 
 namespace ScrcpyEX.View
 {
@@ -31,6 +40,57 @@ namespace ScrcpyEX.View
 
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
+            //var ssim = OpenCv.Compare_SSIM($@"{MV.ScriptPath}\test1.png", $@"{MV.ScriptPath}\test2.png");
+            //Console.WriteLine($"相似度：{ssim}");
+            //await Task.Delay(3000);
+            System.Windows.Point pt1 = PointToScreen(new System.Windows.Point(0, 0));
+            Console.WriteLine($"程序左上角：{pt1.X},{pt1.Y}。");
+
+            Bitmap image = await CaptureScrcpyWindow(_scHandle, new WindowInteropHelper(this).Handle);
+            if (image != null)
+            {
+                RecInfo recInfo = MyCfg.Cfg.RecInfos[1];
+                Int32Rect cropRect = new(
+                    recInfo.CropRect.X - 5,//这里要减去：scrcpy左上角减程序左上角的差
+                    recInfo.CropRect.Y - 70,
+                    recInfo.CropRect.Width,
+                    recInfo.CropRect.Height);
+
+                BitmapSource area = MyGM.ConvertToBitmapSource(image);
+                Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}," +
+                $"比例：{DpiScaleX},{DpiScaleY}," +
+                $"起点：{cropRect.X}，{cropRect.Y}，" +
+                $"宽高：{cropRect.Width},{cropRect.Height}，" +
+                $"终点：{cropRect.X + cropRect.Width}，{cropRect.Y + cropRect.Height}，" +
+                $"图片大小：{area.Width}，{area.Height}," +
+                $"程序大小：{MV.MainWin.Width}，{MV.MainWin.Height}");
+
+                if (cropRect.X + cropRect.Width > (int)area.Width)
+                {
+                    cropRect.Width -= cropRect.X + cropRect.Width - (int)area.Width;
+                }
+                if (cropRect.Y + cropRect.Height > (int)area.Height)
+                {
+                    cropRect.Height -= cropRect.Y + cropRect.Height - (int)area.Height;
+                }
+
+                CroppedBitmap temp = new(area, cropRect);
+                MyGM.SavaImg("tempPic.png", temp);
+
+                
+
+                double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", $@"{MV.ScriptPath}\tempPic.png");
+                if (ssim > 0.9)
+                {
+                    await ExecuteClickScript(recInfo);
+                }
+                Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
+            }
+
+            image?.Save($@"{MV.ScriptPath}\A.png", ImageFormat.Png);
+            Console.WriteLine("完成");
+            //MyGM.SavaImg("A.png", image);
+
             //Point pt1 = PointToScreen(new Point(0, 0));
             //int x = (int)(pt1.X + (_limitPop.HorizontalOffset + ExtraWidthLeft + 50) * DpiScaleX);
             //int y = (int)(pt1.Y + (_limitPop.VerticalOffset + ExtraHeightTop + 50) * DpiScaleY);

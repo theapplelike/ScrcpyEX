@@ -170,25 +170,36 @@ namespace ScrcpyEX.View
                 _magnifierBitmap.Unlock();
             }
 
-            double left, top;
-            if (curPoint.X + 25 + gMagnifier.Width > Width)
-            {
-                left = curPoint.X - 25 - gMagnifier.Width;
-            }
-            else
-            {
-                left = curPoint.X + 25;
-            }
-            if (curPoint.Y + 25 + gMagnifier.Height > Height)
-            {
-                top = curPoint.Y - 25 - gMagnifier.Height;
-            }
-            else
-            {
-                top = curPoint.Y + 25;
-            }
-
+            (double left, double top) = GetLocation(curPoint, 15);
             gMagnifier.Margin = new Thickness(left, top, 0, 0);
+        }
+
+        /// <summary>
+        /// 获得放大镜的位置，和程序相对的左和上的位置，会确保放大镜始终在可视范围内。
+        /// </summary>
+        /// <param name="curPoint">鼠标的当前位置。</param>
+        /// <param name="r">放大镜和鼠标的距离。</param>
+        /// <returns>返回左和上的位置。</returns>
+        private (double, double) GetLocation(Point curPoint, double r)
+        {
+            double left, top;
+            if (curPoint.X + r + gMagnifier.Width > Width)
+            {
+                left = curPoint.X - r - gMagnifier.Width;
+            }
+            else
+            {
+                left = curPoint.X + r;
+            }
+            if (curPoint.Y + r + gMagnifier.Height > Height)
+            {
+                top = curPoint.Y - r - gMagnifier.Height;
+            }
+            else
+            {
+                top = curPoint.Y + r;
+            }
+            return (left, top);
         }
 
 

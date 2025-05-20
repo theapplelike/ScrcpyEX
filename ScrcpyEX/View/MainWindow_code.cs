@@ -135,6 +135,20 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
+        /// 启动Scrcpy。
+        /// </summary>
+        /// <param name="isWired">是否使用有线形式启动。</param>
+        private async void StartScrcpy(bool isWired)
+        {
+            if (_scHandle == IntPtr.Zero)
+            {
+                btnWired.IsEnabled = btnWirel.IsEnabled = false;
+                await ConnectScrcpy(isWired);
+                btnWired.IsEnabled = btnWirel.IsEnabled = true;
+            }
+        }
+
+        /// <summary>
         /// 启动Scrcpy并以指定方式连接手机。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
@@ -167,7 +181,7 @@ namespace ScrcpyEX.View
                     }
                     Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}，程序是否被关闭：{_prc.HasExited}。");
                 }
-                while (!_prc.HasExited || i < 50);
+                while (!_prc.HasExited || i < 30);
                 MessageBox.Show("未能成功启动程序，请重试。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
@@ -237,7 +251,7 @@ namespace ScrcpyEX.View
             
                     HideTitleBar(_scHandle);
                     DLL.SetParent(_scHandle, pnlShow.Handle);
-                    DLL.ShowWindow(_scHandle, 3);
+                    DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
 
                     Console.WriteLine($"Scrcpy句柄：{_scHandle}，名称：{p.MainWindowTitle}。");
                     return true;
@@ -337,9 +351,9 @@ namespace ScrcpyEX.View
         {
             Console.WriteLine($"重新设置scrcpy大小。");
 
-            DLL.ShowWindow(_scHandle, 1);
+            DLL.ShowWindow(_scHandle, SW.SW_SHOWNORMAL);
             await Task.Delay(100);
-            DLL.ShowWindow(_scHandle, 3);
+            DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
 
             Dispatcher.Invoke(() =>
             {
@@ -388,20 +402,6 @@ namespace ScrcpyEX.View
             Height = (Width - ExtraWidth) * 1.0 / 15 * 7 + ExtraHeight;
             Locate();
             Console.WriteLine($"宽高：{Width},{Height}。");
-        }
-
-        /// <summary>
-        /// 以有线形式启动Scrcpy。
-        /// </summary>
-        /// <param name="isWired">是否使用有线形式启动。</param>
-        private async void WiredStart(bool isWired)
-        {
-            if (_scHandle == IntPtr.Zero)
-            {
-                btnWired.IsEnabled = btnWirel.IsEnabled = false;
-                await ConnectScrcpy(isWired);
-                btnWired.IsEnabled = btnWirel.IsEnabled = true;
-            }
         }
 
         /// <summary>
