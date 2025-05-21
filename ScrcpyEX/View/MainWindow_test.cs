@@ -18,7 +18,8 @@ using System.Drawing.Imaging;
 using System.Windows.Interop;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.Xml;
-using OpenCvSharp;
+using WPoint = System.Windows.Point;  //WPF的Point
+using DPoint = System.Drawing.Point;  //Windows Forms的Point
 
 namespace ScrcpyEX.View
 {
@@ -43,51 +44,51 @@ namespace ScrcpyEX.View
             //var ssim = OpenCv.Compare_SSIM($@"{MV.ScriptPath}\test1.png", $@"{MV.ScriptPath}\test2.png");
             //Console.WriteLine($"相似度：{ssim}");
             //await Task.Delay(3000);
-            System.Windows.Point pt1 = PointToScreen(new System.Windows.Point(0, 0));
+            WPoint pt1 = PointToScreen(new WPoint(0, 0));
             Console.WriteLine($"程序左上角：{pt1.X},{pt1.Y}。");
 
-            Bitmap image = await CaptureScrcpyWindow(_scHandle, new WindowInteropHelper(this).Handle);
-            if (image != null)
+            RecInfo recInfo = MyCfg.Cfg.RecInfos[0];
+            (Bitmap scWindow, WPoint diff) = await CaptureScrcpyWindow(_scHandle, _mainHandle);
+            Console.WriteLine($"左上角的差：{diff.X},{diff.Y}");
+            if (scWindow != null)
             {
-                RecInfo recInfo = MyCfg.Cfg.RecInfos[1];
+                //计算要对Scrcpy截取的区域，X和Y要加上程序左上角和Scrcpy左上角坐标的差
                 Int32Rect cropRect = new(
-                    recInfo.CropRect.X - 5,//这里要减去：scrcpy左上角减程序左上角的差
-                    recInfo.CropRect.Y - 70,
+                    (int)(recInfo.CropRect.X + diff.X),
+                    (int)(recInfo.CropRect.Y + diff.Y),
                     recInfo.CropRect.Width,
                     recInfo.CropRect.Height);
 
-                BitmapSource area = MyGM.ConvertToBitmapSource(image);
-                Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}," +
-                $"比例：{DpiScaleX},{DpiScaleY}," +
-                $"起点：{cropRect.X}，{cropRect.Y}，" +
+                BitmapSource sc = MyGM.ConvertToBitmapSource(scWindow);
+                Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}，" +
+                $"比例：{DpiScaleX},{DpiScaleY}，" +
+                $"起点：{cropRect.X},{cropRect.Y}，" +
                 $"宽高：{cropRect.Width},{cropRect.Height}，" +
-                $"终点：{cropRect.X + cropRect.Width}，{cropRect.Y + cropRect.Height}，" +
-                $"图片大小：{area.Width}，{area.Height}," +
-                $"程序大小：{MV.MainWin.Width}，{MV.MainWin.Height}");
+                $"终点：{cropRect.X + cropRect.Width},{cropRect.Y + cropRect.Height}，" +
+                $"图片大小：{sc.Width},{sc.Height}，" +
+                $"程序大小：{MV.MainWin.Width},{MV.MainWin.Height}");
 
-                if (cropRect.X + cropRect.Width > (int)area.Width)
+                //如果要截取的区域超出sc图片的最大范围，则将范围限定在最大值，
+                //用户的截图不能超出Scrcpy的范围，因为这里生成的临时图片始终会被限制在Scrcpy的窗口当中
+                if (cropRect.X + cropRect.Width > (int)sc.Width)
                 {
-                    cropRect.Width -= cropRect.X + cropRect.Width - (int)area.Width;
+                    cropRect.Width -= cropRect.X + cropRect.Width - (int)sc.Width;
                 }
-                if (cropRect.Y + cropRect.Height > (int)area.Height)
+                if (cropRect.Y + cropRect.Height > (int)sc.Height)
                 {
-                    cropRect.Height -= cropRect.Y + cropRect.Height - (int)area.Height;
+                    cropRect.Height -= cropRect.Y + cropRect.Height - (int)sc.Height;
                 }
 
-                CroppedBitmap temp = new(area, cropRect);
+                CroppedBitmap temp = new(sc, cropRect);
                 MyGM.SavaImg("tempPic.png", temp);
 
-                
+                double ssim1 = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", $@"{MV.ScriptPath}\tempPic.png");
+                double ssim2 = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", temp);
 
-                double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", $@"{MV.ScriptPath}\tempPic.png");
-                if (ssim > 0.9)
-                {
-                    await ExecuteClickScript(recInfo);
-                }
-                Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
+                Console.WriteLine($"图像脚本完毕，相似度：{ssim1:F8}，{ssim2:F8}");
             }
 
-            image?.Save($@"{MV.ScriptPath}\A.png", ImageFormat.Png);
+            //scWindow?.Save($@"{MV.ScriptPath}\A.png", ImageFormat.Png);
             Console.WriteLine("完成");
             //MyGM.SavaImg("A.png", image);
 

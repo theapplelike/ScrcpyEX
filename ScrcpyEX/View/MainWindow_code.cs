@@ -28,6 +28,7 @@ namespace ScrcpyEX.View
         {
             MV.MainWin = this;
             MV.Pop = pop;
+            _mainHandle = new WindowInteropHelper(this).Handle;
 
             SetControlEvent();
             SetProcess();

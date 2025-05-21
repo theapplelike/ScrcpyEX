@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -35,6 +36,11 @@ namespace ScrcpyEX.View
         /// scrcpy窗口的名称。
         /// </summary>
         private string _scName;
+
+        /// <summary>
+        /// 主程序的句柄。
+        /// </summary>
+        private IntPtr _mainHandle;
 
         /// <summary>
         /// 保存窗体的临时尺寸、位置。
