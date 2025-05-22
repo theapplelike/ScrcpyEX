@@ -29,6 +29,8 @@ namespace ScrcpyEX.View
             MV.MainWin = this;
             MV.Pop = pop;
             _mainHandle = new WindowInteropHelper(this).Handle;
+            bdRec.Visibility = Visibility.Hidden;
+            dplTip.Visibility = Visibility.Collapsed;
 
             SetControlEvent();
             SetProcess();

@@ -187,6 +187,7 @@ namespace ScrcpyEX.View
             dplTip.Visibility = Visibility.Visible;
             _vm.CycleNum = 0;
             _recInfo = recInfo;
+            _stopwatch = Stopwatch.StartNew();
 
             //如果脚本已执行则关闭
             if (_countTimer.IsEnabled)

@@ -39,18 +39,18 @@ namespace ScrcpyEX.ViewModel
         private int cycleNum = 0;
 
         /// <summary>
-        /// 脚本执行后已产生的间隔。
+        /// 单次脚本执行后已产生的时间，单位是秒。
         /// </summary>
-        public int Interval
+        public int Running
         {
-            get { return interval; }
+            get { return running; }
             set
             {
-                interval = value;
+                running = value;
                 RaisePropertyChanged();
             }
         }
-        private int interval = 0;
+        private int running = 0;
 
 
     }

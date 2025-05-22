@@ -161,8 +161,7 @@ namespace ScrcpyEX.View
         private async void TimedScript_Tick(RecInfo recInfo)
         {
             _vm.CycleNum++;
-            _vm.Interval = 0;
-
+            _stopwatch = Stopwatch.StartNew();
             await ExecuteClickScript(recInfo);
             Console.WriteLine("计时脚本执行完毕...");
         }
@@ -172,6 +171,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private async void ImageScript_Tick(RecInfo recInfo)
         {
+            //25.5.22
             //BitmapSource area = MyGM.CaptureProcessArea(DpiScaleX, DpiScaleY);
             //CroppedBitmap temp = new(area, recInfo.CropRect);
             //MyGM.SavaImg("tempPic.png", temp);
@@ -185,8 +185,14 @@ namespace ScrcpyEX.View
             //}
             //Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
 
+            Console.WriteLine($"进入新一轮，当前间隔：{_vm.Running}。");
+            if (_scriptInterval > 5)
+            {
+                _scriptInterval = 5;
+            }
+
             (Bitmap scWindow, WPoint diff) = await CaptureScrcpyWindow(_scHandle, _mainHandle);
-            Console.WriteLine($"左上角的差：{diff.X},{diff.Y}");
+            //Console.WriteLine($"左上角的差：{diff.X},{diff.Y}");
             if (scWindow == null)
             {
                 popMid.Show("获取Scrcpy截图失败。");
@@ -196,17 +202,22 @@ namespace ScrcpyEX.View
             double ssim = CompareImage(scWindow, diff, recInfo);
             if (ssim > 0.9)
             {
+                _scriptInterval = (int)(_vm.Running * 0.9);//每次将上一次间隔的90%作为自适应间隔
+                _scriptInterval = _scriptInterval < 5 ? 5 : _scriptInterval;
                 _vm.CycleNum++;
-                _vm.Interval = 0;
+                _stopwatch = Stopwatch.StartNew();
                 await ExecuteClickScript(recInfo);
             }
             Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
+
+            Console.WriteLine($"自适应间隔:{_scriptInterval}秒。");
+            _scriptTimer.Interval = TimeSpan.FromSeconds(_scriptInterval);
         }
 
         /// <summary>
         /// 执行脚本时，说明已产生的间隔。
         /// </summary>
-        private void Count_Tick() => _vm.Interval++;
+        private void Count_Tick() => _vm.Running = (int)_stopwatch.Elapsed.TotalSeconds;
 
         /// <summary>
         /// 执行点击脚本，PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
@@ -248,7 +259,7 @@ namespace ScrcpyEX.View
         {
             //Scrcpy嵌入在WPF窗体中，所以要判断主窗体是否最小化，最小化时要显示窗口但不激活，否则最小化时窗口是不会渲染的
             bool isIcon = DLL.IsIconic(mainHandle);
-            Console.WriteLine($"是否最小化:{isIcon}。");
+            //Console.WriteLine($"是否最小化:{isIcon}。");
             if (isIcon)
             {
                 DLL.ShowWindow(mainHandle, SW.SW_SHOWNOACTIVATE);
@@ -260,7 +271,7 @@ namespace ScrcpyEX.View
             {
                 return (null, new());
             }
-            Console.WriteLine($"Scrcpy窗口尺寸：{rc.Left},{rc.Top},{rc.Right},{rc.Bottom},{rc.Width},{rc.Height}");
+            //Console.WriteLine($"Scrcpy窗口尺寸：{rc.Left},{rc.Top},{rc.Right},{rc.Bottom},{rc.Width},{rc.Height}");
 
             Bitmap bmp = new(rc.Width, rc.Height);
             using (Graphics g = Graphics.FromImage(bmp))
@@ -295,13 +306,13 @@ namespace ScrcpyEX.View
                 (int)(rect.Y + diff.Y), rect.Width, rect.Height);
 
             BitmapSource sc = MyGM.ConvertToBitmapSource(scWindow);
-            Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}，" +
-                $"比例：{DpiScaleX},{DpiScaleY}，" +
-                $"起点：{cropRect.X},{cropRect.Y}，" +
-                $"宽高：{cropRect.Width},{cropRect.Height}，" +
-                $"终点：{cropRect.X + cropRect.Width},{cropRect.Y + cropRect.Height}，" +
-                $"图片大小：{sc.Width},{sc.Height}，" +
-                $"程序大小：{MV.MainWin.Width},{MV.MainWin.Height}");
+            //Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}，" +
+            //    $"比例：{DpiScaleX},{DpiScaleY}，" +
+            //    $"起点：{cropRect.X},{cropRect.Y}，" +
+            //    $"宽高：{cropRect.Width},{cropRect.Height}，" +
+            //    $"终点：{cropRect.X + cropRect.Width},{cropRect.Y + cropRect.Height}，" +
+            //    $"图片大小：{sc.Width},{sc.Height}，" +
+            //    $"程序大小：{MV.MainWin.Width},{MV.MainWin.Height}");
 
             //如果要截取的区域超出sc图片的最大范围，则将范围限定在最大值，
             //用户的截图不能超出Scrcpy的范围，因为这里生成的临时图片始终会被限制在Scrcpy的窗口当中

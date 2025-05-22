@@ -35,15 +35,12 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!--程序通用的鼠标提示POP-->
+        <!--程序通用的鼠标提示-->
         <mycontrol:TimePopup x:Name="pop" PopupAnimation="Fade" Placement="Mouse" StaysOpen="True" AllowsTransparency="True">
-            <TextBlock 
-                Text="提示：Hello？"
-                Background="White"
-                Padding="10"/>
+            <TextBlock Text="提示：Hello？" Background="White" Padding="10"/>
         </mycontrol:TimePopup>
 
-        <!--主界面使用的居中POP-->
+        <!--主界面使用的居中提示-->
         <mycontrol:TimePopup x:Name="popMid" PopupAnimation="Slide" Placement="Center" StaysOpen="True" AllowsTransparency="True"  PlacementTarget="{Binding ElementName=dpl}" Opened="PopMid_Opened">
             <Border MinHeight="10" MinWidth="10" CornerRadius="10" BorderThickness="4" BorderBrush="{StaticResource Scb2}" Background="{StaticResource Scb1}" Margin="5">
                 <Border.Effect>
@@ -53,7 +50,7 @@
             </Border>
         </mycontrol:TimePopup>
 
-        <!--显示的POP定位菜单-->
+        <!--设置位置和定位的菜单-->
         <Popup x:Name="popMenu" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnLocate}" Tag="g1" Closed="Pop_Closed">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel>
@@ -89,7 +86,7 @@
             </Border>
         </Popup>
 
-        <!--显示的POP录制菜单-->
+        <!--功能菜单-->
         <Popup x:Name="popRec" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnRecManage}" Tag="g2" Closed="Pop_Closed">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel>
@@ -110,6 +107,7 @@
             </Border>
         </Popup>
 
+        <!--自定义菜单栏-->
         <DockPanel x:Name="dpl" Background="AliceBlue" MouseLeftButtonDown="Dpl_MouseLeftButtonDown">
             <Button x:Name="btnWired" Style="{StaticResource MenuBtn}" Content="&#xF0B9;" Click="BtnWired_Click" Margin="0" ToolTip="有线连接"/>
             <Button x:Name="btnWirel" Style="{StaticResource MenuBtn}" Content="&#xe952;" Click="BtnWirel_Click" ToolTip="无线连接"/>
@@ -130,19 +128,18 @@
             <Button x:Name="btnMaximize" Click="BtnMaximize_Click" Style="{StaticResource MenuBtn}" Content="&#xe922;" DockPanel.Dock="Right"/>
             <Button x:Name="btnMinimize" Click="BtnMinimize_Click" Style="{StaticResource MenuBtn}" Content="&#xe73c;" DockPanel.Dock="Right"/>
 
-            <Border x:Name="bdRec" HorizontalAlignment="Right" BorderBrush="SteelBlue" BorderThickness="4" Visibility="Hidden">
+            <Border x:Name="bdRec" HorizontalAlignment="Right" BorderBrush="SteelBlue" BorderThickness="4">
                 <DockPanel>
-                    <DockPanel x:Name="dplTip" Visibility="Collapsed">
+                    <DockPanel x:Name="dplTip">
                         <TextBlock Text="{Binding CycleNum}" VerticalAlignment="Center" FontSize="16" Margin="2,0,0,0"/>
                         <TextBlock Text="次⊱⊰" VerticalAlignment="Center" FontSize="16"/>
-                        <TextBlock Text="{Binding Interval}" VerticalAlignment="Center" FontSize="16"/>
+                        <TextBlock Text="{Binding Running}" VerticalAlignment="Center" FontSize="16"/>
                         <TextBlock Text="秒" VerticalAlignment="Center" FontSize="16" Margin="0,0,2,0"/>
                         <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
                     </DockPanel>
                     <Button x:Name="btnRecStop" Click="BtnRecStop_Click" Style="{StaticResource MenuBtn}" Content="&#xe769;" Foreground="SteelBlue" Margin="0"/>
                 </DockPanel>
             </Border>
-
         </DockPanel>
 
         <Grid x:Name="gShow" Grid.Row="1" Margin="5">

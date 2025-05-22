@@ -48,14 +48,14 @@ namespace ScrcpyEX.View
         private FormSize _tempSize = null;
 
         /// <summary>
-        /// 调整scrcpy窗口大小的计时器。
+        /// 用于图像脚本计时器的自适应间隔，最小为5秒。
         /// </summary>
-        private readonly DispatcherTimer _resizeTimer = new();
+        private int _scriptInterval = 5;
 
         /// <summary>
-        /// 脚本计时器，可能会绑定计时脚本或图像脚本。
+        /// 准确的测量运行时间。
         /// </summary>
-        private readonly DispatcherTimer _scriptTimer = new();
+        private Stopwatch _stopwatch;
 
         /// <summary>
         /// 计时脚本对应的委托。
@@ -66,6 +66,16 @@ namespace ScrcpyEX.View
         /// 图像脚本对应的委托。
         /// </summary>
         private EventHandler _imageHandler;
+
+        /// <summary>
+        /// 调整scrcpy窗口大小的计时器。
+        /// </summary>
+        private readonly DispatcherTimer _resizeTimer = new();
+
+        /// <summary>
+        /// 脚本计时器，可能会绑定计时脚本或图像脚本。
+        /// </summary>
+        private readonly DispatcherTimer _scriptTimer = new();
 
         /// <summary>
         /// 对每次脚本间隔进行计数。
