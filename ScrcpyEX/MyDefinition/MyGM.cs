@@ -180,18 +180,18 @@ namespace ScrcpyEX.MyDefinition
             //定义要截取的矩形区域，主程序左上角的坐标和宽高
             Point pt = MV.MainWin.PointToScreen(new Point(0, 0));
             Int32Rect cropRect = new(
-                (int)(pt.X ),
+                (int)pt.X,
                 (int)pt.Y,
                 (int)(MV.MainWin.Width * DpiScaleX),
                 (int)(MV.MainWin.Height * DpiScaleY));
 
-            Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}," +
-                $"比例：{DpiScaleX},{DpiScaleY}," +
-                $"起点：{cropRect.X}，{cropRect.Y}" +
-                $"宽高：{cropRect.Width},{cropRect.Height}" +
-                $"终点：{cropRect.X+ cropRect.Width}，{cropRect.Y+ cropRect.Height}，" +
-                $"图片大小：{source.Width}，{source.Height}," +
-                $"程序大小：{MV.MainWin.Width}，{MV.MainWin.Height}");
+            //Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}," +
+            //    $"比例：{DpiScaleX},{DpiScaleY}," +
+            //    $"起点：{cropRect.X}，{cropRect.Y}" +
+            //    $"宽高：{cropRect.Width},{cropRect.Height}" +
+            //    $"终点：{cropRect.X+ cropRect.Width}，{cropRect.Y+ cropRect.Height}，" +
+            //    $"图片大小：{source.Width}，{source.Height}," +
+            //    $"程序大小：{MV.MainWin.Width}，{MV.MainWin.Height}");
             
             if (cropRect.X + cropRect.Width > (int)source .Width)
             {

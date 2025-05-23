@@ -78,7 +78,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         public static double CompareSSIM(string path1, CroppedBitmap crop)
         {
             using Mat img1 = Cv2.ImRead(path1, ImreadModes.Grayscale);
-            using Mat img2 = ConvertCroppedBitmapToMatOptimized(crop);
+            using Mat img2 = ConvertCroppedBitmapToMat(crop);
 
             // 确保图像尺寸一致
             if (img1.Size() != img2.Size())
@@ -128,7 +128,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
             return ssimScalar.Val0; // 返回 SSIM 平均值
         }
 
-        public static Mat ConvertCroppedBitmapToMatOptimized(CroppedBitmap croppedBitmap)
+        /// <summary>
+        /// 将CroppedBitmap类型的图片转换为OpenCv可以处理的Mat类型。
+        /// </summary>
+        /// <param name="croppedBitmap">CroppedBitmap类型的图片。</param>
+        /// <returns>Mat类型。</returns>
+        public static Mat ConvertCroppedBitmapToMat(CroppedBitmap croppedBitmap)
         {
             // 1. 转换为 BGRA32 格式
             var convertedBitmap = new FormatConvertedBitmap();

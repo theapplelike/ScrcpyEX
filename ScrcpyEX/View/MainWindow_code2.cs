@@ -314,17 +314,7 @@ namespace ScrcpyEX.View
             //    $"图片大小：{sc.Width},{sc.Height}，" +
             //    $"程序大小：{MV.MainWin.Width},{MV.MainWin.Height}");
 
-            //如果要截取的区域超出sc图片的最大范围，则将范围限定在最大值，
-            //用户的截图不能超出Scrcpy的范围，因为这里生成的临时图片始终会被限制在Scrcpy的窗口当中
-            if (cropRect.X + cropRect.Width > (int)sc.Width)
-            {
-                cropRect.Width -= cropRect.X + cropRect.Width - (int)sc.Width;
-            }
-            if (cropRect.Y + cropRect.Height > (int)sc.Height)
-            {
-                cropRect.Height -= cropRect.Y + cropRect.Height - (int)sc.Height;
-            }
-
+            CheckRect(ref cropRect, (int)sc.Width, (int)sc.Height);
             CroppedBitmap temp = new(sc, cropRect);
             if (Debugger.IsAttached)
             {
@@ -332,6 +322,33 @@ namespace ScrcpyEX.View
             }
 
             return OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", temp);
+        }
+
+        /// <summary>
+        /// 如果要截取的区域超出sc图片的范围，则将值限定在范围内。
+        /// 用户的截图不能超出Scrcpy的范围，因为脚本临时图片始终会被限制在Scrcpy的窗口当中。
+        /// </summary>
+        /// <param name="rect">说明截图范围的矩形。</param>
+        /// <param name="maxWidth">最大宽度。</param>
+        /// <param name="maxHeight">最大高度。</param>
+        private void CheckRect(ref Int32Rect rect, int maxWidth, int maxHeight)
+        {
+            if (rect.X + rect.Width > maxWidth)
+            {
+                rect.Width -= rect.X + rect.Width - maxWidth;
+            }
+            if (rect.Y + rect.Height > maxHeight)
+            {
+                rect.Height -= rect.Y + rect.Height - maxHeight;
+            }
+            if (rect.X < 0)
+            {
+                rect.X = 0;
+            }
+            if (rect.Y < 0)
+            {
+                rect.Y = 0;
+            }
         }
 
 

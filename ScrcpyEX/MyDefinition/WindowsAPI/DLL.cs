@@ -145,6 +145,12 @@ namespace ScrcpyEX.MyDefinition
         [DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject);
 
+        /// <summary>
+        /// 合成鼠标运动和按钮单击，参考：https://learn.microsoft.com/zh-cn/windows/win32/api/winuser/nf-winuser-mouse_event。
+        /// </summary>
+        [DllImport("user32.dll")]
+        public static extern int mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);
+
         //[DllImport("user32.dll", SetLastError = true)]
         //public static extern IntPtr SetFocus(IntPtr hWnd);
         //
@@ -160,8 +166,7 @@ namespace ScrcpyEX.MyDefinition
         //[DllImport("user32.dll")]
         //public static extern int SetCursorPos(int x, int y);//让鼠标移动到指定位置
         //
-        [DllImport("user32.dll")]
-        public static extern int mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);//控制鼠标执行点击操作
+
         //
         //[DllImport("user32.dll")]
         //[return: MarshalAs(UnmanagedType.Bool)]

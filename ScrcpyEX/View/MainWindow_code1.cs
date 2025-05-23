@@ -398,7 +398,8 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 如果按键处于按下状态，则让鼠标左键在按下和抬起间转化。
+        /// 使用按键操作方向不够顺滑，所以让鼠标持续性按下来操作方向，但是使用鼠标操作方向时，
+        /// 如果按下键盘会中断鼠标按下的状态，目前没有更好的办法实现模拟器一样的操控。
         /// </summary>
         /// <param name="isDown">当前按键是否为按下状态。</param>
         private void PressMouse(bool isDown = true)
@@ -408,17 +409,16 @@ namespace ScrcpyEX.View
                 //if (_isPressMouse)
                 //{
                 //    _isPressMouse = false;
-                //    //DLL.mouse_event(0x04, 0, 0, 0, 0);
+                //    //DLL.mouse_event(0x04, 0, 0, 0, 0);//鼠标抬起
                 //    //DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero);
                 //}
                 //else
                 //{
                 //    _isPressMouse = true;
-                //    //DLL.mouse_event(0x02, 0, 0, 0, 0);//按下
+                //    //DLL.mouse_event(0x02, 0, 0, 0, 0);//鼠标按下
                 //    //DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, IntPtr.Zero);
                 //}
-
-                DLL.mouse_event(0x02, 0, 0, 0, 0);//按下
+                DLL.mouse_event(0x02, 0, 0, 0, 0);//鼠标按下
             }
             //Console.WriteLine($"开启鼠标移动,{_isPressMouse}。");
         }
@@ -459,7 +459,7 @@ namespace ScrcpyEX.View
                 //}
 
                 //ADB_Click(centreX, centreY);
-                Console.WriteLine($"圆心点:({centreX},{centreY})，鼠标移动标志位：{_isPressMouse}。");
+                //Console.WriteLine($"圆心点:({centreX},{centreY})，鼠标移动标志位：{_isPressMouse}。");
             }
         }
 
