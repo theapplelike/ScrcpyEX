@@ -115,7 +115,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 鼠标左键是否处于按下状态。
         /// </summary>
-        private bool _isPressMouse = false;
+        //private bool _isPressMouse = false;
 
         /// <summary>
         /// 窗口除开scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。

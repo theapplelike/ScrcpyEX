@@ -49,43 +49,11 @@ namespace ScrcpyEX.View
 
             RecInfo recInfo = MyCfg.Cfg.RecInfos[0];
             (Bitmap scWindow, WPoint diff) = await CaptureScrcpyWindow(_scHandle, _mainHandle);
-            Console.WriteLine($"左上角的差：{diff.X},{diff.Y}");
+            Console.WriteLine($"左上角的差：{diff.X},{diff.Y}，原始坐标：{recInfo.CropRect.X},{recInfo.CropRect.Y}");
             if (scWindow != null)
             {
-                //计算要对Scrcpy截取的区域，X和Y要加上程序左上角和Scrcpy左上角坐标的差
-                Int32Rect cropRect = new(
-                    (int)(recInfo.CropRect.X + diff.X),
-                    (int)(recInfo.CropRect.Y + diff.Y),
-                    recInfo.CropRect.Width,
-                    recInfo.CropRect.Height);
-
-                BitmapSource sc = MyGM.ConvertToBitmapSource(scWindow);
-                Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}，" +
-                $"比例：{DpiScaleX},{DpiScaleY}，" +
-                $"起点：{cropRect.X},{cropRect.Y}，" +
-                $"宽高：{cropRect.Width},{cropRect.Height}，" +
-                $"终点：{cropRect.X + cropRect.Width},{cropRect.Y + cropRect.Height}，" +
-                $"图片大小：{sc.Width},{sc.Height}，" +
-                $"程序大小：{MV.MainWin.Width},{MV.MainWin.Height}");
-
-                //如果要截取的区域超出sc图片的最大范围，则将范围限定在最大值，
-                //用户的截图不能超出Scrcpy的范围，因为这里生成的临时图片始终会被限制在Scrcpy的窗口当中
-                if (cropRect.X + cropRect.Width > (int)sc.Width)
-                {
-                    cropRect.Width -= cropRect.X + cropRect.Width - (int)sc.Width;
-                }
-                if (cropRect.Y + cropRect.Height > (int)sc.Height)
-                {
-                    cropRect.Height -= cropRect.Y + cropRect.Height - (int)sc.Height;
-                }
-
-                CroppedBitmap temp = new(sc, cropRect);
-                MyGM.SavaImg("tempPic.png", temp);
-
-                double ssim1 = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", $@"{MV.ScriptPath}\tempPic.png");
-                double ssim2 = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", temp);
-
-                Console.WriteLine($"图像脚本完毕，相似度：{ssim1:F8}，{ssim2:F8}");
+                double ssim = CompareImage(scWindow, diff, recInfo);
+                Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
             }
 
             //scWindow?.Save($@"{MV.ScriptPath}\A.png", ImageFormat.Png);
