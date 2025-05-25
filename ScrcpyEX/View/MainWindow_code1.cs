@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp.ML;
 using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition;
@@ -183,11 +184,13 @@ namespace ScrcpyEX.View
             RemoveBlack();
 
             //UI和变量初始化
-            bdRec.Visibility = Visibility.Visible;
-            dplTip.Visibility = Visibility.Visible;
+            _vm.Running = 0;
             _vm.CycleNum = 0;
             _recInfo = recInfo;
             _stopwatch = Stopwatch.StartNew();
+            bdRec.Visibility = Visibility.Visible;
+            dplTip.Visibility = Visibility.Visible;
+            
 
             //如果脚本已执行则关闭
             if (_countTimer.IsEnabled)
