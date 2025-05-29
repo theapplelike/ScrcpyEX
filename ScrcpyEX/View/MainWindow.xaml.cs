@@ -178,13 +178,13 @@ namespace ScrcpyEX.View
             AmplifySize();
         }
 
-        private void BtnStartRec_Click(object sender, RoutedEventArgs e)
+        private void BtnScr_Click(object sender, RoutedEventArgs e)
         {
             StartRecord();
             popRec.IsOpen = false;
         }
 
-        private void BtnSetup_Click(object sender, RoutedEventArgs e)
+        private void BtnSet_Click(object sender, RoutedEventArgs e)
         {
             new Setup().ShowDialog();
         }
@@ -198,6 +198,9 @@ namespace ScrcpyEX.View
         {
             MappingAdd();
         }
+
         #endregion
+
+        
     }
 }

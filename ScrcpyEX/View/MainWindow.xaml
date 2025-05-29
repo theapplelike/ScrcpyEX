@@ -25,6 +25,9 @@
             <Setter Property="BorderThickness" Value="0,0,0,1"/>
             <Setter Property="Height" Value="30"/>
         </Style>
+        <Style TargetType="RadioButton">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
         <SolidColorBrush x:Key="Scb1" Color="#D5EBFB" Opacity="0.6"/>
         <SolidColorBrush x:Key="Scb2" Color="#5B9DF0" Opacity="0.5"/>
     </Window.Resources>
@@ -37,7 +40,9 @@
 
         <!--程序通用的鼠标提示-->
         <mycontrol:TimePopup x:Name="pop" PopupAnimation="Fade" Placement="Mouse" StaysOpen="True" AllowsTransparency="True">
-            <TextBlock Text="提示：Hello？" Background="White" Padding="10"/>
+            <Border MinHeight="10" MinWidth="10" CornerRadius="5" BorderThickness="2" BorderBrush="{StaticResource Scb2}" Background="#D5EBFB" Margin="5">
+                <TextBlock Text="提示文本" Padding="10"/>
+            </Border>
         </mycontrol:TimePopup>
 
         <!--主界面使用的居中提示-->
@@ -55,32 +60,21 @@
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel>
                     <TextBlock Text="{Binding ResolutionDesc}" Background="White" Padding="10"/>
-                    <Grid Background="WhiteSmoke">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <RadioButton x:Name="rdoLoc1" Grid.Row="0" Grid.Column="0" Content="↖左上" Margin="0,10,0,5" HorizontalAlignment="Center"/>
-                        <RadioButton x:Name="rdoLoc2" Grid.Row="0" Grid.Column="1" Content="↗右上" Margin="0,10,0,5" HorizontalAlignment="Center"/>
-                        <RadioButton x:Name="rdoLoc3" Grid.Row="1" Grid.Column="0" Content="↙左下" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                        <RadioButton x:Name="rdoLoc4" Grid.Row="1" Grid.Column="1" Content="↘右下" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                    </Grid>
+                    <UniformGrid Rows="2" Columns="2" Background="WhiteSmoke">
+                        <RadioButton x:Name="rdoLoc1" Content="↖左上" Margin="0,10,0,5"/>
+                        <RadioButton x:Name="rdoLoc2" Content="↗右上" Margin="0,10,0,5"/>
+                        <RadioButton x:Name="rdoLoc3" Content="↙左下" Margin="0,0,0,10"/>
+                        <RadioButton x:Name="rdoLoc4" Content="↘右下" Margin="0,0,0,10"/>
+                    </UniformGrid>
 
                     <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并定位" BorderThickness="0,1"/>
                     <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="▣默认原始尺寸并定位"/>
                     <Button x:Name="btnRemoveBlack" Click="BtnRemoveBlack_Click" Style="{StaticResource ItemBtn}" Content="消除投屏黑边"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Button x:Name="btnReduce"  Click="BtnReduce_Click"  Style="{StaticResource ItemBtn}" Grid.Column="0" Content="缩小尺寸"/>
-                        <Button x:Name="btnAmplify" Click="BtnAmplify_Click" Style="{StaticResource ItemBtn}" Grid.Column="1" Content="放大尺寸" BorderThickness="1,0,0,1"/>
-                    </Grid>
+                    
+                    <UniformGrid Rows="1" Columns="2">
+                        <Button x:Name="btnReduce"  Click="BtnReduce_Click"  Style="{StaticResource ItemBtn}" Content="缩小尺寸"/>
+                        <Button x:Name="btnAmplify" Click="BtnAmplify_Click" Style="{StaticResource ItemBtn}" Content="放大尺寸" BorderThickness="1,0,0,1"/>
+                    </UniformGrid>
                     <!--<Button Style="{StaticResource ItemBtn}" Content="⌂居中"/>-->
                 </StackPanel>
             </Border>
@@ -91,18 +85,13 @@
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel>
                     <TextBlock Text="功能菜单" Background="White" Padding="10"/>
-                    
-                    <Button x:Name="btnStartRec" Click="BtnStartRec_Click" Style="{StaticResource ItemBtn}" Content="开始录制" BorderThickness="0,1"/>
-                    <Button x:Name="btnSetup" Click="BtnSetup_Click" Style="{StaticResource ItemBtn}" Content="功能设置"/>
+                    <Button x:Name="btnScr" Click="BtnScr_Click" Style="{StaticResource ItemBtn}" Content="录制脚本" BorderThickness="0,1"/>
+                    <Button x:Name="btnSet" Click="BtnSet_Click" Style="{StaticResource ItemBtn}" Content="功能设置"/>
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Button x:Name="btnMappingEdit" Click="BtnMappingEdit_Click" Style="{StaticResource ItemBtn}" Grid.Column="0" Content="进行映射编辑"/>
-                        <Button x:Name="btnMappingAdd" Click="BtnMappingAdd_Click" Style="{StaticResource ItemBtn}" Grid.Column="1" Content="添加映射按钮" BorderThickness="1,0,0,1" IsEnabled="False"/>
-                    </Grid>
+                    <UniformGrid Rows="1" Columns="2">
+                        <Button x:Name="btnMappingEdit" Click="BtnMappingEdit_Click" Style="{StaticResource ItemBtn}" Content="进行映射编辑"/>
+                        <Button x:Name="btnMappingAdd"  Click="BtnMappingAdd_Click"  Style="{StaticResource ItemBtn}" Content="添加映射按钮" BorderThickness="1,0,0,1" IsEnabled="False"/>
+                    </UniformGrid>
                 </StackPanel>
             </Border>
         </Popup>

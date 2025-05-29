@@ -22,11 +22,11 @@ namespace ScrcpyEX.View
         {
             if (btn.CommandParameter is RecInfo recInfo)
             {
-                foreach (var info in recInfo.Infos)
-                {
-                    Console.WriteLine($"遍历：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
-                }
-                Console.WriteLine($"循环次数：{recInfo.CycleNumber}，循环间隔：{recInfo.CycleInterval}");
+                //foreach (var info in recInfo.Infos)
+                //{
+                //    Console.WriteLine($"遍历：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
+                //}
+                //Console.WriteLine($"循环次数：{recInfo.CycleNumber}，循环间隔：{recInfo.CycleInterval}");
                 TempRecInfo = recInfo;
                 DialogResult = true;
             }
@@ -45,6 +45,19 @@ namespace ScrcpyEX.View
 
                 TempRecInfo = recInfo;
                 _vm.SetParam(recInfo);
+            }
+        }
+
+        /// <summary>
+        /// 删除指定的脚本。
+        /// </summary>
+        /// <param name="btn">包含脚本数据的按钮。</param>
+        private void DeleteScript(Button btn)
+        {
+            if (btn.CommandParameter is RecInfo recInfo)
+            {
+                TempRecInfo = null;
+                _vm.DelRec(recInfo);
             }
         }
 
@@ -80,7 +93,7 @@ namespace ScrcpyEX.View
                 _g.Background = null;
             }
 
-            _g = MyGM.GetParentObject<Grid>(btn);
+            _g = btn.FindVisualParent<Grid>();
             _g.Background = Brushes.AliceBlue;
         }
 

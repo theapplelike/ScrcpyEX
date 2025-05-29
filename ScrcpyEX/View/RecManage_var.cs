@@ -20,7 +20,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 是否处于脚本名称的编辑状态。
         /// </summary>
-        private bool _isEditing = false;
+        //private bool _isEditing = false;
 
         /// <summary>
         /// 说明截图结果位置大小的矩形。

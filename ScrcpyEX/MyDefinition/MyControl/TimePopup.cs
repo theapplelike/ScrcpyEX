@@ -53,7 +53,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
             }
             else
             {
-                MyGM.FindVisualChild<TextBlock>(Child).Text = text;
+                Child.FindVisualChild<TextBlock>().Text = text;
             }
 
             IsOpen = false;

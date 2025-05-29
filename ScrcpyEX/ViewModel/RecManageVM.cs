@@ -61,30 +61,25 @@ namespace ScrcpyEX.ViewModel
         private DataTable pointDt = new();
 
         /// <summary>
-        /// 删除指定的脚本信息。
+        /// 删除指定脚本。
         /// </summary>
-        public ICommand DelRecCommand => new RelayCommand(DelRec);
-
-        /// <summary>
-        /// 删除指定记录。
-        /// </summary>
-        /// <param name="parameter">指定的记录对象。</param>
-        private void DelRec(object parameter)
+        /// <param name="info">要删除的脚本。</param>
+        public void DelRec(RecInfo info)
         {
-            if (parameter is RecInfo info)
+            MessageBoxResult result = MessageBox.Show($"是否删除“{info.Name}”脚本？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Information);
+            if (result == MessageBoxResult.OK)
             {
-                MessageBoxResult result = MessageBox.Show($"是否删除“{info.Name}”脚本？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Information);
-                if (result == MessageBoxResult.OK)
-                {
-                    RecInfos.Remove(info);
-                }
+                _index = -1;
+                PointDt.Clear();
+                RecInfos.Remove(info);
+                File.Delete(@$"{MV.ScriptPath}\{info.ImgName}");
             }
         }
 
         /// <summary>
-        /// 显示坐标点参数到DataTable中。
+        /// 显示当前脚本的坐标点参数到DataTable中。
         /// </summary>
-        /// <param name="parameter">当前选中的脚本。</param>
+        /// <param name="info">当前选中的脚本。</param>
         public void SetParam(RecInfo info)
         {
             _index = RecInfos.IndexOf(info);
@@ -103,19 +98,24 @@ namespace ScrcpyEX.ViewModel
                 {
                     MyGM.SavaImg(recInfo.ImgName, source);
                 }
+                MyGM.POP("脚本保存成功。");
+            }
+            else
+            {
+                MyGM.POP("未指定脚本，不能保存。");
             }
         }
 
         /// <summary>
         /// 取消修改的PointInfo类数据。
         /// </summary>
-        public void Canel()
-        {
-            if (_index != -1)
-            {
-                CopyToDt(RecInfos[_index].Infos);
-            }
-        }
+        //public void Canel()
+        //{
+        //    if (_index != -1)
+        //    {
+        //        CopyToDt(RecInfos[_index].Infos);
+        //    }
+        //}
 
         /// <summary>
         /// 将实体类的值复制给DataTable。

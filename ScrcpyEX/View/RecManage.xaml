@@ -74,9 +74,9 @@
                                 <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="1" Content="&#xe8ac;" Style="{StaticResource LstBtn}"/>
                                 <TextBlock Text="|" FontSize="20" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
 
-                                <Button x:Name="btnPlay" Click="BtnPlay_Click" CommandParameter="{Binding}" Grid.Column="3" Content="&#xec57;" Style="{StaticResource LstBtn}"/>
+                                <Button x:Name="btnAct" Click="BtnAct_Click" CommandParameter="{Binding}" Grid.Column="3" Content="&#xec57;" Style="{StaticResource LstBtn}"/>
                                 <Button x:Name="btnSet" Click="BtnSet_Click" CommandParameter="{Binding}" Grid.Column="4" Content="&#xe713;" Style="{StaticResource LstBtn}"/>
-                                <Button x:Name="btnDel" Command="{Binding DataContext.DelRecCommand,ElementName=root}" CommandParameter="{Binding}" Grid.Column="5" Content="&#xe74d;" Style="{StaticResource LstBtn}"/>
+                                <Button x:Name="btnDel" Click="BtnDel_Click" CommandParameter="{Binding}" Grid.Column="5" Content="&#xe74d;" Style="{StaticResource LstBtn}"/>
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -149,7 +149,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button x:Name="btnSave" Click="BtnSave_Click" Content="保存" Style="{StaticResource Btn}"/>
-                <Button x:Name="btnCancel" Click="BtnCancel_Click" Content="取消" Style="{StaticResource Btn}" Grid.Column="1"/>
+                <Button x:Name="btnExit" Click="BtnExit_Click" Content="返回" Style="{StaticResource Btn}" Grid.Column="1"/>
             </Grid>
         </Grid>
         

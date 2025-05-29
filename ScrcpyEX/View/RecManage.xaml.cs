@@ -44,10 +44,10 @@ namespace ScrcpyEX.View
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
-            EditName(sender, e);
+            EditName(((Button)sender).DataContext as RecInfo);
         }
 
-        private void BtnPlay_Click(object sender, RoutedEventArgs e)
+        private void BtnAct_Click(object sender, RoutedEventArgs e)
         {
             ExecuteScript((Button)sender);
         }
@@ -57,12 +57,16 @@ namespace ScrcpyEX.View
             EditScript((Button)sender);
         }
 
+        private void BtnDel_Click(object sender, RoutedEventArgs e)
+        {
+            DeleteScript((Button)sender);
+        }
+
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
             SaveScript();
         }
-
-        private void BtnCancel_Click(object sender, RoutedEventArgs e)
+        private void BtnExit_Click(object sender, RoutedEventArgs e)
         {
             //if (TempRecInfo != null)
             //{
@@ -79,7 +83,7 @@ namespace ScrcpyEX.View
 
         private void Img_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            ShowImg showImg = new(img.Source);
+            ShowImg showImg = new(TempRecInfo);
             showImg.ShowDialog();
         }
 

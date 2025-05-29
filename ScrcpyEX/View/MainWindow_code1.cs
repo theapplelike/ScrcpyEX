@@ -357,7 +357,7 @@ namespace ScrcpyEX.View
 
             foreach (Popup pop in MV.TempPopups)
             {
-                string key = MyGM.FindVisualChild<TextBox>(pop.Child).Text;
+                string key = pop.Child.FindVisualChild<TextBox>().Text;
                 double offsetX = pop.HorizontalOffset / ScRatioX;
                 double offsetY = pop.VerticalOffset / ScRatioY;
                 pop.IsOpen = false;

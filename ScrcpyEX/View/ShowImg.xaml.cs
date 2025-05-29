@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,10 +21,13 @@ namespace ScrcpyEX.View
     /// </summary>
     public partial class ShowImg : Window
     {
-        public ShowImg(ImageSource image)
+        public ShowImg(RecInfo recInfo)
         {
             InitializeComponent();
-            img.Source = image;
+            img.Source = MyGM.GetImage(recInfo.ImgName);
+            tbk.Text = 
+                $"起始点：({recInfo.CropRect.X},{recInfo.CropRect.Y})，" +
+                $"图片宽高：({recInfo.CropRect.Width},{recInfo.CropRect.Height})。";
         }
     }
 }

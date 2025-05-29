@@ -35,11 +35,11 @@ namespace ScrcpyEX.MyDefinition.MyClass
             _pop.MouseMove += (s, e) => Pop_MouseMove(isLeaveParent);
             _pop.MouseUp += (s, e) => Pop_MouseUp();
 
-            TextBox txt = MyGM.FindVisualChild<TextBox>(pop.Child);
+            TextBox txt = pop.Child.FindVisualChild<TextBox>();
             txt.PreviewTextInput += TextBox_PreviewTextInput;
             txt.TextChanged += TextBox_TextChanged;
 
-            Button btn = MyGM.FindVisualChild<Button>(pop.Child);
+            Button btn = pop.Child.FindVisualChild<Button>();
             btn.Click += Button_Click;
         }
 
@@ -50,7 +50,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private void Pop_MouseDown()
         {
             //让Popup中的TextBlock捕获鼠标，防止移动太快时丢失Popup
-            TextBlock tbk = MyGM.FindVisualChild<TextBlock>(_pop.Child);
+            TextBlock tbk = _pop.Child.FindVisualChild<TextBlock>();
             _isDragging = Mouse.Capture(tbk);
 
             //记录当前坐标为上一次的坐标

@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 
 namespace ScrcpyEX.MyDefinition
 {
@@ -15,24 +17,50 @@ namespace ScrcpyEX.MyDefinition
     internal static class MyEM
     {
         /// <summary>
-        /// Popup控件的扩展方法，显示带有文本的Popup，并在指定时间后关闭，当前Popup未显示完前不能显示下一个。
+        /// 在指定元素的Visual树中查找类型匹配的子元素。
         /// </summary>
-        /// <param name="pop">Popup控件。</param>
-        /// <param name="text">要显示的文本。</param>
-        /// <param name="time">Popup控件显示的时间，单位ms。</param>
-        //public static async Task SHW(this Popup pop, string text, int time = 3000)
-        //{
-        //    if (pop.IsOpen)
-        //    {
-        //        return;
-        //    }
-        //
-        //    MyGM.FindVisualChild<TextBlock>(pop.Child).Text = text;
-        //    pop.IsOpen = true;
-        //    
-        //    await Task.Delay(time);
-        //    pop.IsOpen = false;
-        //}
+        /// <typeparam name="T">要查找的子元素类型，比如Button。</typeparam>
+        /// <param name="obj">指定的父级元素。</param>
+        /// <returns>返回在指定的父级元素中查找到的第一个类型匹配的子元素，可以查找到孙级元素，如果没找到返回null。</returns>
+        public static T FindVisualChild<T>(this DependencyObject obj) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+                if (child != null && child is T t)
+                {
+                    return t;
+                }
+
+                T childOfChild = FindVisualChild<T>(child);
+                if (childOfChild != null)
+                {
+                    return childOfChild;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 获得元素的第一个指定父元素，未查找到时会继续向上查找祖级元素。
+        /// </summary>
+        /// <typeparam name="T">指定的父元素类型。</typeparam>
+        /// <param name="obj">要查找父元素的元素。</param>
+        /// <returns>返回查找到的第一个指定父元素，未查到时返回null。</returns>
+        public static T FindVisualParent<T>(this DependencyObject obj) where T : FrameworkElement
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(obj);
+            while (parent != null)
+            {
+                if (parent is T t)
+                {
+                    return t;
+                }
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+            return null;
+        }
+
 
     }
 }
