@@ -33,6 +33,11 @@ namespace ScrcpyEX.View
         private Grid _g = null;
 
         /// <summary>
+        /// 保存当前正在编辑名称的脚本。
+        /// </summary>
+        private RecInfo _lastItem = null;
+
+        /// <summary>
         /// 临时存储正在编辑的脚本信息。
         /// </summary>
         public RecInfo TempRecInfo { get; set; } = null;

@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows;
 using ScrcpyEX.MyDefinition;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ScrcpyEX.View
 {
@@ -117,22 +118,50 @@ namespace ScrcpyEX.View
                 TextBox txt = presenter.ContentTemplate.FindName("txtEdit", presenter) as TextBox;
                 TextBlock tbk = presenter.ContentTemplate.FindName("tbkEdit", presenter) as TextBlock;
                 
-                if (currentItem == item)
+                if (item == currentItem)
                 {
-                    btn.Content = "\uf78c";
-                    txt.Visibility = Visibility.Visible;
-                    tbk.Visibility = Visibility.Hidden;
-
-                    txt.Focus();
-                    txt.Select(txt.Text.Length, 0);
+                    if (_lastItem == currentItem)
+                    {
+                        ItemInit(btn, txt, tbk);
+                        //Console.WriteLine("当前项，停止编辑");
+                    }
+                    else
+                    {
+                        ItemEdit(btn, txt, tbk);
+                        //Console.WriteLine("当前项，进行编辑");
+                    }
                 }
                 else
                 {
-                    btn.Content = "\ue8ac";
-                    txt.Visibility = Visibility.Hidden;
-                    tbk.Visibility = Visibility.Visible;
+                    ItemInit(btn, txt, tbk);
+                    //Console.WriteLine("不是当前项，初始化");
                 }
             }
+            _lastItem = currentItem;
+            //Console.WriteLine("-----------------");
+        }
+
+        /// <summary>
+        /// 脚本项的各个控件初始化。
+        /// </summary>
+        private void ItemInit(Button btn, TextBox txt, TextBlock tbk)
+        {
+            btn.Content = "\ue8ac";
+            txt.Visibility = Visibility.Hidden;
+            tbk.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// 编辑脚本项时各个控件进行调整。
+        /// </summary>
+        private void ItemEdit(Button btn, TextBox txt, TextBlock tbk)
+        {
+            btn.Content = "\uf78c";
+            txt.Visibility = Visibility.Visible;
+            tbk.Visibility = Visibility.Hidden;
+
+            txt.Focus();
+            txt.Select(txt.Text.Length, 0);
         }
 
         /// <summary>

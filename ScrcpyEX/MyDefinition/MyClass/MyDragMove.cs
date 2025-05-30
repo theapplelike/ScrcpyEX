@@ -31,27 +31,30 @@ namespace ScrcpyEX.MyDefinition.MyClass
         public MyDragMove(Popup pop, bool isLeaveParent = false)
         {
             _pop = pop;
-            _pop.MouseDown += (s, e) => Pop_MouseDown();
-            _pop.MouseMove += (s, e) => Pop_MouseMove(isLeaveParent);
-            _pop.MouseUp += (s, e) => Pop_MouseUp();
 
             TextBox txt = pop.Child.FindVisualChild<TextBox>();
             txt.PreviewTextInput += TextBox_PreviewTextInput;
             txt.TextChanged += TextBox_TextChanged;
+            txt.SetValue(InputMethod.IsInputMethodEnabledProperty, false);//文本框禁用输入法
 
             Button btn = pop.Child.FindVisualChild<Button>();
             btn.Click += Button_Click;
+
+            _pop.MouseDown += (s, e) => Pop_MouseDown(txt);
+            _pop.MouseMove += (s, e) => Pop_MouseMove(isLeaveParent);
+            _pop.MouseUp += (s, e) => Pop_MouseUp();
         }
 
         /// <summary>
         /// 鼠标按下时发生的事件，允许移动且记录当前坐标。
         /// 嵌套顺序应该为Popup->Border(提供边框)->TextBox(提供输入框)、TextBlock(提供定位点)。
         /// </summary>
-        private void Pop_MouseDown()
+        private void Pop_MouseDown(TextBox txt)
         {
             //让Popup中的TextBlock捕获鼠标，防止移动太快时丢失Popup
             TextBlock tbk = _pop.Child.FindVisualChild<TextBlock>();
             _isDragging = Mouse.Capture(tbk);
+            GotFocus(txt);
 
             //记录当前坐标为上一次的坐标
             _lastPoint = MyGM.GetPosition();
@@ -110,7 +113,10 @@ namespace ScrcpyEX.MyDefinition.MyClass
             {
                 if (textBox.Text.Length >= 1)
                 {
-                    e.Handled = true;//如果已经有一个字符，阻止进一步输入
+                    if (!IsAllTextSelected(textBox))
+                    {
+                        e.Handled = true;//如果已经有一个字符，阻止进一步输入
+                    }
                 }
                 else
                 {
@@ -143,6 +149,25 @@ namespace ScrcpyEX.MyDefinition.MyClass
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 文本框获得焦点，选择所有文本。
+        /// </summary>
+        private void GotFocus(TextBox txt)
+        {
+            txt.Focus();
+            txt.SelectAll();
+        }
+
+        /// <summary>
+        /// 检查文本框是否选中了所有的文本。
+        /// </summary>
+        /// <param name="txt">指定的文本框。</param>
+        /// <returns>true--选中了所有文本；false--未选中所有文本，文本框中没有任何内容时始终返回false。</returns>
+        private bool IsAllTextSelected(TextBox txt)
+        {
+            return txt.SelectionStart == 0 && txt.SelectionLength == txt.Text.Length;
         }
 
         /// <summary>

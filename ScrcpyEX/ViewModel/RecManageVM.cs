@@ -72,7 +72,11 @@ namespace ScrcpyEX.ViewModel
                 _index = -1;
                 PointDt.Clear();
                 RecInfos.Remove(info);
-                File.Delete(@$"{MV.ScriptPath}\{info.ImgName}");
+
+                if (info.ImgName != "")
+                {
+                    File.Delete(@$"{MV.ScriptPath}\{info.ImgName}");
+                }
             }
         }
 
