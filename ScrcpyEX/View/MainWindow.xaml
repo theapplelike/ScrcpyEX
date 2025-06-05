@@ -119,7 +119,9 @@
 
             <Border x:Name="bdRec" HorizontalAlignment="Right" BorderBrush="SteelBlue" BorderThickness="4">
                 <DockPanel>
+                    <Button x:Name="btnImgCompare" Click="BtnImgCompare_Click" Style="{StaticResource MenuBtn}" Content="&#xf58c;" Foreground="SteelBlue" Margin="0" ToolTip="查看脚本比对图像"/>
                     <DockPanel x:Name="dplTip">
+                        <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
                         <TextBlock Text="{Binding CycleNum}" VerticalAlignment="Center" FontSize="16" Margin="2,0,0,0"/>
                         <TextBlock Text="次⊱⊰" VerticalAlignment="Center" FontSize="16"/>
                         <TextBlock Text="{Binding Running}" VerticalAlignment="Center" FontSize="16"/>

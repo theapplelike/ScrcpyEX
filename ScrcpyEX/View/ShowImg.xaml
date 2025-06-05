@@ -12,8 +12,11 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        
-        <Image x:Name="img" Margin="5"/>
+
+        <UniformGrid x:Name="ung" Rows="1">
+            <Image x:Name="img" Margin="5"/>
+        </UniformGrid>
+
         <TextBlock x:Name="tbk" Text="起始点" Grid.Row="1" Margin="10" HorizontalAlignment="Center"/>
     </Grid>
 </Window>

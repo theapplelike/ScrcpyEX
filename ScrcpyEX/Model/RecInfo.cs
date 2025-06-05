@@ -38,7 +38,7 @@ namespace ScrcpyEX.Model
         public int CycleInterval { get; set; } = 100;
 
         /// <summary>
-        /// 局部图片的路径，默认为空字符串。
+        /// 用于对比的脚本图片的名称，默认为空字符串。
         /// </summary>
         public string ImgName { get; set; } = "";
 

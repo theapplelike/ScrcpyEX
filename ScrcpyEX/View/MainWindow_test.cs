@@ -48,11 +48,11 @@ namespace ScrcpyEX.View
             Console.WriteLine($"程序左上角：{pt1.X},{pt1.Y}。");
 
             RecInfo recInfo = MyCfg.Cfg.RecInfos[0];
-            (Bitmap scWindow, WPoint diff) = await CaptureScrcpyWindow(_scHandle, _mainHandle);
-            Console.WriteLine($"左上角的差：{diff.X},{diff.Y}，原始坐标：{recInfo.CropRect.X},{recInfo.CropRect.Y}");
+            CroppedBitmap scWindow = await GetScriptImg(_scHandle, _mainHandle, recInfo.CropRect);
+            Console.WriteLine($"原始坐标：{recInfo.CropRect.X},{recInfo.CropRect.Y}");
             if (scWindow != null)
             {
-                double ssim = CompareImage(scWindow, diff, recInfo);
+                double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
                 Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
             }
 

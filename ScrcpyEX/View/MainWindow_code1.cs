@@ -147,29 +147,38 @@ namespace ScrcpyEX.View
         private void OpenRecordManage()
         {
             RecManage manage = new();
-            if (manage.ShowDialog() == true)
+            if (manage.ShowDialog() != true)
             {
-                if (_scHandle == IntPtr.Zero)
+                return;
+            }
+            
+            if (_scHandle == IntPtr.Zero)
+            {
+                popMid.Show("未进行投屏，不能执行脚本。");
+                return;
+            }
+            
+            if (MouseScript.HookID != IntPtr.Zero)
+            {
+                popMid.Show("已开启录制操作，不能执行脚本。");
+                return;
+            }
+                    
+            if (manage.TempRecInfo.IsTime)
+            {
+                ScriptBefore(manage.TempRecInfo);
+                TimedScript();
+            }
+            else
+            {
+                if (manage.TempRecInfo.ImgName != "")
                 {
-                    popMid.Show("未进行投屏，不能执行脚本。");
+                    ScriptBefore(manage.TempRecInfo);
+                    ImageScript();
                 }
                 else
                 {
-                    if (MouseScript.HookID != IntPtr.Zero)
-                    {
-                        popMid.Show("已开启录制操作，不能执行脚本。");
-                        return;
-                    }
-
-                    ScriptBefore(manage.TempRecInfo);
-                    if (manage.TempRecInfo.IsTime)
-                    {
-                        TimedScript();
-                    }
-                    else
-                    {
-                        ImageScript();
-                    }
+                    popMid.Show("未截取图片，不能执行图片脚本。");
                 }
             }
         }
@@ -190,7 +199,6 @@ namespace ScrcpyEX.View
             _stopwatch = Stopwatch.StartNew();
             bdRec.Visibility = Visibility.Visible;
             dplTip.Visibility = Visibility.Visible;
-            
 
             //如果脚本已执行则关闭
             if (_countTimer.IsEnabled)

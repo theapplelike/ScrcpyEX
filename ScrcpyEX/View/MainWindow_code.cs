@@ -37,6 +37,7 @@ namespace ScrcpyEX.View
             SetTimer();
             ReadCfg();
             SetUISize(true);
+            CheckScrcpy();
         }
 
         /// <summary>
@@ -61,6 +62,22 @@ namespace ScrcpyEX.View
                 Top = (SystemParameters.WorkArea.Height - ActualHeight) / 2;
             }
             //Console.WriteLine($"窗体尺寸：{Width},{Height}。");
+        }
+
+        /// <summary>
+        /// 检查scrcpy是否已经运行，如果运行则停止。
+        /// </summary>
+        private void CheckScrcpy()
+        {
+            // 查询指定名称的进程（无需包含.exe扩展名）
+            Process[] processes = Process.GetProcessesByName("scrcpy");
+
+            if (processes.Length > 0)
+            {
+                //Console.WriteLine($"进程ID: {processes[0].Id}");
+                //Console.WriteLine($"主模块路径: {processes[0].MainModule?.FileName}");
+                processes[0].Kill();
+            }
         }
 
         /// <summary>

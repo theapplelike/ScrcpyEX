@@ -136,6 +136,11 @@ namespace ScrcpyEX.View
         {
             StopScriptAndRecord();
         }
+
+        private void BtnImgCompare_Click(object sender, RoutedEventArgs e)
+        {
+            ImgCompare(_recInfo);
+        }
         #endregion
 
         #region 弹出菜单事件
@@ -198,6 +203,7 @@ namespace ScrcpyEX.View
         {
             MappingAdd();
         }
+
 
         #endregion
 

@@ -163,7 +163,7 @@ namespace ScrcpyEX.View
             _vm.CycleNum++;
             _stopwatch = Stopwatch.StartNew();
             await ExecuteClickScript(recInfo);
-            Console.WriteLine("计时脚本执行完毕...");
+            //Console.WriteLine("计时脚本执行完毕...");
         }
 
         /// <summary>
@@ -191,15 +191,14 @@ namespace ScrcpyEX.View
                 _scriptInterval = 5;
             }
 
-            (Bitmap scWindow, WPoint diff) = await CaptureScrcpyWindow(_scHandle, _mainHandle);
-            //Console.WriteLine($"左上角的差：{diff.X},{diff.Y}");
+            CroppedBitmap scWindow = await GetScriptImg(_scHandle, _mainHandle, recInfo.CropRect);
             if (scWindow == null)
             {
-                popMid.Show("获取Scrcpy截图失败。");
+                popMid.Show("获取Scrcpy脚本截图失败。");
                 return;
             }
 
-            double ssim = CompareImage(scWindow, diff, recInfo);
+            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
             if (ssim > 0.9)
             {
                 _scriptInterval = (int)(_vm.Running * 0.9);//每次将上一次间隔的90%作为自适应间隔
@@ -250,29 +249,32 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 获得Scrcpy窗口的截图。
+        /// 获得脚本的截图，Scrcpy嵌入在WPF窗体中，所以要判断主窗体是否最小化，
+        /// 最小化时要显示窗口但不激活，否则最小化时窗口不会渲染。
         /// </summary>
         /// <param name="scHandle">Scrcpy的句柄。</param>
         /// <param name="mainHandle">承载Scrcpy程序的句柄。</param>
         /// <returns>返回System.Drawing.Bitmap类型的截图；返回程序左上角和Scrcpy左上角坐标的差。</returns>
-        public async Task<(Bitmap, WPoint)> CaptureScrcpyWindow(IntPtr scHandle, IntPtr mainHandle)
+        private async Task<CroppedBitmap> GetScriptImg(IntPtr scHandle, IntPtr mainHandle, Int32Rect rect)
         {
-            //Scrcpy嵌入在WPF窗体中，所以要判断主窗体是否最小化，最小化时要显示窗口但不激活，否则最小化时窗口是不会渲染的
+            //判断主窗口是否最小化
             bool isIcon = DLL.IsIconic(mainHandle);
-            //Console.WriteLine($"是否最小化:{isIcon}。");
             if (isIcon)
             {
                 DLL.ShowWindow(mainHandle, SW.SW_SHOWNOACTIVATE);
                 await Task.Delay(50);
             }
+            //Console.WriteLine($"是否最小化:{isIcon}。");
 
+            //获得scrcpy窗口的矩形大小
             DLL.GetWindowRect(scHandle, out DLL.LpRect rc);
             if (rc.Width <= 0 || rc.Height <= 0)
             {
-                return (null, new());
+                return null;
             }
             //Console.WriteLine($"Scrcpy窗口尺寸：{rc.Left},{rc.Top},{rc.Right},{rc.Bottom},{rc.Width},{rc.Height}");
 
+            //将scrcpy的窗口复制到Bitmap中
             Bitmap bmp = new(rc.Width, rc.Height);
             using (Graphics g = Graphics.FromImage(bmp))
             {
@@ -281,31 +283,21 @@ namespace ScrcpyEX.View
                 g.ReleaseHdc(hdc);
                 if (!success)
                 {
-                    return (null, new());
+                    return null;
                 }
             }
 
             //计算程序左上角和Scrcpy左上角坐标的差
+            BitmapSource scWindow = MyGM.ConvertToBitmapSource(bmp);
             WPoint main = PointToScreen(new WPoint(0, 0));
-            return (bmp, new(main.X - rc.Left, main.Y - rc.Top));
-        }
+            WPoint diff = new(main.X - rc.Left, main.Y - rc.Top);
+            //Console.WriteLine($"左上角的差：{diff.X},{diff.Y}");
 
-        /// <summary>
-        /// 对比脚本图像和Scrcpy指定区域的图像。
-        /// </summary>
-        /// <param name="scWindow">整个Scrcpy窗口的截图。</param>
-        /// <param name="diff">程序左上角和Scrcpy左上角坐标的差。</param>
-        /// <param name="recInfo">当前要执行的脚本。</param>
-        /// <returns>返回相似度，0-1之间，越高说明越相似。</returns>
-        private double CompareImage(Bitmap scWindow, WPoint diff, RecInfo recInfo)
-        {
-            //计算要对Scrcpy截取的区域，X和Y要加上程序左上角和Scrcpy左上角坐标的差
-            Int32Rect rect= recInfo.CropRect;
+            //计算对scrcpy窗口截取的区域
             Int32Rect cropRect = new(
-                (int)(rect.X + diff.X), 
+                (int)(rect.X + diff.X),
                 (int)(rect.Y + diff.Y), rect.Width, rect.Height);
 
-            BitmapSource sc = MyGM.ConvertToBitmapSource(scWindow);
             //Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}，" +
             //    $"比例：{DpiScaleX},{DpiScaleY}，" +
             //    $"起点：{cropRect.X},{cropRect.Y}，" +
@@ -314,15 +306,50 @@ namespace ScrcpyEX.View
             //    $"图片大小：{sc.Width},{sc.Height}，" +
             //    $"程序大小：{MV.MainWin.Width},{MV.MainWin.Height}");
 
-            CheckRect(ref cropRect, (int)sc.Width, (int)sc.Height);
-            CroppedBitmap temp = new(sc, cropRect);
+            //检查范围，获得最终的截图区域
+            CheckRect(ref cropRect, (int)scWindow.Width, (int)scWindow.Height);
+            CroppedBitmap temp = new(scWindow, cropRect);
             if (Debugger.IsAttached)
             {
                 MyGM.SavaImg("tempPic.png", temp);
             }
 
-            return OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", temp);
+            return temp;
         }
+
+        //25.6.5
+        /// <summary>
+        /// 对比脚本图像和Scrcpy指定区域的图像。
+        /// </summary>
+        /// <param name="scWindow">整个Scrcpy窗口的截图。</param>
+        /// <param name="diff">程序左上角和Scrcpy左上角坐标的差。</param>
+        /// <param name="recInfo">当前要执行的脚本。</param>
+        /// <returns>返回相似度，0-1之间，越高说明越相似。</returns>
+        //private double CompareImage(BitmapSource scWindow, WPoint diff, RecInfo recInfo)
+        //{
+        //    //计算要对Scrcpy截取的区域，X和Y要加上程序左上角和Scrcpy左上角坐标的差
+        //    Int32Rect rect= recInfo.CropRect;
+        //    Int32Rect cropRect = new(
+        //        (int)(rect.X + diff.X), 
+        //        (int)(rect.Y + diff.Y), rect.Width, rect.Height);
+        //
+        //    //Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}，" +
+        //    //    $"比例：{DpiScaleX},{DpiScaleY}，" +
+        //    //    $"起点：{cropRect.X},{cropRect.Y}，" +
+        //    //    $"宽高：{cropRect.Width},{cropRect.Height}，" +
+        //    //    $"终点：{cropRect.X + cropRect.Width},{cropRect.Y + cropRect.Height}，" +
+        //    //    $"图片大小：{sc.Width},{sc.Height}，" +
+        //    //    $"程序大小：{MV.MainWin.Width},{MV.MainWin.Height}");
+        //
+        //    CheckRect(ref cropRect, (int)scWindow.Width, (int)scWindow.Height);
+        //    CroppedBitmap temp = new(scWindow, cropRect);
+        //    if (Debugger.IsAttached)
+        //    {
+        //        MyGM.SavaImg("tempPic.png", temp);
+        //    }
+        //
+        //    return OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", temp);
+        //}
 
         /// <summary>
         /// 如果要截取的区域超出sc图片的范围，则将值限定在范围内。
@@ -349,6 +376,22 @@ namespace ScrcpyEX.View
             {
                 rect.Y = 0;
             }
+        }
+
+        private async void ImgCompare(RecInfo recInfo)
+        {
+            CroppedBitmap scWindow = await GetScriptImg(_scHandle, _mainHandle, _recInfo.CropRect);
+            if (scWindow == null)
+            {
+                popMid.Show("获取Scrcpy截图失败。");
+                return;
+            }
+
+            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
+            Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
+
+            ShowImg showImg = new(recInfo, scWindow);
+            showImg.ShowDialog();
         }
 
 
