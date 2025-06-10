@@ -73,12 +73,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// 使用结构相似性指标（SSIM）比较两张图片的相似性。
         /// </summary>
         /// <param name="path1">第一张图片的路径。</param>
-        /// <param name="crop">CroppedBitmap类型的第二张图片。</param>
+        /// <param name="bitmapSource">CroppedBitmap类型的第二张图片。</param>
         /// <returns>SSIM值在0.0到1.0之间，值越大表示相似度越高。</returns>
-        public static double CompareSSIM(string path1, CroppedBitmap crop)
+        public static double CompareSSIM(string path1, BitmapSource bitmapSource)
         {
             using Mat img1 = Cv2.ImRead(path1, ImreadModes.Grayscale);
-            using Mat img2 = ConvertCroppedBitmapToMat(crop);
+            using Mat img2 = ConvertBitmapSourceToMat(bitmapSource);
 
             // 确保图像尺寸一致
             if (img1.Size() != img2.Size())
@@ -129,25 +129,31 @@ namespace ScrcpyEX.MyDefinition.MyClass
         }
 
         /// <summary>
-        /// 将CroppedBitmap类型的图片转换为OpenCv可以处理的Mat类型。
+        /// 将BitmapSource类型及其派生类型的图片转换为OpenCv可以处理的Mat类型。
         /// </summary>
-        /// <param name="croppedBitmap">CroppedBitmap类型的图片。</param>
+        /// <param name="bitmapSource">BitmapSource类型及其派生类型的图片。</param>
         /// <returns>Mat类型。</returns>
-        public static Mat ConvertCroppedBitmapToMat(CroppedBitmap croppedBitmap)
+        public static Mat ConvertBitmapSourceToMat(BitmapSource bitmapSource)
         {
+            BitmapSource source = bitmapSource;
+
             // 1. 转换为 BGRA32 格式
-            var convertedBitmap = new FormatConvertedBitmap();
-            convertedBitmap.BeginInit();
-            convertedBitmap.Source = croppedBitmap;
-            convertedBitmap.DestinationFormat = PixelFormats.Bgra32;
-            convertedBitmap.EndInit();
+            if (bitmapSource.Format != PixelFormats.Bgra32)
+            {
+                FormatConvertedBitmap convertedBitmap = new();
+                convertedBitmap.BeginInit();
+                convertedBitmap.Source = bitmapSource;
+                convertedBitmap.DestinationFormat = PixelFormats.Bgra32;
+                convertedBitmap.EndInit();
+                source = convertedBitmap;
+            }
 
             // 2. 提取像素数据
-            int width = convertedBitmap.PixelWidth;
-            int height = convertedBitmap.PixelHeight;
-            int stride = (width * 32 + 7) / 8; // 32 bits per pixel (BGRA32)
+            int width = source.PixelWidth;
+            int height = source.PixelHeight;
+            int stride = (width * source.Format.BitsPerPixel + 7) / 8;//32 bits per pixel (BGRA32)
             byte[] pixelData = new byte[height * stride];
-            convertedBitmap.CopyPixels(pixelData, stride, 0);
+            source.CopyPixels(pixelData, stride, 0);
 
             // 3. 使用 Mat.FromPixelData 创建 Mat
             Mat mat;
@@ -172,6 +178,51 @@ namespace ScrcpyEX.MyDefinition.MyClass
             Cv2.CvtColor(mat, mat, ColorConversionCodes.BGRA2GRAY);
             return mat;
         }
+
+        /// <summary>
+        /// 将CroppedBitmap类型的图片转换为OpenCv可以处理的Mat类型。
+        /// </summary>
+        /// <param name="croppedBitmap">CroppedBitmap类型的图片。</param>
+        /// <returns>Mat类型。</returns>
+        //public static Mat ConvertCroppedBitmapToMat(CroppedBitmap croppedBitmap)
+        //{
+        //    // 1. 转换为 BGRA32 格式
+        //    var convertedBitmap = new FormatConvertedBitmap();
+        //    convertedBitmap.BeginInit();
+        //    convertedBitmap.Source = croppedBitmap;
+        //    convertedBitmap.DestinationFormat = PixelFormats.Bgra32;
+        //    convertedBitmap.EndInit();
+        //
+        //    // 2. 提取像素数据
+        //    int width = convertedBitmap.PixelWidth;
+        //    int height = convertedBitmap.PixelHeight;
+        //    int stride = (width * 32 + 7) / 8; // 32 bits per pixel (BGRA32)
+        //    byte[] pixelData = new byte[height * stride];
+        //    convertedBitmap.CopyPixels(pixelData, stride, 0);
+        //
+        //    // 3. 使用 Mat.FromPixelData 创建 Mat
+        //    Mat mat;
+        //    unsafe
+        //    {
+        //        fixed (byte* pData = pixelData)
+        //        {
+        //            // 关键修复点：使用 FromPixelData，并传递正确的参数
+        //            mat = Mat.FromPixelData(
+        //                rows: height,
+        //                cols: width,
+        //                type: MatType.CV_8UC4,
+        //                data: (nint)pData,  // 转换为 nint 类型
+        //                step: stride // 步长以字节为单位
+        //            );
+        //
+        //            mat = mat.Clone(); // 克隆以持久化数据（避免指针失效）
+        //        }
+        //    }
+        //
+        //    // 4. 转换为灰度图，使用ColorConversionCodes.BGRA2BGR会异常
+        //    Cv2.CvtColor(mat, mat, ColorConversionCodes.BGRA2GRAY);
+        //    return mat;
+        //}
 
         public static Scalar Compare_SSIM(string imgFile1, string imgFile2)
         {

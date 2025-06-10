@@ -186,10 +186,7 @@ namespace ScrcpyEX.View
             //Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
 
             Console.WriteLine($"进入新一轮，当前间隔：{_vm.Running}。");
-            if (_scriptInterval > 5)
-            {
-                _scriptInterval = 5;
-            }
+            _scriptInterval = 5;
 
             CroppedBitmap scWindow = await GetScriptImg(_scHandle, _mainHandle, recInfo.CropRect);
             if (scWindow == null)
@@ -201,8 +198,12 @@ namespace ScrcpyEX.View
             double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
             if (ssim > 0.9)
             {
-                _scriptInterval = (int)(_vm.Running * 0.9);//每次将上一次间隔的90%作为自适应间隔
-                _scriptInterval = _scriptInterval < 5 ? 5 : _scriptInterval;
+                if (recInfo.IsAdaptive)
+                {
+                    _scriptInterval = (int)(_vm.Running * 0.9);//每次将上一次间隔的90%作为自适应间隔
+                    _scriptInterval = _scriptInterval < 5 ? 5 : _scriptInterval;
+                }
+
                 _vm.CycleNum++;
                 _stopwatch = Stopwatch.StartNew();
                 await ExecuteClickScript(recInfo);
@@ -254,7 +255,8 @@ namespace ScrcpyEX.View
         /// </summary>
         /// <param name="scHandle">Scrcpy的句柄。</param>
         /// <param name="mainHandle">承载Scrcpy程序的句柄。</param>
-        /// <returns>返回System.Drawing.Bitmap类型的截图；返回程序左上角和Scrcpy左上角坐标的差。</returns>
+        /// <param name="rect">脚本图片的裁剪区域。</param>
+        /// <returns>返回System.Windows.Media.Imaging.CroppedBitmap类型的裁剪图。</returns>
         private async Task<CroppedBitmap> GetScriptImg(IntPtr scHandle, IntPtr mainHandle, Int32Rect rect)
         {
             //判断主窗口是否最小化
@@ -287,7 +289,9 @@ namespace ScrcpyEX.View
                 }
             }
 
-            //计算程序左上角和Scrcpy左上角坐标的差
+            //计算程序左上角和Scrcpy左上角坐标的差，
+            //脚本截图时以主程序为底图，以主程序的左上角为准；
+            //脚本比对时以Scrcpy窗口为底图，以Scrcpy窗口的左上角为准，所以计算最后的截取区域时要加上两者的差
             BitmapSource scWindow = MyGM.ConvertToBitmapSource(bmp);
             WPoint main = PointToScreen(new WPoint(0, 0));
             WPoint diff = new(main.X - rc.Left, main.Y - rc.Top);
@@ -378,6 +382,10 @@ namespace ScrcpyEX.View
             }
         }
 
+        /// <summary>
+        /// 在一个窗口中显示脚本和对比图像。
+        /// </summary>
+        /// <param name="recInfo">当前执行的脚本。</param>
         private async void ImgCompare(RecInfo recInfo)
         {
             CroppedBitmap scWindow = await GetScriptImg(_scHandle, _mainHandle, _recInfo.CropRect);
@@ -386,9 +394,6 @@ namespace ScrcpyEX.View
                 popMid.Show("获取Scrcpy截图失败。");
                 return;
             }
-
-            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
-            Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
 
             ShowImg showImg = new(recInfo, scWindow);
             showImg.ShowDialog();

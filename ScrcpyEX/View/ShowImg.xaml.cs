@@ -27,8 +27,9 @@ namespace ScrcpyEX.View
         {
             InitializeComponent();
             img.Source = MyGM.GetImage(recInfo.ImgName);
-            tbk.Text = 
-                $"起始点：({recInfo.CropRect.X},{recInfo.CropRect.Y})，" +
+            tbkDesc.Visibility = Visibility.Collapsed;
+            tbkParam.Text = 
+                $"起始坐标：({recInfo.CropRect.X},{recInfo.CropRect.Y})，" +
                 $"图片宽高：({recInfo.CropRect.Width},{recInfo.CropRect.Height})。";
         }
 
@@ -36,16 +37,15 @@ namespace ScrcpyEX.View
         {
             InitializeComponent();
 
-            //double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", bitmap);
-            //Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
-
-            img.Source = MyGM.GetImage(recInfo.ImgName);
-            tbk.Text =
-                $"起始点：({recInfo.CropRect.X},{recInfo.CropRect.Y})，" +
-                $"图片宽高：({recInfo.CropRect.Width},{recInfo.CropRect.Height})。";
-
+            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", bitmap);
             Image img1 = new() { Margin = new Thickness(5), Source = bitmap };
-            ung.Children.Add(img1);
+
+            ufg.Children.Add(img1);
+            img.Source = MyGM.GetImage(recInfo.ImgName);
+            tbkParam.Text =
+                $"起始坐标：({recInfo.CropRect.X},{recInfo.CropRect.Y})，" +
+                $"图片宽高：({recInfo.CropRect.Width},{recInfo.CropRect.Height})，" +
+                $"相似程度：{ssim:F8}。";
         }
     }
 }

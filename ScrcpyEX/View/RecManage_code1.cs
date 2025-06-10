@@ -76,6 +76,7 @@ namespace ScrcpyEX.View
                 IsTime = (bool)rdoTime.IsChecked,
                 CycleInterval = interval,
                 ImgName = img.Source == null ? "" : $"Pic{DateTime.Now:yyMMddhhmmss}.png",
+                IsAdaptive = (bool)chkAdaptive.IsChecked,
                 CropRect = _cropRect,
             };
 

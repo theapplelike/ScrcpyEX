@@ -48,6 +48,11 @@ namespace ScrcpyEX.Model
         public Int32Rect CropRect { get; set; }
 
         /// <summary>
+        /// 是否使用自适应间隔。
+        /// </summary>
+        public bool IsAdaptive { get; set; } = false;
+
+        /// <summary>
         /// 录制的坐标点信息列表。
         /// </summary>
         public List<PointInfo> Infos { get; set; } = [];

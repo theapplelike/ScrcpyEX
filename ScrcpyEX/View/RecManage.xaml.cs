@@ -66,6 +66,7 @@ namespace ScrcpyEX.View
         {
             SaveScript();
         }
+
         private void BtnExit_Click(object sender, RoutedEventArgs e)
         {
             //if (TempRecInfo != null)
@@ -87,6 +88,14 @@ namespace ScrcpyEX.View
             showImg.ShowDialog();
         }
 
-        
+        private void RdoImage_Checked(object sender, RoutedEventArgs e)
+        {
+            chkAdaptive.Visibility = Visibility.Visible;
+        }
+
+        private void RdoImage_Unchecked(object sender, RoutedEventArgs e)
+        {
+            chkAdaptive.Visibility = Visibility.Hidden;
+        }
     }
 }

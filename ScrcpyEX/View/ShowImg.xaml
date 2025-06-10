@@ -11,12 +11,14 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <UniformGrid x:Name="ung" Rows="1">
+        <UniformGrid x:Name="ufg" Rows="1">
             <Image x:Name="img" Margin="5"/>
         </UniformGrid>
-
-        <TextBlock x:Name="tbk" Text="起始点" Grid.Row="1" Margin="10" HorizontalAlignment="Center"/>
+        
+        <TextBlock x:Name="tbkDesc" Text="脚本截图的起始坐标基于主程序左窗口上角，比对截图的起始坐标基于Scrcpy窗口左上角。" Grid.Row="1" Margin="10" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="tbkParam" Text="起始坐标" Grid.Row="2" Margin="10" HorizontalAlignment="Center"/>
     </Grid>
 </Window>
