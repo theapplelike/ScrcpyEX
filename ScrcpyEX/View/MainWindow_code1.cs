@@ -118,6 +118,7 @@ namespace ScrcpyEX.View
                 {
                     RemoveBlack();
                     bdRec.Visibility = Visibility.Visible;
+                    btnImgCompare.Visibility = Visibility.Collapsed;
                     popMid.Show("已开启录制操作，录制时会自动消除黑边。");
                 }
                 else
@@ -199,6 +200,7 @@ namespace ScrcpyEX.View
             _stopwatch = Stopwatch.StartNew();
             bdRec.Visibility = Visibility.Visible;
             dplTip.Visibility = Visibility.Visible;
+            btnImgCompare.Visibility = Visibility.Visible;
 
             //如果脚本已执行则关闭
             if (_countTimer.IsEnabled)

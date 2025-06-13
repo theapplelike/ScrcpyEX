@@ -313,10 +313,10 @@ namespace ScrcpyEX.View
             //检查范围，获得最终的截图区域
             CheckRect(ref cropRect, (int)scWindow.Width, (int)scWindow.Height);
             CroppedBitmap temp = new(scWindow, cropRect);
-            if (Debugger.IsAttached)
-            {
-                MyGM.SavaImg("tempPic.png", temp);
-            }
+            //if (Debugger.IsAttached)
+            //{
+            //    MyGM.SavaImg("tempPic.png", temp);
+            //}
 
             return temp;
         }
@@ -388,6 +388,12 @@ namespace ScrcpyEX.View
         /// <param name="recInfo">当前执行的脚本。</param>
         private async void ImgCompare(RecInfo recInfo)
         {
+            if (recInfo.ImgName == "")
+            {
+                popMid.Show("此脚本未截取图片，不能进行比对。");
+                return;
+            }
+
             CroppedBitmap scWindow = await GetScriptImg(_scHandle, _mainHandle, _recInfo.CropRect);
             if (scWindow == null)
             {

@@ -61,7 +61,7 @@ namespace ScrcpyEX.ExtensionMethod
         /// <summary>
         /// 无线连接的端口号。
         /// </summary>
-        public string Port { get; set; }
+        public string Port { get; set; } = "5555";
 
         /// <summary>
         /// 定位到左上角。

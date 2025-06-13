@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
         Title="脚本管理" Height="450" Width="640" x:Name="root" 
-        AllowsTransparency="True" WindowStyle="None"
+        AllowsTransparency="True" WindowStyle="None" Background="Transparent"
         WindowStartupLocation="CenterScreen" SizeToContent="Width"
         Loaded="Window_Loaded" Closed="Root_Closed">
 
@@ -40,120 +40,120 @@
         </Style>
     </Window.Resources>
 
-    <Grid>
-        <!--<Grid.RowDefinitions>
-            <RowDefinition Height="200"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>-->
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="360"/>
-            <ColumnDefinition Width="280"/>
-        </Grid.ColumnDefinitions>
+    <!--设置圆角需要窗体背景色为透明，背景色需要在Border设置-->
+    <Border BorderThickness="3" BorderBrush="#5B9DF0" CornerRadius="10" Background="White">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="360"/>
+                <ColumnDefinition Width="280"/>
+            </Grid.ColumnDefinitions>
 
-        <Grid Margin="10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="20"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="脚本列表（有黑边时执行脚本会导致错位）：" Margin="10,0,0,0"/>
-            <ListBox x:Name="lst" ItemsSource="{Binding RecInfos}" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="155" />
-                                    <ColumnDefinition Width="40" />
-                                    <ColumnDefinition Width="10" />
-                                    <ColumnDefinition Width="40" />
-                                    <ColumnDefinition Width="40" />
-                                    <ColumnDefinition Width="40" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock x:Name="tbkEdit" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="10,0" VerticalAlignment="Center"/>
-                                <TextBox x:Name="txtEdit" Text="{Binding Name}" Visibility="Hidden" VerticalAlignment="Center" Margin="10,0"/>
-                                <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="1" Content="&#xe8ac;" Style="{StaticResource LstBtn}"/>
-                                <TextBlock Text="|" FontSize="20" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
-
-                                <Button x:Name="btnAct" Click="BtnAct_Click" CommandParameter="{Binding}" Grid.Column="3" Content="&#xec57;" Style="{StaticResource LstBtn}"/>
-                                <Button x:Name="btnSet" Click="BtnSet_Click" CommandParameter="{Binding}" Grid.Column="4" Content="&#xe713;" Style="{StaticResource LstBtn}"/>
-                                <Button x:Name="btnDel" Click="BtnDel_Click" CommandParameter="{Binding}" Grid.Column="5" Content="&#xe74d;" Style="{StaticResource LstBtn}"/>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </Grid>
-
-        <Grid Grid.Column="1" Margin="10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="20"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="30"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="详细信息：" Margin="10,0,0,0"/>
-
-            <DataGrid Grid.Row="1" ItemsSource="{Binding PointDt}" AutoGenerateColumns="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="延时（秒）" Binding="{Binding LastTime}" Width="*" />
-                    <DataGridTextColumn Header="坐标点X" Binding="{Binding XAxis}" Width="*" />
-                    <DataGridTextColumn Header="坐标点Y" Binding="{Binding YAxis}" Width="*" />
-                </DataGrid.Columns>
-            </DataGrid>
-
-            <Grid Grid.Row="2" Margin="0,5">
+            <Grid Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20"/>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="4"/>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="60"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                <TextBlock Text="脚本列表（有黑边时执行脚本会导致错位）：" Margin="10,0,0,0"/>
+                <ListBox x:Name="lst" ItemsSource="{Binding RecInfos}" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="155" />
+                                        <ColumnDefinition Width="40" />
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition Width="40" />
+                                        <ColumnDefinition Width="40" />
+                                        <ColumnDefinition Width="40" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="tbkEdit" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="10,0" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="txtEdit" Text="{Binding Name}" Visibility="Hidden" VerticalAlignment="Center" Margin="10,0"/>
+                                    <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="1" Content="&#xe8ac;" Style="{StaticResource LstBtn}"/>
+                                    <TextBlock Text="|" FontSize="20" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
 
-                <TextBlock Text="循环次数" HorizontalAlignment="Center"/>
-                <RadioButton x:Name="rdoLimited" Grid.Row="0" Grid.Column="1" GroupName="num">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="指定执行"/>
-                        <TextBox x:Name="txtCycleNum" Width="40" Margin="5,0"/>
-                        <TextBlock Text="次"/>
-                    </StackPanel>
-                </RadioButton>
-                <RadioButton x:Name="rdoHandStop" Grid.Row="1" Grid.Column="1" Content="手动停止" GroupName="num"/>
-
-                <Border Grid.Row="2" Grid.ColumnSpan="2" BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2" Margin="0,0,0,2"/>
-
-                <TextBlock Text="循环条件" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center"/>
-                <RadioButton x:Name="rdoTime" Grid.Row="3" Grid.Column="1" GroupName="cond">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="时间间隔"/>
-                        <TextBox x:Name="txtCycleInterval" Width="40" Margin="5,0"/>
-                        <TextBlock Text="秒"/>
-                    </StackPanel>
-                </RadioButton>
-                <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
-                    <RadioButton x:Name="rdoImage" Checked="RdoImage_Checked" Unchecked="RdoImage_Unchecked" Content="局部图片" GroupName="cond"/>
-                    <Grid Width="40" Margin="5,0" Background="Gainsboro">
-                        <Image x:Name="img" MouseLeftButtonDown="Img_MouseLeftButtonDown"/>
-                    </Grid>
-                    <Button x:Name="btnScreenshot" Click="BtnScreenshot_Click" Content="截图" Style="{StaticResource Btn}" Width="60"/>
-                </StackPanel>
-                <CheckBox x:Name="chkAdaptive" Content="使用自适应间隔" Grid.Row="5" Grid.Column="1" Margin="18,0,0,0" VerticalAlignment="Center" ToolTip="图像比对默认5秒一次，如果开启自适应间隔，第二次起首次比对时间为上一次总间隔的90%，之后恢复为5秒一次。"/>
+                                    <Button x:Name="btnAct" Click="BtnAct_Click" CommandParameter="{Binding}" Grid.Column="3" Content="&#xec57;" Style="{StaticResource LstBtn}"/>
+                                    <Button x:Name="btnSet" Click="BtnSet_Click" CommandParameter="{Binding}" Grid.Column="4" Content="&#xe713;" Style="{StaticResource LstBtn}"/>
+                                    <Button x:Name="btnDel" Click="BtnDel_Click" CommandParameter="{Binding}" Grid.Column="5" Content="&#xe74d;" Style="{StaticResource LstBtn}"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </Grid>
+
+            <Grid Grid.Column="1" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="详细信息：" Margin="10,0,0,0"/>
+
+                <DataGrid Grid.Row="1" ItemsSource="{Binding PointDt}" AutoGenerateColumns="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="延时（秒）" Binding="{Binding LastTime}" Width="*" />
+                        <DataGridTextColumn Header="坐标点X" Binding="{Binding XAxis}" Width="*" />
+                        <DataGridTextColumn Header="坐标点Y" Binding="{Binding YAxis}" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <Grid Grid.Row="2" Margin="0,5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="4"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="20"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="循环次数" HorizontalAlignment="Center"/>
+                    <RadioButton x:Name="rdoLimited" Grid.Row="0" Grid.Column="1" GroupName="num">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="指定执行"/>
+                            <TextBox x:Name="txtCycleNum" Width="40" Margin="5,0"/>
+                            <TextBlock Text="次"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="rdoHandStop" Grid.Row="1" Grid.Column="1" Content="手动停止" GroupName="num"/>
+
+                    <Border Grid.Row="2" Grid.ColumnSpan="2" BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2" Margin="0,0,0,2"/>
+
+                    <TextBlock Text="循环条件" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center"/>
+                    <RadioButton x:Name="rdoTime" Grid.Row="3" Grid.Column="1" GroupName="cond">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="时间间隔"/>
+                            <TextBox x:Name="txtCycleInterval" Width="40" Margin="5,0"/>
+                            <TextBlock Text="秒"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
+                        <RadioButton x:Name="rdoImage" Checked="RdoImage_Checked" Unchecked="RdoImage_Unchecked" Content="局部图片" GroupName="cond"/>
+                        <Grid Width="40" Margin="5,0" Background="Gainsboro">
+                            <Image x:Name="img" MouseLeftButtonDown="Img_MouseLeftButtonDown"/>
+                        </Grid>
+                        <Button x:Name="btnScreenshot" Click="BtnScreenshot_Click" Content="截图" Style="{StaticResource Btn}" Width="60"/>
+                    </StackPanel>
+                    <CheckBox x:Name="chkAdaptive" Content="使用自适应间隔" Grid.Row="5" Grid.Column="1" Margin="18,0,0,0" VerticalAlignment="Center" ToolTip="图像比对默认5秒一次，如果开启自适应间隔，第二次起首次比对时间为上一次总间隔的90%，之后恢复为5秒一次。"/>
+                </Grid>
             
-            <Grid Grid.Row="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button x:Name="btnSave" Click="BtnSave_Click" Content="保存" Style="{StaticResource Btn}"/>
-                <Button x:Name="btnExit" Click="BtnExit_Click" Content="返回" Style="{StaticResource Btn}" Grid.Column="1"/>
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="btnSave" Click="BtnSave_Click" Content="保存" Style="{StaticResource Btn}"/>
+                    <Button x:Name="btnExit" Click="BtnExit_Click" Content="返回" Style="{StaticResource Btn}" Grid.Column="1"/>
+                </Grid>
             </Grid>
-        </Grid>
         
-    </Grid>
+        </Grid>
+    </Border>
+    
 </Window>
