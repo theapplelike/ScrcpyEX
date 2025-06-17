@@ -25,7 +25,7 @@ namespace ScrcpyEX.MyDefinition
         /// </summary>
         /// <param name="hWndChild">作为子窗口的句柄。</param>
         /// <param name="hWndNewParent">新父窗口的句柄。如果此参数为 NULL，桌面窗口将成为新的父窗口。如果此参数 HWND_MESSAGE，则子窗口将成为仅消息窗口。</param>
-        /// <returns>如果函数成功，则返回值是上一个父窗口的句柄。</returns>
+        /// <returns>如果函数成功，则返回值是上一个父窗口的句柄。如果函数失败，则返回值为NULL。</returns>
         [DllImport("User32.dll", EntryPoint = "SetParent")]
         public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 

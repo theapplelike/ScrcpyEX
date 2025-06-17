@@ -74,7 +74,12 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Prc_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            Console.WriteLine($"[E]{e.Data}。");
+            Console.WriteLine($"[E]{e.Data}");
+
+            if (e.Data.Contains("A popup should open on the device to request authorization."))
+            {
+                popMid.Show("请在设备上同意授权后再试。");
+            }
         }
 
         /// <summary>
@@ -86,7 +91,7 @@ namespace ScrcpyEX.View
             {
                 return;
             }
-            Console.WriteLine($"[I]{e.Data}。");
+            Console.WriteLine($"[I]{e.Data}");
 
             //获得当前分辨率，第一个参数是宽，第二个参数是高
             if (e.Data.Contains("Texture"))

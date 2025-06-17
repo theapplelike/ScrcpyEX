@@ -28,7 +28,7 @@ namespace ScrcpyEX.View
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Init();
+            MyInit();
         }
 
         private void BtnScrcpy_Click(object sender, RoutedEventArgs e)

@@ -37,7 +37,6 @@ namespace ScrcpyEX.View
             SetTimer();
             ReadCfg();
             SetUISize(true);
-            CheckScrcpy();
         }
 
         /// <summary>
@@ -163,6 +162,7 @@ namespace ScrcpyEX.View
             if (_scHandle == IntPtr.Zero)
             {
                 btnWired.IsEnabled = btnWirel.IsEnabled = false;
+                CheckScrcpy();
                 await ConnectScrcpy(isWired);
                 btnWired.IsEnabled = btnWirel.IsEnabled = true;
             }
@@ -263,35 +263,35 @@ namespace ScrcpyEX.View
         /// <returns>true--嵌入成功；false嵌入失败。</returns>
         private bool EmbeddedForm()
         {
-            foreach (var p in Process.GetProcesses())
+            // 查询指定名称的进程（无需包含.exe扩展名）
+            Process[] processes = Process.GetProcessesByName("scrcpy");
+            //Console.WriteLine($"进程的数量：{processes.Length}。");
+            if (processes.Length > 0 && processes[0].MainWindowHandle != IntPtr.Zero)
             {
-                if (p.MainWindowTitle.Contains(_scName))
-                {
-                    _scHandle = p.MainWindowHandle;
-            
-                    HideTitleBar(_scHandle);
-                    DLL.SetParent(_scHandle, pnlShow.Handle);
-                    DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
+                _scHandle = processes[0].MainWindowHandle;
 
-                    Console.WriteLine($"Scrcpy句柄：{_scHandle}，名称：{p.MainWindowTitle}。");
-                    return true;
-                }
+                HideTitleBar(_scHandle);
+                IntPtr parent = DLL.SetParent(_scHandle, pnlShow.Handle);
+                DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
+
+                Console.WriteLine($"Scrcpy句柄：{_scHandle}，名称：{processes[0].MainWindowTitle}，父级句柄：{parent}。");
+                return parent != IntPtr.Zero;
             }
 
-            //2024.11.15
-            //IntPtr h = FindWindow(null, _scName);
-            //if (h != IntPtr.Zero)
+            //23.6.17
+            //foreach (var p in Process.GetProcesses())
             //{
-            //    _scHandle = h;
+            //    if (p.MainWindowTitle.Contains(_scName))
+            //    {
+            //        _scHandle = p.MainWindowHandle;
             //
-            //    HideTitleBar(h);
-            //    await Task.Delay(100);
-            //    SetParent(h, pnlShow.Handle);
-            //    await Task.Delay(100);
-            //    ShowWindow(h, 3);
+            //        HideTitleBar(_scHandle);
+            //        DLL.SetParent(_scHandle, pnlShow.Handle);
+            //        DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
             //
-            //    Console.WriteLine($"找到scrcpy句柄：{h}。");
-            //    return true;
+            //        Console.WriteLine($"Scrcpy句柄：{_scHandle}，名称：{p.MainWindowTitle}。");
+            //        return true;
+            //    }
             //}
 
             return false;

@@ -11,7 +11,7 @@ namespace ScrcpyEX.View
 {
     public partial class Setup//code
     {
-        private void Init()
+        private void MyInit()
         {
             stp1.Visibility = Visibility.Collapsed;
             stp2.Visibility = Visibility.Collapsed;
