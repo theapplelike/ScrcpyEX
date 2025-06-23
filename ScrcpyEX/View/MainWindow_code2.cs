@@ -74,6 +74,10 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Prc_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
+            if (e.Data == null)
+            {
+                return;
+            }
             Console.WriteLine($"[E]{e.Data}");
 
             if (e.Data.Contains("A popup should open on the device to request authorization."))
