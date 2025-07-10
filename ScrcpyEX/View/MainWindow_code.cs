@@ -169,7 +169,8 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 启动Scrcpy并以指定方式连接手机。
+        /// 启动Scrcpy并以指定方式连接手机，并不能使用WaitForInputIdle()等待Scrcpy启动完成，因为Process启动的是命令行，
+        /// 图像界面是由命令行启动的。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
         private async Task ConnectScrcpy(bool isWired)
