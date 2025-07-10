@@ -49,13 +49,16 @@ namespace ScrcpyEX.View
 
             RecInfo recInfo = MyCfg.Cfg.RecInfos[0];
             CroppedBitmap scWindow = await GetScriptImg(_scHandle, _mainHandle, recInfo.CropRect);
-            Console.WriteLine($"原始坐标：{recInfo.CropRect.X},{recInfo.CropRect.Y}");
+            Console.WriteLine($"图像脚本原始参数：{recInfo.CropRect.X},{recInfo.CropRect.Y}");
             if (scWindow != null)
             {
                 double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
                 Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
             }
-
+            if (Debugger.IsAttached)
+            {
+                MyGM.SavaImg("tempPic.png", scWindow);
+            }
             //scWindow?.Save($@"{MV.ScriptPath}\A.png", ImageFormat.Png);
             Console.WriteLine("完成");
             //MyGM.SavaImg("A.png", image);

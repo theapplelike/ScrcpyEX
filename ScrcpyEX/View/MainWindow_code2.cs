@@ -25,7 +25,11 @@ using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.MyDefinition.MyClass;
 using WPoint = System.Windows.Point;  //WPF的Point
 using DPoint = System.Drawing.Point;  //Windows Forms的Point
-
+using WRectangle = System.Windows.Shapes.Rectangle;
+using DRectangle = System.Drawing.Rectangle;
+using WBrushes = System.Windows.Media.Brushes;
+using DBrushes = System.Drawing.Brushes;
+using System.Reflection;
 
 namespace ScrcpyEX.View
 {
@@ -316,7 +320,7 @@ namespace ScrcpyEX.View
             //    $"起点：{cropRect.X},{cropRect.Y}，" +
             //    $"宽高：{cropRect.Width},{cropRect.Height}，" +
             //    $"终点：{cropRect.X + cropRect.Width},{cropRect.Y + cropRect.Height}，" +
-            //    $"图片大小：{sc.Width},{sc.Height}，" +
+            //    $"图片大小：{scWindow.Width},{scWindow.Height}，" +
             //    $"程序大小：{MV.MainWin.Width},{MV.MainWin.Height}");
 
             //检查范围，获得最终的截图区域
@@ -324,7 +328,7 @@ namespace ScrcpyEX.View
             CroppedBitmap temp = new(scWindow, cropRect);
             //if (Debugger.IsAttached)
             //{
-            //    MyGM.SavaImg("tempPic.png", temp);
+            //    MyGM.SavaImg("scWindow.png", scWindow);
             //}
 
             return temp;
