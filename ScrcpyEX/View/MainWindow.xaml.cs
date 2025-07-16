@@ -1,5 +1,6 @@
 ﻿using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.MyDefinition;
+using ScrcpyEX.MyDefinition.MyClass;
 using ScrcpyEX.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -44,13 +45,13 @@ namespace ScrcpyEX.View
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            //Console.WriteLine($"窗体大小进行改变，Scrcpy当前：（{ScActualWidth}，{ScActualHeight}），比例：（{ScRatioX}，{ScRatioY}）。");
+            Console.WriteLine($"窗体大小进行改变，Scrcpy当前：（{ScActualWidth}，{ScActualHeight}），比例：（{ScRatioX}，{ScRatioY}）。");
 
             //scrcpy程序句柄不为空调整scrcpy大小
-            if (_scHandle != IntPtr.Zero)
-            {
-                _resizeTimer.Start();
-            }
+            //if (_scHandle != IntPtr.Zero)
+            //{
+            //    _resizeTimer.Start();
+            //}
         }
         #endregion
 
@@ -75,7 +76,7 @@ namespace ScrcpyEX.View
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
-            HandStopScrcpy();
+            CloseScrcpy();
         }
 
         private void BtnClosePrg_Click(object sender, RoutedEventArgs e)
@@ -144,9 +145,11 @@ namespace ScrcpyEX.View
         #endregion
 
         #region 弹出菜单事件
+
         private void PopMid_Opened(object sender, EventArgs e)
         {
-            popMid.VerticalOffset = (ExtraHeightTop + popMid.Child.RenderSize.Height) / 2 + wfh.Margin.Top;
+            //popMid.VerticalOffset = (ExtraHeightTop + popMid.Child.RenderSize.Height) / 2 + wfh.Margin.Top;
+            popMid.VerticalOffset = (ExtraHeightTop + popMid.Child.RenderSize.Height) / 2;
         }
 
         private void Pop_Closed(object sender, EventArgs e)

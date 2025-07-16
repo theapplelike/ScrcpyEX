@@ -17,7 +17,7 @@
     </Window.DataContext>
 
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False" NonClientFrameEdges="Left,Bottom,Right" ResizeBorderThickness="5"></WindowChrome>
+        <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False" NonClientFrameEdges="Left" ResizeBorderThickness="5"></WindowChrome>
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
@@ -133,11 +133,17 @@
             </Border>
         </DockPanel>
 
-        <Grid x:Name="gShow" Grid.Row="1" Margin="5">
+        <!--<Grid x:Name="gShow" Grid.Row="1" Margin="5">
             <WindowsFormsHost x:Name="wfh" Background="Gray">
                 <wf:Panel x:Name="pnlShow" Dock="Fill" AutoSize="True"/>
             </WindowsFormsHost>
+        </Grid>-->
+
+        <Grid x:Name="gShow" Grid.Row="1" Margin="5">
+            <Border x:Name="bdShow" Background="Gray"/>
         </Grid>
+        
+
 
     </Grid>
 </Window>

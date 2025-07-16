@@ -151,6 +151,14 @@ namespace ScrcpyEX.MyDefinition
         [DllImport("user32.dll")]
         public static extern int mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);
 
+        /// <summary>
+        /// 销毁指定的窗口。函数将 WM_DESTROY 和 WM_NCDESTROY 消息发送到窗口，以停用窗口并从窗口中删除键盘焦点。
+        /// </summary>
+        /// <param name="hwnd">要销毁的窗口的句柄。</param>
+        /// <returns>true--函数成功；false--函数失败。</returns>
+        [DllImport("user32.dll", EntryPoint = "DestroyWindow", CharSet = CharSet.Unicode)]
+        internal static extern bool DestroyWindow(IntPtr hwnd);
+
         //[DllImport("user32.dll", SetLastError = true)]
         //public static extern IntPtr SetFocus(IntPtr hWnd);
         //

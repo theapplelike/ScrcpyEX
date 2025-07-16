@@ -20,7 +20,12 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 对第三方程序的引用。
         /// </summary>
-        private readonly Process _prc = new();
+        //private readonly Process _prc = new();
+
+        /// <summary>
+        /// Scrcpy主机，需要先启动主机再启动Scrcpy。
+        /// </summary>
+        private ScrcpyHost _scrcpyHost = null;
 
         /// <summary>
         /// 窗体对应的ViewModel。
@@ -30,7 +35,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// scrcpy的句柄，为IntPtr.Zero时代表scrcpy没有启动。
         /// </summary>
-        private IntPtr _scHandle = IntPtr.Zero;
+        //private IntPtr _scHandle = IntPtr.Zero;
 
         /// <summary>
         /// scrcpy窗口的名称。
@@ -121,21 +126,25 @@ namespace ScrcpyEX.View
         /// 窗口除开scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
         private double ExtraWidth => gShow.Margin.Left + gShow.Margin.Right;
+        //private double ExtraWidth => bdShow.Margin.Left + bdShow.Margin.Right;
 
         /// <summary>
         /// 窗口除开scrcpy的额外高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
         private double ExtraHeight => dpl.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom;
+        //private double ExtraHeight => dpl.ActualHeight + bdShow.Margin.Top + bdShow.Margin.Bottom;
 
         /// <summary>
         /// 窗口除开scrcpy的额外左侧宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
         public double ExtraWidthLeft => gShow.Margin.Left;
+        //public double ExtraWidthLeft => bdShow.Margin.Left;
 
         /// <summary>
         /// 窗口除开scrcpy的额外上方高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
         public double ExtraHeightTop => dpl.ActualHeight + gShow.Margin.Top;
+        //public double ExtraHeightTop => dpl.ActualHeight + bdShow.Margin.Top;
 
         /// <summary>
         /// X轴上的DPI比例。
@@ -166,6 +175,16 @@ namespace ScrcpyEX.View
         /// Scrcpy当前的实际高度。
         /// </summary>
         public double ScActualHeight => ActualHeight - ExtraHeight;
+
+        /// <summary>
+        /// Scrcpy是否处于关闭状态。
+        /// </summary>
+        private bool IsClosed => _scrcpyHost == null || _scrcpyHost.ScHandle == IntPtr.Zero;
+
+        /// <summary>
+        /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。
+        /// </summary>
+        private IntPtr ScHandle => _scrcpyHost?.ScHandle ?? IntPtr.Zero;
 
     }
 }

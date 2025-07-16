@@ -42,7 +42,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
                 if ((int)wParam == WM.WM_KEYDOWN)
                 {
                     int vkCode = Marshal.ReadInt32(lParam);
-                    //Console.WriteLine($"Key: {(Keys)vkCode}/{vkCode:X}, wParam: {(int)wParam:X}。");
+                    Console.WriteLine($"Key: {(Keys)vkCode}/{vkCode:X}, wParam: {(int)wParam:X}。");
 
                     MV.MainWin.KeyboardMapping(((Keys)vkCode).ToString());
                 }

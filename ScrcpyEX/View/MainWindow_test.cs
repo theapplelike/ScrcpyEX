@@ -31,7 +31,7 @@ namespace ScrcpyEX.View
         private void Test_Tick(object sender, EventArgs e)
         {
             IntPtr intPtr = DLL.GetForegroundWindow();
-            Console.WriteLine($"窗体/SC：{IsActive}，{intPtr == _scHandle}。");
+            Console.WriteLine($"窗体/SC：{IsActive}，{intPtr == ScHandle}。");
         }
 
         private void BtnTest_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -47,8 +47,8 @@ namespace ScrcpyEX.View
             WPoint pt1 = PointToScreen(new WPoint(0, 0));
             Console.WriteLine($"程序左上角：{pt1.X},{pt1.Y}。");
 
-            RecInfo recInfo = MyCfg.Cfg.RecInfos[0];
-            CroppedBitmap scWindow = await GetScriptImg(_scHandle, _mainHandle, recInfo.CropRect);
+            RecInfo recInfo = MyCfg.Cfg.RecInfos[2];
+            CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, recInfo.CropRect);
             Console.WriteLine($"图像脚本原始参数：{recInfo.CropRect.X},{recInfo.CropRect.Y}");
             if (scWindow != null)
             {
@@ -60,7 +60,7 @@ namespace ScrcpyEX.View
                 MyGM.SavaImg("tempPic.png", scWindow);
             }
             //scWindow?.Save($@"{MV.ScriptPath}\A.png", ImageFormat.Png);
-            Console.WriteLine("完成");
+            Console.WriteLine($"完成。");
             //MyGM.SavaImg("A.png", image);
 
             //Point pt1 = PointToScreen(new Point(0, 0));

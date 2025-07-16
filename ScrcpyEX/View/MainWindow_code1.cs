@@ -11,6 +11,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -65,18 +66,18 @@ namespace ScrcpyEX.View
         /// 当前窗口或Scrcpy是否为活动窗口。
         /// </summary>
         /// <returns>0--窗口拥有焦点；1--Scrcpy拥有焦点；2--窗口或Scrcpy都没有焦点。</returns>
-        public int IsActiveWindow()
-        {
-            if (IsActive)
-            {
-                return 0;
-            }
-            else
-            {
-                IntPtr intPtr = DLL.GetForegroundWindow();
-                return intPtr == _scHandle ? 1 : 2;
-            }
-        }
+        //public int IsActiveWindow()
+        //{
+        //    if (IsActive)
+        //    {
+        //        return 0;
+        //    }
+        //    else
+        //    {
+        //        IntPtr intPtr = DLL.GetForegroundWindow();
+        //        return intPtr == _scHandle ? 1 : 2;
+        //    }
+        //}
 
         /// <summary>
         /// 停止执行脚本的计时器，如果当前正在录制，也会停止录制操作。
@@ -101,7 +102,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void StartRecord()
         {
-            if (_scHandle == IntPtr.Zero)
+            if (IsClosed)
             {
                 popMid.Show("未进行投屏，不能进行录制。");
                 return;
@@ -153,7 +154,7 @@ namespace ScrcpyEX.View
                 return;
             }
             
-            if (_scHandle == IntPtr.Zero)
+            if (IsClosed)
             {
                 popMid.Show("未进行投屏，不能执行脚本。");
                 return;
@@ -253,6 +254,7 @@ namespace ScrcpyEX.View
             {
                 Placement = PlacementMode.Relative,
                 PlacementTarget = gShow,//这里需要指明父级
+                //PlacementTarget = gMain,//这里需要指明父级
                 AllowsTransparency = true,
                 Height = radius,
                 Width = radius,
@@ -326,7 +328,7 @@ namespace ScrcpyEX.View
         /// <param name="desc">说明当前状态的字符串。</param>
         private void MappingEdit(string desc)
         {
-            if (_scHandle == IntPtr.Zero)
+            if (IsClosed)
             {
                 popMid.Show("未进行投屏，不能进行映射编辑。");
                 return;
@@ -398,15 +400,17 @@ namespace ScrcpyEX.View
         /// <param name="key">捕获的键盘字符。</param>
         public void KeyboardMapping(string key)
         {
-            int focus = IsActiveWindow();
-            if (focus != 2)
+            //int focus = IsActiveWindow();
+            //if (focus != 2)
+            if (IsActive && ScHandle != IntPtr.Zero)
+            
             {
                 if (key =="Q")//按下Q使用鼠标控制方向
                 {
                     PressMouse();
                 }
 
-                DoKeyMapping(key, ScRatioX);
+                DoKeyMapping(key, ScRatioX, ScHandle);
             }
         }
 
@@ -441,7 +445,7 @@ namespace ScrcpyEX.View
         /// </summary>
         /// <param name="key">捕获的键盘字符。</param>
         /// <param name="ratio">Scrcpy当前宽度和默认宽度的比值。</param>
-        private void DoKeyMapping(string key, double ratio)
+        private void DoKeyMapping(string key, double ratio, IntPtr scHandle)
         {
             //让字符只剩字母或数字
             if (Regex.IsMatch(key, @"[0-9]"))
@@ -460,9 +464,9 @@ namespace ScrcpyEX.View
                 int centreY = (int)(m.OffsetY * ratio * DpiScaleY + radius);
 
                 IntPtr lp = new((centreY << 16) + centreX);
-                DLL.PostMessage(_scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
-                DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
-                DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
+                DLL.PostMessage(scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
+                DLL.PostMessage(scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
+                DLL.PostMessage(scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
                 
                 //如果标志位为true，则让鼠标左键处于按下状态
                 //if (_isPressMouse)

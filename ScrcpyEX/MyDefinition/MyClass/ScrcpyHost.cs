@@ -8,13 +8,14 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 
 namespace ScrcpyEX.MyDefinition.MyClass
 {
-    internal class ScrcpyHost : HwndHost
+    internal class ScrcpyHost
     {
         /// <summary>
         /// 对第三方程序的引用。
@@ -24,46 +25,216 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <summary>
         /// 是否使用有线形式启动Scrcpy。
         /// </summary>
-        private readonly bool _isWired;
+        //private readonly bool _isWired;
 
         /// <summary>
         /// scrcpy的句柄，为IntPtr.Zero时代表scrcpy没有启动。
         /// </summary>
-        private IntPtr _scHandle = IntPtr.Zero;
+        public IntPtr ScHandle { get; set; } = IntPtr.Zero;
 
-        public ScrcpyHost(bool isWired)
+        /// <summary>
+        /// Scrcpy上一次的尺寸。
+        /// </summary>
+        //private Size _lastSize = new(0, 0);
+
+        /// <summary>
+        /// Scrcpy上一次的Rect。
+        /// </summary>
+        //private Rect _lastRect = new();
+
+        /// <summary>
+        /// 真正的HwndHost。
+        /// </summary>
+        private InternalHwndHost _hwndHost;
+
+        //public ScrcpyHost(Process prc, IntPtr scHandle)
+        //{
+        //    _prc = prc;
+        //    _scHandle = scHandle;
+        //
+        //    SetProcess();
+        //}
+
+
+        public ScrcpyHost()
         {
-            _isWired = isWired;
+            SetProcess();
         }
 
         /// <summary>
-        /// 当 HwndHost 被添加到可视化树时自动调用，创建并返回要嵌入的 Win32 窗口句柄。
+        /// 异步启动Scrcpy。
         /// </summary>
-        /// <param name="hwndParent">父窗口的句柄。</param>
-        /// <returns>要创建的子 Win32 窗口的句柄。</returns>
-        /// <exception cref="InvalidOperationException">Scrcpy没有启动。</exception>
-        protected override HandleRef BuildWindowCore(HandleRef hwndParent)
+        /// <param name="isWired">是否使用有线形式启动。</param>
+        /// <returns>承载Scrcpy的HwndHost。</returns>
+        public async Task<HwndHost> StartScrcpyAsync(bool isWired)
         {
-            _scHandle = StartScrcpy(_isWired).GetAwaiter().GetResult();
-            if (_scHandle == IntPtr.Zero)
+            // 启动进程
+            await StartScrcpy(isWired);
+            if (ScHandle == IntPtr.Zero)
             {
-                throw new InvalidOperationException("Scrcpy没有启动。");
+                MV.MainWin.popMid.Show("Scrcpy启动失败。");
+                return null;
             }
 
-            // 修改窗口样式
-            ModifyWindowStyle();
-
-            // 设置父子关系
-            DLL.SetParent(_scHandle, hwndParent.Handle);
-
-            return new HandleRef(this, _scHandle);
+            // 创建真正的HwndHost
+            return _hwndHost = new InternalHwndHost(ScHandle, _prc);
         }
+
+        /// <summary>
+        /// HwndHost中不支持异步，所以外部启动Scrcpy，内部封装Scrcpy。
+        /// </summary>
+        private class InternalHwndHost : HwndHost
+        {
+            /// <summary>
+            /// 对第三方程序的引用。
+            /// </summary>
+            private readonly Process _prc = null;
+
+            /// <summary>
+            /// scrcpy的句柄，为IntPtr.Zero时代表scrcpy没有启动。
+            /// </summary>
+            private readonly IntPtr _scHandle = IntPtr.Zero;
+
+            /// <summary>
+            /// Scrcpy上一次的Rect。
+            /// </summary>
+            internal Rect _lastRect = new();
+
+            public InternalHwndHost(IntPtr scHandle, Process prc)
+            {
+                _scHandle= scHandle;
+                _prc = prc;
+            }
+
+            /// <summary>
+            /// 当 HwndHost 被添加到可视化树时自动调用，创建并返回要嵌入的 Win32 窗口句柄。
+            /// </summary>
+            /// <param name="hwndParent">父窗口的窗口句柄。</param>
+            /// <returns>要创建的子 Win32 窗口的句柄。</returns>
+            /// <exception cref="InvalidOperationException">Scrcpy没有启动。</exception>
+            protected override HandleRef BuildWindowCore(HandleRef hwndParent)
+            {
+                // 修改窗口样式
+                ModifyWindowStyle();
+
+                // 设置父子关系
+                DLL.SetParent(_scHandle, hwndParent.Handle);
+
+                return new HandleRef(this, _scHandle);
+            }
+
+            /// <summary>
+            /// 当 HwndHost 从可视化树移除或父窗口关闭时，清理嵌入的 Win32 窗口资源。
+            /// </summary>
+            /// <param name="hwnd">包含窗口句柄的结构。</param>
+            protected override void DestroyWindowCore(HandleRef hwnd)
+            {
+                //Console.WriteLine($"执行资源清理：{hwnd}，句柄：{_scHandle}");
+                if (_scHandle != IntPtr.Zero)
+                {
+                    _prc.Kill();        //Kill()执行后，会调用Exited事件，前提是EnableRaisingEvents属性要设置为true。
+                    _prc.WaitForExit(); //Kill()执行后要一直等待，防止Exited事件未执行完就执行Dispose()
+                    Console.WriteLine("Scrcpy未关闭，程序执行关闭操作。");
+                }
+                
+                _prc.Dispose();
+                DLL.DestroyWindow(hwnd.Handle);
+                Console.WriteLine("Scrcpy已清理完毕，退出整个程序。");
+            }
+
+            /// <summary>
+            /// 当父容器大小/位置改变时，响应父容器尺寸变化。
+            /// </summary>
+            /// <param name="rcBoundingBox">窗口的大小位置。</param>
+            protected override void OnWindowPositionChanged(Rect rcBoundingBox)
+            {
+                //Console.WriteLine($"新旧Rect是否一致：{rcBoundingBox == _lastRect}");
+                if (rcBoundingBox == _lastRect)
+                {
+                    //Console.WriteLine("Scrcpy尺寸未变");
+                    return;
+                }
+
+                Console.WriteLine("Scrcpy尺寸修改");
+                _lastRect = rcBoundingBox;
+                DLL.MoveWindow(_scHandle, 0, 0, (int)rcBoundingBox.Width, (int)rcBoundingBox.Height, true);
+                base.OnWindowPositionChanged(rcBoundingBox);
+            }
+
+            // 重写 WndProc 方法
+            protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+            {
+                try
+                {
+                    Console.WriteLine($"WndProc消息：{msg}");
+                    // 如果未处理，调用基类实现
+                    if (!handled)
+                    {
+                        return base.WndProc(hwnd, msg, wParam, lParam, ref handled);
+                    }
+
+                    return IntPtr.Zero;
+                }
+                catch (Exception ex)
+                {
+                    // 错误处理
+                    Debug.WriteLine($"WndProc 错误: {ex.Message}");
+                    handled = false;
+                    return IntPtr.Zero;
+                }
+            }
+
+            /// <summary>
+            /// 修改Scrcpy窗体样式。
+            /// </summary>
+            private void ModifyWindowStyle()
+            {
+                int GWL_STYLE = -16;//检索窗口的样式
+                int WS_VISIBLE = 0x10000000;//表示窗口可见的标志
+                int WS_CHILD = 0x40000000;//表示子窗口的标志，使窗口成为父窗口的子项、移除窗口的标题栏和边框、禁止窗口独立存在
+
+                // 修改窗口样式
+                DLL.SetWindowLong(_scHandle, GWL_STYLE, WS_VISIBLE | WS_CHILD);
+            }
+
+            /// <summary>
+            /// 刷新窗口，重新绘制窗口后通知基类方法。
+            /// </summary>
+            public void RefreshWindow()
+            {
+                DLL.MoveWindow(_scHandle, 0, 0, (int)_lastRect.Width, (int)_lastRect.Height, true);
+                base.OnWindowPositionChanged(_lastRect);
+                Console.WriteLine("刷新窗口");
+            }
+        }
+
+        /// <summary>
+        /// 隐藏指定窗口的标题栏。通过位运算移除WS_CAPTION样式，从而隐藏标题栏。然后设置为新的窗口样式。
+        /// </summary>
+        /// <param name="handle">窗口的句柄。</param>
+        //private void ModifyWindowStyle()
+        //{
+        //    int GWL_STYLE = -16;//检索窗口的样式
+        //    int WS_CAPTION = 0xC00000;//是窗口标题栏的样式标志
+        //    int WS_THICKFRAME = 0x00040000;//允许通过拖动边缘来调整窗口大小
+        //    int WS_CHILD = 0x40000000;//表示子窗口的标志，使窗口成为父窗口的子项、移除窗口的标题栏和边框、禁止窗口独立存在
+        //    int style = DLL.GetWindowLong(_scHandle, GWL_STYLE);
+        //
+        //    //删除WS_CAPTION样式以隐藏标题栏  
+        //    style &= ~WS_CAPTION;
+        //
+        //    //删除WS_THICKFRAME样式以隐藏窗体可以调整大小的边框
+        //    style &= ~WS_THICKFRAME;
+        //
+        //    //设置为新的窗口样式
+        //    DLL.SetWindowLong(_scHandle, GWL_STYLE, style| WS_CHILD);
+        //}
 
         /// <summary>
         /// 启动Scrcpy并以指定方式连接手机。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
-        private async Task<IntPtr> StartScrcpy(bool isWired)
+        private async Task StartScrcpy(bool isWired)
         {
             ProcessStartInfo info = new(MV.ScrcpyPath)
             {
@@ -74,20 +245,20 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 RedirectStandardError = true,
             };
             _prc.StartInfo = info;
-
+        
             if (_prc.Start())
             {
                 _prc.BeginOutputReadLine();
                 _prc.BeginErrorReadLine();
                 int i = 0;
-
+        
                 do
                 {
                     await Task.Delay(500);
-                    IntPtr found = FindScrcpyHandle();
-                    if (found != IntPtr.Zero)
+                    //Thread.Sleep(500);
+                    if (FindScrcpyHandle())
                     {
-                        return found;
+                        return;
                     }
                     //Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}，程序是否被关闭：{_prc.HasExited}。");
                     Console.WriteLine($">>>>>>>>>>>>>>{i++}:程序是否被关闭：{_prc.HasExited}。");
@@ -95,7 +266,6 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 while (!_prc.HasExited || i < 30);
                 MessageBox.Show("未能成功启动程序，请重试。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            return IntPtr.Zero;
         }
 
         /// <summary>
@@ -105,7 +275,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private string GetCommandLine(bool isWired)
         {
             StringBuilder sb = new();
-
+        
             //根据用户设置获得的命令行参数
             foreach (PropertyInfo prop in typeof(MyCfg).GetProperties())
             {
@@ -116,12 +286,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 }
                 //Console.WriteLine($"属性{prop.Name}：{prop.GetValue(MyCfg.Cfg)}，{GetArg(prop.Name)}。");
             }
-
+        
             //键盘使用UHID可以输入中文，对设备输入中文时电脑输入法必须为英文
             //_scName = $"{DateTime.Now:HHmmss}mook";
             //sb.Append($"--keyboard=uhid --window-title={_scName} ");
             sb.Append($"--keyboard=uhid ");
-
+        
             if (isWired)
             {
                 sb.Append("--select-usb");
@@ -130,7 +300,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             {
                 sb.Append($"--tcpip={MyCfg.Cfg.IP}:{MyCfg.Cfg.Port}");
             }
-
+        
             //Console.WriteLine($"命令行：{sb}。");
             return sb.ToString();
         }
@@ -154,30 +324,96 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// 查找scrcpy的句柄。
         /// </summary>
         /// <returns>scrcpy的句柄，未找到返回IntPtr.Zero。</returns>
-        private IntPtr FindScrcpyHandle()
+        private bool FindScrcpyHandle()
         {
             // 查询指定名称的进程（无需包含.exe扩展名）
             Process[] processes = Process.GetProcessesByName("scrcpy");
             //Console.WriteLine($"进程的数量：{processes.Length}。");
             if (processes.Length > 0 && processes[0].MainWindowHandle != IntPtr.Zero)
             {
-                return processes[0].MainWindowHandle;
+                ScHandle = processes[0].MainWindowHandle;
+                return true;
             }
-            return IntPtr.Zero;
+            return false;
         }
 
         /// <summary>
-        /// 修改Scrcpy窗体样式。
+        /// 设置第三方程序的退出、信息读取事件。
         /// </summary>
-        private void ModifyWindowStyle()
+        private void SetProcess()
         {
-            int GWL_STYLE = -16;//检索窗口的样式
-            int WS_VISIBLE = 0x10000000;//表示窗口可见的标志
-            int WS_CHILD = 0x40000000;//表示子窗口的标志，使窗口成为父窗口的子项、移除窗口的标题栏和边框、禁止窗口独立存在
-
-            // 修改窗口样式
-            DLL.SetWindowLong(_scHandle, GWL_STYLE, WS_VISIBLE | WS_CHILD);
+            _prc.EnableRaisingEvents = true;
+            _prc.Exited += Prc_Exited;
+            _prc.ErrorDataReceived += Prc_ErrorDataReceived;
+            _prc.OutputDataReceived += Prc_OutputDataReceived;
         }
+
+        /// <summary>
+        /// 第三方程序退出时，停止读取输出流和错误流，并重置Scrcpy句柄。
+        /// </summary>
+        private void Prc_Exited(object sender, EventArgs e)
+        {
+            _prc.CancelOutputRead();
+            _prc.CancelErrorRead();
+            ScHandle = IntPtr.Zero;
+            if (KeyboardHook.HookID != IntPtr.Zero)
+            {
+                KeyboardHook.CancelHook();
+            }
+        
+            Console.WriteLine($"Process的Exieted事件执行结束。");
+        }
+
+        /// <summary>
+        /// 读取错误流。
+        /// </summary>
+        private void Prc_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data == null)
+            {
+                return;
+            }
+            Console.WriteLine($"[E]{e.Data}");
+        
+            if (e.Data.Contains("A popup should open on the device to request authorization."))
+            {
+                MV.MainWin.popMid.Show("请在设备上同意授权后再试。");
+            }
+        }
+
+        /// <summary>
+        /// 读取输出流。
+        /// </summary>
+        private void Prc_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data == null)
+            {
+                return;
+            }
+            Console.WriteLine($"[I]{e.Data}");
+        
+            //获得当前分辨率，第一个参数是宽，第二个参数是高
+            if (e.Data.Contains("Texture"))
+            {
+                //Console.WriteLine($"分辨率改变，内部");
+                MV.MainWin.ShowResolutionDesc(e.Data);
+
+                //Scrcpy在横竖屏转换的时候会导致坐标错位，需要重绘窗口，并调用基类的方法
+                _hwndHost?.RefreshWindow();
+            }
+        }
+
+        /// <summary>
+        /// 释放Scrcpy的资源，用于用户关闭。
+        /// </summary>
+        public void DisposeScrcpy()
+        {
+            _prc.Kill();
+            _prc.WaitForExit();
+            _prc.Dispose();
+            DLL.DestroyWindow(ScHandle);
+        }
+
 
     }
 }

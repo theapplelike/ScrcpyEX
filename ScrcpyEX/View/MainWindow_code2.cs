@@ -49,66 +49,93 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 设置第三方程序的绑定事件，且触发退出事件。
         /// </summary>
-        private void SetProcess()
-        {
-            _prc.EnableRaisingEvents = true;
-            _prc.Exited += Prc_Exited;
-            _prc.ErrorDataReceived += Prc_ErrorDataReceived;
-            _prc.OutputDataReceived += Prc_OutputDataReceived;
-        }
+        //private void SetProcess()
+        //{
+        //    _prc.EnableRaisingEvents = true;
+        //    _prc.Exited += Prc_Exited;
+        //    _prc.ErrorDataReceived += Prc_ErrorDataReceived;
+        //    _prc.OutputDataReceived += Prc_OutputDataReceived;
+        //}
+        //
+        ///// <summary>
+        ///// 第三方程序退出时，停止读取输出流和错误流，并重置句柄。
+        ///// </summary>
+        //private void Prc_Exited(object sender, EventArgs e)
+        //{
+        //    _prc.CancelOutputRead();
+        //    _prc.CancelErrorRead();
+        //    _scHandle = IntPtr.Zero;
+        //    if (KeyboardHook.HookID != IntPtr.Zero)
+        //    {
+        //        KeyboardHook.CancelHook();
+        //    }
+        //
+        //    Console.WriteLine($"scrcpy程序已关闭。");
+        //}
+        //
+        ///// <summary>
+        ///// 读取错误流。
+        ///// </summary>
+        //private void Prc_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        //{
+        //    if (e.Data == null)
+        //    {
+        //        return;
+        //    }
+        //    Console.WriteLine($"[E]{e.Data}");
+        //
+        //    if (e.Data.Contains("A popup should open on the device to request authorization."))
+        //    {
+        //        popMid.Show("请在设备上同意授权后再试。");
+        //    }
+        //}
+        //
+        ///// <summary>
+        ///// 读取输出流。
+        ///// </summary>
+        //private void Prc_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        //{
+        //    if (e.Data == null)
+        //    {
+        //        return;
+        //    }
+        //    Console.WriteLine($"[I]{e.Data}");
+        //
+        //    //获得当前分辨率，第一个参数是宽，第二个参数是高
+        //    if (e.Data.Contains("Texture"))
+        //    {
+        //        Regex reg = new("[0-9]+");
+        //        MatchCollection mc = reg.Matches(e.Data);
+        //
+        //        _vm.ResolutionDesc = $"投屏分辨率 {mc[0].Value}*{mc[1].Value}，{GetRatio(mc)}";
+        //
+        //        //DLL.ShowWindow(_scHandle, SW.SW_SHOWNORMAL);
+        //        //await Task.Delay(100);
+        //        //DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
+        //        Dispatcher.Invoke(() =>
+        //        {
+        //            //btnMinimize.Background = WBrushes.Red;
+        //            gMain.InvalidateMeasure();
+        //            gMain.InvalidateArrange();
+        //            gMain.InvalidateVisual();
+        //            gMain.UpdateLayout();
+        //            //gMain.rende
+        //        });
+        //        
+        //        Console.WriteLine($"分辨率改变，外部");
+        //    }
+        //}
 
         /// <summary>
-        /// 第三方程序退出时，停止读取输出流和错误流，并重置句柄。
+        /// 显示分辨率信息到界面上。
         /// </summary>
-        private void Prc_Exited(object sender, EventArgs e)
+        /// <param name="texture">代表分辨率参数的字符串。</param>
+        public void ShowResolutionDesc(string texture)
         {
-            _prc.CancelOutputRead();
-            _prc.CancelErrorRead();
-            _scHandle = IntPtr.Zero;
-            if (KeyboardHook.HookID != IntPtr.Zero)
-            {
-                KeyboardHook.CancelHook();
-            }
+            Regex reg = new("[0-9]+");
+            MatchCollection mc = reg.Matches(texture);
 
-            Console.WriteLine($"scrcpy程序已关闭。");
-        }
-
-        /// <summary>
-        /// 读取错误流。
-        /// </summary>
-        private void Prc_ErrorDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (e.Data == null)
-            {
-                return;
-            }
-            Console.WriteLine($"[E]{e.Data}");
-
-            if (e.Data.Contains("A popup should open on the device to request authorization."))
-            {
-                popMid.Show("请在设备上同意授权后再试。");
-            }
-        }
-
-        /// <summary>
-        /// 读取输出流。
-        /// </summary>
-        private void Prc_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (e.Data == null)
-            {
-                return;
-            }
-            Console.WriteLine($"[I]{e.Data}");
-
-            //获得当前分辨率，第一个参数是宽，第二个参数是高
-            if (e.Data.Contains("Texture"))
-            {
-                Regex reg = new("[0-9]+");
-                MatchCollection mc = reg.Matches(e.Data);
-
-                _vm.ResolutionDesc = $"投屏分辨率 {mc[0].Value}*{mc[1].Value}，{GetRatio(mc)}";
-            }
+            _vm.ResolutionDesc = $"投屏分辨率 {mc[0].Value}*{mc[1].Value}，{GetRatio(mc)}";
         }
 
         /// <summary>
@@ -164,9 +191,31 @@ namespace ScrcpyEX.View
         {
             //Console.WriteLine("正在timer中修改scrcpy大小。");
 
-            new Thread(ResizeSC).Start();
-            _resizeTimer.Stop();
+            //new Thread(ResizeSC).Start();
+            //_resizeTimer.Stop();
         }
+
+        /// <summary>
+        /// 重新设置scrcpy窗口的大小，以完全贴合父级panel，需要先最小化再最大化，防止相对坐标错误。
+        /// 如果相对坐标仍然错误，两次操作间需要增加延时，给系统足够的处理时间。
+        /// </summary>
+        //private async void ResizeSC()
+        //{
+        //    Console.WriteLine($"重新设置scrcpy大小。");
+        //
+        //    DLL.ShowWindow(_scHandle, SW.SW_SHOWNORMAL);
+        //    await Task.Delay(100);
+        //    DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
+        //
+        //    Dispatcher.Invoke(() =>
+        //    {
+        //        foreach (Popup pop in MV.TempPopups)
+        //        {
+        //            pop.IsOpen = false;
+        //        }
+        //        CreateSavedPop();
+        //    });
+        //}
 
         /// <summary>
         /// 执行计时脚本。
@@ -175,7 +224,7 @@ namespace ScrcpyEX.View
         {
             _vm.CycleNum++;
             _stopwatch = Stopwatch.StartNew();
-            await ExecuteClickScript(recInfo);
+            await ExecuteClickScript(recInfo, ScHandle);
             //Console.WriteLine("计时脚本执行完毕...");
         }
 
@@ -201,7 +250,7 @@ namespace ScrcpyEX.View
             Console.WriteLine($"进入新一轮，当前间隔：{_vm.Running}。");
             _scriptInterval = 5;
 
-            CroppedBitmap scWindow = await GetScriptImg(_scHandle, _mainHandle, recInfo.CropRect);
+            CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, recInfo.CropRect);
             if (scWindow == null)
             {
                 popMid.Show("获取Scrcpy脚本截图失败。");
@@ -219,7 +268,7 @@ namespace ScrcpyEX.View
 
                 _vm.CycleNum++;
                 _stopwatch = Stopwatch.StartNew();
-                await ExecuteClickScript(recInfo);
+                await ExecuteClickScript(recInfo, ScHandle);
             }
             Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
 
@@ -237,7 +286,7 @@ namespace ScrcpyEX.View
         /// 点击的实际位置会根据实际大小和scrcpy的初始大小的比值进行调整，但有黑边时仍会偏移。
         /// </summary>
         /// <param name="recInfo">当前要执行的脚本。</param>
-        private async Task ExecuteClickScript(RecInfo recInfo)
+        private async Task ExecuteClickScript(RecInfo recInfo, IntPtr scHandle)
         {
             foreach (PointInfo info in recInfo.Infos)
             {
@@ -250,9 +299,9 @@ namespace ScrcpyEX.View
                 //Console.WriteLine($"比例：（{ScRatioX},{ScRatioY}），实际点击：（{x},{y}）。");
 
                 IntPtr lp = new((y << 16) + x);
-                DLL.PostMessage(_scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
-                DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
-                DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
+                DLL.PostMessage(scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
+                DLL.PostMessage(scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
+                DLL.PostMessage(scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
             }
 
             //如果为有限次循环，检查是否到循环次数
@@ -407,7 +456,7 @@ namespace ScrcpyEX.View
                 return;
             }
 
-            CroppedBitmap scWindow = await GetScriptImg(_scHandle, _mainHandle, _recInfo.CropRect);
+            CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, _recInfo.CropRect);
             if (scWindow == null)
             {
                 popMid.Show("获取Scrcpy截图失败。");
