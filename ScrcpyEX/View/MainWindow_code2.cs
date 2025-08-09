@@ -94,12 +94,50 @@ namespace ScrcpyEX.View
             _timedHandler = (sender, e) => TimedScript_Tick(_recInfo);
             _imageHandler = (sender, e) => ImageScript_Tick(_recInfo);
 
+            _resizeTimer.Tick += new EventHandler(Resize_Tick);
+            _resizeTimer.Interval = TimeSpan.FromSeconds(1);
+
             _countTimer.Tick += (sender, e) => Count_Tick();
             _countTimer.Interval = TimeSpan.FromSeconds(1);
 
             _testTimer.Tick += new EventHandler(Test_Tick);
             _testTimer.Interval = TimeSpan.FromSeconds(1);
         }
+
+        /// <summary>
+        /// 要使用Thread在线程中调整第三方程序大小，这样不会改变焦点，导致用户调整大小操作被打断。
+        /// </summary>
+        private void Resize_Tick(object sender, EventArgs e)
+        {
+            Console.WriteLine("重新定位映射pop。");
+
+            _resizeTimer.Stop();
+            CreateSavedPop(true);
+            //new Thread(ResizeSC).Start();
+            //_resizeTimer.Stop();
+        }
+
+        /// <summary>
+        /// 重新设置scrcpy窗口的大小，以完全贴合父级panel，需要先最小化再最大化，防止相对坐标错误。
+        /// 如果相对坐标仍然错误，两次操作间需要增加延时，给系统足够的处理时间。
+        /// </summary>
+        //private async void ResizeSC()
+        //{
+        //    Console.WriteLine($"重新设置scrcpy大小。");
+        //
+        //    DLL.ShowWindow(_scHandle, SW.SW_SHOWNORMAL);
+        //    await Task.Delay(100);
+        //    DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
+        //
+        //    Dispatcher.Invoke(() =>
+        //    {
+        //        foreach (Popup pop in MV.TempPopups)
+        //        {
+        //            pop.IsOpen = false;
+        //        }
+        //        CreateSavedPop();
+        //    });
+        //}
 
         /// <summary>
         /// 执行计时脚本。

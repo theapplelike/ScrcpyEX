@@ -42,6 +42,14 @@ namespace ScrcpyEX.View
         {
             MyClose();
         }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (!IsClosed)
+            {
+                _resizeTimer.Start();
+            }
+        }
         #endregion
 
         #region 自定义菜单栏事件
@@ -197,7 +205,7 @@ namespace ScrcpyEX.View
 
         private void BtnMappingBack_Click(object sender, RoutedEventArgs e)
         {
-            MappingCancel(MyCfg.Cfg.KeyMappings);
+            MappingCancel();
         }
         #endregion
 

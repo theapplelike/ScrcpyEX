@@ -228,8 +228,8 @@ namespace ScrcpyEX.View
         /// </summary>
         /// <param name="mapping">按键映射类。</param>
         /// <param name="popIsOpen">创建的Popup是否可见。</param>
-        /// <returns>创建的Popup对象。</returns>
-        private Popup CreatePop(KeyMapping mapping, bool popIsOpen)
+        /// <returns>MyDragMove对象，其中封装了Popup的所有事件方法。</returns>
+        private MyDragMove CreatePop(KeyMapping mapping, bool popIsOpen)
         {
             double radius = 50 * ScRatioX;
 
@@ -300,9 +300,7 @@ namespace ScrcpyEX.View
             pop.Child = border;
             gShow.Children.Add(pop);//这里的父级要和pop.PlacementTarget属性一致
 
-            //设置Popup可以移动
-            _ = new MyDragMove(pop);
-            return pop;
+            return new MyDragMove(pop);
         }
 
         /// <summary>
@@ -319,9 +317,9 @@ namespace ScrcpyEX.View
 
             if (desc == "映射编辑")
             {
-                foreach (Popup pop in MV.TempPopups)
+                foreach (MyDragMove drag in MV.DragMoves)
                 {
-                    pop.IsOpen = true;
+                    drag.SetDisplay(true);
                 }
 
                 btnMappingEdit.Content = "保存修改";
@@ -331,22 +329,17 @@ namespace ScrcpyEX.View
             else
             {
                 MappingSave();
-                MappingEditCompleted(true);
+                MappingEditCompleted();
             }
         }
 
         /// <summary>
         /// 不保存按键映射编辑的内容。
         /// </summary>
-        private void MappingCancel(List<KeyMapping> mappings)
+        private void MappingCancel()
         {
-            foreach (Popup pop in MV.TempPopups)
-            {
-                pop.IsOpen = false;
-            }
-
             CreateSavedPop();
-            MappingEditCompleted(false);
+            MappingEditCompleted();
         }
 
         /// <summary>
@@ -354,7 +347,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void MappingAdd()
         {
-            MV.TempPopups.Add(CreatePop(new KeyMapping(), true));
+            MV.DragMoves.Add(CreatePop(new KeyMapping(), true));
         }
 
         /// <summary>
@@ -364,25 +357,24 @@ namespace ScrcpyEX.View
         {
             MyCfg.Cfg.KeyMappings.Clear();
 
-            foreach (Popup pop in MV.TempPopups)
+            foreach (MyDragMove drag in MV.DragMoves)
             {
-                string key = pop.Child.FindVisualChild<TextBox>().Text;
-                double offsetX = pop.HorizontalOffset / ScRatioX;
-                double offsetY = pop.VerticalOffset / ScRatioY;
-                pop.IsOpen = false;
+                string key = drag.Key;
+                double offsetX = drag.OffsetX / ScRatioX;
+                double offsetY = drag.OffsetY / ScRatioY;
+                drag.SetDisplay(false);
 
                 MyCfg.Cfg.KeyMappings.Add(new KeyMapping(key, offsetX, offsetY));
-                Console.WriteLine($"映射内容：{key}，保存偏移：（{offsetX}，{offsetY}）。");
+                Console.WriteLine($"映射内容：{key}，保存偏移:（{offsetX:F2}，{offsetY:F2}）。");
             }
 
-            Console.WriteLine($"已有映射：{MyCfg.Cfg.KeyMappings.Count}。");
+            Console.WriteLine($"已有映射数量：{MyCfg.Cfg.KeyMappings.Count}。");
         }
 
         /// <summary>
         /// 映射按钮编辑完后调用此方法，无论是否保存。
         /// </summary>
-        /// <param name="isHidden">所有的Popup是否已经隐藏。</param>
-        private void MappingEditCompleted(bool isHidden)
+        private void MappingEditCompleted()
         {
             btnMappingEdit.Content = "映射编辑";
             btnMappingBack.IsEnabled = false;
@@ -390,15 +382,21 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 创建配置中所有映射Popup，并保存到临时Popup列表，保存前会清空列表。
+        /// 创建配置中所有的键盘映射Popup，并保存到列表，保存前会清理列表。
         /// </summary>
-        private void CreateSavedPop()
+        /// <param name="popIsOpen">创建的Popup是否可见。</param>
+        private void CreateSavedPop(bool popIsOpen = false)
         {
-            MV.TempPopups.Clear();
+            foreach (MyDragMove drag in MV.DragMoves)
+            {
+                drag.Dispose();
+                drag.SetDisplay(false);
+            }
+            MV.DragMoves.Clear();
 
             foreach (KeyMapping mapping in MyCfg.Cfg.KeyMappings)
             {
-                MV.TempPopups.Add(CreatePop(mapping, false));
+                MV.DragMoves.Add(CreatePop(mapping, popIsOpen));
             }
         }
 

@@ -13,15 +13,25 @@ using System.Windows.Input;
 namespace ScrcpyEX.MyDefinition.MyClass
 {
     /// <summary>
-    /// 拖拽移动类。
+    /// 拖拽移动类，用于键盘映射的Popup。
     /// </summary>
-    internal class MyDragMove
+    internal class MyDragMove : IDisposable
     {
         private readonly Popup _pop;
+        private readonly Button _btn;
+        private readonly TextBox _txt;
+        private readonly bool _isLeaveParent;//是否可以移出逻辑父级
+
         private Point _lastPoint;           //上一次的鼠标坐标
         private Point _nowPoint;            //当前鼠标的坐标
-
         private bool _isDragging = false;   //是否处于可拖拽的状态
+        private bool _disposed = false;     //是否释放资源
+
+        public string Key => _txt.Text;
+
+        public double OffsetX => _pop.HorizontalOffset;
+
+        public double OffsetY => _pop.VerticalOffset;
 
         /// <summary>
         /// 设置指定的Popup可以进行拖拽。
@@ -31,30 +41,31 @@ namespace ScrcpyEX.MyDefinition.MyClass
         public MyDragMove(Popup pop, bool isLeaveParent = false)
         {
             _pop = pop;
+            _isLeaveParent = isLeaveParent;
 
-            TextBox txt = pop.Child.FindVisualChild<TextBox>();
-            txt.PreviewTextInput += TextBox_PreviewTextInput;
-            txt.TextChanged += TextBox_TextChanged;
-            txt.SetValue(InputMethod.IsInputMethodEnabledProperty, false);//文本框禁用输入法
+            _txt = pop.Child.FindVisualChild<TextBox>();
+            _txt.PreviewTextInput += TextBox_PreviewTextInput;
+            _txt.TextChanged += TextBox_TextChanged;
+            _txt.SetValue(InputMethod.IsInputMethodEnabledProperty, false);//文本框禁用输入法
 
-            Button btn = pop.Child.FindVisualChild<Button>();
-            btn.Click += Button_Click;
+            _btn = pop.Child.FindVisualChild<Button>();
+            _btn.Click += Button_Click;
 
-            _pop.MouseDown += (s, e) => Pop_MouseDown(txt);
-            _pop.MouseMove += (s, e) => Pop_MouseMove(isLeaveParent);
-            _pop.MouseUp += (s, e) => Pop_MouseUp();
+            _pop.MouseDown += Pop_MouseDown;
+            _pop.MouseMove += Pop_MouseMove;
+            _pop.MouseUp += Pop_MouseUp;
         }
 
         /// <summary>
         /// 鼠标按下时发生的事件，允许移动且记录当前坐标。
         /// 嵌套顺序应该为Popup->Border(提供边框)->TextBox(提供输入框)、TextBlock(提供定位点)。
         /// </summary>
-        private void Pop_MouseDown(TextBox txt)
+        private void Pop_MouseDown(object sender, MouseButtonEventArgs e)
         {
             //让Popup中的TextBlock捕获鼠标，防止移动太快时丢失Popup
             TextBlock tbk = _pop.Child.FindVisualChild<TextBlock>();
             _isDragging = Mouse.Capture(tbk);
-            GotFocus(txt);
+            GotFocus(_txt);
 
             //记录当前坐标为上一次的坐标
             _lastPoint = MyGM.GetPosition();
@@ -68,8 +79,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <summary>
         /// 鼠标移动时发生的事件。
         /// </summary>
-        /// <param name="isLeaveParent">是否可以移出逻辑父级。</param>
-        private void Pop_MouseMove(bool isLeaveParent)
+        private void Pop_MouseMove(object sender, MouseEventArgs e)
         {
             if (_isDragging)
             {
@@ -78,7 +88,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 double newX = _pop.HorizontalOffset + (_nowPoint.X - _lastPoint.X) / MV.MainWin.DpiScaleX;
                 double newY = _pop.VerticalOffset + (_nowPoint.Y - _lastPoint.Y) / MV.MainWin.DpiScaleY;
 
-                if (!isLeaveParent)//是否允许离开父控件
+                if (!_isLeaveParent)//是否允许离开父控件
                 {
                     LimitToParent(ref newX, ref newY);
                 }
@@ -98,7 +108,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <summary>
         /// 鼠标抬起发生的事件，不允许移动，取消元素对鼠标的捕获。
         /// </summary>
-        private void Pop_MouseUp()
+        private void Pop_MouseUp(object sender, MouseButtonEventArgs e)
         {
             Mouse.Capture(null);
             _isDragging = false;
@@ -175,8 +185,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MV.TempPopups.Remove(_pop);
+            MV.DragMoves.Remove(this);
             _pop.IsOpen = false;
+            Dispose();
         }
 
         /// <summary>
@@ -206,6 +217,43 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 newY = maxTop - _pop.Height;
             }
         }
+
+        /// <summary>
+        /// 设置Popup的显示状态。
+        /// </summary>
+        /// <param name="isOpen">Popup是否可见。</param>
+        public void SetDisplay(bool isOpen)
+        {
+            _pop.IsOpen = isOpen;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+
+            if (disposing)
+            {
+                // 取消所有事件订阅
+                _txt.PreviewTextInput -= TextBox_PreviewTextInput;
+                _txt.TextChanged -= TextBox_TextChanged;
+
+                _btn.Click -= Button_Click;
+
+                _pop.MouseDown -= Pop_MouseDown;
+                _pop.MouseMove -= Pop_MouseMove;
+                _pop.MouseUp -= Pop_MouseUp;
+            }
+
+            _disposed = true;
+        }
+
+        ~MyDragMove() => Dispose(false);
 
 
     }

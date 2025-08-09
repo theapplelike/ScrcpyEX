@@ -8,7 +8,7 @@ using System.Windows.Controls.Primitives;
 namespace ScrcpyEX.MyDefinition.MyClass
 {
     /// <summary>
-    /// 按键映射类。
+    /// 键盘映射信息类，用于保存键盘映射信息。
     /// </summary>
     internal class KeyMapping
     {

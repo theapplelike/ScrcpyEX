@@ -10,7 +10,7 @@
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel" 
         xmlns:mycontrol="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
         Title="MainWindow" Height="488" Width="970" WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded" Closed="Window_Closed">
+        Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged">
 
     <Window.DataContext>
         <ViewModel:MainWindowVM/>

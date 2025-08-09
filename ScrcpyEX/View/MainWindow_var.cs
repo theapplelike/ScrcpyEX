@@ -63,6 +63,11 @@ namespace ScrcpyEX.View
         private EventHandler _imageHandler;
 
         /// <summary>
+        /// 调整scrcpy窗口大小的计时器。
+        /// </summary>
+        private readonly DispatcherTimer _resizeTimer = new();
+
+        /// <summary>
         /// 脚本计时器，可能会绑定计时脚本或图像脚本。
         /// </summary>
         private readonly DispatcherTimer _scriptTimer = new();
@@ -162,7 +167,7 @@ namespace ScrcpyEX.View
         public double ScActualHeight => ActualHeight - ExtraHeight;
 
         /// <summary>
-        /// Scrcpy是否处于关闭状态。
+        /// Scrcpy是否处于关闭状态，true--已关闭；false--已启动。
         /// </summary>
         private bool IsClosed => _scrcpyHost == null || _scrcpyHost.ScHandle == IntPtr.Zero;
 
