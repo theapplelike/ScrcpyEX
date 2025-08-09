@@ -71,15 +71,6 @@ namespace ScrcpyEX.View
 
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
-
-            //if (_testTimer.IsEnabled)
-            //{
-            //    _testTimer.Stop();
-            //}
-            //else
-            //{
-            //    _testTimer.Start();
-            //}
             await Task.Delay(1);
         }
 

@@ -47,86 +47,6 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 设置第三方程序的绑定事件，且触发退出事件。
-        /// </summary>
-        //private void SetProcess()
-        //{
-        //    _prc.EnableRaisingEvents = true;
-        //    _prc.Exited += Prc_Exited;
-        //    _prc.ErrorDataReceived += Prc_ErrorDataReceived;
-        //    _prc.OutputDataReceived += Prc_OutputDataReceived;
-        //}
-        //
-        ///// <summary>
-        ///// 第三方程序退出时，停止读取输出流和错误流，并重置句柄。
-        ///// </summary>
-        //private void Prc_Exited(object sender, EventArgs e)
-        //{
-        //    _prc.CancelOutputRead();
-        //    _prc.CancelErrorRead();
-        //    _scHandle = IntPtr.Zero;
-        //    if (KeyboardHook.HookID != IntPtr.Zero)
-        //    {
-        //        KeyboardHook.CancelHook();
-        //    }
-        //
-        //    Console.WriteLine($"scrcpy程序已关闭。");
-        //}
-        //
-        ///// <summary>
-        ///// 读取错误流。
-        ///// </summary>
-        //private void Prc_ErrorDataReceived(object sender, DataReceivedEventArgs e)
-        //{
-        //    if (e.Data == null)
-        //    {
-        //        return;
-        //    }
-        //    Console.WriteLine($"[E]{e.Data}");
-        //
-        //    if (e.Data.Contains("A popup should open on the device to request authorization."))
-        //    {
-        //        popMid.Show("请在设备上同意授权后再试。");
-        //    }
-        //}
-        //
-        ///// <summary>
-        ///// 读取输出流。
-        ///// </summary>
-        //private void Prc_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        //{
-        //    if (e.Data == null)
-        //    {
-        //        return;
-        //    }
-        //    Console.WriteLine($"[I]{e.Data}");
-        //
-        //    //获得当前分辨率，第一个参数是宽，第二个参数是高
-        //    if (e.Data.Contains("Texture"))
-        //    {
-        //        Regex reg = new("[0-9]+");
-        //        MatchCollection mc = reg.Matches(e.Data);
-        //
-        //        _vm.ResolutionDesc = $"投屏分辨率 {mc[0].Value}*{mc[1].Value}，{GetRatio(mc)}";
-        //
-        //        //DLL.ShowWindow(_scHandle, SW.SW_SHOWNORMAL);
-        //        //await Task.Delay(100);
-        //        //DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
-        //        Dispatcher.Invoke(() =>
-        //        {
-        //            //btnMinimize.Background = WBrushes.Red;
-        //            gMain.InvalidateMeasure();
-        //            gMain.InvalidateArrange();
-        //            gMain.InvalidateVisual();
-        //            gMain.UpdateLayout();
-        //            //gMain.rende
-        //        });
-        //        
-        //        Console.WriteLine($"分辨率改变，外部");
-        //    }
-        //}
-
-        /// <summary>
         /// 显示分辨率信息到界面上。
         /// </summary>
         /// <param name="texture">代表分辨率参数的字符串。</param>
@@ -174,48 +94,12 @@ namespace ScrcpyEX.View
             _timedHandler = (sender, e) => TimedScript_Tick(_recInfo);
             _imageHandler = (sender, e) => ImageScript_Tick(_recInfo);
 
-            _resizeTimer.Tick += new EventHandler(Resize_Tick);
-            _resizeTimer.Interval = TimeSpan.FromSeconds(0.1);//大小调整间隔
-
             _countTimer.Tick += (sender, e) => Count_Tick();
             _countTimer.Interval = TimeSpan.FromSeconds(1);
 
             _testTimer.Tick += new EventHandler(Test_Tick);
             _testTimer.Interval = TimeSpan.FromSeconds(1);
         }
-
-        /// <summary>
-        /// 要使用Thread在线程中调整第三方程序大小，这样不会改变焦点，导致用户调整大小操作被打断。
-        /// </summary>
-        private void Resize_Tick(object sender, EventArgs e)
-        {
-            //Console.WriteLine("正在timer中修改scrcpy大小。");
-
-            //new Thread(ResizeSC).Start();
-            //_resizeTimer.Stop();
-        }
-
-        /// <summary>
-        /// 重新设置scrcpy窗口的大小，以完全贴合父级panel，需要先最小化再最大化，防止相对坐标错误。
-        /// 如果相对坐标仍然错误，两次操作间需要增加延时，给系统足够的处理时间。
-        /// </summary>
-        //private async void ResizeSC()
-        //{
-        //    Console.WriteLine($"重新设置scrcpy大小。");
-        //
-        //    DLL.ShowWindow(_scHandle, SW.SW_SHOWNORMAL);
-        //    await Task.Delay(100);
-        //    DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
-        //
-        //    Dispatcher.Invoke(() =>
-        //    {
-        //        foreach (Popup pop in MV.TempPopups)
-        //        {
-        //            pop.IsOpen = false;
-        //        }
-        //        CreateSavedPop();
-        //    });
-        //}
 
         /// <summary>
         /// 执行计时脚本。
@@ -233,20 +117,6 @@ namespace ScrcpyEX.View
         /// </summary>
         private async void ImageScript_Tick(RecInfo recInfo)
         {
-            //25.5.22
-            //BitmapSource area = MyGM.CaptureProcessArea(DpiScaleX, DpiScaleY);
-            //CroppedBitmap temp = new(area, recInfo.CropRect);
-            //MyGM.SavaImg("tempPic.png", temp);
-            //
-            //double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", $@"{MV.ScriptPath}\tempPic.png");
-            //if (ssim > 0.9)
-            //{
-            //    _vm.CycleNum++;
-            //    _vm.Interval = 0;
-            //    await ExecuteClickScript(recInfo);
-            //}
-            //Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
-
             Console.WriteLine($"进入新一轮，当前间隔：{_vm.Running}。");
             _scriptInterval = 5;
 
@@ -382,40 +252,6 @@ namespace ScrcpyEX.View
 
             return temp;
         }
-
-        //25.6.5
-        /// <summary>
-        /// 对比脚本图像和Scrcpy指定区域的图像。
-        /// </summary>
-        /// <param name="scWindow">整个Scrcpy窗口的截图。</param>
-        /// <param name="diff">程序左上角和Scrcpy左上角坐标的差。</param>
-        /// <param name="recInfo">当前要执行的脚本。</param>
-        /// <returns>返回相似度，0-1之间，越高说明越相似。</returns>
-        //private double CompareImage(BitmapSource scWindow, WPoint diff, RecInfo recInfo)
-        //{
-        //    //计算要对Scrcpy截取的区域，X和Y要加上程序左上角和Scrcpy左上角坐标的差
-        //    Int32Rect rect= recInfo.CropRect;
-        //    Int32Rect cropRect = new(
-        //        (int)(rect.X + diff.X), 
-        //        (int)(rect.Y + diff.Y), rect.Width, rect.Height);
-        //
-        //    //Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}，" +
-        //    //    $"比例：{DpiScaleX},{DpiScaleY}，" +
-        //    //    $"起点：{cropRect.X},{cropRect.Y}，" +
-        //    //    $"宽高：{cropRect.Width},{cropRect.Height}，" +
-        //    //    $"终点：{cropRect.X + cropRect.Width},{cropRect.Y + cropRect.Height}，" +
-        //    //    $"图片大小：{sc.Width},{sc.Height}，" +
-        //    //    $"程序大小：{MV.MainWin.Width},{MV.MainWin.Height}");
-        //
-        //    CheckRect(ref cropRect, (int)scWindow.Width, (int)scWindow.Height);
-        //    CroppedBitmap temp = new(scWindow, cropRect);
-        //    if (Debugger.IsAttached)
-        //    {
-        //        MyGM.SavaImg("tempPic.png", temp);
-        //    }
-        //
-        //    return OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", temp);
-        //}
 
         /// <summary>
         /// 如果要截取的区域超出sc图片的范围，则将值限定在范围内。

@@ -89,13 +89,10 @@ namespace ScrcpyEX.View
         /// <param name="btn">包含脚本数据的按钮。</param>
         private void SetCurrentColor(Button btn)
         {
-            if (_g != null)
-            {
-                _g.Background = null;
-            }
+            _g?.Background = null;
 
             _g = btn.FindVisualParent<Grid>();
-            _g.Background = Brushes.AliceBlue;
+            _g.Background = new SolidColorBrush(Color.FromArgb(128, 118, 238, 198));
         }
 
 

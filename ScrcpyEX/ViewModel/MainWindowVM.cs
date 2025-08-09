@@ -14,43 +14,30 @@ namespace ScrcpyEX.ViewModel
         /// </summary>
         public string ResolutionDesc
         {
-            get { return resolutionDesc; }
-            set
-            {
-                resolutionDesc = value;
-                RaisePropertyChanged();
-            }
+            get => _resolutionDesc;
+            set => SetProperty(ref _resolutionDesc, value);
         }
-        private string resolutionDesc = "未进行投屏";
-
+        private string _resolutionDesc = "未进行投屏";
 
         /// <summary>
         /// 脚本的循环次数。
         /// </summary>
         public int CycleNum
         {
-            get { return cycleNum; }
-            set
-            {
-                cycleNum = value;
-                RaisePropertyChanged();
-            }
+            get => _cycleNum;
+            set => SetProperty(ref _cycleNum, value);
         }
-        private int cycleNum = 0;
+        private int _cycleNum = 0;
 
         /// <summary>
         /// 单次脚本执行后已产生的时间，单位是秒。
         /// </summary>
         public int Running
         {
-            get { return running; }
-            set
-            {
-                running = value;
-                RaisePropertyChanged();
-            }
+            get => _running;
+            set => SetProperty(ref _running, value);
         }
-        private int running = 0;
+        private int _running = 0;
 
 
     }

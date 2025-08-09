@@ -42,17 +42,6 @@ namespace ScrcpyEX.View
         {
             MyClose();
         }
-
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Console.WriteLine($"窗体大小进行改变，Scrcpy当前：（{ScActualWidth}，{ScActualHeight}），比例：（{ScRatioX}，{ScRatioY}）。");
-
-            //scrcpy程序句柄不为空调整scrcpy大小
-            //if (_scHandle != IntPtr.Zero)
-            //{
-            //    _resizeTimer.Start();
-            //}
-        }
         #endregion
 
         #region 自定义菜单栏事件
@@ -117,9 +106,8 @@ namespace ScrcpyEX.View
 
         private void BtnLocOpt_Click(object sender, RoutedEventArgs e)
         {
-            //联动两个定位按钮，显示一致的背景色
             popMenu.IsOpen = true;
-            btnLocate.Background = btnLocOpt.Background = Brushes.LightBlue;
+            btnLocate.Background = btnLocOpt.Background = Brushes.LightBlue;//联动两个定位按钮，显示一致的背景色
         }
 
         private void BtnRecManage_Click(object sender, RoutedEventArgs e)
@@ -207,9 +195,12 @@ namespace ScrcpyEX.View
             MappingAdd();
         }
 
-
+        private void BtnMappingBack_Click(object sender, RoutedEventArgs e)
+        {
+            MappingCancel(MyCfg.Cfg.KeyMappings);
+        }
         #endregion
 
-        
+
     }
 }

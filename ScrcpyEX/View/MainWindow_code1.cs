@@ -63,23 +63,6 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 当前窗口或Scrcpy是否为活动窗口。
-        /// </summary>
-        /// <returns>0--窗口拥有焦点；1--Scrcpy拥有焦点；2--窗口或Scrcpy都没有焦点。</returns>
-        //public int IsActiveWindow()
-        //{
-        //    if (IsActive)
-        //    {
-        //        return 0;
-        //    }
-        //    else
-        //    {
-        //        IntPtr intPtr = DLL.GetForegroundWindow();
-        //        return intPtr == _scHandle ? 1 : 2;
-        //    }
-        //}
-
-        /// <summary>
         /// 停止执行脚本的计时器，如果当前正在录制，也会停止录制操作。
         /// </summary>
         private void StopScriptAndRecord()
@@ -334,22 +317,36 @@ namespace ScrcpyEX.View
                 return;
             }
 
-            if (desc == "进行映射编辑")
+            if (desc == "映射编辑")
             {
                 foreach (Popup pop in MV.TempPopups)
                 {
                     pop.IsOpen = true;
                 }
 
-                btnMappingEdit.Content = "保存编辑";
+                btnMappingEdit.Content = "保存修改";
+                btnMappingBack.IsEnabled = true;
                 btnMappingAdd.IsEnabled = true;
             }
             else
             {
                 MappingSave();
-                btnMappingEdit.Content = "进行映射编辑";
-                btnMappingAdd.IsEnabled = false;
+                MappingEditCompleted(true);
             }
+        }
+
+        /// <summary>
+        /// 不保存按键映射编辑的内容。
+        /// </summary>
+        private void MappingCancel(List<KeyMapping> mappings)
+        {
+            foreach (Popup pop in MV.TempPopups)
+            {
+                pop.IsOpen = false;
+            }
+
+            CreateSavedPop();
+            MappingEditCompleted(false);
         }
 
         /// <summary>
@@ -382,7 +379,18 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 创建已保存的所有映射Popup，并保存到临时Popup列表，保存前会清空列表。
+        /// 映射按钮编辑完后调用此方法，无论是否保存。
+        /// </summary>
+        /// <param name="isHidden">所有的Popup是否已经隐藏。</param>
+        private void MappingEditCompleted(bool isHidden)
+        {
+            btnMappingEdit.Content = "映射编辑";
+            btnMappingBack.IsEnabled = false;
+            btnMappingAdd.IsEnabled = false;
+        }
+
+        /// <summary>
+        /// 创建配置中所有映射Popup，并保存到临时Popup列表，保存前会清空列表。
         /// </summary>
         private void CreateSavedPop()
         {
@@ -400,15 +408,12 @@ namespace ScrcpyEX.View
         /// <param name="key">捕获的键盘字符。</param>
         public void KeyboardMapping(string key)
         {
-            //int focus = IsActiveWindow();
-            //if (focus != 2)
             if (IsActive && ScHandle != IntPtr.Zero)
-            
             {
-                if (key =="Q")//按下Q使用鼠标控制方向
-                {
-                    PressMouse();
-                }
+                //if (key =="Q")//按下Q使用鼠标控制方向
+                //{
+                //    PressMouse();
+                //}
 
                 DoKeyMapping(key, ScRatioX, ScHandle);
             }
@@ -419,26 +424,26 @@ namespace ScrcpyEX.View
         /// 如果按下键盘会中断鼠标按下的状态，目前没有更好的办法实现模拟器一样的操控。
         /// </summary>
         /// <param name="isDown">当前按键是否为按下状态。</param>
-        private void PressMouse(bool isDown = true)
-        {
-            if (isDown)
-            {
-                //if (_isPressMouse)
-                //{
-                //    _isPressMouse = false;
-                //    //DLL.mouse_event(0x04, 0, 0, 0, 0);//鼠标抬起
-                //    //DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero);
-                //}
-                //else
-                //{
-                //    _isPressMouse = true;
-                //    //DLL.mouse_event(0x02, 0, 0, 0, 0);//鼠标按下
-                //    //DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, IntPtr.Zero);
-                //}
-                DLL.mouse_event(0x02, 0, 0, 0, 0);//鼠标按下
-            }
-            //Console.WriteLine($"开启鼠标移动,{_isPressMouse}。");
-        }
+        //private void PressMouse(bool isDown = true)
+        //{
+        //    if (isDown)
+        //    {
+        //        //if (_isPressMouse)
+        //        //{
+        //        //    _isPressMouse = false;
+        //        //    //DLL.mouse_event(0x04, 0, 0, 0, 0);//鼠标抬起
+        //        //    //DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero);
+        //        //}
+        //        //else
+        //        //{
+        //        //    _isPressMouse = true;
+        //        //    //DLL.mouse_event(0x02, 0, 0, 0, 0);//鼠标按下
+        //        //    //DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, IntPtr.Zero);
+        //        //}
+        //        DLL.mouse_event(0x02, 0, 0, 0, 0);//鼠标按下
+        //    }
+        //    //Console.WriteLine($"开启鼠标移动,{_isPressMouse}。");
+        //}
 
         /// <summary>
         /// 如果键入的字符在映射列表中，则映射为单击操作。
@@ -476,7 +481,7 @@ namespace ScrcpyEX.View
                 //}
 
                 //ADB_Click(centreX, centreY);
-                //Console.WriteLine($"圆心点:({centreX},{centreY})，鼠标移动标志位：{_isPressMouse}。");
+                //Console.WriteLine($"圆心点:({centreX},{centreY})。");
             }
         }
 

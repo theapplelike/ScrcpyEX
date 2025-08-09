@@ -12,9 +12,35 @@ namespace ScrcpyEX.MyDefinition
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        /// 设置属性为新的值。
+        /// </summary>
+        /// <typeparam name="T">属性的类型。</typeparam>
+        /// <param name="field">和属性关联的字段。</param>
+        /// <param name="value">新的值。</param>
+        /// <param name="propertyName">属性的名称。</param>
+        /// <returns>true--值设置成功；false--新值和旧值一样，不会通知客户端。</returns>
+        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+
+            field = value;
+            RaisePropertyChanged(propertyName);
+            return true;
+        }
+
+        protected void SetProperty<T>(ref T field, T value, Action callback, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return;
+
+            field = value;
+            RaisePropertyChanged(propertyName);
+            callback?.Invoke();
         }
     }
 }

@@ -18,12 +18,7 @@ namespace ScrcpyEX.View
     public partial class MainWindow//var
     {
         /// <summary>
-        /// 对第三方程序的引用。
-        /// </summary>
-        //private readonly Process _prc = new();
-
-        /// <summary>
-        /// Scrcpy主机，需要先启动主机再启动Scrcpy。
+        /// Scrcpy主机，封装Scrcpy启动、关闭、大小调整的功能。
         /// </summary>
         private ScrcpyHost _scrcpyHost = null;
 
@@ -33,14 +28,9 @@ namespace ScrcpyEX.View
         private readonly MainWindowVM _vm;
 
         /// <summary>
-        /// scrcpy的句柄，为IntPtr.Zero时代表scrcpy没有启动。
-        /// </summary>
-        //private IntPtr _scHandle = IntPtr.Zero;
-
-        /// <summary>
         /// scrcpy窗口的名称。
         /// </summary>
-        private string _scName;
+        //private string _scName;
 
         /// <summary>
         /// 主程序的句柄。
@@ -71,11 +61,6 @@ namespace ScrcpyEX.View
         /// 图像脚本对应的委托。
         /// </summary>
         private EventHandler _imageHandler;
-
-        /// <summary>
-        /// 调整scrcpy窗口大小的计时器。
-        /// </summary>
-        private readonly DispatcherTimer _resizeTimer = new();
 
         /// <summary>
         /// 脚本计时器，可能会绑定计时脚本或图像脚本。

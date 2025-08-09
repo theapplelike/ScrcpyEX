@@ -149,7 +149,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Button x:Name="btnSave" Click="BtnSave_Click" Content="保存" Style="{StaticResource Btn}"/>
-                    <Button x:Name="btnExit" Click="BtnExit_Click" Content="返回" Style="{StaticResource Btn}" Grid.Column="1"/>
+                    <Button x:Name="btnExit" Click="BtnExit_Click" Content="关闭" Style="{StaticResource Btn}" Grid.Column="1"/>
                 </Grid>
             </Grid>
         

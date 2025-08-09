@@ -10,7 +10,7 @@
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel" 
         xmlns:mycontrol="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
         Title="MainWindow" Height="488" Width="970" WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged">
+        Loaded="Window_Loaded" Closed="Window_Closed">
 
     <Window.DataContext>
         <ViewModel:MainWindowVM/>
@@ -88,9 +88,10 @@
                     <Button x:Name="btnScr" Click="BtnScr_Click" Style="{StaticResource ItemBtn}" Content="录制脚本" BorderThickness="0,1"/>
                     <Button x:Name="btnSet" Click="BtnSet_Click" Style="{StaticResource ItemBtn}" Content="功能设置"/>
 
-                    <UniformGrid Rows="1" Columns="2">
-                        <Button x:Name="btnMappingEdit" Click="BtnMappingEdit_Click" Style="{StaticResource ItemBtn}" Content="进行映射编辑"/>
-                        <Button x:Name="btnMappingAdd"  Click="BtnMappingAdd_Click"  Style="{StaticResource ItemBtn}" Content="添加映射按钮" BorderThickness="1,0,0,1" IsEnabled="False"/>
+                    <UniformGrid Rows="1" Columns="3">
+                        <Button x:Name="btnMappingEdit" Click="BtnMappingEdit_Click" Style="{StaticResource ItemBtn}" Content="映射编辑"/>
+                        <Button x:Name="btnMappingBack" Click="BtnMappingBack_Click" Style="{StaticResource ItemBtn}" Content="取消修改" IsEnabled="False" BorderThickness="1,0,1,1"/>
+                        <Button x:Name="btnMappingAdd"  Click="BtnMappingAdd_Click"  Style="{StaticResource ItemBtn}" Content="添加映射" IsEnabled="False"/>
                     </UniformGrid>
                 </StackPanel>
             </Border>
