@@ -63,7 +63,7 @@ namespace ScrcpyEX.View
         private EventHandler _imageHandler;
 
         /// <summary>
-        /// 调整scrcpy窗口大小的计时器。
+        /// 调整窗口大小改变时触发的计时器。
         /// </summary>
         private readonly DispatcherTimer _resizeTimer = new();
 

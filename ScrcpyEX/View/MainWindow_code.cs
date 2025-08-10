@@ -17,6 +17,7 @@ using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.WindowsAPI;
 using System.Windows.Controls.Primitives;
 using ScrcpyEX.MyDefinition.MyClass;
+using ScrcpyEX.Model;
 
 namespace ScrcpyEX.View
 {
@@ -91,6 +92,7 @@ namespace ScrcpyEX.View
                 MyCfg.Cfg.Size.Height = Height;
                 MyCfg.Cfg.Size.Left = Left;
                 MyCfg.Cfg.Size.Top = Top;
+                MyCfg.Cfg.Size.IsRecord = true;
             }
             MyCfg.Save();
         }
@@ -166,9 +168,11 @@ namespace ScrcpyEX.View
         {
             double wd = SystemParameters.WorkArea.Width;
             double ht = SystemParameters.WorkArea.Height;
+
             if (Width >= wd && Height >= ht)
+            //if (_tempSize.IsMaximize)
             {
-                LoadTempSize();
+                LoadTempSize(_tempSize);
                 btnMaximize.Content = "\ue922";
             }
             else
@@ -179,6 +183,7 @@ namespace ScrcpyEX.View
                 Left = Top = 0;
                 btnMaximize.Content = "\ue923";
             }
+            //RemoveBlack();
         }
 
         /// <summary>
@@ -187,21 +192,14 @@ namespace ScrcpyEX.View
         private void SaveTempSize() => _tempSize = new(Width, Height, Left, Top);
 
         /// <summary>
-        /// 获得临时变量中的窗体尺寸和位置。
+        /// 应用临时变量中的窗体尺寸和位置。
         /// </summary>
-        private void LoadTempSize()
+        private void LoadTempSize(FormSize size)
         {
-            if (_tempSize == null)
-            {
-                SetUISize();
-            }
-            else
-            {
-                Width = _tempSize.Width;
-                Height = _tempSize.Height;
-                Left = _tempSize.Left;
-                Top = _tempSize.Top;
-            }
+            Width = size.Width;
+            Height = size.Height;
+            Left = size.Left;
+            Top = size.Top;
         }
 
         /// <summary>
@@ -212,12 +210,13 @@ namespace ScrcpyEX.View
         {
             if ((bool)rdoLoc1.IsChecked)
             {
-                Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
+                //Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
+                Left = 0;
                 Top = 0;
             }
             else if ((bool)rdoLoc2.IsChecked)
             {
-                Left = SystemParameters.WorkArea.Width - Width;
+                Left = SystemParameters.WorkArea.Width - Width - 3;//完全贴合右边会导致截图脚本有偏移
                 Top = 0;
             }
             else if ((bool)rdoLoc3.IsChecked)
@@ -274,7 +273,7 @@ namespace ScrcpyEX.View
 
             int xProportion = scWidth / max;
             int yProportion = scHeight / max;
-            Console.WriteLine($"当前Scrcpy的比例：({scWidth / max}，{scHeight / max})，期望比例:({_horizontalRatio},{_verticalRatio})。");
+            Console.WriteLine($"消除黑边,当前Scrcpy的比例：({scWidth / max}，{scHeight / max})，期望比例:({_horizontalRatio},{_verticalRatio})。");
 
             //计算通分后的分子，如果标准分子大，应以宽为准，调整高度；反之调整宽度
             int currentNumerator = xProportion * _verticalRatio;

@@ -41,27 +41,7 @@ namespace ScrcpyEX.View
 
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
-            //var ssim = OpenCv.Compare_SSIM($@"{MV.ScriptPath}\test1.png", $@"{MV.ScriptPath}\test2.png");
-            //Console.WriteLine($"相似度：{ssim}");
-            //await Task.Delay(3000);
-            WPoint pt1 = PointToScreen(new WPoint(0, 0));
-            Console.WriteLine($"程序左上角：{pt1.X},{pt1.Y}。");
-
-            RecInfo recInfo = MyCfg.Cfg.RecInfos[2];
-            CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, recInfo.CropRect);
-            Console.WriteLine($"图像脚本原始参数：{recInfo.CropRect.X},{recInfo.CropRect.Y}");
-            if (scWindow != null)
-            {
-                double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
-                Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
-            }
-            if (Debugger.IsAttached)
-            {
-                MyGM.SavaImg("tempPic.png", scWindow);
-            }
-            //scWindow?.Save($@"{MV.ScriptPath}\A.png", ImageFormat.Png);
-            Console.WriteLine($"完成。");
-            //MyGM.SavaImg("A.png", image);
+            TestCompareImage();
 
             //Point pt1 = PointToScreen(new Point(0, 0));
             //int x = (int)(pt1.X + (_limitPop.HorizontalOffset + ExtraWidthLeft + 50) * DpiScaleX);
@@ -72,6 +52,26 @@ namespace ScrcpyEX.View
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
             await Task.Delay(1);
+        }
+
+        private async void TestCompareImage()
+        {
+            WPoint pt1 = PointToScreen(new WPoint(0, 0));
+            Console.WriteLine($"程序左上角：{pt1.X},{pt1.Y}。");
+
+            RecInfo recInfo = MyCfg.Cfg.RecInfos[2];
+            CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, recInfo.CropRect);
+            Console.WriteLine($"图像脚本原始参数,起始坐标:({recInfo.CropRect.X},{recInfo.CropRect.Y}),宽高:({recInfo.CropRect.Width},{recInfo.CropRect.Height})");
+            if (scWindow != null)
+            {
+                double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
+                Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
+            }
+            if (Debugger.IsAttached)
+            {
+                MyGM.SavaImg("tempPic.png", scWindow);
+            }
+            Console.WriteLine($"完成。");
         }
 
         /// <summary>

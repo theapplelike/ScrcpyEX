@@ -112,7 +112,7 @@ namespace ScrcpyEX.View
             Console.WriteLine("重新定位映射pop。");
 
             _resizeTimer.Stop();
-            CreateSavedPop(true);
+            CreateSavedPop(btnMappingAdd.IsEnabled);
             //new Thread(ResizeSC).Start();
             //_resizeTimer.Stop();
         }
@@ -265,7 +265,7 @@ namespace ScrcpyEX.View
             BitmapSource scWindow = MyGM.ConvertToBitmapSource(bmp);
             WPoint main = PointToScreen(new WPoint(0, 0));
             WPoint diff = new(main.X - rc.Left, main.Y - rc.Top);
-            //Console.WriteLine($"左上角的差：{diff.X},{diff.Y}");
+            Console.WriteLine($"左上角的差：{diff.X},{diff.Y}");
 
             //计算对scrcpy窗口截取的区域
             Int32Rect cropRect = new(
