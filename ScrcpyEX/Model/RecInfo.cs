@@ -45,7 +45,7 @@ namespace ScrcpyEX.Model
         /// <summary>
         /// 说明局部图片位置大小的矩形。
         /// </summary>
-        public Int32Rect CropRect { get; set; }
+        public Rect CropRect { get; set; }
 
         /// <summary>
         /// 是否使用自适应间隔。

@@ -50,6 +50,11 @@ namespace ScrcpyEX.View
                 _resizeTimer.Start();
             }
         }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            RefreshScrcpy();
+        }
         #endregion
 
         #region 自定义菜单栏事件
@@ -207,8 +212,9 @@ namespace ScrcpyEX.View
         {
             MappingCancel();
         }
+
         #endregion
 
-
+        
     }
 }

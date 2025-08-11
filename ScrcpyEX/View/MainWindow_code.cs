@@ -38,6 +38,8 @@ namespace ScrcpyEX.View
             SetTimer();
             ReadCfg();
             SetUISize(true);
+
+            _vm.Scaling = $"缩放比例 {ScRatioY:P}";
         }
 
         /// <summary>
@@ -273,7 +275,8 @@ namespace ScrcpyEX.View
 
             int xProportion = scWidth / max;
             int yProportion = scHeight / max;
-            Console.WriteLine($"消除黑边,当前Scrcpy的比例：({scWidth / max}，{scHeight / max})，期望比例:({_horizontalRatio},{_verticalRatio})。");
+            Console.WriteLine($"消除黑边,当前Scrcpy的比例：({ScActualWidth / max}，{ScActualHeight / max})，期望比例:({_horizontalRatio},{_verticalRatio})。");
+            Console.WriteLine($"当前Scrcpy的宽高：({ScActualWidth},{ScActualHeight})，\n和原始大小的比例：{ScRatioX}，{ScRatioY}");
 
             //计算通分后的分子，如果标准分子大，应以宽为准，调整高度；反之调整宽度
             int currentNumerator = xProportion * _verticalRatio;
@@ -324,7 +327,8 @@ namespace ScrcpyEX.View
             }
             if (ScRatioX >= 1.5)
             {
-                //X轴不能再放大
+                popMid.Show("不能再继续放大。");
+                return;
             }
             else if (Width + _horizontalRatio * step > SystemParameters.WorkArea.Width)
             {
@@ -350,6 +354,26 @@ namespace ScrcpyEX.View
 
             Locate();
             RemoveBlack();
+        }
+
+        /// <summary>
+        /// 从最小化恢复时可能导致Scrcpy窗口向左偏移，所以恢复时刷新Scrcpy窗口。
+        /// </summary>
+        private void RefreshScrcpy()
+        {
+            switch (WindowState)
+            {
+                case WindowState.Minimized:
+                    Debug.WriteLine("窗口已最小化");
+                    break;
+                case WindowState.Normal:
+                    Debug.WriteLine("窗口已恢复正常状态");
+                    _scrcpyHost.RefreshScrcpy();
+                    break;
+                case WindowState.Maximized:
+                    Debug.WriteLine("窗口已最大化");
+                    break;
+            }
         }
 
     }

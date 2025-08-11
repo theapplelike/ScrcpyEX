@@ -1,19 +1,21 @@
-﻿using System;
+﻿using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.MyDefinition;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
-using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.IO;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
-using System.Security.Cryptography;
-using System.Net;
-using System.Windows.Interop;
 using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace ScrcpyEX.View
 {
@@ -119,11 +121,11 @@ namespace ScrcpyEX.View
         {
             //Console.WriteLine($"开始点：{_startPoint.X}，{_startPoint.Y}，结束点：{_endPoint.X}，{_endPoint.Y}。");
 
-            Int32Rect cropRect = new(
-                (int)(Math.Min(_startPoint.X, _endPoint.X) * DpiScaleX),
-                (int)(Math.Min(_startPoint.Y, _endPoint.Y) * DpiScaleY),
-                (int)(Math.Abs(_endPoint.X - _startPoint.X) * DpiScaleX),
-                (int)(Math.Abs(_endPoint.Y - _startPoint.Y) * DpiScaleY));
+            Rect cropRect = new(
+                (Math.Min(_startPoint.X, _endPoint.X) * DpiScaleX),
+                (Math.Min(_startPoint.Y, _endPoint.Y) * DpiScaleY),
+                (Math.Abs(_endPoint.X - _startPoint.X) * DpiScaleX),
+                (Math.Abs(_endPoint.Y - _startPoint.Y) * DpiScaleY));
 
             //未截取任何内容时退出
             if (cropRect.Width == 0 || cropRect.Height == 0)
@@ -141,13 +143,18 @@ namespace ScrcpyEX.View
         /// </summary>
         /// <param name="e">承载整个屏幕截图的控件。</param>
         /// <param name="cropRect">说明其中要截取部分的矩形描述。</param>
-        private void GetCropArea(FrameworkElement e, Int32Rect cropRect)
+        private void GetCropArea(FrameworkElement e, Rect cropRect)
         {
             RenderTargetBitmap render = new((int)(e.ActualWidth * DpiScaleX), (int)(e.ActualHeight * DpiScaleY), PixelsPerInchX, PixelsPerInchY, PixelFormats.Pbgra32);
-            
+            Rect saveRect = new(
+                cropRect.X/ MV.MainWin.ScRatioX,
+                cropRect.Y/ MV.MainWin.ScRatioY,
+                cropRect.Width / MV.MainWin.ScRatioX,
+                cropRect.Height / MV.MainWin.ScRatioY);
+
             render.Render(e);
-            Crop = new CroppedBitmap(render, cropRect);
-            CropRect = cropRect;
+            Crop = new CroppedBitmap(render, MyGM.ConvertToInt32Rect(cropRect));
+            CropRect = saveRect;
         }
 
 

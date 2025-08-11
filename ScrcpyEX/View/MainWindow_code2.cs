@@ -55,7 +55,7 @@ namespace ScrcpyEX.View
             Regex reg = new("[0-9]+");
             MatchCollection mc = reg.Matches(texture);
 
-            _vm.ResolutionDesc = $"投屏分辨率 {mc[0].Value}*{mc[1].Value}，{GetRatio(mc)}";
+            _vm.Resolution = $"投屏分辨率 {mc[0].Value}*{mc[1].Value}，{GetRatio(mc)}";
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace ScrcpyEX.View
         /// <param name="mainHandle">承载Scrcpy程序的句柄。</param>
         /// <param name="rect">脚本图片的裁剪区域。</param>
         /// <returns>返回System.Windows.Media.Imaging.CroppedBitmap类型的裁剪图。</returns>
-        private async Task<CroppedBitmap> GetScriptImg(IntPtr scHandle, IntPtr mainHandle, Int32Rect rect)
+        private async Task<CroppedBitmap> GetScriptImg(IntPtr scHandle, IntPtr mainHandle, Rect originalRect)
         {
             //判断主窗口是否最小化
             bool isIcon = DLL.IsIconic(mainHandle);
@@ -238,54 +238,40 @@ namespace ScrcpyEX.View
             }
             //Console.WriteLine($"是否最小化:{isIcon}。");
 
-            //获得scrcpy窗口的矩形大小
-            DLL.GetWindowRect(scHandle, out DLL.LpRect rc);
-            if (rc.Width <= 0 || rc.Height <= 0)
-            {
-                return null;
-            }
-            //Console.WriteLine($"Scrcpy窗口尺寸：{rc.Left},{rc.Top},{rc.Right},{rc.Bottom},{rc.Width},{rc.Height}");
-
-            //将scrcpy的窗口复制到Bitmap中
-            Bitmap bmp = new(rc.Width, rc.Height);
-            using (Graphics g = Graphics.FromImage(bmp))
-            {
-                IntPtr hdc = g.GetHdc();
-                bool success = DLL.PrintWindow(scHandle, hdc, 0x2);//PW_RENDERFULLCONTENT
-                g.ReleaseHdc(hdc);
-                if (!success)
-                {
-                    return null;
-                }
-            }
-
             //计算程序左上角和Scrcpy左上角坐标的差，
             //脚本截图时以主程序为底图，以主程序的左上角为准；
             //脚本比对时以Scrcpy窗口为底图，以Scrcpy窗口的左上角为准，所以计算最后的截取区域时要加上两者的差
-            BitmapSource scWindow = MyGM.ConvertToBitmapSource(bmp);
-            WPoint main = PointToScreen(new WPoint(0, 0));
-            WPoint diff = new(main.X - rc.Left, main.Y - rc.Top);
-            Console.WriteLine($"左上角的差：{diff.X},{diff.Y}");
+            BitmapSource scBitmap = MyGM.GetHandleImage(scHandle);
+            //WPoint main = PointToScreen(new WPoint(0, 0));
+            //WPoint diff = new(main.X - rc.Left, main.Y - rc.Top);
+            //Console.WriteLine($"左上角的差：{diff.X},{diff.Y}");
 
             //计算对scrcpy窗口截取的区域
-            Int32Rect cropRect = new(
-                (int)(rect.X + diff.X),
-                (int)(rect.Y + diff.Y), rect.Width, rect.Height);
+            //Int32Rect cropRect = new(
+            //    (int)(rect.X + diff.X),
+            //    (int)(rect.Y + diff.Y), rect.Width, rect.Height);
+
+            //计算对Scrcpy窗口截取的区域
+            Rect cropRect = new(
+                originalRect.X * ScRatioX,
+                originalRect.Y * ScRatioY,
+                originalRect.Width * ScRatioX,
+                originalRect.Height * ScRatioY);
 
             //Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}，" +
             //    $"比例：{DpiScaleX},{DpiScaleY}，" +
             //    $"起点：{cropRect.X},{cropRect.Y}，" +
             //    $"宽高：{cropRect.Width},{cropRect.Height}，" +
             //    $"终点：{cropRect.X + cropRect.Width},{cropRect.Y + cropRect.Height}，" +
-            //    $"图片大小：{scWindow.Width},{scWindow.Height}，" +
+            //    $"图片大小：{scBitmap.Width},{scBitmap.Height}，" +
             //    $"程序大小：{MV.MainWin.Width},{MV.MainWin.Height}");
 
             //检查范围，获得最终的截图区域
-            CheckRect(ref cropRect, (int)scWindow.Width, (int)scWindow.Height);
-            CroppedBitmap temp = new(scWindow, cropRect);
+            CheckRect(ref cropRect, scBitmap.Width, scBitmap.Height);
+            CroppedBitmap temp = new(scBitmap, MyGM.ConvertToInt32Rect(cropRect));
             //if (Debugger.IsAttached)
             //{
-            //    MyGM.SavaImg("scWindow.png", scWindow);
+            //    MyGM.SavaImg("scBitmap.png", scBitmap);
             //}
 
             return temp;
@@ -298,7 +284,7 @@ namespace ScrcpyEX.View
         /// <param name="rect">说明截图范围的矩形。</param>
         /// <param name="maxWidth">最大宽度。</param>
         /// <param name="maxHeight">最大高度。</param>
-        private void CheckRect(ref Int32Rect rect, int maxWidth, int maxHeight)
+        private void CheckRect(ref Rect rect, double maxWidth, double maxHeight)
         {
             if (rect.X + rect.Width > maxWidth)
             {

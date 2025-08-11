@@ -32,12 +32,23 @@ namespace ScrcpyEX.View
             ShowInTaskbar = false;
             Topmost = true;
 
-            Left = MV.MainWin.Left;
-            Top = MV.MainWin.Top;
-            Width = MV.MainWin.Width;
-            Height = MV.MainWin.Height;
+            //截图区域创建到Scrcpy的上方
+            DLL.LpRect rect = MyGM.GetHandleRect(MV.MainWin.ScHandle);
+            Top = rect.Top / DpiScaleY;
+            Left = rect.Left / DpiScaleX;
+            Width = rect.Width / DpiScaleX;
+            Height = rect.Height / DpiScaleY;
 
-            gBack.Background = new ImageBrush(MyGM.CaptureProcessArea(DpiScaleX, DpiScaleY))
+            //Left = MV.MainWin.Left;
+            //Top = MV.MainWin.Top;
+            //Width = MV.MainWin.Width;
+            //Height = MV.MainWin.Height;
+
+            //gBack.Background = new ImageBrush(MyGM.CaptureProcessArea(DpiScaleX, DpiScaleY))
+            //{
+            //    Stretch = Stretch.Fill
+            //};
+            gBack.Background = new ImageBrush(MyGM.GetHandleImage(MV.MainWin.ScHandle))
             {
                 Stretch = Stretch.Fill
             };
@@ -60,7 +71,7 @@ namespace ScrcpyEX.View
             //{
             //    Stretch = Stretch.Fill
             //};
-            
+
             //放大镜根据DPI缩放
             _d = (int)(50 * DpiScaleX);
             _magnifierBitmap = new(_d, _d, 96 * DpiScaleX, 96 * DpiScaleY, PixelFormats.Pbgra32, null);

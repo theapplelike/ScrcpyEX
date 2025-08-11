@@ -228,6 +228,14 @@ namespace ScrcpyEX.MyDefinition.MyClass
         }
 
         /// <summary>
+        /// 调用后马上重绘Scrcpy窗口。
+        /// </summary>
+        public void RefreshScrcpy()
+        {
+            _hwndHost?.RefreshWindow();
+        }
+
+        /// <summary>
         /// 释放Scrcpy的资源，用于用户关闭。
         /// </summary>
         public void DisposeScrcpy()

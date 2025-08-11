@@ -116,25 +116,21 @@ namespace ScrcpyEX.View
         /// 窗口除开scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
         private double ExtraWidth => gShow.Margin.Left + gShow.Margin.Right;
-        //private double ExtraWidth => bdShow.Margin.Left + bdShow.Margin.Right;
 
         /// <summary>
         /// 窗口除开scrcpy的额外高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
         private double ExtraHeight => dpl.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom;
-        //private double ExtraHeight => dpl.ActualHeight + bdShow.Margin.Top + bdShow.Margin.Bottom;
 
         /// <summary>
         /// 窗口除开scrcpy的额外左侧宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
         public double ExtraWidthLeft => gShow.Margin.Left;
-        //public double ExtraWidthLeft => bdShow.Margin.Left;
 
         /// <summary>
         /// 窗口除开scrcpy的额外上方高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
         public double ExtraHeightTop => dpl.ActualHeight + gShow.Margin.Top;
-        //public double ExtraHeightTop => dpl.ActualHeight + bdShow.Margin.Top;
 
         /// <summary>
         /// X轴上的DPI比例。
@@ -149,12 +145,12 @@ namespace ScrcpyEX.View
         /// <summary>
         /// Scrcpy当前宽度和默认宽度的比值。
         /// </summary>
-        private double ScRatioX => ScActualWidth / _scWidth;
+        public double ScRatioX => ScActualWidth / _scWidth;
 
         /// <summary>
         /// Scrcpy当前高度和默认高度的比值。
         /// </summary>
-        private double ScRatioY => ScActualHeight / _scHeight;
+        public double ScRatioY => ScActualHeight / _scHeight;
 
         /// <summary>
         /// Scrcpy当前的实际宽度。
@@ -174,7 +170,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。
         /// </summary>
-        private IntPtr ScHandle => _scrcpyHost?.ScHandle ?? IntPtr.Zero;
+        public IntPtr ScHandle => _scrcpyHost?.ScHandle ?? IntPtr.Zero;
 
     }
 }

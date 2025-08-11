@@ -12,12 +12,22 @@ namespace ScrcpyEX.ViewModel
         /// <summary>
         /// 说明投屏的分辨率、比例。
         /// </summary>
-        public string ResolutionDesc
+        public string Resolution
         {
-            get => _resolutionDesc;
-            set => SetProperty(ref _resolutionDesc, value);
+            get => _resolution;
+            set => SetProperty(ref _resolution, value);
         }
-        private string _resolutionDesc = "未进行投屏";
+        private string _resolution = "未进行投屏";
+
+        /// <summary>
+        /// 说明程序当前的缩放比例。
+        /// </summary>
+        public string Scaling
+        {
+            get => _scaling;
+            set => SetProperty(ref _scaling, value);
+        }
+        private string _scaling = "未进行投屏";
 
         /// <summary>
         /// 脚本的循环次数。

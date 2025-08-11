@@ -1,17 +1,18 @@
-﻿using System;
+﻿using ScrcpyEX.ExtensionMethod;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using ScrcpyEX.ExtensionMethod;
-using System.Windows.Media;
-using System.Windows;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
-using System.Windows.Interop;
-using System.Windows.Media.Imaging;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace ScrcpyEX.MyDefinition
 {
@@ -226,6 +227,63 @@ namespace ScrcpyEX.MyDefinition
             PngBitmapEncoder encoder = new();
             encoder.Frames.Add(BitmapFrame.Create(source));
             encoder.Save(fs);
+        }
+
+        /// <summary>
+        /// 获得指定句柄窗口的矩形大小。
+        /// </summary>
+        /// <param name="handle">窗口的句柄。</param>
+        /// <returns>LpRect的数据。</returns>
+        public static DLL.LpRect GetHandleRect(IntPtr handle)
+        {
+            DLL.GetWindowRect(handle, out DLL.LpRect rc);
+            //Console.WriteLine($"句柄窗口尺寸：{rc.Left},{rc.Top},{rc.Right},{rc.Bottom},{rc.Width},{rc.Height}");
+            return rc;
+        }
+
+        /// <summary>
+        /// 获得指定句柄窗口的图像。
+        /// </summary>
+        /// <param name="handle">窗口的句柄。</param>
+        /// <returns>返回BitmapSource类型的图像。</returns>
+        public static BitmapSource GetHandleImage(IntPtr handle)
+        {
+            DLL.LpRect rc = GetHandleRect(handle);
+            if (rc.Width <= 0 || rc.Height <= 0)
+            {
+                return null;
+            }
+
+            //将Scrcpy的窗口复制到Bitmap中
+            System.Drawing.Bitmap bmp = new(rc.Width, rc.Height);
+            using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp))
+            {
+                IntPtr hdc = g.GetHdc();
+                bool success = DLL.PrintWindow(handle, hdc, 0x2);//PW_RENDERFULLCONTENT
+                g.ReleaseHdc(hdc);
+                if (!success)
+                {
+                    return null;
+                }
+            }
+
+            return ConvertToBitmapSource(bmp);
+        }
+
+        /// <summary>
+        /// 将Rect转化为Int32Rect，会进行四舍五入。
+        /// </summary>
+        /// <param name="rect">Rect类型的数据。</param>
+        /// <returns>Int32Rect类型的数据。</returns>
+        public static Int32Rect ConvertToInt32Rect(Rect rect)
+        {
+            Int32Rect int32Rect = new(
+                (int)Math.Round(rect.X),
+                (int)Math.Round(rect.Y),
+                (int)Math.Round(rect.Width),
+                (int)Math.Round(rect.Height));
+
+            return int32Rect;
         }
 
 

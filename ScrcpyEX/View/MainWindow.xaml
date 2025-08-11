@@ -10,7 +10,8 @@
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel" 
         xmlns:mycontrol="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
         Title="MainWindow" Height="488" Width="970" WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged">
+        Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged"
+        StateChanged="Window_StateChanged">
 
     <Window.DataContext>
         <ViewModel:MainWindowVM/>
@@ -59,7 +60,8 @@
         <Popup x:Name="popMenu" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnLocate}" Tag="g1" Closed="Pop_Closed">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel>
-                    <TextBlock Text="{Binding ResolutionDesc}" Background="White" Padding="10"/>
+                    <TextBlock Text="{Binding Resolution}" Background="White" Padding="5"/>
+                    <TextBlock Text="{Binding Scaling}" Background="White" Padding="5"/>
                     <UniformGrid Rows="2" Columns="2" Background="WhiteSmoke">
                         <RadioButton x:Name="rdoLoc1" Content="↖左上" Margin="0,10,0,5"/>
                         <RadioButton x:Name="rdoLoc2" Content="↗右上" Margin="0,10,0,5"/>

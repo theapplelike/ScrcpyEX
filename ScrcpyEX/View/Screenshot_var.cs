@@ -46,7 +46,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 说明截图结果位置大小的矩形。
         /// </summary>
-        public Int32Rect CropRect { get; set; }
+        public Rect CropRect { get; set; }
 
         /// <summary>
         /// X轴上的DPI比例。

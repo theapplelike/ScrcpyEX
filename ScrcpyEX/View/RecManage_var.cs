@@ -25,7 +25,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 说明截图结果位置大小的矩形。
         /// </summary>
-        private Int32Rect _cropRect;
+        private Rect _cropRect;
 
         /// <summary>
         /// 存储当前编辑脚本的UI对象的引用。
