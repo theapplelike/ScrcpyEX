@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 
 namespace ScrcpyEX.MyDefinition.MyClass
@@ -87,7 +88,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                     //Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}，程序是否被关闭：{_prc.HasExited}。");
                     Console.WriteLine($">>>>>>>>>>>>>>{i++}:程序是否被关闭：{_prc.HasExited}。");
                 }
-                while (!_prc.HasExited || i < 30);
+                while (!_prc.HasExited && i < 30);
                 MessageBox.Show("未能成功启动程序，请重试。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
@@ -249,28 +250,22 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <summary>
         /// HwndHost中不支持异步，所以外部启动Scrcpy，内部封装Scrcpy。
         /// </summary>
-        private class InternalHwndHost : HwndHost
+        private class InternalHwndHost(IntPtr scHandle, Process prc) : HwndHost
         {
             /// <summary>
             /// 对第三方程序的引用。
             /// </summary>
-            private readonly Process _prc = null;
+            private readonly Process _prc = prc;
 
             /// <summary>
             /// scrcpy的句柄，为IntPtr.Zero时代表scrcpy没有启动。
             /// </summary>
-            private readonly IntPtr _scHandle = IntPtr.Zero;
+            private readonly IntPtr _scHandle = scHandle;
 
             /// <summary>
             /// Scrcpy上一次的Rect。
             /// </summary>
             internal Rect _lastRect = new();
-
-            public InternalHwndHost(IntPtr scHandle, Process prc)
-            {
-                _scHandle = scHandle;
-                _prc = prc;
-            }
 
             /// <summary>
             /// 当 HwndHost 被添加到可视化树时自动调用，创建并返回要嵌入的 Win32 窗口句柄。
@@ -327,29 +322,6 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 base.OnWindowPositionChanged(rcBoundingBox);
             }
 
-            // 重写 WndProc 方法
-            protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-            {
-                try
-                {
-                    Console.WriteLine($"WndProc消息：{msg}");
-                    // 如果未处理，调用基类实现
-                    if (!handled)
-                    {
-                        return base.WndProc(hwnd, msg, wParam, lParam, ref handled);
-                    }
-
-                    return IntPtr.Zero;
-                }
-                catch (Exception ex)
-                {
-                    // 错误处理
-                    Debug.WriteLine($"WndProc 错误: {ex.Message}");
-                    handled = false;
-                    return IntPtr.Zero;
-                }
-            }
-
             /// <summary>
             /// 修改Scrcpy窗体样式。
             /// </summary>
@@ -370,7 +342,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             {
                 DLL.MoveWindow(_scHandle, 0, 0, (int)_lastRect.Width, (int)_lastRect.Height, true);
                 base.OnWindowPositionChanged(_lastRect);
-                Console.WriteLine("刷新窗口");
+                Console.WriteLine("刷新Scrcpy窗口");
             }
         }
 

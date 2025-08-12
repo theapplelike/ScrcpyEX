@@ -159,9 +159,14 @@ namespace ScrcpyEX.MyDefinition
         [DllImport("user32.dll", EntryPoint = "DestroyWindow", CharSet = CharSet.Unicode)]
         internal static extern bool DestroyWindow(IntPtr hwnd);
 
-        //[DllImport("user32.dll", SetLastError = true)]
-        //public static extern IntPtr SetFocus(IntPtr hWnd);
-        //
+        /// <summary>
+        /// 将键盘焦点设置为指定的窗口。 窗口必须附加到调用线程的消息队列。
+        /// </summary>
+        /// <param name="hWnd">将接收键盘输入的窗口的句柄。 如果此参数为 NULL，则忽略击键。</param>
+        /// <returns>如果函数成功，则返回值是以前具有键盘焦点的窗口的句柄。如果hWnd参数无效或窗口未附加到调用线程的消息队列，则返回值为NULL。</returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr SetFocus(IntPtr hWnd);
+
         //[DllImport("User32.dll", EntryPoint = "SendMessage", SetLastError = true)]
         //public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
         //

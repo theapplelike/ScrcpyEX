@@ -71,8 +71,11 @@
 
                     <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并定位" BorderThickness="0,1"/>
                     <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="▣默认原始尺寸并定位"/>
-                    <Button x:Name="btnRemoveBlack" Click="BtnRemoveBlack_Click" Style="{StaticResource ItemBtn}" Content="消除投屏黑边"/>
-                    
+
+                    <UniformGrid Rows="1" Columns="2">
+                        <Button x:Name="btnRemoveBlack" Click="BtnRemoveBlack_Click" Style="{StaticResource ItemBtn}" Content="消除投屏黑边"/>
+                        <Button x:Name="btnScGotFocus"  Click="BtnScGotFocus_Click"  Style="{StaticResource ItemBtn}" Content="激活投屏输入(F1)" BorderThickness="1,0,0,1"/>
+                    </UniformGrid>
                     <UniformGrid Rows="1" Columns="2">
                         <Button x:Name="btnReduce"  Click="BtnReduce_Click"  Style="{StaticResource ItemBtn}" Content="缩小尺寸"/>
                         <Button x:Name="btnAmplify" Click="BtnAmplify_Click" Style="{StaticResource ItemBtn}" Content="放大尺寸" BorderThickness="1,0,0,1"/>

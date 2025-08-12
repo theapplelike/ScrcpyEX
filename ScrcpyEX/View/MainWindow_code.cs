@@ -1,23 +1,25 @@
 ﻿using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.ExtensionMethod.MyAttribute;
+using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition;
+using ScrcpyEX.MyDefinition.MyClass;
+using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Interop;
-using System.Windows;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
-using System.Windows.Media;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
-using ScrcpyEX.MyDefinition;
-using ScrcpyEX.MyDefinition.WindowsAPI;
 using System.Windows.Controls.Primitives;
-using ScrcpyEX.MyDefinition.MyClass;
-using ScrcpyEX.Model;
+using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ScrcpyEX.View
 {
@@ -39,7 +41,7 @@ namespace ScrcpyEX.View
             ReadCfg();
             SetUISize(true);
 
-            _vm.Scaling = $"缩放比例 {ScRatioY:P}";
+            InputBindings.Add(new KeyBinding(new RelayCommand(ScGotFocus), Key.F1, ModifierKeys.None));
         }
 
         /// <summary>
@@ -158,9 +160,9 @@ namespace ScrcpyEX.View
             _scrcpyHost = new ScrcpyHost();
             bdShow.Child = await _scrcpyHost.StartScrcpyAsync(isWired);
 
-            KeyboardHook.RegisterHook();
             CreateSavedPop();
-            Activate();
+            //Activate();
+            KeyboardHook.RegisterHook();
         }
 
         /// <summary>
@@ -172,7 +174,6 @@ namespace ScrcpyEX.View
             double ht = SystemParameters.WorkArea.Height;
 
             if (Width >= wd && Height >= ht)
-            //if (_tempSize.IsMaximize)
             {
                 LoadTempSize(_tempSize);
                 btnMaximize.Content = "\ue922";
@@ -185,7 +186,6 @@ namespace ScrcpyEX.View
                 Left = Top = 0;
                 btnMaximize.Content = "\ue923";
             }
-            //RemoveBlack();
         }
 
         /// <summary>
@@ -198,6 +198,13 @@ namespace ScrcpyEX.View
         /// </summary>
         private void LoadTempSize(FormSize size)
         {
+            if (size == null)
+            {
+                SetUISize();
+                Locate();
+                return;
+            }
+
             Width = size.Width;
             Height = size.Height;
             Left = size.Left;
@@ -364,14 +371,14 @@ namespace ScrcpyEX.View
             switch (WindowState)
             {
                 case WindowState.Minimized:
-                    Debug.WriteLine("窗口已最小化");
+                    //Debug.WriteLine("窗口已最小化");
                     break;
                 case WindowState.Normal:
-                    Debug.WriteLine("窗口已恢复正常状态");
+                    //Debug.WriteLine("窗口已恢复正常状态");
                     _scrcpyHost.RefreshScrcpy();
                     break;
                 case WindowState.Maximized:
-                    Debug.WriteLine("窗口已最大化");
+                    //Debug.WriteLine("窗口已最大化");
                     break;
             }
         }

@@ -406,6 +406,7 @@ namespace ScrcpyEX.View
         /// <param name="key">捕获的键盘字符。</param>
         public void KeyboardMapping(string key)
         {
+            //Console.WriteLine($"窗口是否活动：{IsActive}，是否有焦点：{IsFocused}");
             if (IsActive && ScHandle != IntPtr.Zero)
             {
                 //if (key =="Q")//按下Q使用鼠标控制方向
@@ -483,7 +484,13 @@ namespace ScrcpyEX.View
             }
         }
 
-        
+        /// <summary>
+        /// Scrcpy窗口获得焦点，Scrcpy有焦点时才能触发输入法。
+        /// </summary>
+        private void ScGotFocus(object parameter)
+        {
+            DLL.SetFocus(ScHandle);
+        }
 
 
     }

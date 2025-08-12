@@ -1,5 +1,8 @@
-﻿using ScrcpyEX.MyDefinition.WindowsAPI;
+﻿using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition;
+using ScrcpyEX.MyDefinition.MyClass;
+using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,28 +11,20 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows;
-using System.Windows.Shapes;
-using ScrcpyEX.Model;
-using System.Windows.Controls.Primitives;
 using System.Windows.Controls;
-using System.IO;
-using System.Drawing.Drawing2D;
-using System.Drawing.Text;
-using System.Drawing;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ScrcpyEX.ExtensionMethod;
-using ScrcpyEX.MyDefinition.MyClass;
-using WPoint = System.Windows.Point;  //WPF的Point
+using System.Windows.Shapes;
+using DBrushes = System.Drawing.Brushes;
 using DPoint = System.Drawing.Point;  //Windows Forms的Point
-using WRectangle = System.Windows.Shapes.Rectangle;
 using DRectangle = System.Drawing.Rectangle;
 using WBrushes = System.Windows.Media.Brushes;
-using DBrushes = System.Drawing.Brushes;
-using System.Reflection;
+using WPoint = System.Windows.Point;  //WPF的Point
+using WRectangle = System.Windows.Shapes.Rectangle;
 
 namespace ScrcpyEX.View
 {
@@ -166,19 +161,25 @@ namespace ScrcpyEX.View
             }
 
             double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
-            if (ssim > 0.9)
+            if (ssim > 0.8)
             {
-                if (recInfo.IsAdaptive)
-                {
-                    _scriptInterval = (int)(_vm.Running * 0.9);//每次将上一次间隔的90%作为自适应间隔
-                    _scriptInterval = _scriptInterval < 5 ? 5 : _scriptInterval;
-                }
-
-                _vm.CycleNum++;
-                _stopwatch = Stopwatch.StartNew();
-                await ExecuteClickScript(recInfo, ScHandle);
+                //if (recInfo.IsAdaptive)
+                //{
+                //    _scriptInterval = (int)(_vm.Running * 0.9);//每次将上一次间隔的90%作为自适应间隔
+                //    _scriptInterval = _scriptInterval < 5 ? 5 : _scriptInterval;
+                //}
+                //
+                //_vm.CycleNum++;
+                //_stopwatch = Stopwatch.StartNew();
+                //await ExecuteClickScript(recInfo, ScHandle);
+                await NextImageScript(recInfo);
+                Console.WriteLine($"单次对比通过，相似度：{ssim:F8}");
             }
-            Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
+            else if (await MatrixComparison(recInfo))
+            {
+                await NextImageScript(recInfo);
+                Console.WriteLine($"多次对比通过");
+            }
 
             Console.WriteLine($"自适应间隔:{_scriptInterval}秒。");
             _scriptTimer.Interval = TimeSpan.FromSeconds(_scriptInterval);
@@ -188,6 +189,23 @@ namespace ScrcpyEX.View
         /// 执行脚本时，说明已产生的间隔。
         /// </summary>
         private void Count_Tick() => _vm.Running = (int)_stopwatch.Elapsed.TotalSeconds;
+
+        /// <summary>
+        /// 图像比对通过，进行脚本下一轮循环。
+        /// </summary>
+        /// <param name="recInfo">脚本信息。</param>
+        private async Task NextImageScript(RecInfo recInfo)
+        {
+            if (recInfo.IsAdaptive)
+            {
+                _scriptInterval = (int)(_vm.Running * 0.9);//每次将上一次间隔的90%作为自适应间隔
+                _scriptInterval = _scriptInterval < 5 ? 5 : _scriptInterval;
+            }
+
+            _vm.CycleNum++;
+            _stopwatch = Stopwatch.StartNew();
+            await ExecuteClickScript(recInfo, ScHandle);
+        }
 
         /// <summary>
         /// 执行点击脚本，PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
@@ -238,20 +256,8 @@ namespace ScrcpyEX.View
             }
             //Console.WriteLine($"是否最小化:{isIcon}。");
 
-            //计算程序左上角和Scrcpy左上角坐标的差，
-            //脚本截图时以主程序为底图，以主程序的左上角为准；
-            //脚本比对时以Scrcpy窗口为底图，以Scrcpy窗口的左上角为准，所以计算最后的截取区域时要加上两者的差
+            //获得Scrcpy窗口截图，并计算截取的区域
             BitmapSource scBitmap = MyGM.GetHandleImage(scHandle);
-            //WPoint main = PointToScreen(new WPoint(0, 0));
-            //WPoint diff = new(main.X - rc.Left, main.Y - rc.Top);
-            //Console.WriteLine($"左上角的差：{diff.X},{diff.Y}");
-
-            //计算对scrcpy窗口截取的区域
-            //Int32Rect cropRect = new(
-            //    (int)(rect.X + diff.X),
-            //    (int)(rect.Y + diff.Y), rect.Width, rect.Height);
-
-            //计算对Scrcpy窗口截取的区域
             Rect cropRect = new(
                 originalRect.X * ScRatioX,
                 originalRect.Y * ScRatioY,
@@ -325,6 +331,40 @@ namespace ScrcpyEX.View
 
             ShowImg showImg = new(recInfo, scWindow);
             showImg.ShowDialog();
+        }
+
+        /// <summary>
+        /// 矩形比对/九宫格比对，获得原始点及周围1像素总共9张图片，用于图像质量不一致时的比较。
+        /// </summary>
+        /// <param name="recInfo">脚本信息。</param>
+        /// <returns>其中任意一张图片的像素度在80%以上时，返回true，否则返回false。</returns>
+        private async Task<bool> MatrixComparison(RecInfo recInfo)
+        {
+            List<double> matrixs = [];
+            string imgName = recInfo.ImgName;
+
+            for (int i = -1; i <= 1; i++)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                    Rect rect = recInfo.CropRect;
+                    rect.X += i;
+                    rect.Y += j;
+
+                    CroppedBitmap scBitmap = await GetScriptImg(ScHandle, _mainHandle, rect);
+                    if (scBitmap == null)
+                    {
+                        matrixs.Add(0);
+                        continue;
+                    }
+
+                    double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{imgName}", scBitmap);
+                    matrixs.Add(ssim);
+                }
+            }
+
+            Console.WriteLine(string.Join(", ", matrixs.Select(n => $"{n:F2}")));
+            return matrixs.Max() >= 0.8;
         }
 
 

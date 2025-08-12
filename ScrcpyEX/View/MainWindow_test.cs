@@ -1,25 +1,25 @@
 ﻿using ScrcpyEX.ExtensionMethod;
-using ScrcpyEX.MyDefinition.MyClass;
+using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition;
+using ScrcpyEX.MyDefinition.MyClass;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Windows;
-using System.Reflection;
-using ScrcpyEX.Model;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Windows.Interop;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.Xml;
-using WPoint = System.Windows.Point;  //WPF的Point
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using DPoint = System.Drawing.Point;  //Windows Forms的Point
+using WPoint = System.Windows.Point;  //WPF的Point
 
 namespace ScrcpyEX.View
 {
@@ -41,27 +41,27 @@ namespace ScrcpyEX.View
 
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
-            for (int i = -1; i <= 1; i++)
-            {
-                for (int j = -1; j <= 1; j++)
-                {
-                    Rect rect = MyCfg.Cfg.RecInfos[1].CropRect;
-                    Console.Write($"测试参数：{i},{j}。");
-                    rect.X += i;
-                    rect.Y += j;
-                    TestCompareImage(rect);
-                }
-                    
-            }
-            Console.WriteLine($"完成//////////////。");
-            //for (int i = -2; i < 3; i++)
+            //闪烁截屏
+            //ReduceSize();
+            //RecInfo recInfo = MyCfg.Cfg.RecInfos[2];
+            //TestCompareImage(recInfo.CropRect, recInfo.ImgName);
+            //AmplifySize();
+
+            await MatrixComparison(MyCfg.Cfg.RecInfos[2]);
+            //for (int i = -1; i <= 1; i++)
             //{
-            //    Rect rect = MyCfg.Cfg.RecInfos[2].CropRect;
-            //    Console.Write($"测试参数：{i}。");
-            //    rect.X += i;
-            //    TestCompareImage(rect);
+            //    for (int j = -1; j <= 1; j++)
+            //    {
+            //        Rect rect = MyCfg.Cfg.RecInfos[2].CropRect;
+            //        Console.Write($"测试参数：{i},{j}。");
+            //        rect.X += i;
+            //        rect.Y += j;
+            //        TestCompareImage(rect, MyCfg.Cfg.RecInfos[2].ImgName);
+            //    }
+            //        
             //}
-            //Point pt1 = PointToScreen(new Point(0, 0));
+            //Console.WriteLine($"完成//////////////。");
+
             //int x = (int)(pt1.X + (_limitPop.HorizontalOffset + ExtraWidthLeft + 50) * DpiScaleX);
             //int y = (int)(pt1.Y + (_limitPop.VerticalOffset + ExtraHeightTop + 50) * DpiScaleY);
             //DLL.SetCursorPos(x, y);
@@ -72,22 +72,21 @@ namespace ScrcpyEX.View
             await Task.Delay(1);
         }
 
-        private async void TestCompareImage(Rect rect)
+        private async void TestCompareImage(Rect rect, string imgName)
         {
-            WPoint pt1 = PointToScreen(new WPoint(0, 0));
+            //WPoint pt1 = PointToScreen(new WPoint(0, 0));
             //Console.WriteLine($"程序左上角：{pt1.X},{pt1.Y}。");
 
-            RecInfo recInfo = MyCfg.Cfg.RecInfos[1];
-            CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, rect);
+            CroppedBitmap scBitmap = await GetScriptImg(ScHandle, _mainHandle, rect);
             Console.WriteLine($"图像脚本原始参数,起始坐标:({rect.X},{rect.Y}),宽高:({rect.Width},{rect.Height})");
-            if (scWindow != null)
+            if (scBitmap != null)
             {
-                double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
+                double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{imgName}", scBitmap);
                 Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
             }
             if (Debugger.IsAttached)
             {
-                MyGM.SavaImg("tempPic.png", scWindow);
+                MyGM.SavaImg("tempPic.png", scBitmap);
             }
             //Console.WriteLine($"完成。");
         }

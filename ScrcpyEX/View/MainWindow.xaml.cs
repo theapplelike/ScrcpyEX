@@ -45,6 +45,7 @@ namespace ScrcpyEX.View
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            _vm.Scaling = $"缩放比例 {ScRatioX:P}:{ScRatioY:P}";
             if (!IsClosed)
             {
                 _resizeTimer.Start();
@@ -149,8 +150,7 @@ namespace ScrcpyEX.View
 
         private void PopMid_Opened(object sender, EventArgs e)
         {
-            //popMid.VerticalOffset = (ExtraHeightTop + popMid.Child.RenderSize.Height) / 2 + wfh.Margin.Top;
-            popMid.VerticalOffset = (ExtraHeightTop + popMid.Child.RenderSize.Height) / 2;
+            popMid.VerticalOffset = (ExtraHeightTop + popMid.Child.RenderSize.Height) / 2 + gShow.Margin.Top;
         }
 
         private void Pop_Closed(object sender, EventArgs e)
@@ -174,6 +174,12 @@ namespace ScrcpyEX.View
         private void BtnRemoveBlack_Click(object sender, RoutedEventArgs e)
         {
             RemoveBlack();
+            popMenu.IsOpen = false;
+        }
+
+        private void BtnScGotFocus_Click(object sender, RoutedEventArgs e)
+        {
+            ScGotFocus(null);
             popMenu.IsOpen = false;
         }
 
@@ -212,7 +218,6 @@ namespace ScrcpyEX.View
         {
             MappingCancel();
         }
-
         #endregion
 
         

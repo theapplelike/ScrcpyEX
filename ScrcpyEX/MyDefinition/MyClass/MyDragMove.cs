@@ -27,10 +27,19 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private bool _isDragging = false;   //是否处于可拖拽的状态
         private bool _disposed = false;     //是否释放资源
 
+        /// <summary>
+        /// 当前映射绑定的字符。
+        /// </summary>
         public string Key => _txt.Text;
 
+        /// <summary>
+        /// 当前映射的X轴偏移。
+        /// </summary>
         public double OffsetX => _pop.HorizontalOffset;
 
+        /// <summary>
+        /// 当前映射的Y轴偏移。
+        /// </summary>
         public double OffsetY => _pop.VerticalOffset;
 
         /// <summary>
