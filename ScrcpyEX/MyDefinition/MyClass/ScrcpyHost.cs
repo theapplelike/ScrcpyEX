@@ -112,7 +112,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 //Console.WriteLine($"属性{prop.Name}：{prop.GetValue(MyCfg.Cfg)}，{GetArg(prop.Name)}。");
             }
         
-            //键盘使用UHID可以输入中文，对设备输入中文时电脑输入法必须为英文
+            //键盘使用UHID可以输入中文，对安卓输入中文时电脑输入法必须为英文
             //_scName = $"{DateTime.Now:HHmmss}mook";
             //sb.Append($"--keyboard=uhid --window-title={_scName} ");
             sb.Append($"--keyboard=uhid ");

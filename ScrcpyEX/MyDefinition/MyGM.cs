@@ -53,7 +53,7 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
-        /// 获得光标的当前坐标，以屏幕为基准，且此值已乘以了Dpi比例。
+        /// 获得光标的当前坐标，以屏幕为基准，且此值已乘以了DPI比例（与DPI相关）。
         /// </summary>
         /// <returns>一个System.Windows.Point类型的值。</returns>
         public static Point GetPosition()

@@ -337,7 +337,7 @@ namespace ScrcpyEX.View
         /// 矩形比对/九宫格比对，获得原始点及周围1像素总共9张图片，用于图像质量不一致时的比较。
         /// </summary>
         /// <param name="recInfo">脚本信息。</param>
-        /// <returns>其中任意一张图片的像素度在80%以上时，返回true，否则返回false。</returns>
+        /// <returns>其中任意一张图片的像素度在指定阈值以上时，返回true，否则返回false。</returns>
         private async Task<bool> MatrixComparison(RecInfo recInfo)
         {
             List<double> matrixs = [];
@@ -364,7 +364,7 @@ namespace ScrcpyEX.View
             }
 
             Console.WriteLine(string.Join(", ", matrixs.Select(n => $"{n:F2}")));
-            return matrixs.Max() >= 0.8;
+            return matrixs.Max() >= 0.7;
         }
 
 

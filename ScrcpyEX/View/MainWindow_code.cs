@@ -41,6 +41,7 @@ namespace ScrcpyEX.View
             ReadCfg();
             SetUISize(true);
 
+            //快捷键
             InputBindings.Add(new KeyBinding(new RelayCommand(ScGotFocus), Key.F1, ModifierKeys.None));
         }
 
@@ -161,7 +162,7 @@ namespace ScrcpyEX.View
             bdShow.Child = await _scrcpyHost.StartScrcpyAsync(isWired);
 
             CreateSavedPop();
-            //Activate();
+            Activate();
             KeyboardHook.RegisterHook();
         }
 

@@ -27,17 +27,32 @@ namespace ScrcpyEX.View
     public partial class MainWindow//code1
     {
         /// <summary>
-        /// 获得鼠标在scrcpy中的位坐标，计算需要额外减去Point(左额外距离*Dpi比例-左非工作区距离*Dpi比例，上额外距离*Dpi比例)。
-        /// 计算最大宽度和高度时需要乘以Dpi比例，Point的参数已经乘了Dpi比例，其他参数没有。
+        /// 获得鼠标在Scrcpy中的坐标，
+        /// X轴需要额外减去：左额外距离*DPI比例-左非工作区距离*DPI比例，
+        /// Y轴需要额外减去：上额外距离*DPI比例。
         /// </summary>
-        /// <returns>如果鼠标在scrcpy中，返回鼠标在scrcpy中的坐标，否则返回null。</returns>
-        public Point? GetMouseInScrcpy()
+        /// <returns>鼠标在Scrcpy中的坐标，以元组表示（X，Y）。</returns>
+        public (double, double) GetPointInScrcpy()
         {
-            Point pt1 = PointToScreen(new Point(0, 0));//获得程序左上角相对于屏幕的位置，获得的值与DPI相关
-            Point pt2 = MyGM.GetPosition();//获取鼠标相对于屏幕的位置
+            Point pt1 = PointToScreen(new Point(0, 0)); //获得程序左上角相对于屏幕的位置，获得的值与DPI相关
+            Point pt2 = MyGM.GetPosition();             //获取鼠标相对于屏幕的位置
 
             double x = pt2.X - pt1.X - ExtraWidthLeft * DpiScaleX + SystemParameters.WindowNonClientFrameThickness.Left * DpiScaleX;
             double y = pt2.Y - pt1.Y - ExtraHeightTop * DpiScaleY;
+
+            //Console.WriteLine($"程序相对于屏幕%：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
+            //Console.WriteLine($"鼠标相对于屏幕%：({pt2.X}, {pt2.Y})。");
+
+            return (x, y);
+        }
+
+        /// <summary>。
+        /// 计算最大宽度和高度时需要乘以DPI比例。
+        /// </summary>
+        /// <returns>如果鼠标在Scrcpy中，返回鼠标在Scrcpy中的坐标；否则返回null。</returns>
+        public Point? GetMouseInScrcpy()
+        {
+            (double x, double y) = GetPointInScrcpy();
             double maxW = ScActualWidth * DpiScaleX;
             double maxH = ScActualHeight * DpiScaleY;
             
@@ -45,9 +60,6 @@ namespace ScrcpyEX.View
             //这样可以让用户在任意尺寸下录制的脚本在任意尺寸下都可以正确播放
             double actuclX = x / ScRatioX;
             double actuclY = y / ScRatioY;
-
-            //Console.WriteLine($"程序相对于屏幕%：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
-            //Console.WriteLine($"鼠标相对于屏幕%：({pt2.X}, {pt2.Y})。");
             //Console.WriteLine($"鼠标在程序中坐标%：({x}, {y})；scrcpy尺寸%：({maxW}, {maxH})，和初始尺寸的比例：（{ScRatioX},{ScRatioY}），实际保存点：（{actuclX},{actuclY}）");
             
             if (x > 0 && x < maxW && y > 0 && y < maxH)
@@ -482,10 +494,15 @@ namespace ScrcpyEX.View
                 //ADB_Click(centreX, centreY);
                 //Console.WriteLine($"圆心点:({centreX},{centreY})。");
             }
+
+            //逻辑鼠标回到物理鼠标的位置
+            (double originX, double originY) = GetPointInScrcpy();
+            IntPtr lp1 = new(((int)originY << 16) + (int)originX);
+            DLL.PostMessage(scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp1);
         }
 
         /// <summary>
-        /// Scrcpy窗口获得焦点，Scrcpy有焦点时才能触发输入法。
+        /// Scrcpy窗口获得焦点，Scrcpy有焦点时才能触发安卓的输入法。
         /// </summary>
         private void ScGotFocus(object parameter)
         {
