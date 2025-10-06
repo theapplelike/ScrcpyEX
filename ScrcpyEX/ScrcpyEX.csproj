@@ -91,6 +91,7 @@
     <Compile Include="Model\PointInfo.cs" />
     <Compile Include="Model\RecInfo.cs" />
     <Compile Include="MyDefinition\MyClass\ADBSocketCommunicator.cs" />
+    <Compile Include="MyDefinition\MyClass\InputModeSwitcher.cs" />
     <Compile Include="MyDefinition\MyClass\MyDragMove.cs" />
     <Compile Include="MyDefinition\MyClass\KeyMapping.cs" />
     <Compile Include="MyDefinition\MyClass\OpenCv.cs" />

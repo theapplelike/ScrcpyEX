@@ -40,6 +40,7 @@ namespace ScrcpyEX.View
             SetTimer();
             ReadCfg();
             SetUISize(true);
+            InputModeSwitcher.SwitchToEnglishMode(_mainHandle);
 
             //快捷键
             InputBindings.Add(new KeyBinding(new RelayCommand(ScGotFocus), Key.F1, ModifierKeys.None));
