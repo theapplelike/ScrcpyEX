@@ -21,6 +21,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using Keys = System.Windows.Forms.Keys;
 
 namespace ScrcpyEX.View
 {
@@ -253,7 +254,7 @@ namespace ScrcpyEX.View
                 AllowsTransparency = true,
                 Height = radius,
                 Width = radius,
-                IsOpen = popIsOpen,
+                IsOpen = true,
                 HorizontalOffset = mapping.OffsetX * ScRatioX,
                 VerticalOffset = mapping.OffsetY * ScRatioY,
             };
@@ -275,7 +276,7 @@ namespace ScrcpyEX.View
             //提供输入
             TextBox txt = new()
             {
-                Text = mapping.Key,
+                Text = mapping.Char,
                 Width = 15,
                 FontSize = 16,
                 FontFamily = new FontFamily("Consolas"),
@@ -312,7 +313,7 @@ namespace ScrcpyEX.View
             pop.Child = border;
             gShow.Children.Add(pop);//这里的父级要和pop.PlacementTarget属性一致
 
-            return new MyDragMove(pop);
+            return new MyDragMove(pop, mapping.VkCode, popIsOpen);
         }
 
         /// <summary>
@@ -371,13 +372,14 @@ namespace ScrcpyEX.View
 
             foreach (MyDragMove drag in MV.DragMoves)
             {
-                string key = drag.Key;
+                string ch = drag.Char;
+                Keys vkCode = drag.VkCode;
                 double offsetX = drag.OffsetX / ScRatioX;
                 double offsetY = drag.OffsetY / ScRatioY;
                 drag.SetDisplay(false);
 
-                MyCfg.Cfg.KeyMappings.Add(new KeyMapping(key, offsetX, offsetY));
-                Console.WriteLine($"映射内容：{key}，保存偏移:（{offsetX:F2}，{offsetY:F2}）。");
+                MyCfg.Cfg.KeyMappings.Add(new KeyMapping(ch, vkCode, offsetX, offsetY));
+                Console.WriteLine($"映射字符：{ch}，虚拟键：{vkCode}/{(int)vkCode}，保存偏移:（{offsetX:F2}，{offsetY:F2}）。");
             }
 
             Console.WriteLine($"已有映射数量：{MyCfg.Cfg.KeyMappings.Count}。");
@@ -415,8 +417,8 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 键盘输入映射为点击操作。
         /// </summary>
-        /// <param name="key">捕获的键盘字符。</param>
-        public void KeyboardMapping(string key)
+        /// <param name="vkCode">捕获的虚拟键码。</param>
+        public void KeyboardMapping(Keys vkCode)
         {
             //Console.WriteLine($"窗口是否活动：{IsActive}，是否有焦点：{IsFocused}");
             if (IsActive && ScHandle != IntPtr.Zero)
@@ -426,7 +428,7 @@ namespace ScrcpyEX.View
                 //    PressMouse();
                 //}
 
-                DoKeyMapping(key, ScRatioX, ScHandle);
+                DoKeyMapping(vkCode, ScRatioX, ScHandle);
             }
         }
 
@@ -459,17 +461,18 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 如果键入的字符在映射列表中，则映射为单击操作。
         /// </summary>
-        /// <param name="key">捕获的键盘字符。</param>
+        /// <param name="vkCode">捕获的虚拟键码。</param>
         /// <param name="ratio">Scrcpy当前宽度和默认宽度的比值。</param>
-        private void DoKeyMapping(string key, double ratio, IntPtr scHandle)
+        /// <param name="scHandle">Scrcpy的句柄。</param>
+        private void DoKeyMapping(Keys vkCode, double ratio, IntPtr scHandle)
         {
             //让字符只剩字母或数字
-            if (Regex.IsMatch(key, @"[0-9]"))
-            {
-                key = Regex.Replace(key, @"[A-Za-z]", "");
-            }
+            //if (Regex.IsMatch(key, @"[0-9]"))
+            //{
+            //    key = Regex.Replace(key, @"[A-Za-z]", "");
+            //}
 
-            List<KeyMapping> mappings = MyCfg.Cfg.KeyMappings.Where(a => a.Key == key).ToList();
+            List<KeyMapping> mappings = MyCfg.Cfg.KeyMappings.Where(a => a.VkCode == vkCode).ToList();
             foreach (KeyMapping m in mappings)
             {
                 //根据现在的比例计算半径

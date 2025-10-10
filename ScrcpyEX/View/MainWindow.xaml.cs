@@ -204,6 +204,9 @@ namespace ScrcpyEX.View
             new Setup().ShowDialog();
         }
 
+        /// <summary>
+        /// 映射按钮编辑。
+        /// </summary>
         private void BtnMappingEdit_Click(object sender, RoutedEventArgs e)
         {
             MappingEdit(btnMappingEdit.Content.ToString());

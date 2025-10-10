@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using Keys = System.Windows.Forms.Keys;
 using System.Windows.Input;
 
 namespace ScrcpyEX.MyDefinition.MyClass
@@ -30,7 +31,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <summary>
         /// 当前映射绑定的字符。
         /// </summary>
-        public string Key => _txt.Text;
+        public string Char => _txt.Text;
+
+        /// <summary>
+        /// 当前映射绑定的虚拟键码。
+        /// </summary>
+        public Keys VkCode { get; set; } = Keys.None;
 
         /// <summary>
         /// 当前映射的X轴偏移。
@@ -47,8 +53,10 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         /// <param name="pop">要添加拖拽功能的Popup。</param>
         /// <param name="isLeaveParent">是否可以移出逻辑父级。</param>
-        public MyDragMove(Popup pop, bool isLeaveParent = false)
+        public MyDragMove(Popup pop, Keys vkCode, bool popIsOpen, bool isLeaveParent = false)
         {
+            VkCode = vkCode;
+
             _pop = pop;
             _isLeaveParent = isLeaveParent;
 
@@ -63,6 +71,8 @@ namespace ScrcpyEX.MyDefinition.MyClass
             _pop.MouseDown += Pop_MouseDown;
             _pop.MouseMove += Pop_MouseMove;
             _pop.MouseUp += Pop_MouseUp;
+
+            SetDisplay(popIsOpen);
         }
 
         /// <summary>
@@ -132,17 +142,27 @@ namespace ScrcpyEX.MyDefinition.MyClass
             {
                 if (textBox.Text.Length >= 1)
                 {
-                    if (!IsAllTextSelected(textBox))
+                    if (IsAllTextSelected(textBox))
+                    {
+                        VkCode = CharToVirtualKey(e.Text[0]);
+                        Console.WriteLine($"转化为：{CharToVirtualKey(e.Text[0])}");
+                    }
+                    else
                     {
                         e.Handled = true;//如果已经有一个字符，阻止进一步输入
                     }
                 }
                 else
                 {
-                    if (!Regex.IsMatch(e.Text, "^[a-zA-Z0-9]{1}$"))
+                    if (Regex.IsMatch(e.Text, @"^[a-zA-Z0-9,./;\[\]']{1}$"))
                     {
-                        e.Handled = true;
+                        VkCode = CharToVirtualKey(e.Text[0]);
+                        Console.WriteLine($"转化为：{CharToVirtualKey(e.Text[0])}");
                     }
+                    else
+                    {
+                        e.Handled = true;//如果不符合正则表达式，阻止输入
+                    } 
                 }
             }
         }
@@ -190,6 +210,24 @@ namespace ScrcpyEX.MyDefinition.MyClass
         }
 
         /// <summary>
+        /// 将字符转换为虚拟键码。
+        /// </summary>
+        /// <param name="character">需要转化的字符。</param>
+        /// <returns>Keys枚举。</returns>
+        private Keys CharToVirtualKey(char character)
+        {
+            short result = DLL.VkKeyScan(character);
+
+            if (result != -1)
+            {
+                int vkCode = result & 0xFF;//低字节是虚拟键码
+                return (Keys)vkCode;
+            }
+
+            return Keys.None;
+        }
+
+        /// <summary>
         /// 删除当前的Popup。
         /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -234,6 +272,14 @@ namespace ScrcpyEX.MyDefinition.MyClass
         public void SetDisplay(bool isOpen)
         {
             _pop.IsOpen = isOpen;
+            if (isOpen)
+            {
+                _pop.Child.FindVisualChild<Button>().Visibility = Visibility.Visible;
+            }
+            else
+            {
+                _pop.Child.FindVisualChild<Button>().Visibility = Visibility.Hidden;
+            }
         }
 
         public void Dispose()

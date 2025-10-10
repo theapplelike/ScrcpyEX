@@ -147,9 +147,10 @@
 
         <Grid x:Name="gShow" Grid.Row="1" Margin="5">
             <Border x:Name="bdShow" Background="Gray"/>
+            <Border Width="50" Height="50" Background="AliceBlue" />
         </Grid>
-        
 
+        <Border Width="50" Height="50"  Background="Green" Grid.RowSpan="2" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

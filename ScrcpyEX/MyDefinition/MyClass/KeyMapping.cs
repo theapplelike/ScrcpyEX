@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
+using System.Windows.Forms;
 
 namespace ScrcpyEX.MyDefinition.MyClass
 {
@@ -13,9 +15,14 @@ namespace ScrcpyEX.MyDefinition.MyClass
     internal class KeyMapping
     {
         /// <summary>
-        /// 映射的按键，应为单个大写英文字母或数字。
+        /// 映射的字符，应为单个大写英文字母、数字、以及允许的特殊字符。
         /// </summary>
-        public string Key { get; set; } = "";
+        public string Char { get; set; } = "";
+
+        /// <summary>
+        /// 映射的虚拟键码(Virtual Key Code)，是Windows定义的与硬件和键盘布局无关的键码。表示一个物理按键，而不是字符。
+        /// </summary>
+        public Keys VkCode { get; set; }= Keys.None;
 
         /// <summary>
         /// Popup控件的X轴偏移。
@@ -29,9 +36,10 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
         public KeyMapping() { }
 
-        public KeyMapping(string key, double offsetX, double offsetY)
+        public KeyMapping(string ch,Keys vkCode, double offsetX, double offsetY)
         {
-            Key = key;
+            Char = ch;
+            VkCode = vkCode;
             OffsetX = offsetX;
             OffsetY = offsetY;
         }

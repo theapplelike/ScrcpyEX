@@ -177,7 +177,15 @@ namespace ScrcpyEX.MyDefinition
         /// <returns></returns>
         [DllImport("User32.dll", EntryPoint = "SendMessage", SetLastError = true)]
         public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-        
+
+        /// <summary>
+        /// 将字符转换为其对应的虚拟键码和Shift状态。
+        /// </summary>
+        /// <param name="ch">要转换的字符。</param>
+        /// <returns>低字节(0-7位): 虚拟键码；高字节(8-15位): Shift状态标志位。在当前键盘布局下没有对应的虚拟键码时返回-1。</returns>
+        [DllImport("user32.dll")]
+        public static extern short VkKeyScan(char ch);
+
         //[DllImport("user32.dll", CharSet = CharSet.Auto)]
         //public static extern bool PostThreadMessage(uint idThread, uint Msg, IntPtr wParam, IntPtr lParam);
         //
