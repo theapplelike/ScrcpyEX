@@ -14,6 +14,8 @@ using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -67,37 +69,10 @@ namespace ScrcpyEX.View
             //int y = (int)(pt1.Y + (_limitPop.VerticalOffset + ExtraHeightTop + 50) * DpiScaleY);
             //DLL.SetCursorPos(x, y);
             //await AdbTest1(500, 500);
-
+            popMid.Show("yeooooooooooooooooooooos",310);
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
-
-            // 字符转虚拟键码
-            Keys commaKey = CharToVirtualKey('q');
-            Keys periodKey = CharToVirtualKey('Q');
-
-            Console.WriteLine($"字符',' -> 虚拟键码: {commaKey}/{(int)commaKey}");
-            Console.WriteLine($"字符'.' -> 虚拟键码: {periodKey}/{(int)periodKey}");
             await Task.Delay(1);
-        }
-
-
-
-        /// <summary>
-        /// 将字符转换为虚拟键码。
-        /// </summary>
-        /// <param name="character">需要转化的字符。</param>
-        /// <returns>Keys枚举。</returns>
-        public static Keys CharToVirtualKey(char character)
-        {
-            short result = DLL.VkKeyScan(character);
-
-            if (result != -1)
-            {
-                int vkCode = result & 0xFF;//低字节是虚拟键码
-                return (Keys)vkCode;
-            }
-
-            return Keys.None;
         }
 
         private async void TestCompareImage(Rect rect, string imgName)

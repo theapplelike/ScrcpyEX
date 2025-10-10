@@ -1,15 +1,18 @@
 ﻿using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using Keys = System.Windows.Forms.Keys;
 using System.Windows.Input;
+using System.Windows.Media;
+using Keys = System.Windows.Forms.Keys;
 
 namespace ScrcpyEX.MyDefinition.MyClass
 {
@@ -26,6 +29,8 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private Point _lastPoint;           //上一次的鼠标坐标
         private Point _nowPoint;            //当前鼠标的坐标
         private bool _isDragging = false;   //是否处于可拖拽的状态
+        private bool _isEdit = false;       //当前是否处于编辑状态
+        private IntPtr _lp = IntPtr.Zero;   //记录位置信息的句柄
         private bool _disposed = false;     //是否释放资源
 
         /// <summary>
@@ -76,31 +81,43 @@ namespace ScrcpyEX.MyDefinition.MyClass
         }
 
         /// <summary>
-        /// 鼠标按下时发生的事件，允许移动且记录当前坐标。
+        /// 鼠标按下时发生的事件，处于编辑状态时允许移动且记录当前坐标，不可编辑时应将点击操作发给Scrcpy。
         /// 嵌套顺序应该为Popup->Border(提供边框)->TextBox(提供输入框)、TextBlock(提供定位点)。
         /// </summary>
         private void Pop_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            //让Popup中的TextBlock捕获鼠标，防止移动太快时丢失Popup
-            TextBlock tbk = _pop.Child.FindVisualChild<TextBlock>();
-            _isDragging = Mouse.Capture(tbk);
-            GotFocus(_txt);
+            if (_isEdit)
+            {
+                //让Popup中的TextBlock捕获鼠标，防止移动太快时丢失Popup
+                TextBlock tbk = _pop.Child.FindVisualChildByName<TextBlock>("tbk");
+                _isDragging = Mouse.Capture(tbk);
+                GotFocus(_txt);
 
-            //记录当前坐标为上一次的坐标
-            _lastPoint = MyGM.GetPosition();
+                //记录当前坐标为上一次的坐标
+                _lastPoint = MyGM.GetPosition();
+            }
+            else
+            {
+                (double originX, double originY) = MV.MainWin.GetPointInScrcpy();
+                _lp = new(((int)originY << 16) + (int)originX);
+
+                //发送鼠标按下消息
+                DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, _lp);
+                DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, _lp);
+            }
 
             //double radius = 50 * MV.MainWin.ScRatioX / 2;
             double radius = 50 / 2;//根据现在的比例计算半径，还需要乘以Scrcpy当前宽度和默认宽度的比值，这里默认这个比值为1，这个值仅用于输出调试内容，所以没有传入
             Console.WriteLine($"popup中心点：（{_pop.HorizontalOffset + radius}，{_pop.VerticalOffset + radius}），左上角：（{_pop.HorizontalOffset}，{_pop.VerticalOffset}）。");
-            Console.WriteLine($"当前鼠标坐标：（{_lastPoint.X},{_lastPoint.Y}）,{_isDragging}.");
+            Console.WriteLine($"记录的最后鼠标坐标：（{_lastPoint.X},{_lastPoint.Y}）,{_isDragging}.");
         }
-
+        
         /// <summary>
         /// 鼠标移动时发生的事件。
         /// </summary>
         private void Pop_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_isDragging)
+            if (_isDragging && _isEdit)
             {
                 _nowPoint = MyGM.GetPosition();//现在的坐标
 
@@ -129,8 +146,22 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         private void Pop_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            Mouse.Capture(null);
-            _isDragging = false;
+            if (_isEdit)
+            {
+                Mouse.Capture(null);
+                _isDragging = false;
+                //Console.WriteLine("解锁");
+            }
+            else
+            {
+                //Console.WriteLine("准备发送");
+                if (_lp != IntPtr.Zero)
+                {
+                    //发送鼠标抬起消息
+                    DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_LBUTTONUP, IntPtr.Zero, _lp);
+                    //Console.WriteLine("发送抬起事件");
+                }
+            }
         }
 
         /// <summary>
@@ -145,7 +176,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                     if (IsAllTextSelected(textBox))
                     {
                         VkCode = CharToVirtualKey(e.Text[0]);
-                        Console.WriteLine($"转化为：{CharToVirtualKey(e.Text[0])}");
+                        //Console.WriteLine($"转化为：{CharToVirtualKey(e.Text[0])}");
                     }
                     else
                     {
@@ -268,18 +299,43 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <summary>
         /// 设置Popup的显示状态。
         /// </summary>
-        /// <param name="isOpen">Popup是否可见。</param>
-        public void SetDisplay(bool isOpen)
+        /// <param name="isEdit">Popup是否为编辑状态。</param>
+        public void SetDisplay(bool isEdit)
         {
-            _pop.IsOpen = isOpen;
-            if (isOpen)
+            _isEdit = isEdit;
+            if (isEdit)
             {
+                Border border = (Border)_pop.Child;
+                border.Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255));
+                border.BorderThickness = new(1);
+
+                _pop.Child.FindVisualChild<TextBox>().Visibility = Visibility.Visible;
                 _pop.Child.FindVisualChild<Button>().Visibility = Visibility.Visible;
+                _pop.Child.FindVisualChildByName<Border>("borderChar").Visibility = Visibility.Hidden;
+                _pop.Child.FindVisualChildByName<TextBlock>("tbkChar").Visibility = Visibility.Hidden;
+                //_pop.IsHitTestVisible = true;
             }
             else
             {
+                Border border = (Border)_pop.Child;
+                border.Background = Brushes.Transparent;
+                border.BorderThickness = new(0);
+
+                _pop.Child.FindVisualChild<TextBox>().Visibility = Visibility.Hidden;
                 _pop.Child.FindVisualChild<Button>().Visibility = Visibility.Hidden;
+                _pop.Child.FindVisualChildByName<Border>("borderChar").Visibility = Visibility.Visible;
+                _pop.Child.FindVisualChildByName<TextBlock>("tbkChar").Visibility = Visibility.Visible;
+                //_pop.IsHitTestVisible = false;
             }
+        }
+
+        /// <summary>
+        /// 设置Popup是否显示。
+        /// </summary>
+        /// <param name="isOpen">Popup是否可见。</param>
+        public void SetVisible(bool isOpen)
+        {
+            _pop.IsOpen = isOpen;
         }
 
         public void Dispose()

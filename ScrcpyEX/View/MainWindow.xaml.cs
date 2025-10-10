@@ -56,6 +56,22 @@ namespace ScrcpyEX.View
         {
             RefreshScrcpy();
         }
+
+        private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            //Console.WriteLine($"{(Visibility == Visibility.Visible ? "可见" : "不可见")}");
+        }
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+            Console.WriteLine($"窗口激活,{IsActive},{WindowState}");
+        }
+
+        private void Window_Deactivated(object sender, EventArgs e)
+        {
+            Console.WriteLine($"窗口失活,{IsActive},{WindowState}");
+            HideKeyMapping();
+        }
         #endregion
 
         #region 自定义菜单栏事件
@@ -193,6 +209,9 @@ namespace ScrcpyEX.View
             AmplifySize();
         }
 
+        /// <summary>
+        /// 开始录制脚本。
+        /// </summary>
         private void BtnScr_Click(object sender, RoutedEventArgs e)
         {
             StartRecord();
@@ -223,6 +242,6 @@ namespace ScrcpyEX.View
         }
         #endregion
 
-        
+
     }
 }

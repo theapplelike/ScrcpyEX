@@ -47,8 +47,8 @@ namespace ScrcpyEX.View
             return (x, y);
         }
 
-        /// <summary>。
-        /// 计算最大宽度和高度时需要乘以DPI比例。
+        /// <summary>
+        /// 获得鼠标在Scrcpy中的坐标，计算最大宽度和高度时需要乘以DPI比例。
         /// </summary>
         /// <returns>如果鼠标在Scrcpy中，返回鼠标在Scrcpy中的坐标；否则返回null。</returns>
         public Point? GetMouseInScrcpy()
@@ -268,6 +268,7 @@ namespace ScrcpyEX.View
                 BorderBrush = Brushes.Black,
                 BorderThickness = new(1),
                 CornerRadius = new(radius),
+                Name = "border",
             };
 
             //提供装多个控件的容器
@@ -290,7 +291,8 @@ namespace ScrcpyEX.View
             {
                 Width = 1,
                 Height = 1,
-                //Background= Brushes.Red,
+                //Background = Brushes.Red,
+                Name = "tbk",
             };
 
             //提供删除功能
@@ -305,10 +307,35 @@ namespace ScrcpyEX.View
                 //Visibility = Visibility.Collapsed,
             };
 
+            //说明的字符的边框
+            Border borderChar = new()
+            {
+                Width = 20,
+                Height = 20,
+                Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
+                BorderBrush = Brushes.Black,
+                CornerRadius = new(20),
+                Name = "borderChar",
+            };
+
+            //提供说明字符的TextBlock
+            TextBlock tbkChar = new()
+            {
+                Text = mapping.Char,
+                Name = "tbkChar",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                FontWeight = FontWeights.Black,
+                FontSize = 16,
+                FontFamily = new FontFamily("Consolas"),
+            };
+
             //确定层次关系
+            borderChar.Child = tbkChar;
             grid.Children.Add(txt);
             grid.Children.Add(tbk);
             grid.Children.Add(btn);
+            grid.Children.Add(borderChar);
             border.Child = grid;
             pop.Child = border;
             gShow.Children.Add(pop);//这里的父级要和pop.PlacementTarget属性一致
@@ -330,10 +357,7 @@ namespace ScrcpyEX.View
 
             if (desc == "映射编辑")
             {
-                foreach (MyDragMove drag in MV.DragMoves)
-                {
-                    drag.SetDisplay(true);
-                }
+                ShowKeyMapping();
 
                 btnMappingEdit.Content = "保存修改";
                 btnMappingBack.IsEnabled = true;
@@ -404,13 +428,35 @@ namespace ScrcpyEX.View
             foreach (MyDragMove drag in MV.DragMoves)
             {
                 drag.Dispose();
-                drag.SetDisplay(false);
+                drag.SetVisible(false);
             }
             MV.DragMoves.Clear();
 
             foreach (KeyMapping mapping in MyCfg.Cfg.KeyMappings)
             {
                 MV.DragMoves.Add(CreatePop(mapping, popIsOpen));
+            }
+        }
+
+        /// <summary>
+        /// 隐藏所有的按键映射。
+        /// </summary>
+        private void HideKeyMapping()
+        {
+            foreach (MyDragMove drag in MV.DragMoves)
+            {
+                drag.SetVisible(false);
+            }
+        }
+
+        /// <summary>
+        /// 显示所有的按键映射。
+        /// </summary>
+        private void ShowKeyMapping()
+        {
+            foreach (MyDragMove drag in MV.DragMoves)
+            {
+                drag.SetVisible(true);
             }
         }
 

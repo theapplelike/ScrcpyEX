@@ -11,7 +11,8 @@
         xmlns:mycontrol="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
         Title="MainWindow" Height="488" Width="970" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged"
-        StateChanged="Window_StateChanged">
+        StateChanged="Window_StateChanged" IsVisibleChanged="Window_IsVisibleChanged"
+        Activated="Window_Activated" Deactivated="Window_Deactivated">
 
     <Window.DataContext>
         <ViewModel:MainWindowVM/>
@@ -47,7 +48,7 @@
         </mycontrol:TimePopup>
 
         <!--主界面使用的居中提示-->
-        <mycontrol:TimePopup x:Name="popMid" PopupAnimation="Slide" Placement="Center" StaysOpen="True" AllowsTransparency="True"  PlacementTarget="{Binding ElementName=dpl}" Opened="PopMid_Opened">
+        <mycontrol:TimePopup x:Name="popMid" PopupAnimation="Slide" Placement="Center" StaysOpen="True" AllowsTransparency="True" PlacementTarget="{Binding ElementName=dpl}" Opened="PopMid_Opened">
             <Border MinHeight="10" MinWidth="10" CornerRadius="10" BorderThickness="4" BorderBrush="{StaticResource Scb2}" Background="{StaticResource Scb1}" Margin="5">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="10" ShadowDepth="0" Color="Gray"/>
@@ -149,8 +150,6 @@
             <Border x:Name="bdShow" Background="Gray"/>
             <Border Width="50" Height="50" Background="AliceBlue" />
         </Grid>
-
-        <Border Width="50" Height="50"  Background="Green" Grid.RowSpan="2" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

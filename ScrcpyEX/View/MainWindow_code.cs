@@ -377,7 +377,8 @@ namespace ScrcpyEX.View
                     break;
                 case WindowState.Normal:
                     //Debug.WriteLine("窗口已恢复正常状态");
-                    _scrcpyHost.RefreshScrcpy();
+                    _scrcpyHost?.RefreshScrcpy();
+                    ShowKeyMapping();
                     break;
                 case WindowState.Maximized:
                     //Debug.WriteLine("窗口已最大化");
