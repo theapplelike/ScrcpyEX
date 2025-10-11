@@ -24,6 +24,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private readonly Popup _pop;
         private readonly Button _btn;
         private readonly TextBox _txt;
+        private readonly TextBlock _tbkChar;
         private readonly bool _isLeaveParent;//是否可以移出逻辑父级
 
         private Point _lastPoint;           //上一次的鼠标坐标
@@ -72,6 +73,8 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
             _btn = pop.Child.FindVisualChild<Button>();
             _btn.Click += Button_Click;
+
+            _tbkChar = pop.Child.FindVisualChildByName<TextBlock>("tbkChar");
 
             _pop.MouseDown += Pop_MouseDown;
             _pop.MouseMove += Pop_MouseMove;
@@ -176,6 +179,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                     if (IsAllTextSelected(textBox))
                     {
                         VkCode = CharToVirtualKey(e.Text[0]);
+                        _tbkChar.Text = e.Text;
                         //Console.WriteLine($"转化为：{CharToVirtualKey(e.Text[0])}");
                     }
                     else
@@ -188,6 +192,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                     if (Regex.IsMatch(e.Text, @"^[a-zA-Z0-9,./;\[\]']{1}$"))
                     {
                         VkCode = CharToVirtualKey(e.Text[0]);
+                        _tbkChar.Text = e.Text;
                         Console.WriteLine($"转化为：{CharToVirtualKey(e.Text[0])}");
                     }
                     else

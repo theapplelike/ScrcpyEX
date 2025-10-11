@@ -26,6 +26,36 @@ namespace ScrcpyEX.View
     public partial class MainWindow//code
     {
         /// <summary>
+        /// 添加消息钩子监听程序的所有消息。
+        /// </summary>
+        private void OnSourceInitialized(object sender, EventArgs e)
+        {
+            _hwndSource = PresentationSource.FromVisual(this) as HwndSource;
+            _hwndSource?.AddHook(WndProc);
+        }
+
+        /// <summary>
+        /// 拦截和处理发送到窗口的所有Windows消息。
+        /// </summary>
+        /// <param name="hwnd">接收消息的窗口的句柄。</param>
+        /// <param name="msg">消息标识符，这是一个整数，表示特定的Windows消息。</param>
+        /// <param name="wParam">附加消息参数。</param>
+        /// <param name="lParam">长消息参数。</param>
+        /// <param name="handled">消息处理状态标志，如果设置为true则表示消息已被处理，不再传递给默认的消息处理程序。</param>
+        /// <returns>消息处理结果，大多数情况下返回 IntPtr.Zero（表示使用默认处理）。</returns>
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            //wParam高字节为0X20，低字节为1时，说明窗口被激活，但处于最小化
+            if (msg == 0x0006 && (int)wParam == 0X200001)
+            {
+                handled = true;
+                Debug.WriteLine($"拦截消息：{msg:X4}，窗口活动状态改变，{(int)wParam:X4}，{(int)lParam:X4}");
+            }
+
+            return IntPtr.Zero;
+        }
+
+        /// <summary>
         /// 自定义初始化。
         /// </summary>
         private void MyInit()
@@ -378,7 +408,6 @@ namespace ScrcpyEX.View
                 case WindowState.Normal:
                     //Debug.WriteLine("窗口已恢复正常状态");
                     _scrcpyHost?.RefreshScrcpy();
-                    ShowKeyMapping();
                     break;
                 case WindowState.Maximized:
                     //Debug.WriteLine("窗口已最大化");

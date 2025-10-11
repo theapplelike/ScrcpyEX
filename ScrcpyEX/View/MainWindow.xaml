@@ -11,8 +11,7 @@
         xmlns:mycontrol="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
         Title="MainWindow" Height="488" Width="970" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged"
-        StateChanged="Window_StateChanged" IsVisibleChanged="Window_IsVisibleChanged"
-        Activated="Window_Activated" Deactivated="Window_Deactivated">
+        StateChanged="Window_StateChanged" Activated="Window_Activated" Deactivated="Window_Deactivated">
 
     <Window.DataContext>
         <ViewModel:MainWindowVM/>
@@ -148,7 +147,6 @@
 
         <Grid x:Name="gShow" Grid.Row="1" Margin="5">
             <Border x:Name="bdShow" Background="Gray"/>
-            <Border Width="50" Height="50" Background="AliceBlue" />
         </Grid>
 
     </Grid>

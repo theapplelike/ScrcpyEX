@@ -38,6 +38,11 @@ namespace ScrcpyEX.View
         private IntPtr _mainHandle;
 
         /// <summary>
+        /// 句柄源，用于注册消息钩子。
+        /// </summary>
+        private HwndSource _hwndSource;
+
+        /// <summary>
         /// 保存窗体的临时尺寸、位置。
         /// </summary>
         private FormSize _tempSize = null;

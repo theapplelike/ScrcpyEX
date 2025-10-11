@@ -357,7 +357,10 @@ namespace ScrcpyEX.View
 
             if (desc == "映射编辑")
             {
-                ShowKeyMapping();
+                foreach (MyDragMove drag in MV.DragMoves)
+                {
+                    drag.SetDisplay(true);
+                }
 
                 btnMappingEdit.Content = "保存修改";
                 btnMappingBack.IsEnabled = true;

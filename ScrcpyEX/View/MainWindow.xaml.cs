@@ -29,6 +29,7 @@ namespace ScrcpyEX.View
         public MainWindow()
         {
             InitializeComponent();
+            SourceInitialized += OnSourceInitialized;
             _vm = (MainWindowVM)DataContext;
         }
 
@@ -54,22 +55,19 @@ namespace ScrcpyEX.View
 
         private void Window_StateChanged(object sender, EventArgs e)
         {
+            Console.WriteLine($"-------------窗口状态改变：{WindowState}");
             RefreshScrcpy();
-        }
-
-        private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            //Console.WriteLine($"{(Visibility == Visibility.Visible ? "可见" : "不可见")}");
         }
 
         private void Window_Activated(object sender, EventArgs e)
         {
-            Console.WriteLine($"窗口激活,{IsActive},{WindowState}");
+            Console.WriteLine($"++++++++++窗口激活,{IsActive},{WindowState}");
+            ShowKeyMapping();
         }
 
         private void Window_Deactivated(object sender, EventArgs e)
         {
-            Console.WriteLine($"窗口失活,{IsActive},{WindowState}");
+            Console.WriteLine($"++++++++++窗口失活,{IsActive},{WindowState}");
             HideKeyMapping();
         }
         #endregion

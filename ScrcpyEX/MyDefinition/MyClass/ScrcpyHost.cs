@@ -342,7 +342,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             {
                 DLL.MoveWindow(_scHandle, 0, 0, (int)_lastRect.Width, (int)_lastRect.Height, true);
                 base.OnWindowPositionChanged(_lastRect);
-                Console.WriteLine("刷新Scrcpy窗口");
+                //Console.WriteLine("刷新Scrcpy窗口");
             }
         }
 
