@@ -315,8 +315,8 @@ namespace ScrcpyEX.MyDefinition.MyClass
                     //Console.WriteLine("Scrcpy尺寸未变");
                     return;
                 }
-
-                Console.WriteLine("Scrcpy尺寸修改");
+                
+                Debug.WriteLine("ScrcpyHost：Scrcpy尺寸修改");
                 _lastRect = rcBoundingBox;
                 DLL.MoveWindow(_scHandle, 0, 0, (int)rcBoundingBox.Width, (int)rcBoundingBox.Height, true);
                 base.OnWindowPositionChanged(rcBoundingBox);

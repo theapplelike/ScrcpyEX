@@ -82,7 +82,8 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 设置计时器。
+        /// 设置计时器。DispatcherTimer计时器有一个特性，如果已经启动，
+        /// 再执行DispatcherTimer.Start()方法不会有任何效果，计时器不会重新开始计时，也不会重置间隔。
         /// </summary>
         private void SetTimer()
         {
@@ -91,6 +92,9 @@ namespace ScrcpyEX.View
 
             _resizeTimer.Tick += new EventHandler(Resize_Tick);
             _resizeTimer.Interval = TimeSpan.FromSeconds(1);
+
+            _locationChangeTimer.Tick += new EventHandler(LocationChange_Tick);
+            _locationChangeTimer.Interval = TimeSpan.FromSeconds(1);
 
             _countTimer.Tick += (sender, e) => Count_Tick();
             _countTimer.Interval = TimeSpan.FromSeconds(1);
@@ -104,7 +108,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Resize_Tick(object sender, EventArgs e)
         {
-            Console.WriteLine("重新定位映射pop。");
+            Debug.WriteLine("程序大小已改变，重新定位映射pop。");
 
             _resizeTimer.Stop();
             CreateSavedPop(btnMappingAdd.IsEnabled);
@@ -133,6 +137,18 @@ namespace ScrcpyEX.View
         //        CreateSavedPop();
         //    });
         //}
+
+        /// <summary>
+        /// 位置改变后重新设置映射Popup的位置。
+        /// </summary>
+        private void LocationChange_Tick(object sender, EventArgs e)
+        {
+            Debug.WriteLine("程序位置已改变，重新定位映射pop。");
+
+            _locationChangeTimer.Stop();
+            HideKeyMapping();
+            ShowKeyMapping();
+        }
 
         /// <summary>
         /// 执行计时脚本。

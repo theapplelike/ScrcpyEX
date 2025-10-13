@@ -55,20 +55,29 @@ namespace ScrcpyEX.View
 
         private void Window_StateChanged(object sender, EventArgs e)
         {
-            Console.WriteLine($"-------------窗口状态改变：{WindowState}");
+            //Console.WriteLine($"-------------窗口状态改变：{WindowState}");
             RefreshScrcpy();
         }
 
         private void Window_Activated(object sender, EventArgs e)
         {
-            Console.WriteLine($"++++++++++窗口激活,{IsActive},{WindowState}");
+            //Console.WriteLine($"++++++++++窗口激活,{IsActive},{WindowState}");
             ShowKeyMapping();
         }
 
         private void Window_Deactivated(object sender, EventArgs e)
         {
-            Console.WriteLine($"++++++++++窗口失活,{IsActive},{WindowState}");
+            //Console.WriteLine($"++++++++++窗口失活,{IsActive},{WindowState}");
             HideKeyMapping();
+        }
+
+        private void Window_LocationChanged(object sender, EventArgs e)
+        {
+            //Console.WriteLine($"窗口位置改变,{IsActive}");
+            if (!IsClosed && IsActive)
+            {
+                _locationChangeTimer.Start();
+            }
         }
         #endregion
 
@@ -238,8 +247,9 @@ namespace ScrcpyEX.View
         {
             MappingCancel();
         }
+
         #endregion
 
-
+        
     }
 }

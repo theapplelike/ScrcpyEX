@@ -68,14 +68,19 @@ namespace ScrcpyEX.View
         private EventHandler _imageHandler;
 
         /// <summary>
+        /// 脚本计时器，可能会绑定计时脚本或图像脚本。
+        /// </summary>
+        private readonly DispatcherTimer _scriptTimer = new();
+
+        /// <summary>
         /// 调整窗口大小改变时触发的计时器。
         /// </summary>
         private readonly DispatcherTimer _resizeTimer = new();
 
         /// <summary>
-        /// 脚本计时器，可能会绑定计时脚本或图像脚本。
+        /// 窗口位置改变时触发的计时器。
         /// </summary>
-        private readonly DispatcherTimer _scriptTimer = new();
+        private readonly DispatcherTimer _locationChangeTimer = new();
 
         /// <summary>
         /// 对每次脚本间隔进行计数。
