@@ -8,18 +8,21 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
+/// <summary>
+/// 扫描局域网中开放ADB端口的设备，包括电脑所在网络和电脑的热点网络。
+/// </summary>
 public class AdbDeviceScanner
 {
     private const int AdbPort = 5555;
     private const int TimeoutMs = 2000;
-    private const int MaxConcurrentScans = 500;
+    private const int MaxConcurrentScans = 600;
 
     /// <summary>
-    /// 扫描局域网中开放ADB端口的设备
+    /// 扫描局域网中开放ADB端口的设备。
     /// </summary>
-    /// <param name="startRange">IP范围起始</param>
-    /// <param name="endRange">IP范围结束</param>
-    /// <returns>发现的设备IP地址列表</returns>
+    /// <param name="startRange">IP范围起始。</param>
+    /// <param name="endRange">IP范围结束。</param>
+    /// <returns>发现的设备IP地址列表。</returns>
     public async Task<List<string>> ScanNetworkForAdbDevicesAsync(int startRange = 1, int endRange = 254)
     {
         List<string> devices = [];
@@ -89,7 +92,7 @@ public class AdbDeviceScanner
     /// <summary>
     /// 获得本地电脑的网段（开启热点后给连接设备的网段）和已连接WIFI的网段（所在局域网的网段）。
     /// </summary>
-    /// <returns>包含网段的列表，子网掩码255.255.255.0。</returns>
+    /// <returns>只包含网段的列表，子网掩码255.255.255.0，即IP地址的前24位。</returns>
     public List<string> GetNetworkSegment()
     {
         List<string> addresses = [];

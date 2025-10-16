@@ -97,7 +97,7 @@ namespace ScrcpyEX.View
 
         private void BtnWirel_Click(object sender, RoutedEventArgs e)
         {
-            StartScrcpy(false, MyCfg.Cfg.IP, MyCfg.Cfg.Port);
+            StartScrcpy(false);
         }
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)

@@ -114,6 +114,7 @@
     <Compile Include="ViewModel\MainWindowVM.cs" />
     <Compile Include="ViewModel\RecManageVM.cs" />
     <Compile Include="ViewModel\ScreenshotVM.cs" />
+    <Compile Include="ViewModel\SelectDeviceVM.cs" />
     <Compile Include="ViewModel\SetupVM.cs" />
     <Compile Include="View\MainWindow_code.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -154,6 +155,15 @@
     <Compile Include="View\Screenshot_var.cs">
       <DependentUpon>Screenshot.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\SelectDevice.xaml.cs">
+      <DependentUpon>SelectDevice.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SelectDevice_code.cs">
+      <DependentUpon>SelectDevice.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SelectDevice_var.cs">
+      <DependentUpon>SelectDevice.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -187,6 +197,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Screenshot.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SelectDevice.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -158,13 +158,22 @@ namespace ScrcpyEX.View
         /// 启动Scrcpy。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
-        private async void StartScrcpy(bool isWired, string ip = "", string port = "5555")
+        private async void StartScrcpy(bool isWired)
         {
             if (IsClosed)
             {
                 btnWired.IsEnabled = btnWirel.IsEnabled = false;
                 CheckScrcpy();
-                await ScrcpyInit(isWired, ip, port);
+
+                if (isWired)
+                {
+                    await ScrcpyInit(true);
+                }
+                else
+                {
+                    await PrepareWireless();
+                }
+
                 btnWired.IsEnabled = btnWirel.IsEnabled = true;
             }
         }
@@ -188,7 +197,7 @@ namespace ScrcpyEX.View
         /// Scrcpy启动完成后，初始化Scrcpy相关的所有功能。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
-        private async Task ScrcpyInit(bool isWired, string ip, string port)
+        private async Task ScrcpyInit(bool isWired, string ip = "", string port = "5555")
         {
             _scrcpyHost = new ScrcpyHost();
             bdShow.Child = await _scrcpyHost.StartScrcpyAsync(isWired, ip, port);
@@ -441,7 +450,7 @@ namespace ScrcpyEX.View
         /// <returns>设备无线调试是否打开成功。</returns>
         private async Task<bool> OpenWirelessDebug()
         {
-            List<string> devices = ParseAdbDevicesLinq(await Adb($"devices"));
+            List<string> devices = ParseAdbDevicesLinq(await MyGM.Adb($"devices"));
 
             foreach (string device in devices)
             {
@@ -450,49 +459,18 @@ namespace ScrcpyEX.View
                 {
                     //获得指定设备IP，awk 是一个文本处理工具，按行处理文本
                     //{print $9}表示打印每一行的第9个字段，字段默认以空格或制表符分隔
-                    string ip = (await Adb($@"-s {device} shell ip route | awk '{{print $9}}'")).Trim();
-                    await Adb($"-s {device} tcpip 5555");
-                    await Adb($"connect {ip}:5555");
+                    string ip = (await MyGM.Adb($@"-s {device} shell ip route | awk '{{print $9}}'")).Trim();
+                    await MyGM.Adb($"-s {device} tcpip 5555");
+                    await MyGM.Adb($"connect {ip}:5555");
 
                     CloseScrcpy();
                     await Task.Delay(1000);
-                    StartScrcpy(false, ip);
+                    StartScrcpy(false);
 
                     return true;
                 }
             }
             return false;
-        }
-
-        /// <summary>
-        /// 启动ADB发送命令。
-        /// </summary>
-        /// <param name="adbCmd">需要执行的ADB命令。</param>
-        /// <returns>执行命令后的结果。</returns>
-        private async Task<string> Adb(string adbCmd)
-        {
-            return await Task.Run(() =>
-            {
-                ProcessStartInfo processStartInfo = new()
-                {
-                    FileName = MV.ADB_Path,         //adb的路径
-                    Arguments = adbCmd,             //执行完命令后adb会直接关闭
-                    RedirectStandardOutput = true,  //重定向输出
-                    RedirectStandardError = true,
-                    StandardOutputEncoding = Encoding.UTF8,
-                    StandardErrorEncoding = Encoding.UTF8,
-                    UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
-                    CreateNoWindow = true,          // 不创建窗口
-                };
-                using Process adbPrc = Process.Start(processStartInfo);
-                string output = adbPrc.StandardOutput.ReadToEnd();
-                string error = adbPrc.StandardError.ReadToEnd();
-
-                adbPrc.WaitForExit();
-
-                Debug.WriteLine($"{adbCmd}，命令已发送，命令结果：\n{output}。{error}");
-                return output;
-            });
         }
 
         /// <summary>
@@ -508,6 +486,32 @@ namespace ScrcpyEX.View
                 .Where(parts => parts.Length >= 2 && parts[1] == "device")
                 .Select(parts => parts[0].Trim())
                 .ToList();
+        }
+
+        /// <summary>
+        /// 准备进行无线连接，连接前会查询网络中所有IP和端口开放的设备，如有多个设备则会让用户选择。
+        /// </summary>
+        private async Task PrepareWireless()
+        {
+            AdbDeviceScanner scanner = new();
+            List<string> devices = await scanner.ScanNetworkForAdbDevicesAsync();
+
+            if (devices.Count <= 0)
+            {
+                popMid.Show("局域网中没有可以连接的设备。");
+            }
+            else if (devices.Count == 1)
+            {
+                await ScrcpyInit(false, devices[0]);
+            }
+            else
+            {
+                SelectDevice select = new(devices);
+                if (select.ShowDialog() == true)
+                {
+                    await ScrcpyInit(false, devices[select.Index]);
+                }
+            }
         }
 
     }

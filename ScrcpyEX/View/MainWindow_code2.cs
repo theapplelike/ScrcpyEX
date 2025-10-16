@@ -94,7 +94,7 @@ namespace ScrcpyEX.View
             _resizeTimer.Interval = TimeSpan.FromSeconds(1);
 
             _locationChangeTimer.Tick += new EventHandler(LocationChange_Tick);
-            _locationChangeTimer.Interval = TimeSpan.FromSeconds(1);
+            _locationChangeTimer.Interval = TimeSpan.FromSeconds(0.1);
 
             _countTimer.Tick += (sender, e) => Count_Tick();
             _countTimer.Interval = TimeSpan.FromSeconds(1);

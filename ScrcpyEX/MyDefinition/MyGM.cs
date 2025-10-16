@@ -1,6 +1,7 @@
 ﻿using ScrcpyEX.ExtensionMethod;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.IO;
@@ -284,6 +285,37 @@ namespace ScrcpyEX.MyDefinition
                 (int)Math.Round(rect.Height));
 
             return int32Rect;
+        }
+
+        /// <summary>
+        /// 启动ADB发送命令。
+        /// </summary>
+        /// <param name="adbCmd">需要执行的ADB命令。</param>
+        /// <returns>执行命令后的结果。</returns>
+        public static async Task<string> Adb(string adbCmd)
+        {
+            return await Task.Run(() =>
+            {
+                ProcessStartInfo processStartInfo = new()
+                {
+                    FileName = MV.ADB_Path,         //adb的路径
+                    Arguments = adbCmd,             //执行完命令后adb会直接关闭
+                    RedirectStandardOutput = true,  //重定向输出
+                    RedirectStandardError = true,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8,
+                    UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
+                    CreateNoWindow = true,          // 不创建窗口
+                };
+                using Process adbPrc = Process.Start(processStartInfo);
+                string output = adbPrc.StandardOutput.ReadToEnd();
+                string error = adbPrc.StandardError.ReadToEnd();
+
+                adbPrc.WaitForExit();
+
+                Debug.WriteLine($"{adbCmd}，命令已发送，命令结果：\n{output}。{error}");
+                return output;
+            });
         }
 
 
