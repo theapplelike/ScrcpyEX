@@ -97,7 +97,7 @@ namespace ScrcpyEX.View
 
         private void BtnWirel_Click(object sender, RoutedEventArgs e)
         {
-            StartScrcpy(false);
+            StartScrcpy(false, MyCfg.Cfg.IP, MyCfg.Cfg.Port);
         }
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)
@@ -225,6 +225,14 @@ namespace ScrcpyEX.View
             popRec.IsOpen = false;
         }
 
+        /// <summary>
+        /// 打开无线调试。
+        /// </summary>
+        private void BtnOpenWireless_Click(object sender, RoutedEventArgs e)
+        {
+            WirelessDebug();
+        }
+
         private void BtnSet_Click(object sender, RoutedEventArgs e)
         {
             new Setup().ShowDialog();
@@ -247,6 +255,7 @@ namespace ScrcpyEX.View
         {
             MappingCancel();
         }
+
 
         #endregion
 

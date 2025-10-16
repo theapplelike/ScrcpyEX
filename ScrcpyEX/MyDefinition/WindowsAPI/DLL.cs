@@ -152,7 +152,7 @@ namespace ScrcpyEX.MyDefinition
         public static extern int mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);
 
         /// <summary>
-        /// 销毁指定的窗口。函数将 WM_DESTROY 和 WM_NCDESTROY 消息发送到窗口，以停用窗口并从窗口中删除键盘焦点。
+        /// 销毁指定句柄的窗口，销毁成功后句柄会置为0。函数将 WM_DESTROY 和 WM_NCDESTROY 消息发送到窗口，以停用窗口并从窗口中删除键盘焦点。
         /// </summary>
         /// <param name="hwnd">要销毁的窗口的句柄。</param>
         /// <returns>true--函数成功；false--函数失败。</returns>

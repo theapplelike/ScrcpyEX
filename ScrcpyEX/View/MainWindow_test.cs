@@ -69,9 +69,23 @@ namespace ScrcpyEX.View
             //int y = (int)(pt1.Y + (_limitPop.VerticalOffset + ExtraHeightTop + 50) * DpiScaleY);
             //DLL.SetCursorPos(x, y);
             //await AdbTest1(500, 500);
-            popMid.Show("yeooooooooooooooooooooos",310);
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
+
+            List<string> devices = ParseAdbDevicesLinq(await Adb($"devices"));
+            
+            foreach (string device in devices)
+            {
+                //await Adb($@"-s {device} shell ip route | awk '{{print $9}}'");
+                await Adb($@"-s {device} shell getprop | grep -E 'net.hostname|ro.product.name|ro.product.device|ro.product.manufacturer|ro.product.brand|ro.product.model'");
+                //await Adb($@"-s {device} shell getprop");
+            }
+
+
+            AdbDeviceScanner scanner = new();
+            List<string> dev = await scanner.ScanNetworkForAdbDevicesAsync();
+            Console.WriteLine($"扫描完毕");
+
             await Task.Delay(1);
         }
 

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -157,13 +158,13 @@ namespace ScrcpyEX.View
         /// 启动Scrcpy。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
-        private async void StartScrcpy(bool isWired)
+        private async void StartScrcpy(bool isWired, string ip = "", string port = "5555")
         {
             if (IsClosed)
             {
                 btnWired.IsEnabled = btnWirel.IsEnabled = false;
                 CheckScrcpy();
-                await ScrcpyInit(isWired);
+                await ScrcpyInit(isWired, ip, port);
                 btnWired.IsEnabled = btnWirel.IsEnabled = true;
             }
         }
@@ -187,14 +188,17 @@ namespace ScrcpyEX.View
         /// Scrcpy启动完成后，初始化Scrcpy相关的所有功能。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
-        private async Task ScrcpyInit(bool isWired)
+        private async Task ScrcpyInit(bool isWired, string ip, string port)
         {
             _scrcpyHost = new ScrcpyHost();
-            bdShow.Child = await _scrcpyHost.StartScrcpyAsync(isWired);
+            bdShow.Child = await _scrcpyHost.StartScrcpyAsync(isWired, ip, port);
 
-            CreateSavedPop();
-            Activate();
-            KeyboardHook.RegisterHook();
+            if (bdShow.Child != null)
+            {
+                CreateSavedPop();
+                Activate();
+                KeyboardHook.RegisterHook();
+            }
         }
 
         /// <summary>
@@ -293,7 +297,7 @@ namespace ScrcpyEX.View
                 _scrcpyHost.DisposeScrcpy();
                 bdShow.Child = null;
                 StopScriptAndRecord();
-                Console.WriteLine($"手动结束Scrcpy程序。");
+                Debug.WriteLine($"中途结束Scrcpy程序。");
             }
         }
 
@@ -413,6 +417,97 @@ namespace ScrcpyEX.View
                     //Debug.WriteLine("窗口已最大化");
                     break;
             }
+        }
+
+        /// <summary>
+        /// 打开设备的无线调试功能，开启后可以无线连接，需要在同一个网络中。
+        /// </summary>
+        private async void WirelessDebug()
+        {
+            popMid.Show("正在打开无线调试，请保持USB连接稳定。");
+            if (await OpenWirelessDebug())
+            {
+                popMid.Show("匹配完成，正在启动Scrcpy。");
+            }
+            else
+            {
+                popMid.Show("没有USB连接的设备或设备未打开USB调试。");
+            }
+        }
+
+        /// <summary>
+        /// 通过ADB将USB连接的设备打开无线调试，然后重启Scrcpy，打开无线调试的设备可以被Tcpclient访问。
+        /// </summary>
+        /// <returns>设备无线调试是否打开成功。</returns>
+        private async Task<bool> OpenWirelessDebug()
+        {
+            List<string> devices = ParseAdbDevicesLinq(await Adb($"devices"));
+
+            foreach (string device in devices)
+            {
+                //判断是序列号还是IP，序列号代表是USB连接
+                if (!device.Contains(":") || !IPAddress.TryParse(device.Split(':')[0], out _))
+                {
+                    //获得指定设备IP，awk 是一个文本处理工具，按行处理文本
+                    //{print $9}表示打印每一行的第9个字段，字段默认以空格或制表符分隔
+                    string ip = (await Adb($@"-s {device} shell ip route | awk '{{print $9}}'")).Trim();
+                    await Adb($"-s {device} tcpip 5555");
+                    await Adb($"connect {ip}:5555");
+
+                    CloseScrcpy();
+                    await Task.Delay(1000);
+                    StartScrcpy(false, ip);
+
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 启动ADB发送命令。
+        /// </summary>
+        /// <param name="adbCmd">需要执行的ADB命令。</param>
+        /// <returns>执行命令后的结果。</returns>
+        private async Task<string> Adb(string adbCmd)
+        {
+            return await Task.Run(() =>
+            {
+                ProcessStartInfo processStartInfo = new()
+                {
+                    FileName = MV.ADB_Path,         //adb的路径
+                    Arguments = adbCmd,             //执行完命令后adb会直接关闭
+                    RedirectStandardOutput = true,  //重定向输出
+                    RedirectStandardError = true,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8,
+                    UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
+                    CreateNoWindow = true,          // 不创建窗口
+                };
+                using Process adbPrc = Process.Start(processStartInfo);
+                string output = adbPrc.StandardOutput.ReadToEnd();
+                string error = adbPrc.StandardError.ReadToEnd();
+
+                adbPrc.WaitForExit();
+
+                Debug.WriteLine($"{adbCmd}，命令已发送，命令结果：\n{output}。{error}");
+                return output;
+            });
+        }
+
+        /// <summary>
+        /// 使用LINQ解析从Adb获得的设备列表。
+        /// </summary>
+        private List<string> ParseAdbDevicesLinq(string output)
+        {
+            if (string.IsNullOrEmpty(output)) return [];
+
+            return output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+                .Where(line => !line.StartsWith("List of devices attached") && !string.IsNullOrWhiteSpace(line))
+                .Select(line => line.Split(['\t', ' '], StringSplitOptions.RemoveEmptyEntries))
+                .Where(parts => parts.Length >= 2 && parts[1] == "device")
+                .Select(parts => parts[0].Trim())
+                .ToList();
         }
 
     }

@@ -43,9 +43,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
         /// <returns>承载Scrcpy的HwndHost。</returns>
-        public async Task<HwndHost> StartScrcpyAsync(bool isWired)
+        public async Task<HwndHost> StartScrcpyAsync(bool isWired, string ip, string port)
         {
-            await StartScrcpy(isWired);
+            await StartScrcpy(isWired, ip, port);
             if (ScHandle == IntPtr.Zero)
             {
                 MV.MainWin.popMid.Show("Scrcpy启动失败。");
@@ -60,15 +60,17 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// 启动Scrcpy并以指定方式连接手机。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
-        private async Task StartScrcpy(bool isWired)
+        private async Task StartScrcpy(bool isWired, string ip, string port)
         {
             ProcessStartInfo info = new(MV.ScrcpyPath)
             {
-                Arguments = GetCommandLine(isWired),
+                Arguments = GetCommandLine(isWired, ip, port),
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
+                StandardOutputEncoding = Encoding.UTF8,
+                StandardErrorEncoding = Encoding.UTF8,
             };
             _prc.StartInfo = info;
         
@@ -89,7 +91,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                     Console.WriteLine($">>>>>>>>>>>>>>{i++}:程序是否被关闭：{_prc.HasExited}。");
                 }
                 while (!_prc.HasExited && i < 30);
-                MessageBox.Show("未能成功启动程序，请重试。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                //MessageBox.Show("未能成功启动程序，请重试。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -97,7 +99,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// 获得Scrcpy启动时附带的命令行参数。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
-        private string GetCommandLine(bool isWired)
+        private string GetCommandLine(bool isWired, string ip, string port)
         {
             StringBuilder sb = new();
         
@@ -123,7 +125,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             }
             else
             {
-                sb.Append($"--tcpip={MyCfg.Cfg.IP}:{MyCfg.Cfg.Port}");
+                sb.Append($"--tcpip={ip}:{port}");
             }
         
             //Console.WriteLine($"命令行：{sb}。");

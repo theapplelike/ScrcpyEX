@@ -91,9 +91,13 @@
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel>
                     <TextBlock Text="功能菜单" Background="White" Padding="10"/>
-                    <Button x:Name="btnScr" Click="BtnScr_Click" Style="{StaticResource ItemBtn}" Content="录制脚本" BorderThickness="0,1"/>
-                    <Button x:Name="btnSet" Click="BtnSet_Click" Style="{StaticResource ItemBtn}" Content="功能设置"/>
+                    <Button x:Name="btnSet" Click="BtnSet_Click" Style="{StaticResource ItemBtn}" Content="功能设置" BorderThickness="0,0,1,1"/>
 
+                    <UniformGrid Rows="1" Columns="2">
+                        <Button x:Name="btnScr" Click="BtnScr_Click" Style="{StaticResource ItemBtn}" Content="录制脚本"/>
+                        <Button x:Name="btnOpenWireless" Click="BtnOpenWireless_Click" Style="{StaticResource ItemBtn}" Content="开启无线调试" BorderThickness="1,0,1,1" ToolTip="开启无线调试后，可以进行无线连接，设备和电脑需要处于一个网络中，进行无线配对时请先使用USB连接电脑。"/>
+                    </UniformGrid>
+                    
                     <UniformGrid Rows="1" Columns="3">
                         <Button x:Name="btnMappingEdit" Click="BtnMappingEdit_Click" Style="{StaticResource ItemBtn}" Content="映射编辑"/>
                         <Button x:Name="btnMappingBack" Click="BtnMappingBack_Click" Style="{StaticResource ItemBtn}" Content="取消修改" IsEnabled="False" BorderThickness="1,0,1,1"/>
