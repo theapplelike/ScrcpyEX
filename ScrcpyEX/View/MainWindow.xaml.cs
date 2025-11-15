@@ -61,10 +61,24 @@ namespace ScrcpyEX.View
 
         private void Window_Activated(object sender, EventArgs e)
         {
-            //Console.WriteLine($"++++++++++窗口激活,{IsActive},{WindowState}");
-            ShowKeyMapping();
-        }
+            //Console.WriteLine($"++++++++++窗口激活,{IsActive},{DLL.GetForegroundWindow()}");
 
+            // 延迟检查，确保窗口已经完全激活
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (DLL.GetForegroundWindow() == _mainHandle)
+                {
+                    ShowKeyMapping();
+                    Console.WriteLine($"窗口是Z轴最顶端窗口，yes。");
+                }
+                else
+                {
+                    WindowState = WindowState.Minimized;
+                    Console.WriteLine($"窗口不是Z轴最顶端窗口。");
+                }
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        }
+        
         private void Window_Deactivated(object sender, EventArgs e)
         {
             //Console.WriteLine($"++++++++++窗口失活,{IsActive},{WindowState}");

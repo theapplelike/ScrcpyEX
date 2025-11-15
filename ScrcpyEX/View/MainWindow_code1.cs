@@ -240,9 +240,10 @@ namespace ScrcpyEX.View
         /// 有黑边时会导致Popup的位置有偏移。
         /// </summary>
         /// <param name="mapping">按键映射类。</param>
-        /// <param name="popIsOpen">创建的Popup是否可见。</param>
+        /// <param name="popIsEdit">Popup是否为编辑状态。</param>
+        /// <param name="popIsVisible">Popup是否可见。</param>
         /// <returns>MyDragMove对象，其中封装了Popup的所有事件方法。</returns>
-        private MyDragMove CreatePop(KeyMapping mapping, bool popIsOpen)
+        private MyDragMove CreatePop(KeyMapping mapping, bool popIsEdit, bool popIsVisible = true)
         {
             double radius = 50 * ScRatioX;
 
@@ -254,7 +255,7 @@ namespace ScrcpyEX.View
                 AllowsTransparency = true,
                 Height = radius,
                 Width = radius,
-                IsOpen = true,
+                IsOpen = popIsVisible,
                 HorizontalOffset = mapping.OffsetX * ScRatioX,
                 VerticalOffset = mapping.OffsetY * ScRatioY,
             };
@@ -340,7 +341,7 @@ namespace ScrcpyEX.View
             pop.Child = border;
             gShow.Children.Add(pop);//这里的父级要和pop.PlacementTarget属性一致
 
-            return new MyDragMove(pop, mapping.VkCode, popIsOpen);
+            return new MyDragMove(pop, mapping.VkCode, popIsEdit);
         }
 
         /// <summary>
@@ -425,8 +426,8 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 创建配置中所有的键盘映射Popup，并保存到列表，保存前会清理列表。
         /// </summary>
-        /// <param name="popIsOpen">创建的Popup是否可见。</param>
-        private void CreateSavedPop(bool popIsOpen = false)
+        /// <param name="popIsEdit">Popup是否为编辑状态。</param>
+        private void CreateSavedPop(bool popIsEdit = false, bool popIsVisible = true)
         {
             foreach (MyDragMove drag in MV.DragMoves)
             {
@@ -437,7 +438,7 @@ namespace ScrcpyEX.View
 
             foreach (KeyMapping mapping in MyCfg.Cfg.KeyMappings)
             {
-                MV.DragMoves.Add(CreatePop(mapping, popIsOpen));
+                MV.DragMoves.Add(CreatePop(mapping, popIsEdit, popIsVisible));
             }
         }
 

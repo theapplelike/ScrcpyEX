@@ -50,8 +50,20 @@ namespace ScrcpyEX.View
             if (msg == 0x0006 && (int)wParam == 0X200001)
             {
                 handled = true;
-                Debug.WriteLine($"拦截消息：{msg:X4}，窗口活动状态改变，{(int)wParam:X4}，{(int)lParam:X4}");
+                Debug.WriteLine($"拦截消息：{msg:X4}，{(int)wParam:X4}，{(int)lParam:X4}，" +
+                    $"说明窗口被激活，但处于最小化");
             }
+            //窗口的非客户区域激活状态改变，wParam为0时窗口失活，为1时窗口激活，
+            //当窗口Z序在后面，但处于激活状态时，Z序到最前面是不会触发Activated事件的，此时强制显示映射按钮
+            //else if (msg == 0x0086 && (int)wParam == 0X0001)
+            //{
+            //    //ShowKeyMapping();
+            //    //Debug.WriteLine($"拦截消息：{msg:X4}，{(int)wParam:X4}，{(int)lParam:X4}，" +
+            //    //    $"未触发Activated事件，强制显示映射按钮");
+            //}
+            //else
+            //    Debug.WriteLine($"MEG：{msg:X4}，{(long)wParam:X4}，{(long)lParam:X4}");
+
 
             return IntPtr.Zero;
         }
@@ -204,9 +216,13 @@ namespace ScrcpyEX.View
 
             if (bdShow.Child != null)
             {
-                CreateSavedPop();
-                Activate();
+                bool isActivate = Activate();
+                Debug.WriteLine($"窗口是否激活：{isActivate}");
+                CreateSavedPop(false, DLL.GetForegroundWindow() == _mainHandle);
                 KeyboardHook.RegisterHook();
+
+                //Console.WriteLine($"窗体句柄：{_mainHandle},scrcpy句柄：{_scrcpyHost.ScHandle},前台窗口句柄：{DLL.GetForegroundWindow()}");
+                //Console.WriteLine($"前台窗口句柄：{DLL.GetForegroundWindow()}");
             }
         }
 

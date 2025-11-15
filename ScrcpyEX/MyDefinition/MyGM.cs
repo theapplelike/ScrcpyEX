@@ -318,6 +318,24 @@ namespace ScrcpyEX.MyDefinition
             });
         }
 
+        /// <summary>
+        /// 记录日志。
+        /// </summary>
+        /// <param name="text">日志内容。</param>
+        public static void Log(string text)
+        {
+            StringBuilder sb = new();
+            sb.AppendLine("****************************日志文本****************************");
+            sb.AppendLine("【出现时间】：" + DateTime.Now.ToString());
+            sb.AppendLine("【处理事件】：" + text);
+            sb.AppendLine("****************************--------****************************");
+            Directory.CreateDirectory(@".\main\Local\Log");
+
+            //第二个参数为true表示追加数据到该文件中；为false表示覆盖该文件。如果指定的文件不存在，该参数无效，且构造函数将创建一个新文件。
+            using StreamWriter sw = new(@".\main\Local\Log\Log.txt", true, Encoding.UTF8);
+            sw.WriteLine(sb);
+        }
+
 
     }
 }

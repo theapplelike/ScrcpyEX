@@ -109,9 +109,9 @@
 
         <!--自定义菜单栏-->
         <DockPanel x:Name="dpl" Background="AliceBlue" MouseLeftButtonDown="Dpl_MouseLeftButtonDown">
-            <Button x:Name="btnWired" Style="{StaticResource MenuBtn}" Content="&#xF0B9;" Click="BtnWired_Click" Margin="0" ToolTip="有线连接"/>
+            <Button x:Name="btnWired" Style="{StaticResource MenuBtn}" Content="&#xF0B9;" Click="BtnWired_Click" ToolTip="有线连接" Margin="0"/>
             <Button x:Name="btnWirel" Style="{StaticResource MenuBtn}" Content="&#xe952;" Click="BtnWirel_Click" ToolTip="无线连接"/>
-            <Button x:Name="btnStop"  Style="{StaticResource MenuBtn}" Content="&#xECCB;" Click="BtnStop_Click" ToolTip="停止投屏"/>
+            <Button x:Name="btnStop"  Style="{StaticResource MenuBtn}" Content="&#xECCB;" Click="BtnStop_Click"  ToolTip="停止投屏"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
             <Button x:Name="btnLocate" Click="BtnLocate_Click" Style="{StaticResource MenuBtn}" Content="&#xe7f7;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g1" Width="40" ToolTip="快速定位"/>

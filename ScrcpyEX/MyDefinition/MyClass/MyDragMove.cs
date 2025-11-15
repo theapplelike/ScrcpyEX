@@ -58,8 +58,10 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// 设置指定的Popup可以进行拖拽。
         /// </summary>
         /// <param name="pop">要添加拖拽功能的Popup。</param>
+        /// <param name="vkCode">当前映射绑定的虚拟键码。</param>
+        /// <param name="popIsEdit">Popup是否为编辑状态。</param>
         /// <param name="isLeaveParent">是否可以移出逻辑父级。</param>
-        public MyDragMove(Popup pop, Keys vkCode, bool popIsOpen, bool isLeaveParent = false)
+        public MyDragMove(Popup pop, Keys vkCode, bool popIsEdit, bool isLeaveParent = false)
         {
             VkCode = vkCode;
 
@@ -80,7 +82,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             _pop.MouseMove += Pop_MouseMove;
             _pop.MouseUp += Pop_MouseUp;
 
-            SetDisplay(popIsOpen);
+            SetDisplay(popIsEdit);
         }
 
         /// <summary>
