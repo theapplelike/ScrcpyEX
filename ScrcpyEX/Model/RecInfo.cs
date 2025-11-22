@@ -33,7 +33,7 @@ namespace ScrcpyEX.Model
         public bool IsTime { get; set; } = true;
 
         /// <summary>
-        /// 指定每次循环的间隔。
+        /// 指定每次循环的间隔，单位秒。
         /// </summary>
         public int CycleInterval { get; set; } = 100;
 

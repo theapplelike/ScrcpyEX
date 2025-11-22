@@ -1,4 +1,5 @@
 ﻿using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.MyClass;
 using ScrcpyEX.ViewModel;
 using System;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Timers;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -48,29 +49,9 @@ namespace ScrcpyEX.View
         private FormSize _tempSize = null;
 
         /// <summary>
-        /// 用于图像脚本计时器的自适应间隔，最小为5秒。
-        /// </summary>
-        private int _scriptInterval = 5;
-
-        /// <summary>
         /// 准确的测量运行时间。
         /// </summary>
         private Stopwatch _stopwatch;
-
-        /// <summary>
-        /// 计时脚本对应的委托。
-        /// </summary>
-        private EventHandler _timedHandler;
-
-        /// <summary>
-        /// 图像脚本对应的委托。
-        /// </summary>
-        private EventHandler _imageHandler;
-
-        /// <summary>
-        /// 脚本计时器，可能会绑定计时脚本或图像脚本。
-        /// </summary>
-        private readonly DispatcherTimer _scriptTimer = new();
 
         /// <summary>
         /// 调整窗口大小改变时触发的计时器。
@@ -83,14 +64,39 @@ namespace ScrcpyEX.View
         private readonly DispatcherTimer _locationChangeTimer = new();
 
         /// <summary>
+        /// 处理任务锁。
+        /// </summary>
+        private readonly object _processingLock = new();
+
+        /// <summary>
+        /// Timer脚本是否正在处理任务。
+        /// </summary>
+        private volatile bool _isProcessing = false;
+
+        /// <summary>
+        /// 计时脚本对应的委托。
+        /// </summary>
+        private ElapsedEventHandler _timedHandler;
+
+        /// <summary>
+        /// 图像脚本对应的委托。
+        /// </summary>
+        private ElapsedEventHandler _imageHandler;
+
+        /// <summary>
+        /// 脚本计时器，可能会绑定计时脚本或图像脚本。
+        /// </summary>
+        private readonly Timer _scriptTimer = new();
+
+        /// <summary>
         /// 对每次脚本间隔进行计数。
         /// </summary>
-        private readonly DispatcherTimer _countTimer = new();
+        private readonly Timer _countTimer = new();
 
         /// <summary>
         /// 测试用计时器。
         /// </summary>
-        private readonly DispatcherTimer _testTimer = new();
+        private readonly Timer _testTimer = new();
 
         /// <summary>
         /// scrcpy的默认初始宽高（在100%缩放下），使用比例为15：7。
@@ -125,12 +131,38 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 窗口除开scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
-        private double ExtraWidth => gShow.Margin.Left + gShow.Margin.Right;
+        private double ExtraWidth //=> Dispatcher.Invoke(() => { return gShow.Margin.Left + gShow.Margin.Right; });
+        {
+            get
+            {
+                if (gShow.CheckAccess()) //检查是否在UI线程
+                {
+                    return gShow.Margin.Left + gShow.Margin.Right;
+                }
+                else
+                {
+                    return Dispatcher.Invoke(() => gShow.Margin.Left + gShow.Margin.Right);
+                }
+            }
+        }
 
         /// <summary>
         /// 窗口除开scrcpy的额外高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
-        private double ExtraHeight => dpl.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom;
+        private double ExtraHeight //=> dpl.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom;
+        {
+            get
+            {
+                if (gShow.CheckAccess()) //检查是否在UI线程
+                {
+                    return dpl.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom;
+                }
+                else
+                {
+                    return Dispatcher.Invoke(() => dpl.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom);
+                }
+            }
+        }
 
         /// <summary>
         /// 窗口除开scrcpy的额外左侧宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
@@ -163,13 +195,15 @@ namespace ScrcpyEX.View
         public double ScRatioY => ScActualHeight / _scHeight;
 
         /// <summary>
-        /// Scrcpy当前的实际宽度。
+        /// Scrcpy当前的实际宽度，与DPI无关。
         /// </summary>
+        //public double ScActualWidth => MyGM.GetHandleWidth(ScHandle) / DpiScaleX;
         public double ScActualWidth => ActualWidth - ExtraWidth;
 
         /// <summary>
-        /// Scrcpy当前的实际高度。
+        /// Scrcpy当前的实际高度，与DPI无关。
         /// </summary>
+        //public double ScActualHeight => MyGM.GetHandleHeight(ScHandle) / DpiScaleY;
         public double ScActualHeight => ActualHeight - ExtraHeight;
 
         /// <summary>

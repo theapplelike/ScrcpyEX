@@ -31,10 +31,13 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 测试专用。
         /// </summary>
-        private void Test_Tick(object sender, EventArgs e)
+        private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {
             IntPtr intPtr = DLL.GetForegroundWindow();
-            Console.WriteLine($"窗体/SC：{IsActive}，{intPtr == ScHandle}。");
+            Dispatcher.BeginInvoke(() =>
+            {
+                Console.WriteLine($"窗体/SC：{IsActive}，{intPtr == ScHandle}。");
+            });
         }
 
         private void BtnTest_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -44,6 +47,12 @@ namespace ScrcpyEX.View
 
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
+            //MyGM.GetHandleRect(ScHandle);
+            //Console.WriteLine($"SC的实际宽高：{ScActualWidth * DpiScaleX},{ScActualHeight *DpiScaleY},{DpiScaleX}");
+
+            //Console.WriteLine($"比例：{ScRatioX},{ScActualWidth},{ActualWidth - ExtraWidth}");
+
+
             //闪烁截屏
             //ReduceSize();
             //RecInfo recInfo = MyCfg.Cfg.RecInfos[2];
@@ -98,38 +107,38 @@ namespace ScrcpyEX.View
         /// </summary>
         /// <param name="centreX">映射控件的圆心X坐标。</param>
         /// <param name="centreY">映射控件的圆心Y坐标。</param>
-        private async void ADB_Click(int centreX, int centreY)
-        {
-            double x = centreX / ScActualWidth * 2312 / DpiScaleX;
-            double y = centreY / ScActualHeight * 1080 / DpiScaleY;
-            await AdbTest1(x, y);
-
-            Console.WriteLine($"安卓坐标:({x},{y})，程序实际宽高：({ScActualWidth},{ScActualHeight})，");
-        }
+        //private async void ADB_Click(int centreX, int centreY)
+        //{
+        //    double x = centreX / ScActualWidth * 2312 / DpiScaleX;
+        //    double y = centreY / ScActualHeight * 1080 / DpiScaleY;
+        //    await AdbTest1(x, y);
+        //
+        //    Console.WriteLine($"安卓坐标:({x},{y})，程序实际宽高：({ScActualWidth},{ScActualHeight})，");
+        //}
 
         /// <summary>
         /// 启动adb发送命令。
         /// </summary>
-        private async Task AdbTest1(double x, double y)
-        {
-            //string adbClickCommand = $"shell input tap {x} {y}";
-            string adbClickCommand = $"shell dumpsys power | grep \"mStayOn\"";
-
-            // 创建一个新的进程启动信息
-            ProcessStartInfo processStartInfo = new()
-            {
-                FileName = MV.ADB_Path,         //adb的路径
-                Arguments = adbClickCommand,    //执行完命令后adb会直接关闭
-                RedirectStandardOutput = true, // 重定向输出
-                UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
-                CreateNoWindow = true,          // 不创建窗口
-            };
-            Process adbPrc = Process.Start(processStartInfo);
-            string output = adbPrc.StandardOutput.ReadToEnd();
-
-            Console.WriteLine($"{adbClickCommand}，命令已发送，命令结果：{output}。");
-            await Task.Delay(1);
-        }
+        //private async Task AdbTest1(double x, double y)
+        //{
+        //    //string adbClickCommand = $"shell input tap {x} {y}";
+        //    string adbClickCommand = $"shell dumpsys power | grep \"mStayOn\"";
+        //
+        //    // 创建一个新的进程启动信息
+        //    ProcessStartInfo processStartInfo = new()
+        //    {
+        //        FileName = MV.ADB_Path,         //adb的路径
+        //        Arguments = adbClickCommand,    //执行完命令后adb会直接关闭
+        //        RedirectStandardOutput = true, // 重定向输出
+        //        UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
+        //        CreateNoWindow = true,          // 不创建窗口
+        //    };
+        //    Process adbPrc = Process.Start(processStartInfo);
+        //    string output = adbPrc.StandardOutput.ReadToEnd();
+        //
+        //    Console.WriteLine($"{adbClickCommand}，命令已发送，命令结果：{output}。");
+        //    await Task.Delay(1);
+        //}
 
         //static Process _adbPrc = null;
         //static StreamWriter sw = null;

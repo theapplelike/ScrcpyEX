@@ -343,8 +343,8 @@ namespace ScrcpyEX.View
 
             int xProportion = scWidth / max;
             int yProportion = scHeight / max;
-            Console.WriteLine($"消除黑边,当前Scrcpy的比例：({ScActualWidth / max}，{ScActualHeight / max})，期望比例:({_horizontalRatio},{_verticalRatio})。");
-            Console.WriteLine($"当前Scrcpy的宽高：({ScActualWidth},{ScActualHeight})，\n和原始大小的比例：{ScRatioX}，{ScRatioY}");
+            Debug.WriteLine($"消除黑边,当前Scrcpy的比例：({ScActualWidth / max}，{ScActualHeight / max})，期望比例:({_horizontalRatio},{_verticalRatio})。");
+            Debug.WriteLine($"当前Scrcpy的宽高：({ScActualWidth},{ScActualHeight})，\n和原始大小的比例：{ScRatioX}，{ScRatioY}");
 
             //计算通分后的分子，如果标准分子大，应以宽为准，调整高度；反之调整宽度
             int currentNumerator = xProportion * _verticalRatio;

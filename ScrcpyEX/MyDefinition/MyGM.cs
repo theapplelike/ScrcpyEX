@@ -14,6 +14,8 @@ using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace ScrcpyEX.MyDefinition
 {
@@ -243,6 +245,28 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
+        /// 获得指定句柄窗口的宽度。
+        /// </summary>
+        /// <param name="handle">窗口的句柄。</param>
+        /// <returns>窗口的宽度。</returns>
+        //public static double GetHandleWidth(IntPtr handle)
+        //{
+        //    DLL.LpRect rc = GetHandleRect(handle);
+        //    return rc.Width;
+        //}
+
+        /// <summary>
+        /// 获得指定句柄窗口的高度。
+        /// </summary>
+        /// <param name="handle">窗口的句柄。</param>
+        /// <returns>窗口的高度。</returns>
+        //public static double GetHandleHeight(IntPtr handle)
+        //{
+        //    DLL.LpRect rc = GetHandleRect(handle);
+        //    return rc.Height;
+        //}
+
+        /// <summary>
         /// 获得指定句柄窗口的图像。
         /// </summary>
         /// <param name="handle">窗口的句柄。</param>
@@ -319,19 +343,15 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
-        /// 记录日志。
+        /// 记录普通日志。
         /// </summary>
         /// <param name="text">日志内容。</param>
         public static void Log(string text)
         {
             StringBuilder sb = new();
-            sb.AppendLine("****************************日志文本****************************");
-            sb.AppendLine("【出现时间】：" + DateTime.Now.ToString());
-            sb.AppendLine("【处理事件】：" + text);
-            sb.AppendLine("****************************--------****************************");
+            sb.AppendLine($"【{DateTime.Now}】：{text}");
             Directory.CreateDirectory(@".\main\Local\Log");
 
-            //第二个参数为true表示追加数据到该文件中；为false表示覆盖该文件。如果指定的文件不存在，该参数无效，且构造函数将创建一个新文件。
             using StreamWriter sw = new(@".\main\Local\Log\Log.txt", true, Encoding.UTF8);
             sw.WriteLine(sb);
         }

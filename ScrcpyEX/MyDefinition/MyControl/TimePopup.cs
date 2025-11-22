@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
@@ -60,6 +61,19 @@ namespace ScrcpyEX.MyDefinition.MyControl
             IsOpen = true;
             popTimer.Interval = TimeSpan.FromSeconds(time);
             popTimer.Start();
+        }
+
+        /// <summary>
+        /// 显示Popup提示，重复执行时可以显示到最新位置，子线程中使用此方法。
+        /// </summary>
+        /// <param name="text">要显示的文本。</param>
+        /// <param name="time">Popup控件显示的时间，单位s。</param>
+        public void ThreadShow(string text, int time = 3)
+        {
+            Dispatcher.BeginInvoke(() =>
+            {
+                Show(text, time);
+            });
         }
 
 

@@ -21,6 +21,8 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using Keys = System.Windows.Forms.Keys;
 
 namespace ScrcpyEX.View
@@ -80,7 +82,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void StopScriptAndRecord()
         {
-            if (_countTimer.IsEnabled)
+            if (_countTimer.Enabled)
             {
                 _scriptTimer.Stop();
                 _countTimer.Stop();
@@ -94,6 +96,17 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
+        /// 停止执行脚本的计时器，如果当前正在录制，也会停止录制操作，子线程调用此方法。
+        /// </summary>
+        private void ThreadStopScriptAndRecord()
+        {
+            Dispatcher.BeginInvoke(() =>
+            {
+                StopScriptAndRecord();
+            });
+        }
+
+        /// <summary>
         /// 注册鼠标钩子进行录制脚本操作，如果已注册鼠标钩子，则注销鼠标钩子并保存录制的脚本。
         /// </summary>
         private void StartRecord()
@@ -103,7 +116,7 @@ namespace ScrcpyEX.View
                 popMid.Show("未进行投屏，不能进行录制。");
                 return;
             }
-            if (_countTimer.IsEnabled)
+            if (_countTimer.Enabled)
             {
                 popMid.Show("正在执行脚本，不能进行录制。");
                 return;
@@ -200,27 +213,28 @@ namespace ScrcpyEX.View
             btnImgCompare.Visibility = Visibility.Visible;
 
             //如果脚本已执行则关闭
-            if (_countTimer.IsEnabled)
+            if (_countTimer.Enabled)
             {
                 _scriptTimer.Stop();
                 _countTimer.Stop();
             }
 
             //移除计时脚本和图像脚本，避免重复注册
-            _scriptTimer.Tick -= _timedHandler;
-            _scriptTimer.Tick -= _imageHandler;
+            _scriptTimer.Elapsed -= _timedHandler;
+            _scriptTimer.Elapsed -= _imageHandler;
         }
 
         /// <summary>
         /// 注册计时脚本并执行。
         /// </summary>
-        private void TimedScript()
+        private async void TimedScript()
         {
-            _scriptTimer.Tick += _timedHandler;
-            _scriptTimer.Interval = TimeSpan.FromSeconds(_recInfo.CycleInterval);
+            _scriptTimer.Elapsed += _timedHandler;
+            _scriptTimer.Interval = _recInfo.CycleInterval * 1000;
+            await TimedScript_Tick(_recInfo);//立刻执行一次脚本
+
             _scriptTimer.Start();
             _countTimer.Start();
-            TimedScript_Tick(_recInfo);//立刻执行一次脚本
         }
 
         /// <summary>
@@ -228,11 +242,11 @@ namespace ScrcpyEX.View
         /// </summary>
         private void ImageScript()
         {
-            _scriptTimer.Tick += _imageHandler;
-            _scriptTimer.Interval = TimeSpan.FromSeconds(5);
+            _scriptTimer.Elapsed += _imageHandler;
+            _scriptTimer.Interval = 10;//第一次执行的间隔
             _scriptTimer.Start();
             _countTimer.Start();
-            ImageScript_Tick(_recInfo);//立刻执行一次脚本
+            //ImageScript_Tick(_recInfo);//立刻执行一次脚本
         }
 
         /// <summary>
@@ -259,7 +273,6 @@ namespace ScrcpyEX.View
                 HorizontalOffset = mapping.OffsetX * ScRatioX,
                 VerticalOffset = mapping.OffsetY * ScRatioY,
             };
-
             //Console.WriteLine($"映射Popup原始左上:({mapping.OffsetX},{mapping.OffsetY}),比例:({ScRatioX},{ScRatioY}),最终左上:({pop.HorizontalOffset},{pop.VerticalOffset})。");
 
             //提供边框
@@ -407,10 +420,10 @@ namespace ScrcpyEX.View
                 drag.SetDisplay(false);
 
                 MyCfg.Cfg.KeyMappings.Add(new KeyMapping(ch, vkCode, offsetX, offsetY));
-                Console.WriteLine($"映射字符：{ch}，虚拟键：{vkCode}/{(int)vkCode}，保存偏移:（{offsetX:F2}，{offsetY:F2}）。");
+                Debug.WriteLine($"映射字符：{ch}，虚拟键：{vkCode}/{(int)vkCode}，保存偏移:（{offsetX:F2}，{offsetY:F2}）。");
             }
 
-            Console.WriteLine($"已有映射数量：{MyCfg.Cfg.KeyMappings.Count}。");
+            Debug.WriteLine($"已有映射数量：{MyCfg.Cfg.KeyMappings.Count}。");
         }
 
         /// <summary>

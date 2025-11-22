@@ -87,24 +87,24 @@ namespace ScrcpyEX.View
         /// </summary>
         private void SetTimer()
         {
-            _timedHandler = (sender, e) => TimedScript_Tick(_recInfo);
-            _imageHandler = (sender, e) => ImageScript_Tick(_recInfo);
-
             _resizeTimer.Tick += new EventHandler(Resize_Tick);
             _resizeTimer.Interval = TimeSpan.FromSeconds(1);
 
             _locationChangeTimer.Tick += new EventHandler(LocationChange_Tick);
             _locationChangeTimer.Interval = TimeSpan.FromSeconds(0.1);
 
-            _countTimer.Tick += (sender, e) => Count_Tick();
-            _countTimer.Interval = TimeSpan.FromSeconds(1);
+            _timedHandler = async (sender, e) => await TimedScript_Tick(_recInfo);
+            _imageHandler = async (sender, e) => await ImageScript_Tick(_recInfo);
 
-            _testTimer.Tick += new EventHandler(Test_Tick);
-            _testTimer.Interval = TimeSpan.FromSeconds(1);
+            _countTimer.Elapsed += (sender, e) => Count_Tick();
+            _countTimer.Interval = 1000;
+
+            _testTimer.Elapsed += Test_Tick;
+            _testTimer.Interval = 3000;
         }
 
         /// <summary>
-        /// 要使用Thread在线程中调整第三方程序大小，这样不会改变焦点，导致用户调整大小操作被打断。
+        /// 程序大小改变后重新创建映射Popup。
         /// </summary>
         private void Resize_Tick(object sender, EventArgs e)
         {
@@ -112,34 +112,10 @@ namespace ScrcpyEX.View
 
             _resizeTimer.Stop();
             CreateSavedPop(btnMappingAdd.IsEnabled);
-            //new Thread(ResizeSC).Start();
-            //_resizeTimer.Stop();
         }
 
         /// <summary>
-        /// 重新设置scrcpy窗口的大小，以完全贴合父级panel，需要先最小化再最大化，防止相对坐标错误。
-        /// 如果相对坐标仍然错误，两次操作间需要增加延时，给系统足够的处理时间。
-        /// </summary>
-        //private async void ResizeSC()
-        //{
-        //    Console.WriteLine($"重新设置scrcpy大小。");
-        //
-        //    DLL.ShowWindow(_scHandle, SW.SW_SHOWNORMAL);
-        //    await Task.Delay(100);
-        //    DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
-        //
-        //    Dispatcher.Invoke(() =>
-        //    {
-        //        foreach (Popup pop in MV.TempPopups)
-        //        {
-        //            pop.IsOpen = false;
-        //        }
-        //        CreateSavedPop();
-        //    });
-        //}
-
-        /// <summary>
-        /// 位置改变后重新设置映射Popup的位置。
+        /// 程序位置改变后重新设置映射Popup的位置。
         /// </summary>
         private void LocationChange_Tick(object sender, EventArgs e)
         {
@@ -153,52 +129,63 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 执行计时脚本。
         /// </summary>
-        private async void TimedScript_Tick(RecInfo recInfo)
+        private async Task TimedScript_Tick(RecInfo recInfo)
         {
             _vm.CycleNum++;
             _stopwatch = Stopwatch.StartNew();
             await ExecuteClickScript(recInfo, ScHandle);
-            //Console.WriteLine("计时脚本执行完毕...");
+            //Debug.WriteLine("计时脚本执行完毕...");
         }
-
+        
         /// <summary>
         /// 执行图像脚本。
         /// </summary>
-        private async void ImageScript_Tick(RecInfo recInfo)
+        private async Task ImageScript_Tick(RecInfo recInfo)
         {
-            Console.WriteLine($"进入新一轮，当前间隔：{_vm.Running}。");
-            _scriptInterval = 5;
-
-            CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, recInfo.CropRect);
-            if (scWindow == null)
+            // 防止重叠执行
+            lock (_processingLock)
             {
-                popMid.Show("获取Scrcpy脚本截图失败。");
-                return;
+                if (_isProcessing) { return; }
+                _isProcessing = true;
             }
 
-            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
-            if (ssim > 0.8)
+            try
             {
-                //if (recInfo.IsAdaptive)
+                Debug.WriteLine($"进入新一轮，已产生的间隔：{_vm.Running}。");
+                _vm.ScriptInterval = 0;
+
+                CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, recInfo.CropRect);
+                if (scWindow == null)
+                {
+                    popMid.ThreadShow("获取Scrcpy脚本截图失败。");
+                    return;
+                }
+
+                double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
+                if (ssim > 0.7)
+                {
+                    await NextImageScript(recInfo);
+                    Debug.WriteLine($"单次对比通过，相似度：{ssim:F8}");
+                }
+                //else if (await MatrixComparison(recInfo))
                 //{
-                //    _scriptInterval = (int)(_vm.Running * 0.9);//每次将上一次间隔的90%作为自适应间隔
-                //    _scriptInterval = _scriptInterval < 5 ? 5 : _scriptInterval;
+                //    await NextImageScript(recInfo);
+                //    Debug.WriteLine($"多次对比通过");
                 //}
-                //
-                //_vm.CycleNum++;
-                //_stopwatch = Stopwatch.StartNew();
-                //await ExecuteClickScript(recInfo, ScHandle);
-                await NextImageScript(recInfo);
-                Console.WriteLine($"单次对比通过，相似度：{ssim:F8}");
             }
-            else if (await MatrixComparison(recInfo))
+            catch (Exception ex)
             {
-                await NextImageScript(recInfo);
-                Console.WriteLine($"多次对比通过");
+                Debug.WriteLine($"执行图像脚本时异常：{ex}。");
             }
-
-            Console.WriteLine($"自适应间隔:{_scriptInterval}秒。");
-            _scriptTimer.Interval = TimeSpan.FromSeconds(_scriptInterval);
+            finally
+            {
+                Debug.WriteLine($"自适应间隔:{_vm.ScriptInterval}豪秒。");
+                _scriptTimer.Interval = _vm.ScriptInterval;
+                lock (_processingLock)
+                {
+                    _isProcessing = false;
+                }
+            }
         }
 
         /// <summary>
@@ -214,8 +201,7 @@ namespace ScrcpyEX.View
         {
             if (recInfo.IsAdaptive)
             {
-                _scriptInterval = (int)(_vm.Running * 0.9);//每次将上一次间隔的90%作为自适应间隔
-                _scriptInterval = _scriptInterval < 5 ? 5 : _scriptInterval;
+                _vm.ScriptInterval = _vm.Running * 1000 * 0.9;//每次将上一次间隔的90%作为自适应间隔
             }
 
             _vm.CycleNum++;
@@ -233,12 +219,12 @@ namespace ScrcpyEX.View
             foreach (PointInfo info in recInfo.Infos)
             {
                 await Task.Delay(TimeSpan.FromSeconds(info.LastTime));
-                //Console.WriteLine($"Timer点击：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
+                //Debug.WriteLine($"Timer点击：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
 
                 //保存的坐标数据都是以默认尺寸为准，使用时需要乘以当前尺寸和默认尺寸的比例
                 int x = (int)(info.Pt.X * ScRatioX);
                 int y = (int)(info.Pt.Y * ScRatioY);
-                //Console.WriteLine($"比例：（{ScRatioX},{ScRatioY}），实际点击：（{x},{y}）。");
+                //Debug.WriteLine($"比例：（{ScRatioX},{ScRatioY}），实际点击：（{x},{y}）。");
 
                 IntPtr lp = new((y << 16) + x);
                 DLL.PostMessage(scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
@@ -249,7 +235,7 @@ namespace ScrcpyEX.View
             //如果为有限次循环，检查是否到循环次数
             if (recInfo.IsLimited && recInfo.CycleNumber <= _vm.CycleNum)
             {
-                StopScriptAndRecord();
+                ThreadStopScriptAndRecord();
             }
         }
 
@@ -379,7 +365,7 @@ namespace ScrcpyEX.View
                 }
             }
 
-            Console.WriteLine(string.Join(", ", matrixs.Select(n => $"{n:F2}")));
+            Debug.WriteLine($"多次比对：{string.Join(", ", matrixs.Select(n => $"{n:F2}"))}");
             return matrixs.Max() >= 0.7;
         }
 
