@@ -68,6 +68,7 @@ namespace ScrcpyEX.View
         {
             int.TryParse(txtCycleNum.Text, out int num);
             int.TryParse(txtCycleInterval.Text, out int interval);
+            double.TryParse(txtSimilarity.Text, out double similarity);
 
             RecInfo recInfo = new()
             {
@@ -76,6 +77,7 @@ namespace ScrcpyEX.View
                 IsTime = (bool)rdoTime.IsChecked,
                 CycleInterval = interval,
                 ImgName = img.Source == null ? "" : $"Pic{DateTime.Now:yyMMddhhmmss}.png",
+                Similarity = similarity,
                 IsAdaptive = (bool)chkAdaptive.IsChecked,
                 CropRect = _cropRect,
             };

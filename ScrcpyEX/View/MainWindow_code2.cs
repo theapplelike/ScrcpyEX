@@ -162,7 +162,7 @@ namespace ScrcpyEX.View
                 }
 
                 double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
-                if (ssim > 0.7)
+                if (ssim >= recInfo.Similarity / 100)
                 {
                     await NextImageScript(recInfo);
                     Debug.WriteLine($"单次对比通过，相似度：{ssim:F8}");

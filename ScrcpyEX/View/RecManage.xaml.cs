@@ -90,12 +90,12 @@ namespace ScrcpyEX.View
 
         private void RdoImage_Checked(object sender, RoutedEventArgs e)
         {
-            chkAdaptive.Visibility = Visibility.Visible;
+            gSuboption.Visibility = Visibility.Visible;
         }
 
         private void RdoImage_Unchecked(object sender, RoutedEventArgs e)
         {
-            chkAdaptive.Visibility = Visibility.Hidden;
+            gSuboption.Visibility = Visibility.Hidden;
         }
     }
 }

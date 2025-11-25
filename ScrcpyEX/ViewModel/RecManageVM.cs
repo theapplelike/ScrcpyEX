@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -158,9 +159,10 @@ namespace ScrcpyEX.ViewModel
 
             ReplaceImg(RecInfos[_index].ImgName, recInfo.ImgName);
             RecInfos[_index].ImgName = recInfo.ImgName;
-            RecInfos[_index].CropRect = recInfo.CropRect;
+            RecInfos[_index].Similarity = recInfo.Similarity;
             RecInfos[_index].IsAdaptive = recInfo.IsAdaptive;
-            Console.WriteLine($"保存信息：{recInfo.CropRect}。");
+            RecInfos[_index].CropRect = recInfo.CropRect;
+            //Debug.WriteLine($"保存信息：{recInfo.CropRect}。");
         }
 
         /// <summary>

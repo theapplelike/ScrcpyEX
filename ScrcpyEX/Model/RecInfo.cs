@@ -53,6 +53,19 @@ namespace ScrcpyEX.Model
         public bool IsAdaptive { get; set; } = false;
 
         /// <summary>
+        /// 阈值相似度，范围限定在0~100。
+        /// </summary>
+        public double Similarity
+        {
+            get { return _similarity; }
+            set
+            {
+                _similarity = value < 0 ? 0 : (value > 100 ? 100 : value);
+            }
+        }
+        private double _similarity = 80.0;
+
+        /// <summary>
         /// 录制的坐标点信息列表。
         /// </summary>
         public List<PointInfo> Infos { get; set; } = [];

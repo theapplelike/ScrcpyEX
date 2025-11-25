@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows;
 using ScrcpyEX.MyDefinition;
+using System.Diagnostics;
 
 namespace ScrcpyEX.View
 {
@@ -17,7 +18,7 @@ namespace ScrcpyEX.View
         private void MyInit()
         {
             _vm.RecInfos = new(MyCfg.Cfg.RecInfos);
-            chkAdaptive.Visibility = Visibility.Hidden;
+            gSuboption.Visibility = Visibility.Hidden;
         }
 
         /// <summary>
@@ -108,10 +109,11 @@ namespace ScrcpyEX.View
             rdoImage.IsChecked = !recInfo.IsTime;
             txtCycleInterval.Text = recInfo.CycleInterval.ToString();
             img.Source = MyGM.GetImage(recInfo.ImgName);
+            txtSimilarity.Text = recInfo.Similarity.ToString();
             chkAdaptive.IsChecked = recInfo.IsAdaptive;
             _cropRect = recInfo.CropRect;
 
-            Console.WriteLine($"图片名：{recInfo.ImgName}，范围：{recInfo.CropRect}。");
+            Debug.WriteLine($"图片名：{recInfo.ImgName}，范围：{recInfo.CropRect}，{recInfo.Similarity}。");
         }
 
         /// <summary>
