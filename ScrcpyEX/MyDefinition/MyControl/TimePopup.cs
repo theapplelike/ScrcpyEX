@@ -37,11 +37,28 @@ namespace ScrcpyEX.MyDefinition.MyControl
         }
 
         /// <summary>
-        /// 显示Popup提示，重复执行时可以显示到最新位置。
+        /// 显示Popup提示，重复执行时可以显示到最新位置，此方法线程安全。
         /// </summary>
         /// <param name="text">要显示的文本。</param>
         /// <param name="time">Popup控件显示的时间，单位s。</param>
         public void Show(string text, int time = 3)
+        {
+            if (CheckAccess())
+            {
+                ShowPop(text, time);
+            }
+            else
+            {
+                Dispatcher.BeginInvoke(() => { ShowPop(text, time); });
+            }
+        }
+
+        /// <summary>
+        /// 显示Popup提示，重复执行时可以显示到最新位置。
+        /// </summary>
+        /// <param name="text">要显示的文本。</param>
+        /// <param name="time">Popup控件显示的时间，单位s。</param>
+        private void ShowPop(string text, int time = 3)
         {
             if (popTimer.IsEnabled)
             {
@@ -68,13 +85,13 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// </summary>
         /// <param name="text">要显示的文本。</param>
         /// <param name="time">Popup控件显示的时间，单位s。</param>
-        public void ThreadShow(string text, int time = 3)
-        {
-            Dispatcher.BeginInvoke(() =>
-            {
-                Show(text, time);
-            });
-        }
+        //public void ThreadShow(string text, int time = 3)
+        //{
+        //    Dispatcher.BeginInvoke(() =>
+        //    {
+        //        Show(text, time);
+        //    });
+        //}
 
 
     }
