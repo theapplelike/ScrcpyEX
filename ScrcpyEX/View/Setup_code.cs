@@ -20,6 +20,11 @@ namespace ScrcpyEX.View
             _vm.Cfg = MyCfg.Cfg;
         }
 
+        private void MyClose()
+        {
+            MyCfg.Save();
+        }
+
         /// <summary>
         /// 菜单状态转换，如果菜单显示，持续减少高度后隐藏；如果菜单隐藏，显示菜单后，持续增加高度到最大值。
         /// </summary>

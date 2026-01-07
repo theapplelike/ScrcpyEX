@@ -7,7 +7,7 @@
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
         mc:Ignorable="d"
         Title="功能设置" Height="450" Width="600" d:DesignHeight="1000" 
-        WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+        WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Unloaded="Window_Unloaded">
 
     <Window.DataContext>
         <ViewModel:SetupVM/>

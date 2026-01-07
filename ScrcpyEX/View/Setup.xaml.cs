@@ -31,6 +31,11 @@ namespace ScrcpyEX.View
             MyInit();
         }
 
+        private void Window_Unloaded(object sender, RoutedEventArgs e)
+        {
+            MyClose();
+        }
+
         private void BtnScrcpy_Click(object sender, RoutedEventArgs e)
         {
             MenuStateTransition(stp1);
@@ -40,5 +45,7 @@ namespace ScrcpyEX.View
         {
             MenuStateTransition(stp2);
         }
+
+        
     }
 }
