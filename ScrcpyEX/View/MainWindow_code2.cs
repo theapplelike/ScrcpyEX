@@ -157,7 +157,7 @@ namespace ScrcpyEX.View
                 CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, recInfo.CropRect);
                 if (scWindow == null)
                 {
-                    popMid.ThreadShow("获取Scrcpy脚本截图失败。");
+                    popMid.Show("获取Scrcpy脚本截图失败。");
                     return;
                 }
 
