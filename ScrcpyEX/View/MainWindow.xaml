@@ -41,8 +41,8 @@
         </Grid.RowDefinitions>
 
         <!--程序通用的鼠标提示-->
-        <mycontrol:TimePopup x:Name="pop" PopupAnimation="Fade" Placement="Mouse" StaysOpen="True" AllowsTransparency="True">
-            <Border MinHeight="10" MinWidth="10" CornerRadius="5" BorderThickness="2" BorderBrush="{StaticResource Scb2}" Background="#D5EBFB" Margin="5">
+        <mycontrol:TimePopup x:Name="pop" PopupAnimation="Fade" Placement="Mouse" StaysOpen="False" AllowsTransparency="True">
+            <Border MinHeight="10" MinWidth="10" CornerRadius="5" BorderThickness="2" BorderBrush="{StaticResource Scb2}" Background="{StaticResource Scb1}" Margin="5">
                 <TextBlock Text="提示文本" Padding="10"/>
             </Border>
         </mycontrol:TimePopup>
