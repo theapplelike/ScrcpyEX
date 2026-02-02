@@ -36,7 +36,26 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
         public KeyMapping() { }
 
-        public KeyMapping(string ch,Keys vkCode, double offsetX, double offsetY)
+        /// <summary>
+        /// 在Scrcpy中间创建一个空的键盘映射Popup。
+        /// </summary>
+        /// <param name="ScActualWidth">Scrcpy的实际宽度。</param>
+        /// <param name="ScActualHeight">Scrcpy的实际高度。</param>
+        /// <param name="popdiameter">Popup的直径。</param>
+        public KeyMapping(double ScActualWidth, double ScActualHeight, double popdiameter)
+        {
+            OffsetX = (ScActualWidth - popdiameter) / 2;
+            OffsetY = (ScActualHeight - popdiameter) / 2;
+        }
+
+        /// <summary>
+        /// 根据已有的数据创建键盘映射信息类。
+        /// </summary>
+        /// <param name="ch">映射的字符。</param>
+        /// <param name="vkCode">映射的虚拟键码(Virtual Key Code)。</param>
+        /// <param name="offsetX">Popup控件的X轴偏移。</param>
+        /// <param name="offsetY">Popup控件的Y轴偏移。</param>
+        public KeyMapping(string ch, Keys vkCode, double offsetX, double offsetY)
         {
             Char = ch;
             VkCode = vkCode;

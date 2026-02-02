@@ -2,6 +2,7 @@
 using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -182,7 +183,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                     {
                         VkCode = CharToVirtualKey(e.Text[0]);
                         _tbkChar.Text = e.Text;
-                        //Console.WriteLine($"转化为：{CharToVirtualKey(e.Text[0])}");
+                        //Console.WriteLine($"长度>=1：{CharToVirtualKey(e.Text[0])}");
                     }
                     else
                     {
@@ -194,8 +195,8 @@ namespace ScrcpyEX.MyDefinition.MyClass
                     if (Regex.IsMatch(e.Text, @"^[a-zA-Z0-9,./;\[\]']{1}$"))
                     {
                         VkCode = CharToVirtualKey(e.Text[0]);
-                        _tbkChar.Text = e.Text;
-                        Console.WriteLine($"转化为：{CharToVirtualKey(e.Text[0])}");
+                        _tbkChar.Text = e.Text.ToUpper();
+                        //Console.WriteLine($"长度<1：{CharToVirtualKey(e.Text[0])}");
                     }
                     else
                     {

@@ -24,7 +24,7 @@
 
     <Window.Resources>
         <Style x:Key="ItemBtn" TargetType="Button">
-            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Margin" Value="1"/>
             <Setter Property="Height" Value="30"/>
         </Style>
         <Style TargetType="RadioButton">
@@ -58,28 +58,28 @@
         </mycontrol:TimePopup>
 
         <!--设置位置和定位的菜单-->
-        <Popup x:Name="popMenu" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnLocate}" Tag="g1" Closed="Pop_Closed">
+        <Popup x:Name="popMenu" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnLocate}" Tag="g1" Closed="Pop_Closed">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
-                <StackPanel>
+                <StackPanel Background="White">
                     <TextBlock Text="{Binding Resolution}" Background="White" Padding="5"/>
                     <TextBlock Text="{Binding Scaling}" Background="White" Padding="5"/>
-                    <UniformGrid Rows="2" Columns="2" Background="WhiteSmoke">
-                        <RadioButton x:Name="rdoLoc1" Content="↖左上" Margin="0,10,0,5"/>
-                        <RadioButton x:Name="rdoLoc2" Content="↗右上" Margin="0,10,0,5"/>
-                        <RadioButton x:Name="rdoLoc3" Content="↙左下" Margin="0,0,0,10"/>
-                        <RadioButton x:Name="rdoLoc4" Content="↘右下" Margin="0,0,0,10"/>
+                    <UniformGrid Rows="2" Columns="2" Margin="0,3" Background="lavender">
+                        <RadioButton x:Name="rdoLoc1" Content="↖左上" Margin="0,5,0,2"/>
+                        <RadioButton x:Name="rdoLoc2" Content="↗右上" Margin="0,5,0,2"/>
+                        <RadioButton x:Name="rdoLoc3" Content="↙左下" Margin="0,2,0,5"/>
+                        <RadioButton x:Name="rdoLoc4" Content="↘右下" Margin="0,2,0,5"/>
                     </UniformGrid>
 
-                    <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并定位" BorderThickness="0,1"/>
+                    <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并定位"/>
                     <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="▣默认原始尺寸并定位"/>
 
                     <UniformGrid Rows="1" Columns="2">
                         <Button x:Name="btnRemoveBlack" Click="BtnRemoveBlack_Click" Style="{StaticResource ItemBtn}" Content="消除投屏黑边"/>
-                        <Button x:Name="btnScGotFocus"  Click="BtnScGotFocus_Click"  Style="{StaticResource ItemBtn}" Content="激活投屏输入(F1)" BorderThickness="1,0,0,1"/>
+                        <Button x:Name="btnScGotFocus"  Click="BtnScGotFocus_Click"  Style="{StaticResource ItemBtn}" Content="激活投屏输入(F1)"/>
                     </UniformGrid>
                     <UniformGrid Rows="1" Columns="2">
                         <Button x:Name="btnReduce"  Click="BtnReduce_Click"  Style="{StaticResource ItemBtn}" Content="缩小尺寸"/>
-                        <Button x:Name="btnAmplify" Click="BtnAmplify_Click" Style="{StaticResource ItemBtn}" Content="放大尺寸" BorderThickness="1,0,0,1"/>
+                        <Button x:Name="btnAmplify" Click="BtnAmplify_Click" Style="{StaticResource ItemBtn}" Content="放大尺寸"/>
                     </UniformGrid>
                     <!--<Button Style="{StaticResource ItemBtn}" Content="⌂居中"/>-->
                 </StackPanel>
@@ -87,20 +87,20 @@
         </Popup>
 
         <!--功能菜单-->
-        <Popup x:Name="popRec" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnRecManage}" Tag="g2" Closed="Pop_Closed">
+        <Popup x:Name="popRec" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnRecManage}" Tag="g2" Closed="Pop_Closed">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
-                <StackPanel>
-                    <TextBlock Text="功能菜单" Background="White" Padding="10"/>
-                    <Button x:Name="btnSet" Click="BtnSet_Click" Style="{StaticResource ItemBtn}" Content="功能设置" BorderThickness="0,0,1,1"/>
+                <StackPanel Background="White">
+                    <TextBlock Text="功能菜单" Background="AliceBlue" Padding="10"/>
+                    <Button x:Name="btnSet" Click="BtnSet_Click" Style="{StaticResource ItemBtn}" Content="功能设置"/>
 
                     <UniformGrid Rows="1" Columns="2">
                         <Button x:Name="btnScr" Click="BtnScr_Click" Style="{StaticResource ItemBtn}" Content="录制脚本"/>
-                        <Button x:Name="btnOpenWireless" Click="BtnOpenWireless_Click" Style="{StaticResource ItemBtn}" Content="开启无线调试" BorderThickness="1,0,1,1" ToolTip="将USB连接电脑的设备开启无线调试，开启可以进行无线连接，设备和电脑需要处于一个网络中。"/>
+                        <Button x:Name="btnOpenWireless" Click="BtnOpenWireless_Click" Style="{StaticResource ItemBtn}" Content="开启无线调试" ToolTip="将USB连接电脑的设备开启无线调试，开启可以进行无线连接，设备和电脑需要处于一个网络中。"/>
                     </UniformGrid>
                     
                     <UniformGrid Rows="1" Columns="3">
                         <Button x:Name="btnMappingEdit" Click="BtnMappingEdit_Click" Style="{StaticResource ItemBtn}" Content="映射编辑"/>
-                        <Button x:Name="btnMappingBack" Click="BtnMappingBack_Click" Style="{StaticResource ItemBtn}" Content="取消修改" IsEnabled="False" BorderThickness="1,0,1,1"/>
+                        <Button x:Name="btnMappingBack" Click="BtnMappingBack_Click" Style="{StaticResource ItemBtn}" Content="取消修改" IsEnabled="False"/>
                         <Button x:Name="btnMappingAdd"  Click="BtnMappingAdd_Click"  Style="{StaticResource ItemBtn}" Content="添加映射" IsEnabled="False"/>
                     </UniformGrid>
                 </StackPanel>

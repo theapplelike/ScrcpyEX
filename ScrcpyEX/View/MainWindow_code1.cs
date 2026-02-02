@@ -250,7 +250,7 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 在窗体中创建一个可以移动的Popup，Popup为圆形，直径默认为50，会根据比例放大缩小。
+        /// 在窗体中创建一个可以移动的圆形Popup，作为键盘映射，此控件宽高与DPI相关。
         /// 有黑边时会导致Popup的位置有偏移。
         /// </summary>
         /// <param name="mapping">按键映射类。</param>
@@ -259,16 +259,13 @@ namespace ScrcpyEX.View
         /// <returns>MyDragMove对象，其中封装了Popup的所有事件方法。</returns>
         private MyDragMove CreatePop(KeyMapping mapping, bool popIsEdit, bool popIsVisible = true)
         {
-            double radius = 50 * ScRatioX;
-
             Popup pop = new()
             {
                 Placement = PlacementMode.Relative,
                 PlacementTarget = gShow,//这里需要指明父级
-                //PlacementTarget = gMain,//这里需要指明父级
                 AllowsTransparency = true,
-                Height = radius,
-                Width = radius,
+                Height = PopupDiameter,
+                Width = PopupDiameter,
                 IsOpen = popIsVisible,
                 HorizontalOffset = mapping.OffsetX * ScRatioX,
                 VerticalOffset = mapping.OffsetY * ScRatioY,
@@ -281,7 +278,7 @@ namespace ScrcpyEX.View
                 Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
                 BorderBrush = Brushes.Black,
                 BorderThickness = new(1),
-                CornerRadius = new(radius),
+                CornerRadius = new(PopupDiameter),
                 Name = "border",
             };
 
@@ -401,7 +398,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void MappingAdd()
         {
-            MV.DragMoves.Add(CreatePop(new KeyMapping(), true));
+            MV.DragMoves.Add(CreatePop(new KeyMapping(ScActualWidth, ScActualHeight, PopupDiameter), true));
         }
 
         /// <summary>
@@ -490,7 +487,7 @@ namespace ScrcpyEX.View
                 //{
                 //    PressMouse();
                 //}
-
+                
                 DoKeyMapping(vkCode, ScRatioX, ScHandle);
             }
         }
@@ -529,17 +526,22 @@ namespace ScrcpyEX.View
         /// <param name="scHandle">Scrcpy的句柄。</param>
         private void DoKeyMapping(Keys vkCode, double ratio, IntPtr scHandle)
         {
-            //让字符只剩字母或数字
-            //if (Regex.IsMatch(key, @"[0-9]"))
-            //{
-            //    key = Regex.Replace(key, @"[A-Za-z]", "");
-            //}
-
             List<KeyMapping> mappings = MyCfg.Cfg.KeyMappings.Where(a => a.VkCode == vkCode).ToList();
+
+            if (mappings.Count <= 0)
+            {
+                return;
+            }
+            else
+            {
+                if (popMenu.IsOpen) { popMenu.IsOpen = false; }
+                if (popRec.IsOpen) { popRec.IsOpen = false; }
+            }
+
             foreach (KeyMapping m in mappings)
             {
                 //根据现在的比例计算半径
-                double radius = 50 * ratio * DpiScaleX / 2;
+                double radius = PopupDiameter * DpiScaleX / 2;
                 
                 //获得圆心坐标
                 int centreX = (int)(m.OffsetX * ratio * DpiScaleX + radius);

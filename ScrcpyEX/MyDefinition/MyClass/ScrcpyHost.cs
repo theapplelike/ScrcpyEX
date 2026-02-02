@@ -88,7 +88,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                         return;
                     }
                     //Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}，程序是否被关闭：{_prc.HasExited}。");
-                    Console.WriteLine($">>>>>>>>>>>>>>{i++}:程序是否被关闭：{_prc.HasExited}。");
+                    Debug.WriteLine($">>>>>>>>>>>>>>{i++}:程序是否被关闭：{_prc.HasExited}。");
                 }
                 while (!_prc.HasExited && i < 30);
                 //MessageBox.Show("未能成功启动程序，请重试。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -200,16 +200,20 @@ namespace ScrcpyEX.MyDefinition.MyClass
             {
                 return;
             }
-            Console.WriteLine($"[E]{e.Data}");
+            Debug.WriteLine($"[E]{e.Data}");
         
             if (e.Data.Contains("A popup should open on the device to request authorization."))
             {
                 MV.MainWin.popMid.Show("请在设备上同意授权后再试。");
             }
+            else if (e.Data.Contains("INSTALL_FAILED_NO_MATCHING_ABIS: Failed to extract native libraries, res=-113"))
+            {
+                MV.MainWin.popMid.Show("安装的APK文件与设备CPU架构不匹配。");
+            }
         }
 
         /// <summary>
-        /// 读取输出流。
+        /// 读取输出信息流。
         /// </summary>
         private void Prc_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
@@ -217,7 +221,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             {
                 return;
             }
-            Console.WriteLine($"[I]{e.Data}");
+            Debug.WriteLine($"[I]{e.Data}");
         
             //获得当前分辨率，第一个参数是宽，第二个参数是高
             if (e.Data.Contains("Texture"))

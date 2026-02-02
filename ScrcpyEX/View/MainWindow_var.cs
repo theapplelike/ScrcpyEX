@@ -216,5 +216,9 @@ namespace ScrcpyEX.View
         /// </summary>
         public IntPtr ScHandle => _scrcpyHost?.ScHandle ?? IntPtr.Zero;
 
+        /// <summary>
+        /// 圆形Popup的直径。
+        /// </summary>
+        private double PopupDiameter => 50 * ScRatioX;
     }
 }
