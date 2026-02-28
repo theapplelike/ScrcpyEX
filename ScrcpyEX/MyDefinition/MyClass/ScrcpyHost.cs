@@ -127,8 +127,8 @@ namespace ScrcpyEX.MyDefinition.MyClass
             {
                 sb.Append($"--tcpip={ip}:{port}");
             }
-        
-            //Console.WriteLine($"命令行：{sb}。");
+
+            Debug.WriteLine($"命令行：{sb}。");
             return sb.ToString();
         }
 
@@ -188,7 +188,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 KeyboardHook.CancelHook();
             }
         
-            Console.WriteLine($"Process的Exieted事件执行结束。");
+            Debug.WriteLine($"Process的Exieted事件执行结束。");
         }
 
         /// <summary>
@@ -301,12 +301,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 {
                     _prc.Kill();        //Kill()执行后，会调用Exited事件，前提是EnableRaisingEvents属性要设置为true。
                     _prc.WaitForExit(); //Kill()执行后要一直等待，防止Exited事件未执行完就执行Dispose()
-                    Console.WriteLine("Scrcpy未关闭，程序执行关闭操作。");
+                    Debug.WriteLine("ScrcpyHost：Scrcpy未关闭，程序执行关闭操作。");
                 }
 
                 _prc.Dispose();
                 DLL.DestroyWindow(hwnd.Handle);
-                Console.WriteLine("Scrcpy已清理完毕，退出整个程序。");
+                Debug.WriteLine("ScrcpyHost：Scrcpy已清理完毕，退出整个程序。");
             }
 
             /// <summary>

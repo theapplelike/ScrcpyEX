@@ -480,7 +480,8 @@ namespace ScrcpyEX.View
         /// <param name="vkCode">捕获的虚拟键码。</param>
         public void KeyboardMapping(Keys vkCode)
         {
-            //Console.WriteLine($"窗口是否活动：{IsActive}，是否有焦点：{IsFocused}");
+            //Debug.WriteLine($"窗口是否活动：{IsActive}，是否有焦点：{IsFocused}");
+            //Debug.WriteLine($"主句柄：{DLL.GetForegroundWindow() == _mainHandle}，子句柄：{DLL.GetForegroundWindow() == ScHandle}");
             if (IsActive && ScHandle != IntPtr.Zero)
             {
                 //if (key =="Q")//按下Q使用鼠标控制方向
@@ -575,6 +576,8 @@ namespace ScrcpyEX.View
         private void ScGotFocus(object parameter)
         {
             DLL.SetFocus(ScHandle);
+            //bool a = DLL.SetForegroundWindow(ScHandle);
+            Debug.WriteLine($"让Scrcpy获得焦点");
         }
 
 

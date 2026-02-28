@@ -122,7 +122,7 @@
             <Button x:Name="btnRecOption" Click="BtnRecOption_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="22" ToolTip="功能菜单"/>
             <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
 
-            <Button x:Name="btnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
+            <Button x:Name="btnTest" Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
 
             <Button x:Name="btnClosePrg" Click="BtnClosePrg_Click" Style="{StaticResource MenuBtn}" Content="&#xe711;" DockPanel.Dock="Right" Margin="0"/>
             <Button x:Name="btnMaximize" Click="BtnMaximize_Click" Style="{StaticResource MenuBtn}" Content="&#xe922;" DockPanel.Dock="Right"/>

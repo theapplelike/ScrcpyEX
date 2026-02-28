@@ -236,7 +236,7 @@ namespace ScrcpyEX.View
             string output = adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
             string Error = adbPrc.StandardError.ReadToEnd();
             await Task.Delay(1);
-            Console.WriteLine($"输出：{output}。  错误：{Error}。{adbPrc.HasExited}。");
+            Console.WriteLine($"输出：{output}。错误：{Error}。{adbPrc.HasExited}。");
         }
     }
 }

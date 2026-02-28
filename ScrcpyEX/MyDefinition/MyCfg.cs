@@ -122,6 +122,12 @@ namespace ScrcpyEX.ExtensionMethod
         [CommandLine("--power-off-on-close")]
         public bool DeviceSleep { get; set; }
 
+        /// <summary>
+        /// Scrcpy运行时禁用屏幕保护。
+        /// </summary>
+        [CommandLine("--disable-screensaver")]
+        public bool Disablecreensaver { get; set; }
+
 
     }
 }
