@@ -70,7 +70,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         {
             HookDLL.UnhookWindowsHookEx(HookID);
             HookID = IntPtr.Zero;
-            //Console.WriteLine($"注销钩子句柄：{HookID}。");
+            //Debug.WriteLine($"注销钩子句柄：{HookID}。");
         }
 
 

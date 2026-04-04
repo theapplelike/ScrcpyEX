@@ -69,12 +69,12 @@ namespace ScrcpyEX.View
                 if (DLL.GetForegroundWindow() == _mainHandle)
                 {
                     ShowKeyMapping();
-                    Debug.WriteLine($"窗口是Z轴最顶端窗口，yes。");
+                    Debug.WriteLine($"窗口是Z轴最顶端窗口，top yes。");
                 }
                 else
                 {
                     WindowState = WindowState.Minimized;
-                    Debug.WriteLine($"窗口不是Z轴最顶端窗口。");
+                    Debug.WriteLine($"窗口非Z轴最顶端窗口，top no。");
                 }
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }

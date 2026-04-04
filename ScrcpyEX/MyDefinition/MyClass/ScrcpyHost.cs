@@ -79,19 +79,23 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 _prc.BeginOutputReadLine();
                 _prc.BeginErrorReadLine();
                 int i = 0;
-        
+                
                 do
                 {
-                    await Task.Delay(500);
-                    if (FindScrcpyHandle())
+                    await Task.Delay(250);
+
+                    if (_prc.MainWindowHandle != IntPtr.Zero)
                     {
+                        ScHandle = _prc.MainWindowHandle;
                         return;
                     }
-                    //Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}，程序是否被关闭：{_prc.HasExited}。");
-                    Debug.WriteLine($">>>>>>>>>>>>>>{i++}:程序是否被关闭：{_prc.HasExited}。");
+                    //if (FindScrcpyHandle())
+                    //{
+                    //    return;
+                    //}
+                    Debug.WriteLine($">>>>>>>>>>>>>>{++i}：句柄：{_prc.MainWindowHandle}。");
                 }
                 while (!_prc.HasExited && i < 30);
-                //MessageBox.Show("未能成功启动程序，请重试。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -128,7 +132,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 sb.Append($"--tcpip={ip}:{port}");
             }
 
-            Debug.WriteLine($"命令行：{sb}。");
+            Debug.WriteLine($"ScrcpyHost命令行：{sb}。");
             return sb.ToString();
         }
 
@@ -148,21 +152,21 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private bool ConvToBool(object val) => val is bool result && result;
 
         /// <summary>
-        /// 查找scrcpy的句柄。
+        /// 查找Scrcpy的句柄。
         /// </summary>
-        /// <returns>scrcpy的句柄，未找到返回IntPtr.Zero。</returns>
-        private bool FindScrcpyHandle()
-        {
-            // 查询指定名称的进程（无需包含.exe扩展名）
-            Process[] processes = Process.GetProcessesByName("scrcpy");
-            //Console.WriteLine($"进程的数量：{processes.Length}。");
-            if (processes.Length > 0 && processes[0].MainWindowHandle != IntPtr.Zero)
-            {
-                ScHandle = processes[0].MainWindowHandle;
-                return true;
-            }
-            return false;
-        }
+        /// <returns>Scrcpy的句柄，未找到返回IntPtr.Zero。</returns>
+        //private bool FindScrcpyHandle()
+        //{
+        //    // 查询指定名称的进程（无需包含.exe扩展名）
+        //    Process[] processes = Process.GetProcessesByName("scrcpy");
+        //    //Console.WriteLine($"进程的数量：{processes.Length}。");
+        //    if (processes.Length > 0 && processes[0].MainWindowHandle != IntPtr.Zero)
+        //    {
+        //        ScHandle = processes[0].MainWindowHandle;
+        //        return true;
+        //    }
+        //    return false;
+        //}
 
         /// <summary>
         /// 设置第三方程序的退出、信息读取事件。
@@ -180,15 +184,17 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         private void Prc_Exited(object sender, EventArgs e)
         {
+            _prc.Exited -= Prc_Exited;
             _prc.CancelOutputRead();
             _prc.CancelErrorRead();
             ScHandle = IntPtr.Zero;
+
             if (KeyboardHook.HookID != IntPtr.Zero)
             {
                 KeyboardHook.CancelHook();
             }
-        
-            Debug.WriteLine($"Process的Exieted事件执行结束。");
+
+            Debug.WriteLine($"ScrcpyHost：Process的Exieted事件执行结束。");
         }
 
         /// <summary>
@@ -247,10 +253,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         public void DisposeScrcpy()
         {
-            _prc.Kill();
+            _prc.CloseMainWindow();
             _prc.WaitForExit();
             _prc.Dispose();
-            DLL.DestroyWindow(ScHandle);
         }
 
         /// <summary>
@@ -296,17 +301,16 @@ namespace ScrcpyEX.MyDefinition.MyClass
             /// <param name="hwnd">包含窗口句柄的结构。</param>
             protected override void DestroyWindowCore(HandleRef hwnd)
             {
-                //Console.WriteLine($"执行资源清理：{hwnd}，句柄：{_scHandle}");
+                //Debug.WriteLine($"执行资源清理：{hwnd}，Scrcpy句柄：{_scHandle}");
                 if (_scHandle != IntPtr.Zero)
                 {
-                    _prc.Kill();        //Kill()执行后，会调用Exited事件，前提是EnableRaisingEvents属性要设置为true。
-                    _prc.WaitForExit(); //Kill()执行后要一直等待，防止Exited事件未执行完就执行Dispose()
-                    Debug.WriteLine("ScrcpyHost：Scrcpy未关闭，程序执行关闭操作。");
+                    _prc.CloseMainWindow(); //进程退出后会调用Exited事件，前提是EnableRaisingEvents属性要设置为true
+                    _prc.WaitForExit();     //进程退出后要一直等待，防止Exited事件未执行完就执行Dispose()
+                    Debug.WriteLine("InternalHwndHost：Scrcpy未关闭，程序执行关闭操作。");
                 }
 
                 _prc.Dispose();
-                DLL.DestroyWindow(hwnd.Handle);
-                Debug.WriteLine("ScrcpyHost：Scrcpy已清理完毕，退出整个程序。");
+                Debug.WriteLine("InternalHwndHost：Scrcpy已清理完毕，退出整个程序。");
             }
 
             /// <summary>
@@ -322,7 +326,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                     return;
                 }
                 
-                Debug.WriteLine("ScrcpyHost：Scrcpy尺寸修改");
+                Debug.WriteLine("InternalHwndHost：Scrcpy尺寸修改");
                 _lastRect = rcBoundingBox;
                 DLL.MoveWindow(_scHandle, 0, 0, (int)rcBoundingBox.Width, (int)rcBoundingBox.Height, true);
                 base.OnWindowPositionChanged(rcBoundingBox);

@@ -113,9 +113,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
             }
 
             //double radius = 50 * MV.MainWin.ScRatioX / 2;
-            double radius = 50 / 2;//根据现在的比例计算半径，还需要乘以Scrcpy当前宽度和默认宽度的比值，这里默认这个比值为1，这个值仅用于输出调试内容，所以没有传入
-            Console.WriteLine($"popup中心点：（{_pop.HorizontalOffset + radius}，{_pop.VerticalOffset + radius}），左上角：（{_pop.HorizontalOffset}，{_pop.VerticalOffset}）。");
-            Console.WriteLine($"记录的最后鼠标坐标：（{_lastPoint.X},{_lastPoint.Y}）,{_isDragging}.");
+            //double radius = 50 / 2;//根据现在的比例计算半径，还需要乘以Scrcpy当前宽度和默认宽度的比值，这里默认这个比值为1，这个值仅用于输出调试内容，所以没有传入
+            //Debug.WriteLine($"popup中心点：（{_pop.HorizontalOffset + radius}，{_pop.VerticalOffset + radius}），左上角：（{_pop.HorizontalOffset}，{_pop.VerticalOffset}）。");
+            //Debug.WriteLine($"记录的最后鼠标坐标：（{_lastPoint.X},{_lastPoint.Y}）,{_isDragging}.");
         }
         
         /// <summary>

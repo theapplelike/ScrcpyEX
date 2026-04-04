@@ -322,7 +322,7 @@ namespace ScrcpyEX.View
                 _scrcpyHost.DisposeScrcpy();
                 bdShow.Child = null;
                 StopScriptAndRecord();
-                Debug.WriteLine($"中途结束Scrcpy程序。");
+                Debug.WriteLine($"用户结束Scrcpy程序。");
             }
         }
 
