@@ -207,7 +207,7 @@ namespace ScrcpyEX.View
         public double ScActualHeight => ActualHeight - ExtraHeight;
 
         /// <summary>
-        /// Scrcpy是否处于关闭状态，true--已关闭；false--已启动。
+        /// Scrcpy是否处于关闭状态，true--关闭状态；false--启动状态。
         /// </summary>
         private bool IsClosed => _scrcpyHost == null || _scrcpyHost.ScHandle == IntPtr.Zero;
 

@@ -1,5 +1,6 @@
 ﻿using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.ExtensionMethod.MyAttribute;
+using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,22 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private InternalHwndHost _hwndHost;
 
         /// <summary>
-        /// scrcpy的句柄，为IntPtr.Zero时代表scrcpy没有启动。
+        /// 是否使用有线形式启动。
+        /// </summary>
+        private bool _isWired;
+
+        /// <summary>
+        /// 有线形式启动时的IP地址。
+        /// </summary>
+        private string _ip;
+
+        /// <summary>
+        /// 有线形式启动启动时的端口号。
+        /// </summary>
+        private string _port;
+
+        /// <summary>
+        /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。
         /// </summary>
         public IntPtr ScHandle { get; set; } = IntPtr.Zero;
 
@@ -42,10 +58,16 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// 异步启动Scrcpy。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
+        /// <param name="ip">有线形式启动时的IP地址。</param>
+        /// <param name="port">有线形式启动启动时的端口号。</param>
         /// <returns>承载Scrcpy的HwndHost。</returns>
         public async Task<HwndHost> StartScrcpyAsync(bool isWired, string ip, string port)
         {
-            await StartScrcpy(isWired, ip, port);
+            _isWired = isWired;
+            _ip = ip;
+            _port = port;
+
+            await StartScrcpy();
             if (ScHandle == IntPtr.Zero)
             {
                 MV.MainWin.popMid.Show("Scrcpy启动失败。");
@@ -59,12 +81,11 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <summary>
         /// 启动Scrcpy并以指定方式连接手机。
         /// </summary>
-        /// <param name="isWired">是否使用有线形式启动。</param>
-        private async Task StartScrcpy(bool isWired, string ip, string port)
+        private async Task StartScrcpy()
         {
             ProcessStartInfo info = new(MV.ScrcpyPath)
             {
-                Arguments = GetCommandLine(isWired, ip, port),
+                Arguments = GetCommandLine(),
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -79,57 +100,73 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 _prc.BeginOutputReadLine();
                 _prc.BeginErrorReadLine();
                 int i = 0;
-                
+
                 do
                 {
                     await Task.Delay(250);
 
-                    if (_prc.MainWindowHandle != IntPtr.Zero)
+                    try
                     {
-                        ScHandle = _prc.MainWindowHandle;
-                        return;
+                        if (_prc.MainWindowHandle != IntPtr.Zero)
+                        {
+                            ScHandle = _prc.MainWindowHandle;
+                            return;
+                        }
+                        //if (FindScrcpyHandle())
+                        //{
+                        //    return;
+                        //}
+                        Debug.WriteLine($">>>>>>>>>>>>>>{++i}：尝试启动Scrcpy。");
                     }
-                    //if (FindScrcpyHandle())
-                    //{
-                    //    return;
-                    //}
-                    Debug.WriteLine($">>>>>>>>>>>>>>{++i}：句柄：{_prc.MainWindowHandle}。");
+                    catch(InvalidOperationException)
+                    {
+                        Debug.WriteLine($"第{i}次时启动失败，进程已退出。");
+                        break;
+                    }
                 }
-                while (!_prc.HasExited && i < 30);
+                while (!_prc.HasExited && i < 60);
             }
         }
 
         /// <summary>
         /// 获得Scrcpy启动时附带的命令行参数。
         /// </summary>
-        /// <param name="isWired">是否使用有线形式启动。</param>
-        private string GetCommandLine(bool isWired, string ip, string port)
+        private string GetCommandLine()
         {
             StringBuilder sb = new();
         
             //根据用户设置获得的命令行参数
-            foreach (PropertyInfo prop in typeof(MyCfg).GetProperties())
+            //foreach (PropertyInfo prop in typeof(MyCfg).GetProperties())
+            //{
+            //    string str = GetArg(prop.Name);
+            //    if (str != null && ConvToBool(prop.GetValue(MyCfg.Cfg)))
+            //    {
+            //        sb.Append($"{str} ");
+            //    }
+            //    Debug.WriteLine($"属性{prop.Name}：{prop.GetValue(MyCfg.Cfg)}，{GetArg(prop.Name)}。");
+            //}
+            foreach (PropertyInfo prop in typeof(ScrcpySet).GetProperties())
             {
-                string str = GetArg(prop.Name);
-                if (str != null && ConvToBool(prop.GetValue(MyCfg.Cfg)))
+                string arg = prop.GetCustomAttribute<CommandLineAttribute>().Arguments;
+                if (arg != null && ConvToBool(prop.GetValue(MyCfg.Cfg.ScrcpySet)))
                 {
-                    sb.Append($"{str} ");
+                    sb.Append($"{arg} ");
                 }
-                //Console.WriteLine($"属性{prop.Name}：{prop.GetValue(MyCfg.Cfg)}，{GetArg(prop.Name)}。");
+                Debug.WriteLine($"属性{prop.Name}：{prop.GetValue(MyCfg.Cfg.ScrcpySet)}，{arg}。");
             }
-        
+
             //键盘使用UHID可以输入中文，对安卓输入中文时电脑输入法必须为英文
             //_scName = $"{DateTime.Now:HHmmss}mook";
             //sb.Append($"--keyboard=uhid --window-title={_scName} ");
             sb.Append($"--keyboard=uhid ");
         
-            if (isWired)
+            if (_isWired)
             {
                 sb.Append("--select-usb");
             }
             else
             {
-                sb.Append($"--tcpip={ip}:{port}");
+                sb.Append($"--tcpip={_ip}:{_port}");
             }
 
             Debug.WriteLine($"ScrcpyHost命令行：{sb}。");
@@ -137,14 +174,14 @@ namespace ScrcpyEX.MyDefinition.MyClass
         }
 
         /// <summary>
-        /// 获得指定属性（Property）的特性（Attribute），如果没有特性（Attribute）则返回null。
+        /// 获得自定义命令行特性。属性（Property）的特性（Attribute），如果没有特性（Attribute）则返回null。
         /// </summary>
-        /// <param name="Prop">属性（Property）的名称。</param>
-        private string GetArg(string Prop)
-        {
-            var info = typeof(MyCfg).GetProperty(Prop).GetCustomAttribute<CommandLineAttribute>();
-            return info?.Arguments ?? null;
-        }
+        /// <param name="prop">属性（Property）的名称。</param>
+        //private string GetArg(string prop)
+        //{
+        //    var info = typeof(ScrcpySet).GetProperty(prop).GetCustomAttribute<CommandLineAttribute>();
+        //    return info?.Arguments ?? null;
+        //}
 
         /// <summary>
         /// 判断传入的对象是否可以转化为bool，不能返回false，如果可以返回其bool值。
@@ -158,7 +195,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         //private bool FindScrcpyHandle()
         //{
         //    // 查询指定名称的进程（无需包含.exe扩展名）
-        //    Process[] processes = Process.GetProcessesByName("scrcpy");
+        //    Process[] processes = Process.GetProcessesByName("Scrcpy");
         //    //Console.WriteLine($"进程的数量：{processes.Length}。");
         //    if (processes.Length > 0 && processes[0].MainWindowHandle != IntPtr.Zero)
         //    {
@@ -193,7 +230,6 @@ namespace ScrcpyEX.MyDefinition.MyClass
             {
                 KeyboardHook.CancelHook();
             }
-
             Debug.WriteLine($"ScrcpyHost：Process的Exieted事件执行结束。");
         }
 
@@ -269,7 +305,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             private readonly Process _prc = prc;
 
             /// <summary>
-            /// scrcpy的句柄，为IntPtr.Zero时代表scrcpy没有启动。
+            /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。
             /// </summary>
             private readonly IntPtr _scHandle = scHandle;
 
@@ -283,7 +319,6 @@ namespace ScrcpyEX.MyDefinition.MyClass
             /// </summary>
             /// <param name="hwndParent">父窗口的窗口句柄。</param>
             /// <returns>要创建的子 Win32 窗口的句柄。</returns>
-            /// <exception cref="InvalidOperationException">Scrcpy没有启动。</exception>
             protected override HandleRef BuildWindowCore(HandleRef hwndParent)
             {
                 // 修改窗口样式
@@ -319,17 +354,17 @@ namespace ScrcpyEX.MyDefinition.MyClass
             /// <param name="rcBoundingBox">窗口的大小位置。</param>
             protected override void OnWindowPositionChanged(Rect rcBoundingBox)
             {
-                //Console.WriteLine($"新旧Rect是否一致：{rcBoundingBox == _lastRect}");
                 if (rcBoundingBox == _lastRect)
                 {
                     //Console.WriteLine("Scrcpy尺寸未变");
                     return;
                 }
                 
-                Debug.WriteLine("InternalHwndHost：Scrcpy尺寸修改");
                 _lastRect = rcBoundingBox;
                 DLL.MoveWindow(_scHandle, 0, 0, (int)rcBoundingBox.Width, (int)rcBoundingBox.Height, true);
                 base.OnWindowPositionChanged(rcBoundingBox);
+
+                Debug.WriteLine("InternalHwndHost：Scrcpy尺寸修改");
             }
 
             /// <summary>
