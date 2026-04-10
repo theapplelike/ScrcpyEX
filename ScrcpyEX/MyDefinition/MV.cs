@@ -57,14 +57,9 @@ namespace ScrcpyEX.ExtensionMethod
         public static TimePopup Pop { get; set; }
 
         /// <summary>
-        /// 编辑键盘映射时使用的临时Popup列表。
-        /// </summary>
-        //public static List<Popup> TempPopups { get; set; } = [];
-
-        /// <summary>
         /// 按键映射Popup列表。
         /// </summary>
-        public static List<MyDragMove> DragMoves { get; set; } = [];
+        public static List<DragPopup> DragPopups { get; set; } = [];
 
 
     }

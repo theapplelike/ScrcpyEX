@@ -47,7 +47,7 @@ namespace ScrcpyEX.MyDefinition
         /// <param name="nWidth">窗口的新宽度。</param>
         /// <param name="nHeight">窗口的新高度。</param>
         /// <param name="repaint">指示是否重新绘制窗口。如果此参数为TRUE，则窗口将收到消息。如果参数为FALSE，则不会进行任何类型的重新绘制。这适用于工作区、非工作区 (包括标题栏和滚动条) ，以及由于移动子窗口而发现父窗口的任何部分。</param>
-        /// <returns>如果该函数成功，则返回值为非零值。如果函数失败，则返回值为零。 要获得更多的错误信息，请调用 GetLastError。</returns>
+        /// <returns>如果该函数成功，则返回值为非零值。如果函数失败，则返回值为零。要获得更多的错误信息，请调用 GetLastError。</returns>
         [DllImport("user32.dll", SetLastError = true)]
         public static extern bool MoveWindow(IntPtr hwnd, int x, int y, int nWidth, int nHeight, bool repaint);
 
@@ -132,7 +132,7 @@ namespace ScrcpyEX.MyDefinition
         /// </summary>
         /// <param name="hwnd">要复制的窗口的句柄。</param>
         /// <param name="hdcBlt">设备上下文的句柄。</param>
-        /// <param name="nFlags">绘图选项。0x1，捕获窗口的客户区，即窗口内部内容，排除标题栏、边框等非客户区。0x2，捕获窗口的完整内容，包括非客户区（标题栏、边框等）</param>
+        /// <param name="nFlags">绘图选项。0x1，捕获窗口的客户区，即窗口内部内容，排除标题栏、边框等非客户区。0x2，捕获窗口的完整内容，包括非客户区（标题栏、边框等）。</param>
         /// <returns>true--函数成功；false--函数失败。</returns>
         [DllImport("user32.dll")]
         public static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
@@ -183,7 +183,7 @@ namespace ScrcpyEX.MyDefinition
         /// 将字符转换为其对应的虚拟键码和Shift状态。
         /// </summary>
         /// <param name="ch">要转换的字符。</param>
-        /// <returns>低字节(0-7位): 虚拟键码；高字节(8-15位): Shift状态标志位。在当前键盘布局下没有对应的虚拟键码时返回-1。</returns>
+        /// <returns>低字节(0-7位)：虚拟键码；高字节(8-15位)：Shift状态标志位。在当前键盘布局下没有对应的虚拟键码时返回-1。</returns>
         [DllImport("user32.dll")]
         public static extern short VkKeyScan(char ch);
 

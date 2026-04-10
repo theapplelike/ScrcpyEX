@@ -29,11 +29,6 @@ namespace ScrcpyEX.View
         private readonly MainWindowVM _vm;
 
         /// <summary>
-        /// scrcpy窗口的名称。
-        /// </summary>
-        //private string _scName;
-
-        /// <summary>
         /// 主程序的句柄。
         /// </summary>
         private IntPtr _mainHandle;
@@ -99,7 +94,7 @@ namespace ScrcpyEX.View
         private readonly Timer _testTimer = new();
 
         /// <summary>
-        /// scrcpy的默认初始宽高（在100%缩放下），使用比例为15：7。
+        /// Scrcpy的默认初始宽高（在100%缩放下），使用比例为15：7。
         /// </summary>
         private readonly int _scWidth = 960, _scHeight = 448;
 
@@ -129,9 +124,9 @@ namespace ScrcpyEX.View
         //private bool _isPressMouse = false;
 
         /// <summary>
-        /// 窗口除开scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
+        /// 窗口除开Scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
-        private double ExtraWidth //=> Dispatcher.Invoke(() => { return gShow.Margin.Left + gShow.Margin.Right; });
+        private double ExtraWidth
         {
             get
             {
@@ -147,9 +142,9 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 窗口除开scrcpy的额外高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
+        /// 窗口除开Scrcpy的额外高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
-        private double ExtraHeight //=> dpl.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom;
+        private double ExtraHeight
         {
             get
             {
@@ -165,22 +160,22 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 窗口除开scrcpy的额外左侧宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
+        /// 窗口除开Scrcpy的额外左侧宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
-        public double ExtraWidthLeft => gShow.Margin.Left;
+        private double ExtraWidthLeft => gShow.Margin.Left;
 
         /// <summary>
-        /// 窗口除开scrcpy的额外上方高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
+        /// 窗口除开Scrcpy的额外上方高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
-        public double ExtraHeightTop => dpl.ActualHeight + gShow.Margin.Top;
+        private double ExtraHeightTop => dpl.ActualHeight + gShow.Margin.Top;
 
         /// <summary>
-        /// X轴上的DPI比例。
+        /// 屏幕X轴上的DPI比例。
         /// </summary>
         public double DpiScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;
 
         /// <summary>
-        /// Y轴上的DPI比例。
+        /// 屏幕Y轴上的DPI比例。
         /// </summary>
         public double DpiScaleY => VisualTreeHelper.GetDpi(this).DpiScaleY;
 
@@ -217,7 +212,7 @@ namespace ScrcpyEX.View
         public IntPtr ScHandle => _scrcpyHost?.ScHandle ?? IntPtr.Zero;
 
         /// <summary>
-        /// 圆形Popup的直径。
+        /// 圆形DragPopup的直径。
         /// </summary>
         private double PopupDiameter => 50 * ScRatioX;
     }

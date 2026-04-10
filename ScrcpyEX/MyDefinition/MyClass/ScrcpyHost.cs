@@ -112,7 +112,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                             ScHandle = _prc.MainWindowHandle;
                             return;
                         }
-                        //if (FindScrcpyHandle())
+                        //if (FindScrcpyHandle())//26.4.10
                         //{
                         //    return;
                         //}
@@ -135,7 +135,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         {
             StringBuilder sb = new();
         
-            //根据用户设置获得的命令行参数
+            //根据用户设置获得的命令行参数26.4.10
             //foreach (PropertyInfo prop in typeof(MyCfg).GetProperties())
             //{
             //    string str = GetArg(prop.Name);
@@ -177,7 +177,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// 获得自定义命令行特性。属性（Property）的特性（Attribute），如果没有特性（Attribute）则返回null。
         /// </summary>
         /// <param name="prop">属性（Property）的名称。</param>
-        //private string GetArg(string prop)
+        //private string GetArg(string prop)//26.4.10
         //{
         //    var info = typeof(ScrcpySet).GetProperty(prop).GetCustomAttribute<CommandLineAttribute>();
         //    return info?.Arguments ?? null;
@@ -192,7 +192,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// 查找Scrcpy的句柄。
         /// </summary>
         /// <returns>Scrcpy的句柄，未找到返回IntPtr.Zero。</returns>
-        //private bool FindScrcpyHandle()
+        //private bool FindScrcpyHandle()//26.4.10
         //{
         //    // 查询指定名称的进程（无需包含.exe扩展名）
         //    Process[] processes = Process.GetProcessesByName("Scrcpy");

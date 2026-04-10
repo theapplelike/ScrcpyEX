@@ -110,7 +110,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
             if (point is Point pt)
             {
                 infos.Add(new PointInfo(pt, 1.5));
-                Console.WriteLine($"添加点：{pt.X},{pt.Y}。");
+                Debug.WriteLine($"添加点：{pt.X},{pt.Y}。");
             }
         }
 
@@ -144,7 +144,8 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         {
             if (infos.Count > 0)
             {
-                MyCfg.Cfg.RecInfos.Add(new RecInfo() { Infos = new List<PointInfo>(infos) });
+                //MyCfg.Cfg.RecInfos.Add(new RecInfo() { Infos = new List<PointInfo>(infos) });//26.4.10
+                MyCfg.Cfg.RecInfos.Add(new RecInfo(infos));
                 infos.Clear();
             }
         }

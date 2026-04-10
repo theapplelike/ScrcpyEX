@@ -211,7 +211,7 @@ namespace ScrcpyEX.View
 
         /// <summary>
         /// 执行点击脚本，PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
-        /// 点击的实际位置会根据实际大小和scrcpy的初始大小的比值进行调整，但有黑边时仍会偏移。
+        /// 点击的实际位置会根据实际大小和Scrcpy的初始大小的比值进行调整，但有黑边时仍会偏移。
         /// </summary>
         /// <param name="recInfo">当前要执行的脚本。</param>
         private async Task ExecuteClickScript(RecInfo recInfo, IntPtr scHandle)

@@ -91,7 +91,7 @@ namespace ScrcpyEX.View
 
         /// <summary>
         /// 如果不使用上一次的尺寸位置，则设置为默认初始大小，
-        /// 宽=scrcpy宽+左右边距，高=scrcpy高+上下边距+标题栏高。
+        /// 宽=Scrcpy宽+左右边距，高=Scrcpy高+上下边距+标题栏高。
         /// </summary>
         /// <param name="isUseLastSize">是否使用上一次的大小和位置。</param>
         private void SetUISize(bool isUseLastSize = false)
@@ -191,16 +191,16 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 检查scrcpy是否已经运行，如果运行则停止。
+        /// 检查Scrcpy是否已经运行，如果运行则停止。
         /// </summary>
         private void CheckScrcpy()
         {
             // 查询指定名称的进程（无需包含.exe扩展名）
-            Process[] processes = Process.GetProcessesByName("scrcpy");
+            Process[] processes = Process.GetProcessesByName("Scrcpy");
 
             if (processes.Length > 0)
             {
-                //Console.WriteLine($"进程ID: {processes[0].Id}，路径：{processes[0].MainModule?.FileName}");
+                //Debug.WriteLine($"进程ID: {processes[0].Id}，路径：{processes[0].MainModule?.FileName}");
                 processes[0].Kill();
             }
         }
@@ -221,7 +221,7 @@ namespace ScrcpyEX.View
                 CreateSavedPop(false, DLL.GetForegroundWindow() == _mainHandle);
                 KeyboardHook.RegisterHook();
 
-                //Console.WriteLine($"窗体句柄：{_mainHandle},scrcpy句柄：{_scrcpyHost.ScHandle},前台窗口句柄：{DLL.GetForegroundWindow()}");
+                //Console.WriteLine($"窗体句柄：{_mainHandle},Scrcpy句柄：{_scrcpyHost.ScHandle},前台窗口句柄：{DLL.GetForegroundWindow()}");
                 //Console.WriteLine($"前台窗口句柄：{DLL.GetForegroundWindow()}");
             }
         }

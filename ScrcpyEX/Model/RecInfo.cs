@@ -8,7 +8,7 @@ using System.Windows;
 namespace ScrcpyEX.Model
 {
     /// <summary>
-    /// 录制的脚本信息。
+    /// 录制脚本信息类，保存录制的脚本信息。
     /// </summary>
     public class RecInfo
     {
@@ -48,7 +48,7 @@ namespace ScrcpyEX.Model
         public Rect CropRect { get; set; }
 
         /// <summary>
-        /// 是否使用自适应间隔。
+        /// 图像脚本是否使用自适应间隔。
         /// </summary>
         public bool IsAdaptive { get; set; } = false;
 
@@ -69,5 +69,19 @@ namespace ScrcpyEX.Model
         /// 录制的坐标点信息列表。
         /// </summary>
         public List<PointInfo> Infos { get; set; } = [];
+
+        /// <summary>
+        /// 默认构造函数。
+        /// </summary>
+        public RecInfo() { }
+
+        /// <summary>
+        /// 使用坐标点信息列表构造类。
+        /// </summary>
+        /// <param name="infos">录制的坐标点信息列表。</param>
+        public RecInfo(List<PointInfo> infos)
+        {
+            Infos = infos;
+        }
     }
 }

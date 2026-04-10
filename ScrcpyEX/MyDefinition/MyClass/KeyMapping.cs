@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace ScrcpyEX.MyDefinition.MyClass
 {
     /// <summary>
-    /// 键盘映射信息类，用于保存键盘映射信息。
+    /// 按键映射信息类，用于保存按键映射信息。
     /// </summary>
     internal class KeyMapping
     {
@@ -22,7 +22,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <summary>
         /// 映射的虚拟键码(Virtual Key Code)，是Windows定义的与硬件和键盘布局无关的键码。表示一个物理按键，而不是字符。
         /// </summary>
-        public Keys VkCode { get; set; }= Keys.None;
+        public Keys VkCode { get; set; } = Keys.None;
 
         /// <summary>
         /// Popup控件的X轴偏移。
@@ -37,19 +37,19 @@ namespace ScrcpyEX.MyDefinition.MyClass
         public KeyMapping() { }
 
         /// <summary>
-        /// 在Scrcpy中间创建一个空的键盘映射Popup。
+        /// 在指定位置创建一个包含空字符的按键映射信息类。
         /// </summary>
         /// <param name="ScActualWidth">Scrcpy的实际宽度。</param>
         /// <param name="ScActualHeight">Scrcpy的实际高度。</param>
-        /// <param name="popdiameter">Popup的直径。</param>
-        public KeyMapping(double ScActualWidth, double ScActualHeight, double popdiameter)
+        /// <param name="popDiameter">Popup的直径。</param>
+        public KeyMapping(double ScActualWidth, double ScActualHeight, double popDiameter)
         {
-            OffsetX = (ScActualWidth - popdiameter) / 2;
-            OffsetY = (ScActualHeight - popdiameter) / 2;
+            OffsetX = (ScActualWidth - popDiameter) / 2;
+            OffsetY = (ScActualHeight - popDiameter) / 2;
         }
 
         /// <summary>
-        /// 根据已有的数据创建键盘映射信息类。
+        /// 根据已有的数据创建按键映射信息类。
         /// </summary>
         /// <param name="ch">映射的字符。</param>
         /// <param name="vkCode">映射的虚拟键码(Virtual Key Code)。</param>

@@ -98,6 +98,7 @@
     <Compile Include="MyDefinition\MyClass\KeyMapping.cs" />
     <Compile Include="MyDefinition\MyClass\OpenCv.cs" />
     <Compile Include="MyDefinition\MyClass\ScrcpyHost.cs" />
+    <Compile Include="MyDefinition\MyControl\DragPopup.cs" />
     <Compile Include="MyDefinition\MyControl\TimePopup.cs" />
     <Compile Include="MyDefinition\WindowsAPI\DLL.cs" />
     <Compile Include="MyDefinition\MV.cs" />

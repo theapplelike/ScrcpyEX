@@ -84,7 +84,7 @@ namespace ScrcpyEX.ExtensionMethod
         public bool Locate4 { get; set; } = false;
 
         /// <summary>
-        /// 记录窗体的位置、大小。
+        /// 记录窗体尺寸、位置信息。
         /// </summary>
         public FormSize Size { get; set; } = new();
 
@@ -94,9 +94,9 @@ namespace ScrcpyEX.ExtensionMethod
         public List<RecInfo> RecInfos { get; set; } = [];
 
         /// <summary>
-        /// 按键映射类的列表。
+        /// 键盘映射信息类列表，用于保存键盘映射信息。
         /// </summary>
-        public List<KeyMapping> KeyMappings = [];
+        public List<KeyMapping> KeyMappings { get; set; } = [];
 
         /// <summary>
         /// 记录Scrcpy相关的设置。

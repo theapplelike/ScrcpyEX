@@ -8,7 +8,7 @@ using System.Windows;
 namespace ScrcpyEX.Model
 {
     /// <summary>
-    /// 录制的坐标点信息。
+    /// 脚本坐标点信息类。
     /// </summary>
     public class PointInfo
     {
