@@ -26,7 +26,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <summary>
         /// 存储每一次有效的坐标点。
         /// </summary>
-        private static readonly List<PointInfo> infos = [];
+        private static readonly List<PointInfo> _infos = [];
 
         /// <summary>
         /// 钩子句柄，为IntPtr.Zero时未注册鼠标钩子。
@@ -109,7 +109,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
             Point? point = MV.MainWin.GetMouseInScrcpy();
             if (point is Point pt)
             {
-                infos.Add(new PointInfo(pt, 1.5));
+                _infos.Add(new PointInfo(pt, 1.5));
                 Debug.WriteLine($"添加点：{pt.X},{pt.Y}。");
             }
         }
@@ -142,11 +142,10 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// </summary>
         private static void SaveRecordInfo()
         {
-            if (infos.Count > 0)
+            if (_infos.Count > 0)
             {
-                MyCfg.Cfg.RecInfos.Add(new RecInfo() { Infos = new List<PointInfo>(infos) });//26.4.10
-                //MyCfg.Cfg.RecInfos.Add(new RecInfo(infos));
-                infos.Clear();
+                MyCfg.Cfg.RecInfos.Add(new RecInfo(_infos));
+                _infos.Clear();
             }
         }
 

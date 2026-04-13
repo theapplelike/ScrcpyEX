@@ -81,7 +81,7 @@ namespace ScrcpyEX.Model
         /// <param name="infos">录制的坐标点信息列表。</param>
         public RecInfo(List<PointInfo> infos)
         {
-            Infos = infos;
+            Infos = [.. infos];//创建独立的数据副本
         }
     }
 }
