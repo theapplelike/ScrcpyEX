@@ -37,7 +37,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         public KeyMapping() { }
 
         /// <summary>
-        /// 在指定位置创建一个包含空字符的按键映射信息类。
+        /// 在中心位置创建一个包含空字符的按键映射信息类。
         /// </summary>
         /// <param name="ScActualWidth">Scrcpy的实际宽度。</param>
         /// <param name="ScActualHeight">Scrcpy的实际高度。</param>

@@ -110,6 +110,31 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
+        /// 根据比例限定值的范围。
+        /// </summary>
+        /// <param name="orgValue">原始值。</param>
+        /// <param name="orgRatio">原始比例。</param>
+        /// <param name="limitRatio">限定的比例。</param>
+        /// <returns>如果乘值在限定的比例中，则返回乘值，否则返回上下限。</returns>
+        public static double RatioClamp(double orgValue, double orgRatio, double limitRatio)
+        {
+            double value = orgValue * orgRatio;
+
+            if (value < orgValue * (1 - limitRatio))
+            {
+                return orgValue * (1 - limitRatio);
+            }
+            else if (value > orgValue * (1 + limitRatio))
+            {
+                return orgValue * (1 + limitRatio);
+            }
+            else
+            {
+                return value;
+            }
+        }
+
+        /// <summary>
         /// 捕获主程序区域的截图。
         /// </summary>
         /// <param name="DpiScaleX">X轴上的DPI比例。</param>

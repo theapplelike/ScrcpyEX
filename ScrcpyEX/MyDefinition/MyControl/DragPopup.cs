@@ -43,7 +43,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         private Button _btnDelete;
 
         /// <summary>
-        /// 显示映射按键字符的边框，固定大小。
+        /// 显示映射按键字符的边框。
         /// </summary>
         private Border _bdChar;
 
@@ -52,13 +52,40 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// </summary>
         private TextBlock _tbkDisplayChar;
 
-        private readonly bool _isLeaveParent;   //是否可以移出逻辑父级
-        private Point _lastPoint;               //上一次的鼠标坐标
-        private Point _nowPoint;                //当前鼠标的坐标
-        private bool _isDragging = false;       //是否处于可拖拽的状态
-        private bool _isEdit = false;           //当前是否处于编辑状态
-        private IntPtr _lp = IntPtr.Zero;       //记录位置信息的句柄
-        private bool _disposed = false;         //是否释放资源
+        /// <summary>
+        /// 是否可以移出逻辑父级。
+        /// </summary>
+        private readonly bool _isLeaveParent;
+
+        /// <summary>
+        /// 上一次的鼠标坐标。
+        /// </summary>
+        private Point _lastPoint;
+
+        /// <summary>
+        /// 当前鼠标的坐标。
+        /// </summary>
+        private Point _nowPoint;
+
+        /// <summary>
+        /// 是否处于可拖拽的状态。
+        /// </summary>
+        private bool _isDragging = false;
+
+        /// <summary>
+        /// 当前是否处于编辑状态。
+        /// </summary>
+        private bool _isEdit = false;
+
+        /// <summary>
+        /// 记录位置信息的句柄，用于PostMessage函数。
+        /// </summary>
+        private IntPtr _lp = IntPtr.Zero;
+
+        /// <summary>
+        /// 是否已释放资源。
+        /// </summary>
+        private bool _disposed = false;
 
         /// <summary>
         /// 当前映射绑定的字符。
@@ -83,40 +110,26 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// <summary>
         /// 可拖拽、可映射按键的Popup。
         /// </summary>
-        /// <param name="vkCode">当前映射绑定的虚拟键码。</param>
-        /// <param name="popIsEdit">Popup是否为编辑状态。</param>
+        /// <param name="mapping">当前Popup对应的按键信息映射类。</param>
+        /// <param name="ratio">其中控件的缩放比例。</param>
+        /// <param name="isInitEdit">Popup初始是否为编辑状态。</param>
         /// <param name="isLeaveParent">是否可以移出逻辑父级。</param>
-        public DragPopup(KeyMapping mapping, bool popIsEdit, double diameter, bool isLeaveParent = false)
+        public DragPopup(KeyMapping mapping, double ratio, bool isInitEdit, bool isLeaveParent = false)
         {
-            ControlInit(mapping.Char, diameter);
-            ControlEventBinding();
-
             VkCode = mapping.VkCode;
             _isLeaveParent = isLeaveParent;
 
-            //_txt = Child.FindVisualChild<TextBox>();
-            //_txt.PreviewTextInput += TextBox_PreviewTextInput;
-            //_txt.TextChanged += TextBox_TextChanged;
-            //_txt.SetValue(InputMethod.IsInputMethodEnabledProperty, false);//文本框禁用输入法
-
-            //_btn = Child.FindVisualChild<Button>();
-            //_btn.Click += Button_Click;
-
-            //_tbkChar = Child.FindVisualChildByName<TextBlock>("tbkChar");
-
-            //MouseDown += Pop_MouseDown;
-            //MouseMove += Pop_MouseMove;
-            //MouseUp += Pop_MouseUp;
-
-            SetDisplay(popIsEdit);
+            ControlInit(mapping.Char, ratio);
+            ControlEventBinding();
+            SetEditingStatus(isInitEdit);
         }
 
         /// <summary>
         /// DragPopup中包含的控件进行初始化。
         /// </summary>
         /// <param name="ch">映射的字符。</param>
-        /// <param name="diameter">映射Popup的直径。</param>
-        private void ControlInit(string ch, double diameter)
+        /// <param name="ratio">映射Popup的直径。</param>
+        private void ControlInit(string ch, double ratio)
         {
             //提供最外层边框
             _bdOuter = new()
@@ -124,8 +137,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
                 BorderBrush = Brushes.Black,
                 BorderThickness = new(1),
-                CornerRadius = new(diameter),
-                //Name = "bdOuter",
+                CornerRadius = new(50 * ratio),
             };
 
             //提供装多个控件的容器
@@ -135,8 +147,10 @@ namespace ScrcpyEX.MyDefinition.MyControl
             _txtInput = new()
             {
                 Text = ch,
-                Width = 15,
-                FontSize = 16,
+                //Width = 15,
+                Width = MyGM.RatioClamp(15 , ratio, 0.2),
+                //FontSize = 16,
+                FontSize = MyGM.RatioClamp(16, ratio, 0.2),
                 FontFamily = new FontFamily("Consolas"),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
@@ -149,7 +163,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 Width = 1,
                 Height = 1,
                 //Background = Brushes.Red,
-                //Name = "tbkAnchorPoint",
             };
 
             //提供删除功能
@@ -157,22 +170,25 @@ namespace ScrcpyEX.MyDefinition.MyControl
             {
                 FontSize = 8,
                 Content = "X",
-                Height = 14,
-                Width = 14,
+                //Height = 14,
+                //Width = 14,
+                Height = MyGM.RatioClamp(14, ratio, 0.2),
+                Width = MyGM.RatioClamp(14, ratio, 0.2),
                 VerticalAlignment = VerticalAlignment.Top,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 //Visibility = Visibility.Collapsed,
             };
 
-            //显示映射按键字符的边框，固定大小
+            //显示映射按键字符的边框
             _bdChar = new()
             {
-                Width = 20,
-                Height = 20,
+                //Width = 20,
+                //Height = 20,
+                Height = MyGM.RatioClamp(20, ratio, 0.2),
+                Width = MyGM.RatioClamp(20, ratio, 0.2),
                 Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
                 BorderBrush = Brushes.Black,
                 CornerRadius = new(20),
-                //Name = "bdChar",
             };
 
             //显示映射按键的字符
@@ -182,9 +198,9 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 FontWeight = FontWeights.Black,
-                FontSize = 16,
+                //FontSize = 16,
+                FontSize = MyGM.RatioClamp(16, ratio, 0.2),
                 FontFamily = new FontFamily("Consolas"),
-                //Name = "tbkDisplayChar",
             };
 
             //确定层次关系
@@ -221,8 +237,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         {
             if (_isEdit)
             {
-                //让Popup中的TextBlock捕获鼠标，防止移动太快时丢失Popup
-                //TextBlock tbk = Child.FindVisualChildByName<TextBlock>("tbkAnchorPoint");
+                //让Popup中的锚定点捕获鼠标，防止移动太快时丢失Popup
                 _isDragging = Mouse.Capture(_tbkAnchorPoint);
                 SelectAll(_txtInput);
 
@@ -254,16 +269,13 @@ namespace ScrcpyEX.MyDefinition.MyControl
             {
                 Mouse.Capture(null);
                 _isDragging = false;
-                //Console.WriteLine("解锁");
             }
             else
             {
-                //Console.WriteLine("准备发送");
                 if (_lp != IntPtr.Zero)
                 {
                     //发送鼠标抬起消息
                     DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_LBUTTONUP, IntPtr.Zero, _lp);
-                    //Console.WriteLine("发送抬起事件");
                 }
             }
         }
@@ -432,24 +444,14 @@ namespace ScrcpyEX.MyDefinition.MyControl
         }
 
         /// <summary>
-        /// 设置Popup的显示状态。
+        /// 设置Popup的编辑状态。
         /// </summary>
         /// <param name="isEdit">Popup是否为编辑状态。</param>
-        public void SetDisplay(bool isEdit)
+        public void SetEditingStatus(bool isEdit)
         {
             _isEdit = isEdit;
             if (isEdit)
             {
-                //Border border = (Border)Child;
-                //border.Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255));
-                //border.BorderThickness = new(1);
-
-                //Child.FindVisualChild<TextBox>().Visibility = Visibility.Visible;
-                //Child.FindVisualChild<Button>().Visibility = Visibility.Visible;
-                //Child.FindVisualChildByName<Border>("borderChar").Visibility = Visibility.Hidden;
-                //Child.FindVisualChildByName<TextBlock>("tbkChar").Visibility = Visibility.Hidden;
-                //_pop.IsHitTestVisible = true;
-
                 _bdOuter.Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255));
                 _bdOuter.BorderThickness = new(1);
                 _txtInput.Visibility = Visibility.Visible;
@@ -459,16 +461,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
             }
             else
             {
-                //Border border = (Border)Child;
-                //border.Background = Brushes.Transparent;
-                //border.BorderThickness = new(0);
-
-                //Child.FindVisualChild<TextBox>().Visibility = Visibility.Hidden;
-                //Child.FindVisualChild<Button>().Visibility = Visibility.Hidden;
-                //Child.FindVisualChildByName<Border>("borderChar").Visibility = Visibility.Visible;
-                //Child.FindVisualChildByName<TextBlock>("tbkChar").Visibility = Visibility.Visible;
-                //_pop.IsHitTestVisible = false;
-
                 _bdOuter.Background = Brushes.Transparent;
                 _bdOuter.BorderThickness = new(0);
                 _txtInput.Visibility = Visibility.Hidden;
@@ -476,15 +468,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 _bdChar.Visibility = Visibility.Visible;
                 _tbkDisplayChar.Visibility = Visibility.Visible;
             }
-        }
-
-        /// <summary>
-        /// 设置Popup是否显示。
-        /// </summary>
-        /// <param name="isOpen">Popup是否可见。</param>
-        public void SetVisible(bool isOpen)
-        {
-            IsOpen = isOpen;
         }
 
         public void Dispose()

@@ -249,119 +249,30 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 在窗体中创建一个可以移动的圆形Popup，作为键盘映射，此控件宽高与DPI相关。
+        /// 在窗体中创建一个可以移动的圆形Popup，作为按键映射，此控件宽高与DPI相关。
         /// 有黑边时会导致Popup的位置有偏移。
         /// </summary>
         /// <param name="mapping">按键映射信息类。</param>
-        /// <param name="popIsEdit">Popup初始是否为编辑状态。</param>
-        /// <param name="popIsVisible">Popup初始是否可见。</param>
-        /// <returns>MyDragMove对象，其中封装了Popup的所有事件方法。</returns>
-        private DragPopup CreatePop(KeyMapping mapping, bool popIsEdit, bool popIsVisible = true)
+        /// <param name="isInitEdit">Popup初始是否为编辑状态。</param>
+        /// <param name="isInitVisible">Popup初始是否可见。</param>
+        /// <returns>DragPopup对象。</returns>
+        private DragPopup CreatePop(KeyMapping mapping, bool isInitEdit, bool isInitVisible = true)
         {
-            //Popup pop = new()
-            //{
-            //    Placement = PlacementMode.Relative,
-            //    PlacementTarget = gShow,//这里需要指明父级
-            //    AllowsTransparency = true,
-            //    Height = PopupDiameter,
-            //    Width = PopupDiameter,
-            //    IsOpen = popIsVisible,
-            //    HorizontalOffset = mapping.OffsetX * ScRatioX,
-            //    VerticalOffset = mapping.OffsetY * ScRatioY,
-            //};
-            DragPopup pop = new(mapping, popIsEdit, PopupDiameter)
+            DragPopup pop = new(mapping, ScRatioX, isInitEdit)
             {
                 Placement = PlacementMode.Relative,
                 PlacementTarget = gShow,    //这里需要指明父级
                 AllowsTransparency = true,
-                Height = PopupDiameter,     //与DPI相关，无需额外乘以DPI
-                Width = PopupDiameter,      //与DPI相关，无需额外乘以DPI
-                IsOpen = popIsVisible,
+                Height = PopupDiameter,
+                Width = PopupDiameter,
+                IsOpen = isInitVisible,
                 HorizontalOffset = mapping.OffsetX * ScRatioX,
                 VerticalOffset = mapping.OffsetY * ScRatioY,
             };
-            //Console.WriteLine($"映射Popup原始左上:({mapping.OffsetX},{mapping.OffsetY}),比例:({ScRatioX},{ScRatioY}),最终左上:({pop.HorizontalOffset},{pop.VerticalOffset})。");
 
-            //提供边框
-            //Border border = new()
-            //{
-            //    Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
-            //    BorderBrush = Brushes.Black,
-            //    BorderThickness = new(1),
-            //    CornerRadius = new(PopupDiameter),
-            //    Name = "border",
-            //};
-
-            //提供装多个控件的容器
-            //Grid grid = new();
-
-            //提供输入
-            //TextBox txt = new()
-            //{
-            //    Text = mapping.Char,
-            //    Width = 15,
-            //    FontSize = 16,
-            //    FontFamily = new FontFamily("Consolas"),
-            //    HorizontalAlignment = HorizontalAlignment.Center,
-            //    VerticalAlignment = VerticalAlignment.Center,
-            //    //Visibility = Visibility.Collapsed,
-            //};
-
-            //提供定位点
-            //TextBlock tbk = new()
-            //{
-            //    Width = 1,
-            //    Height = 1,
-            //    //Background = Brushes.Red,
-            //    Name = "tbk",
-            //};
-
-            //提供删除功能
-            //Button btn = new()
-            //{
-            //    FontSize = 8,
-            //    Content = "X",
-            //    Height = 14,
-            //    Width = 14,
-            //    HorizontalAlignment = HorizontalAlignment.Right,
-            //    VerticalAlignment = VerticalAlignment.Top,
-            //    //Visibility = Visibility.Collapsed,
-            //};
-
-            //说明的字符的边框
-            //Border borderChar = new()
-            //{
-            //    Width = 20,
-            //    Height = 20,
-            //    Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
-            //    BorderBrush = Brushes.Black,
-            //    CornerRadius = new(20),
-            //    Name = "borderChar",
-            //};
-
-            //提供说明字符的TextBlock
-            //TextBlock tbkChar = new()
-            //{
-            //    Text = mapping.Char,
-            //    Name = "tbkChar",
-            //    HorizontalAlignment = HorizontalAlignment.Center,
-            //    VerticalAlignment = VerticalAlignment.Center,
-            //    FontWeight = FontWeights.Black,
-            //    FontSize = 16,
-            //    FontFamily = new FontFamily("Consolas"),
-            //};
-
-            //确定层次关系
-            //borderChar.Child = tbkChar;
-            //grid.Children.Add(txt);
-            //grid.Children.Add(tbk);
-            //grid.Children.Add(btn);
-            //grid.Children.Add(borderChar);
-            //border.Child = grid;
-            //pop.Child = border;
             gShow.Children.Add(pop);//这里的父级要和pop.PlacementTarget属性一致
+            //Debug.WriteLine($"映射Popup原始左上:({mapping.OffsetX},{mapping.OffsetY}),比例:({ScRatioX},{ScRatioY}),最终左上:({pop.HorizontalOffset},{pop.VerticalOffset})。");
 
-            //return new MyDragMove(pop, mapping.VkCode, popIsEdit);
             return pop;
         }
 
@@ -381,7 +292,7 @@ namespace ScrcpyEX.View
             {
                 foreach (DragPopup drag in MV.DragPopups)
                 {
-                    drag.SetDisplay(true);
+                    drag.SetEditingStatus(true);
                 }
 
                 btnMappingEdit.Content = "保存修改";
@@ -425,7 +336,7 @@ namespace ScrcpyEX.View
                 string ch = drag.Char;
                 double offsetX = drag.OffsetX / ScRatioX;
                 double offsetY = drag.OffsetY / ScRatioY;
-                drag.SetDisplay(false);
+                drag.SetEditingStatus(false);
 
                 MyCfg.Cfg.KeyMappings.Add(new KeyMapping(ch, vkCode, offsetX, offsetY));
                 Debug.WriteLine($"映射字符：{ch}，虚拟键：{vkCode}/{(int)vkCode}，保存偏移:（{offsetX:F2}，{offsetY:F2}）。");
@@ -435,7 +346,7 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 映射按钮编辑完后调用此方法，无论是否保存。
+        /// 映射按键编辑完后恢复UI状态。
         /// </summary>
         private void MappingEditCompleted()
         {
@@ -447,19 +358,20 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 创建配置中所有的键盘映射Popup，并保存到列表，保存前会清理列表。
         /// </summary>
-        /// <param name="popIsEdit">Popup是否为编辑状态。</param>
-        private void CreateSavedPop(bool popIsEdit = false, bool popIsVisible = true)
+        /// <param name="isInitEdit">Popup初始是否为编辑状态。</param>
+        /// <param name="isInitVisible">Popup初始是否可见。</param>
+        private void CreateSavedPop(bool isInitEdit = false, bool isInitVisible = true)
         {
             foreach (DragPopup drag in MV.DragPopups)
             {
                 drag.Dispose();
-                drag.SetVisible(false);
+                drag.IsOpen = false;
             }
             MV.DragPopups.Clear();
 
             foreach (KeyMapping mapping in MyCfg.Cfg.KeyMappings)
             {
-                MV.DragPopups.Add(CreatePop(mapping, popIsEdit, popIsVisible));
+                MV.DragPopups.Add(CreatePop(mapping, isInitEdit, isInitVisible));
             }
         }
 
@@ -470,7 +382,7 @@ namespace ScrcpyEX.View
         {
             foreach (DragPopup drag in MV.DragPopups)
             {
-                drag.SetVisible(false);
+                drag.IsOpen = false;
             }
         }
 
@@ -481,7 +393,7 @@ namespace ScrcpyEX.View
         {
             foreach (DragPopup drag in MV.DragPopups)
             {
-                drag.SetVisible(true);
+                drag.IsOpen = true;
             }
         }
 

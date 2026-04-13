@@ -2,6 +2,7 @@
 using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.MyClass;
+using ScrcpyEX.MyDefinition.MyControl;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -53,6 +54,13 @@ namespace ScrcpyEX.View
             //Console.WriteLine($"比例：{ScRatioX},{ScActualWidth},{ActualWidth - ExtraWidth}");
 
 
+            //foreach (DragPopup pop in MV.DragPopups)
+            //{
+            //    Debug.WriteLine($"父级：{pop.Parent}");
+            //}
+            Debug.WriteLine($"：{MyGM.RatioClamp(10,0.1,0.2)}");
+            Debug.WriteLine($"：{MyGM.RatioClamp(10, 0.9, 0.2)}");
+            Debug.WriteLine($"：{MyGM.RatioClamp(10, 10.1, 0.2)}");
             //闪烁截屏
             //ReduceSize();
             //RecInfo recInfo = MyCfg.Cfg.RecInfos[2];
