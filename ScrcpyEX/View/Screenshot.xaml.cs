@@ -22,7 +22,11 @@ namespace ScrcpyEX.View
     /// </summary>
     public partial class Screenshot : Window
     {
-        public Screenshot()
+        /// <summary>
+        /// 用于给Scrcpy截图的窗口。
+        /// </summary>
+        /// <param name="scHandle">Scrcpy的句柄。</param>
+        public Screenshot(IntPtr scHandle)
         {
             InitializeComponent();
 
@@ -33,7 +37,7 @@ namespace ScrcpyEX.View
             Topmost = true;
 
             //截图区域创建到Scrcpy的上方
-            DLL.LpRect rect = MyGM.GetHandleRect(MV.MainWin.ScHandle);
+            DLL.LpRect rect = MyGM.GetHandleRect(scHandle);
             Top = rect.Top / DpiScaleY;
             Left = rect.Left / DpiScaleX;
             Width = rect.Width / DpiScaleX;
@@ -48,7 +52,7 @@ namespace ScrcpyEX.View
             //{
             //    Stretch = Stretch.Fill
             //};
-            gBack.Background = new ImageBrush(MyGM.GetHandleImage(MV.MainWin.ScHandle))
+            gBack.Background = new ImageBrush(MyGM.GetHandleImage(scHandle))
             {
                 Stretch = Stretch.Fill
             };

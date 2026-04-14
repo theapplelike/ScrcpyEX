@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace ScrcpyEX.ExtensionMethod
@@ -61,6 +62,14 @@ namespace ScrcpyEX.ExtensionMethod
         /// </summary>
         public static List<DragPopup> DragPopups { get; set; } = [];
 
+        /// <summary>
+        /// 屏幕X轴上的DPI比例。
+        /// </summary>
+        public static double DpiScaleX { get; set; }
 
+        /// <summary>
+        /// 屏幕Y轴上的DPI比例。
+        /// </summary>
+        public static double DpiScaleY { get; set; }
     }
 }

@@ -110,7 +110,7 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
-        /// 根据比例限定值的范围。
+        /// 根据比例限定值的范围，（orgValue*orgRatio）限定在（1±limitRatio）中。
         /// </summary>
         /// <param name="orgValue">原始值。</param>
         /// <param name="orgRatio">原始比例。</param>
@@ -191,8 +191,7 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
-        /// 将System.Drawing.Bitmap转换为System.Windows.Media.Imaging.BitmapSource。
-        /// BitmapSource用于WPF。
+        /// 将System.Drawing.Bitmap转换为System.Windows.Media.Imaging.BitmapSource，用于WPF。
         /// </summary>
         /// <param name="bitmap">System.Drawing.Bitmap对象。</param>
         /// <returns>返回一个托管的BitmapSource。</returns>
@@ -268,28 +267,6 @@ namespace ScrcpyEX.MyDefinition
             //Console.WriteLine($"句柄窗口尺寸：{rc.Left},{rc.Top},{rc.Right},{rc.Bottom},{rc.Width},{rc.Height}");
             return rc;
         }
-
-        /// <summary>
-        /// 获得指定句柄窗口的宽度。
-        /// </summary>
-        /// <param name="handle">窗口的句柄。</param>
-        /// <returns>窗口的宽度。</returns>
-        //public static double GetHandleWidth(IntPtr handle)
-        //{
-        //    DLL.LpRect rc = GetHandleRect(handle);
-        //    return rc.Width;
-        //}
-
-        /// <summary>
-        /// 获得指定句柄窗口的高度。
-        /// </summary>
-        /// <param name="handle">窗口的句柄。</param>
-        /// <returns>窗口的高度。</returns>
-        //public static double GetHandleHeight(IntPtr handle)
-        //{
-        //    DLL.LpRect rc = GetHandleRect(handle);
-        //    return rc.Height;
-        //}
 
         /// <summary>
         /// 获得指定句柄窗口的图像。

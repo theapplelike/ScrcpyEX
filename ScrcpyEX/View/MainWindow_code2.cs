@@ -228,7 +228,7 @@ namespace ScrcpyEX.View
 
                 IntPtr lp = new((y << 16) + x);
                 DLL.PostMessage(scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
-                DLL.PostMessage(scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
+                DLL.PostMessage(scHandle, WM.WM_LBUTTONDOWN, (IntPtr)MK.MK_LBUTTON, lp);
                 DLL.PostMessage(scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
             }
 
@@ -250,13 +250,12 @@ namespace ScrcpyEX.View
         private async Task<CroppedBitmap> GetScriptImg(IntPtr scHandle, IntPtr mainHandle, Rect originalRect)
         {
             //判断主窗口是否最小化
-            bool isIcon = DLL.IsIconic(mainHandle);
-            if (isIcon)
+            if (DLL.IsIconic(mainHandle))
             {
                 DLL.ShowWindow(mainHandle, SW.SW_SHOWNOACTIVATE);
                 await Task.Delay(50);
             }
-            //Console.WriteLine($"是否最小化:{isIcon}。");
+            //Console.WriteLine($"是否最小化:{DLL.IsIconic(mainHandle)}。");
 
             //获得Scrcpy窗口截图，并计算截取的区域
             BitmapSource scBitmap = MyGM.GetHandleImage(scHandle);

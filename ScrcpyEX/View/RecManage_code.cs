@@ -124,7 +124,7 @@ namespace ScrcpyEX.View
             Opacity = 0;
             await Task.Delay(500);//让当前窗体有足够时间隐藏
 
-            Screenshot screen = new();
+            Screenshot screen = new(_scHandle);
             if (screen.ShowDialog() == true)
             {
                 img.Source = screen.Crop;

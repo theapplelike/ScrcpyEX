@@ -26,10 +26,15 @@ namespace ScrcpyEX.View
     /// </summary>
     public partial class RecManage : Window
     {
-        public RecManage()
+        /// <summary>
+        /// 录制的脚本管理界面。
+        /// </summary>
+        /// <param name="scHandle">Scrcpy的句柄。</param>
+        public RecManage(IntPtr scHandle)
         {
             InitializeComponent();
             _vm = (RecManageVM)DataContext;
+            _scHandle = scHandle;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -69,11 +74,6 @@ namespace ScrcpyEX.View
 
         private void BtnExit_Click(object sender, RoutedEventArgs e)
         {
-            //if (TempRecInfo != null)
-            //{
-            //    ValToUI(TempRecInfo);
-            //    _vm.Canel();
-            //}
             DialogResult = false;
         }
 

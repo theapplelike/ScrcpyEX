@@ -49,12 +49,12 @@ namespace ScrcpyEX.View
         public Rect CropRect { get; set; }
 
         /// <summary>
-        /// X轴上的DPI比例。
+        /// 屏幕X轴上的DPI比例。
         /// </summary>
         private double DpiScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;
 
         /// <summary>
-        /// Y轴上的DPI比例。
+        /// 屏幕Y轴上的DPI比例。
         /// </summary>
         private double DpiScaleY => VisualTreeHelper.GetDpi(this).DpiScaleY;
 

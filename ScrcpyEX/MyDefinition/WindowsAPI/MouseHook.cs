@@ -106,7 +106,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// </summary>
         private static void RecordPosition()
         {
-            Point? point = MV.MainWin.GetMouseInScrcpy();
+            Point? point = MV.MainWin.GetPointInScrcpy();
             if (point is Point pt)
             {
                 _infos.Add(new PointInfo(pt, 1.5));

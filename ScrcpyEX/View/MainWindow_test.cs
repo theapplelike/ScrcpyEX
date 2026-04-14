@@ -34,10 +34,10 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {
-            IntPtr intPtr = DLL.GetForegroundWindow();
+            //IntPtr intPtr = DLL.GetForegroundWindow();
             Dispatcher.BeginInvoke(() =>
             {
-                Console.WriteLine($"窗体/SC：{IsActive}，{intPtr == ScHandle}。");
+                //Console.WriteLine($"窗体/SC：{IsActive}，{intPtr == ScHandle}。");
             });
         }
 
@@ -54,13 +54,6 @@ namespace ScrcpyEX.View
             //Console.WriteLine($"比例：{ScRatioX},{ScActualWidth},{ActualWidth - ExtraWidth}");
 
 
-            //foreach (DragPopup pop in MV.DragPopups)
-            //{
-            //    Debug.WriteLine($"父级：{pop.Parent}");
-            //}
-            Debug.WriteLine($"：{MyGM.RatioClamp(10,0.1,0.2)}");
-            Debug.WriteLine($"：{MyGM.RatioClamp(10, 0.9, 0.2)}");
-            Debug.WriteLine($"：{MyGM.RatioClamp(10, 10.1, 0.2)}");
             //闪烁截屏
             //ReduceSize();
             //RecInfo recInfo = MyCfg.Cfg.RecInfos[2];
@@ -88,6 +81,7 @@ namespace ScrcpyEX.View
             //await AdbTest1();
             //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
             //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
+            _testTimer.Start();
             await Task.Delay(1);
         }
 

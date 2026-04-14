@@ -172,12 +172,27 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 屏幕X轴上的DPI比例。
         /// </summary>
-        public double DpiScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;
+        //public double DpiScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;
 
         /// <summary>
         /// 屏幕Y轴上的DPI比例。
         /// </summary>
-        public double DpiScaleY => VisualTreeHelper.GetDpi(this).DpiScaleY;
+        //public double DpiScaleY => VisualTreeHelper.GetDpi(this).DpiScaleY;
+
+        /// <summary>
+        /// Scrcpy是否处于关闭状态，true--关闭状态；false--启动状态。
+        /// </summary>
+        private bool IsScClosed => _scrcpyHost == null || _scrcpyHost.ScHandle == IntPtr.Zero;
+
+        /// <summary>
+        /// 圆形DragPopup的直径。
+        /// </summary>
+        private double PopupDiameter => 50 * ScRatioX;
+
+        /// <summary>
+        /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。
+        /// </summary>
+        public IntPtr ScHandle => _scrcpyHost?.ScHandle ?? IntPtr.Zero;
 
         /// <summary>
         /// Scrcpy当前宽度和默认宽度的比值。
@@ -192,28 +207,13 @@ namespace ScrcpyEX.View
         /// <summary>
         /// Scrcpy当前的实际宽度，与DPI无关。
         /// </summary>
-        //public double ScActualWidth => MyGM.GetHandleWidth(ScHandle) / DpiScaleX;
         public double ScActualWidth => ActualWidth - ExtraWidth;
 
         /// <summary>
         /// Scrcpy当前的实际高度，与DPI无关。
         /// </summary>
-        //public double ScActualHeight => MyGM.GetHandleHeight(ScHandle) / DpiScaleY;
         public double ScActualHeight => ActualHeight - ExtraHeight;
 
-        /// <summary>
-        /// Scrcpy是否处于关闭状态，true--关闭状态；false--启动状态。
-        /// </summary>
-        private bool IsClosed => _scrcpyHost == null || _scrcpyHost.ScHandle == IntPtr.Zero;
 
-        /// <summary>
-        /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。
-        /// </summary>
-        public IntPtr ScHandle => _scrcpyHost?.ScHandle ?? IntPtr.Zero;
-
-        /// <summary>
-        /// 圆形DragPopup的直径。
-        /// </summary>
-        private double PopupDiameter => 50 * ScRatioX;
     }
 }

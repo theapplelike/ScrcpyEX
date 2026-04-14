@@ -29,21 +29,22 @@ namespace ScrcpyEX.View
     public partial class MainWindow//code1
     {
         /// <summary>
-        /// 获得鼠标在Scrcpy中的坐标，
+        /// 获得鼠标相对于Scrcpy左上角的坐标，
         /// X轴需要额外减去：左额外距离*DPI比例-左非工作区距离*DPI比例，
         /// Y轴需要额外减去：上额外距离*DPI比例。
         /// </summary>
-        /// <returns>鼠标在Scrcpy中的坐标，以元组表示（X，Y）。</returns>
-        public (double, double) GetPointInScrcpy()
+        /// <returns>鼠标相对于Scrcpy左上角的坐标，以元组表示（X，Y）。</returns>
+        public (double, double) GetPointRelativeToScrcpy()
         {
             Point pt1 = PointToScreen(new Point(0, 0)); //获得程序左上角相对于屏幕的位置，获得的值与DPI相关
             Point pt2 = MyGM.GetPosition();             //获取鼠标相对于屏幕的位置
 
-            double x = pt2.X - pt1.X - ExtraWidthLeft * DpiScaleX + SystemParameters.WindowNonClientFrameThickness.Left * DpiScaleX;
-            double y = pt2.Y - pt1.Y - ExtraHeightTop * DpiScaleY;
+            double x = pt2.X - pt1.X - ExtraWidthLeft * MV.DpiScaleX + SystemParameters.WindowNonClientFrameThickness.Left * MV.DpiScaleX;
+            double y = pt2.Y - pt1.Y - ExtraHeightTop * MV.DpiScaleY;
 
-            //Console.WriteLine($"程序相对于屏幕%：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
-            //Console.WriteLine($"鼠标相对于屏幕%：({pt2.X}, {pt2.Y})。");
+            //Debug.WriteLine($"程序相对于屏幕：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
+            //Debug.WriteLine($"鼠标相对于屏幕：({pt2.X}, {pt2.Y})。");
+            //Debug.WriteLine($"Scrcpy相对于：({x}, {y})。");
 
             return (x, y);
         }
@@ -52,11 +53,11 @@ namespace ScrcpyEX.View
         /// 获得鼠标在Scrcpy中的坐标，计算最大宽度和高度时需要乘以DPI比例。
         /// </summary>
         /// <returns>如果鼠标在Scrcpy中，返回鼠标在Scrcpy中的坐标；否则返回null。</returns>
-        public Point? GetMouseInScrcpy()
+        public Point? GetPointInScrcpy()
         {
-            (double x, double y) = GetPointInScrcpy();
-            double maxW = ScActualWidth * DpiScaleX;
-            double maxH = ScActualHeight * DpiScaleY;
+            (double x, double y) = GetPointRelativeToScrcpy();
+            double maxW = ScActualWidth * MV.DpiScaleX;
+            double maxH = ScActualHeight * MV.DpiScaleY;
             
             //最后实际保存的坐标要以默认尺寸为准，需要除以当前尺寸和默认尺寸的比例，
             //这样可以让用户在任意尺寸下录制的脚本在任意尺寸下都可以正确播放
@@ -110,7 +111,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void StartRecord()
         {
-            if (IsClosed)
+            if (IsScClosed)
             {
                 popMid.Show("未进行投屏，不能进行录制。");
                 return;
@@ -156,13 +157,13 @@ namespace ScrcpyEX.View
         /// </summary>
         private void OpenRecordManage()
         {
-            RecManage manage = new();
+            RecManage manage = new(ScHandle);
             if (manage.ShowDialog() != true)
             {
                 return;
             }
             
-            if (IsClosed)
+            if (IsScClosed)
             {
                 popMid.Show("未进行投屏，不能执行脚本。");
                 return;
@@ -282,7 +283,7 @@ namespace ScrcpyEX.View
         /// <param name="desc">说明当前状态的字符串。</param>
         private void MappingEdit(string desc)
         {
-            if (IsClosed)
+            if (IsScClosed)
             {
                 popMid.Show("未进行投屏，不能进行映射编辑。");
                 return;
@@ -465,15 +466,15 @@ namespace ScrcpyEX.View
             foreach (KeyMapping m in mappings)
             {
                 //根据现在的比例计算半径
-                double radius = PopupDiameter * DpiScaleX / 2;
+                double radius = PopupDiameter * MV.DpiScaleX / 2;
                 
                 //获得圆心坐标
-                int centreX = (int)(m.OffsetX * ratio * DpiScaleX + radius);
-                int centreY = (int)(m.OffsetY * ratio * DpiScaleY + radius);
+                int centreX = (int)(m.OffsetX * ratio * MV.DpiScaleX + radius);
+                int centreY = (int)(m.OffsetY * ratio * MV.DpiScaleY + radius);
 
                 IntPtr lp = new((centreY << 16) + centreX);
                 DLL.PostMessage(scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
-                DLL.PostMessage(scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, lp);
+                DLL.PostMessage(scHandle, WM.WM_LBUTTONDOWN, (IntPtr)MK.MK_LBUTTON, lp);
                 DLL.PostMessage(scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
                 
                 //如果标志位为true，则让鼠标左键处于按下状态
@@ -488,7 +489,7 @@ namespace ScrcpyEX.View
             }
 
             //逻辑鼠标回到物理鼠标的位置
-            (double originX, double originY) = GetPointInScrcpy();
+            (double originX, double originY) = GetPointRelativeToScrcpy();
             IntPtr lp1 = new(((int)originY << 16) + (int)originX);
             DLL.PostMessage(scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp1);
         }

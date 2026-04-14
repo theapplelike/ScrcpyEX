@@ -20,7 +20,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ScrcpyEX.View
 {
@@ -47,12 +46,11 @@ namespace ScrcpyEX.View
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             //wParam高字节为0X20，低字节为1时，说明窗口被激活，但处于最小化
-            if (msg == 0x0006 && (int)wParam == 0X200001)
-            {
-                handled = true;
-                Debug.WriteLine($"拦截消息：{msg:X4}，{(int)wParam:X4}，{(int)lParam:X4}，" +
-                    $"说明窗口被激活，但处于最小化");
-            }
+            //if (msg == 0x0006 && (int)wParam == 0X200001)
+            //{
+            //    handled = true;
+            //    Debug.WriteLine($"拦截消息：{msg:X4}，{(int)wParam:X4}，{(int)lParam:X4}，说明窗口被激活，但处于最小化");
+            //}
             //窗口的非客户区域激活状态改变，wParam为0时窗口失活，为1时窗口激活，
             //当窗口Z序在后面，但处于激活状态时，Z序到最前面是不会触发Activated事件的，此时强制显示映射按钮
             //else if (msg == 0x0086 && (int)wParam == 0X0001)
@@ -64,6 +62,25 @@ namespace ScrcpyEX.View
             //else
             //    Debug.WriteLine($"MEG：{msg:X4}，{(long)wParam:X4}，{(long)lParam:X4}");
 
+            switch (msg)
+            {
+                case WM.WM_ACTIVATE:
+                    //wParam高字节为0X20，低字节为1时，说明窗口被激活，但处于最小化
+                    if ((int)wParam == 0X200001)
+                    {
+                        handled = true;
+                        Debug.WriteLine($"拦截消息：{msg:X4}，{(int)wParam:X4}，{(int)lParam:X4}，窗口被激活，但处于最小化");
+                    }
+                    break;
+                case WM.WM_DPICHANGED:
+                    MV.DpiScaleX = VisualTreeHelper.GetDpi(this).DpiScaleX;
+                    MV.DpiScaleY = VisualTreeHelper.GetDpi(this).DpiScaleY;
+                    Debug.WriteLine($"DPI 改变了，重新获取当前窗口的 DPI");
+                    break;
+                //default:
+                //    Debug.WriteLine($"MEG：{msg:X4}，{(long)wParam:X4}，{(long)lParam:X4}");
+                //    break;
+            }
 
             return IntPtr.Zero;
         }
@@ -75,6 +92,9 @@ namespace ScrcpyEX.View
         {
             MV.MainWin = this;
             MV.Pop = pop;
+            MV.DpiScaleX = VisualTreeHelper.GetDpi(this).DpiScaleX;
+            MV.DpiScaleY = VisualTreeHelper.GetDpi(this).DpiScaleY;
+
             _mainHandle = new WindowInteropHelper(this).Handle;
             bdRec.Visibility = Visibility.Hidden;
             dplTip.Visibility = Visibility.Collapsed;
@@ -172,7 +192,7 @@ namespace ScrcpyEX.View
         /// <param name="isWired">是否使用有线形式启动。</param>
         private async void StartScrcpy(bool isWired)
         {
-            if (IsClosed)
+            if (IsScClosed)
             {
                 btnWired.IsEnabled = btnWirel.IsEnabled = false;
                 CheckScrcpy();
@@ -309,15 +329,15 @@ namespace ScrcpyEX.View
             Width = SystemParameters.WorkArea.Width / 2;
             Height = (Width - ExtraWidth) * 1.0 / 15 * 7 + ExtraHeight;
             Locate();
-            Console.WriteLine($"宽高：{Width},{Height}。");
+            //Console.WriteLine($"宽高：{Width},{Height}。");
         }
 
         /// <summary>
-        /// Process.Kill()执行后，会调用Exited事件，前提是EnableRaisingEvents要设置为true。
+        /// 关闭Scrcpy。
         /// </summary>
         private void CloseScrcpy()
         {
-            if (!IsClosed)
+            if (!IsScClosed)
             {
                 _scrcpyHost.DisposeScrcpy();
                 bdShow.Child = null;
@@ -331,7 +351,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void RemoveBlack()
         {
-            if (IsClosed)
+            if (IsScClosed)
             {
                 popMid.Show("未进行投屏，不能进行调整。");
                 return;
@@ -365,7 +385,7 @@ namespace ScrcpyEX.View
         /// <param name="step">步长，默认为8。</param>
         private void ReduceSize(int step = 8)
         {
-            if (IsClosed)
+            if (IsScClosed)
             {
                 popMid.Show("未进行投屏，不能缩放尺寸。");
                 return;
@@ -388,7 +408,7 @@ namespace ScrcpyEX.View
         /// <param name="step">步长，默认为8。</param>
         private void AmplifySize(int step = 8)
         {
-            if (IsClosed)
+            if (IsScClosed)
             {
                 popMid.Show("未进行投屏，不能缩放尺寸。");
                 return;

@@ -47,7 +47,7 @@ namespace ScrcpyEX.View
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             _vm.Scaling = $"缩放比例 {ScRatioX:P}:{ScRatioY:P}";
-            if (!IsClosed)
+            if (!IsScClosed)
             {
                 _resizeTimer.Start();
             }
@@ -88,7 +88,7 @@ namespace ScrcpyEX.View
         private void Window_LocationChanged(object sender, EventArgs e)
         {
             //Console.WriteLine($"窗口位置改变,{IsActive}");
-            if (!IsClosed && IsActive)
+            if (!IsScClosed && IsActive)
             {
                 _locationChangeTimer.Start();
             }

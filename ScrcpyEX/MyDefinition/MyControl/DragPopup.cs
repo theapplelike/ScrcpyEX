@@ -246,12 +246,12 @@ namespace ScrcpyEX.MyDefinition.MyControl
             }
             else
             {
-                (double originX, double originY) = MV.MainWin.GetPointInScrcpy();
+                (double originX, double originY) = MV.MainWin.GetPointRelativeToScrcpy();
                 _lp = new(((int)originY << 16) + (int)originX);
 
                 //发送鼠标按下消息
                 DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, _lp);
-                DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, _lp);
+                DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_LBUTTONDOWN, (IntPtr)MK.MK_LBUTTON, _lp);
             }
 
             //double radius = 50 * MV.MainWin.ScRatioX / 2;
@@ -289,19 +289,19 @@ namespace ScrcpyEX.MyDefinition.MyControl
             {
                 _nowPoint = MyGM.GetPosition();//现在的坐标
 
-                double newX = HorizontalOffset + (_nowPoint.X - _lastPoint.X) / MV.MainWin.DpiScaleX;
-                double newY = VerticalOffset + (_nowPoint.Y - _lastPoint.Y) / MV.MainWin.DpiScaleY;
+                double newX = HorizontalOffset + (_nowPoint.X - _lastPoint.X) / MV.DpiScaleX;
+                double newY = VerticalOffset + (_nowPoint.Y - _lastPoint.Y) / MV.DpiScaleY;
 
                 if (!_isLeaveParent)//是否允许离开父控件
                 {
                     LimitToParent(ref newX, ref newY);
                 }
 
-                //Console.WriteLine($"##:{newX}+{_pop.Height}<>{_parentRect.Width}。");
-                //Console.WriteLine($"上次坐标：（{_lastPoint.X}，{_lastPoint.Y}），" +
+                //Debug.WriteLine(
+                //    $"上次坐标：（{_lastPoint.X}，{_lastPoint.Y}），" +
                 //    $"当前坐标：（{_nowPoint.X}，{_nowPoint.Y}），" +
                 //    $"旧位置：（{newX}，{newY}），" +
-                //    $"新位置：（{_pop.HorizontalOffset}，{_pop.VerticalOffset}），");
+                //    $"新位置：（{HorizontalOffset}，{VerticalOffset}），");
 
                 HorizontalOffset = newX;
                 VerticalOffset = newY;

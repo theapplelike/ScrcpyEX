@@ -9,13 +9,24 @@ using System.Threading;
 using System.Threading.Tasks;
 
 /// <summary>
-/// 扫描局域网中开放ADB端口的设备，包括电脑所在网络和电脑的热点网络。
+/// 扫描局域网中开放ADB调试的设备，包括电脑所在网络和电脑的热点网络。
 /// </summary>
 public class AdbDeviceScanner
 {
-    private const int AdbPort = 5555;
-    private const int TimeoutMs = 2000;
-    private const int MaxConcurrentScans = 600;
+    /// <summary>
+    /// adb的端口。
+    /// </summary>
+    private const int _adbPort = 5555;
+
+    /// <summary>
+    /// 每次检测任务的超时时间。
+    /// </summary>
+    private const int _timeoutMs = 2000;
+
+    /// <summary>
+    /// 最大并发扫描数量。
+    /// </summary>
+    private const int _maxConcurrentScans = 600;
 
     /// <summary>
     /// 扫描局域网中开放ADB端口的设备。
@@ -28,7 +39,7 @@ public class AdbDeviceScanner
         List<string> devices = [];
         List<Task> tasks = [];
         List<string> baseIps = GetNetworkSegment();
-        SemaphoreSlim semaphore = new(MaxConcurrentScans);
+        SemaphoreSlim semaphore = new(_maxConcurrentScans);
 
         foreach (string baseIp in baseIps)
         {
@@ -42,7 +53,7 @@ public class AdbDeviceScanner
                 {
                     try
                     {
-                        if (await IsPortOpenAsync(ip, AdbPort, TimeoutMs))
+                        if (await IsPortOpenAsync(ip, _adbPort, _timeoutMs))
                         {
                             lock (devices)
                             {
@@ -173,27 +184,42 @@ public class AdbDeviceScanner
         return addresses;
     }
 
-    // 计算CIDR表示法的子网掩码（如255.255.255.0 → /24）
+    /// <summary>
+    /// 计算CIDR表示法的子网掩码（如255.255.255.0 → /24）。
+    /// </summary>
+    /// <param name="maskBytes"></param>
+    /// <returns></returns>
     private int GetCidrMask(byte[] maskBytes)
     {
         int cidr = 0;
 
         for (int i = 0; i < maskBytes.Length; i++)
-        //foreach (byte b in maskBytes)
         {
-            if (maskBytes[i] == 255) cidr += 8;
+            if (maskBytes[i] == 255)
+            {
+                cidr += 8;
+            }
             else if (maskBytes[i] > 0)
             {
                 // 计算连续1的位数（如254=11111110 → 7位）
                 while (maskBytes[i] > 0)
                 {
-                    if ((maskBytes[i] & 0x80) == 0x80) cidr++;
-                    else break;
+                    if ((maskBytes[i] & 0x80) == 0x80)
+                    {
+                        cidr++;
+                    }
+                    else
+                    {
+                        break;
+                    }
                     maskBytes[i] <<= 1;
                 }
                 return cidr;
             }
-            else break;
+            else
+            {
+                break;
+            }
         }
         return cidr;
     }

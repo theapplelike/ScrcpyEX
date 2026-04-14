@@ -38,6 +38,11 @@ namespace ScrcpyEX.View
         private RecInfo _lastItem = null;
 
         /// <summary>
+        /// Scrcpy的句柄。
+        /// </summary>
+        private IntPtr _scHandle = IntPtr.Zero;
+
+        /// <summary>
         /// 临时存储正在编辑的脚本信息。
         /// </summary>
         public RecInfo TempRecInfo { get; set; } = null;
