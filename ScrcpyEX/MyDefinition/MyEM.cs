@@ -17,7 +17,7 @@ namespace ScrcpyEX.MyDefinition
     internal static class MyEM
     {
         /// <summary>
-        /// 在指定元素的Visual树中查找类型匹配的子元素。
+        /// 在指定元素的Visual树中查找类型匹配的子元素，Popup要使用Child属性调用此方法。
         /// </summary>
         /// <typeparam name="T">要查找的子元素类型，比如Button。</typeparam>
         /// <param name="obj">指定的父级元素。</param>

@@ -1,0 +1,58 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ScrcpyEX.MyDefinition.MyControl">
+    
+    <Style TargetType="local:IconButton" BasedOn="{StaticResource MenuBtn}">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+
+        <!--如果重写Template，继承的父控件所有Template的内容会被覆盖，需要把父控件的Template复制过来，在其中添加需要的内容-->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:IconButton">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
+                        <Grid>
+                            <!-- 主图标 -->
+                            <TextBlock x:Name="PART_MainIcon"
+                                   Text="{TemplateBinding MainIcon}"
+                                   Style="{StaticResource txtIcon}"
+                                   FontSize="20"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                            <!-- 角标图标（初始透明） -->
+                            <TextBlock x:Name="PART_CornerIcon"
+                                   Text="{TemplateBinding CornerIcon}"
+                                   Style="{StaticResource txtIcon}"
+                                   FontSize="12"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Bottom"
+                                   Opacity="0" Margin="0,0,1,1"/>
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <!-- 鼠标悬停时显示角标 -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="LightBlue"/>
+                            <Setter TargetName="PART_CornerIcon" Property="Opacity" Value="1"/>
+                        </Trigger>
+                        <!--鼠标按下时的样式-->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="SkyBlue"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+                        <!--鼠标禁用时的样式-->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="#EEEEEE"/>
+                            <Setter Property="Foreground" Value="#AAAAAA"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

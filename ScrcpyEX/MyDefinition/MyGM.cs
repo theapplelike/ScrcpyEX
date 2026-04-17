@@ -322,7 +322,7 @@ namespace ScrcpyEX.MyDefinition
         {
             return await Task.Run(() =>
             {
-                ProcessStartInfo processStartInfo = new()
+                ProcessStartInfo prcStartInfo = new()
                 {
                     FileName = MV.ADB_Path,         //adb的路径
                     Arguments = adbCmd,             //执行完命令后adb会直接关闭
@@ -333,13 +333,16 @@ namespace ScrcpyEX.MyDefinition
                     UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
                     CreateNoWindow = true,          // 不创建窗口
                 };
-                using Process adbPrc = Process.Start(processStartInfo);
+                using Process adbPrc = Process.Start(prcStartInfo);
                 string output = adbPrc.StandardOutput.ReadToEnd();
                 string error = adbPrc.StandardError.ReadToEnd();
 
                 adbPrc.WaitForExit();
 
-                Debug.WriteLine($"{adbCmd}，命令已发送，命令结果：\n{output}。{error}");
+                Debug.Write($"{adbCmd}，执行结果：\n{output}");
+                Debug.WriteIf(error != "", $"错误信息：{error}\n");
+                Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
+
                 return output;
             });
         }

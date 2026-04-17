@@ -104,6 +104,11 @@ namespace ScrcpyEX.ExtensionMethod
         public ScrcpySet ScrcpySet { get; set; } = new();
 
         /// <summary>
+        /// 最后一次连接Scrcpy是否使用有线连接。
+        /// </summary>
+        public bool IsUseWiredInLast { get; set; } = true;
+
+        /// <summary>
         /// 保持清醒，防止设备进入休眠状态（无线连接时无效）。
         /// </summary>
         //[CommandLine("--stay-awake")]

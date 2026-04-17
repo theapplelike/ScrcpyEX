@@ -93,6 +93,12 @@ namespace ScrcpyEX.View
             _locationChangeTimer.Tick += new EventHandler(LocationChange_Tick);
             _locationChangeTimer.Interval = TimeSpan.FromSeconds(0.1);
 
+            _rightOvfMenuTimer.Tick += new EventHandler(CloseRightMenu_Tick);
+            _rightOvfMenuTimer.Interval = TimeSpan.FromSeconds(0.2);
+
+            _scOptMenuTimer.Tick += new EventHandler(CloseScMenu_Tick);
+            _scOptMenuTimer.Interval = TimeSpan.FromSeconds(0.2);
+
             _timedHandler = async (sender, e) => await TimedScript_Tick(_recInfo);
             _imageHandler = async (sender, e) => await ImageScript_Tick(_recInfo);
 
@@ -124,6 +130,24 @@ namespace ScrcpyEX.View
             _locationChangeTimer.Stop();
             HideKeyMapping();
             ShowKeyMapping();
+        }
+
+        /// <summary>
+        /// 指定延时后关闭右侧Popup溢出菜单。
+        /// </summary>
+        private void CloseRightMenu_Tick(object sender, EventArgs e)
+        {
+            _rightOvfMenuTimer.Stop();
+            popRightOvfMenu.IsOpen = false;
+        }
+
+        /// <summary>
+        /// 指定延时后关闭Scrcpy功能菜单。
+        /// </summary>
+        private void CloseScMenu_Tick(object sender, EventArgs e)
+        {
+            _scOptMenuTimer.Stop();
+            popScOpt.IsOpen = false;
         }
 
         /// <summary>

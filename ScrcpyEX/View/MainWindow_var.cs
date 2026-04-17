@@ -59,6 +59,16 @@ namespace ScrcpyEX.View
         private readonly DispatcherTimer _locationChangeTimer = new();
 
         /// <summary>
+        /// 关闭右侧Popup溢出菜单的计时器，Ovf->Overflow。
+        /// </summary>
+        private readonly DispatcherTimer _rightOvfMenuTimer = new();
+
+        /// <summary>
+        /// 关闭Scrcpy相关功能菜单的计时器，Opt->Option。
+        /// </summary>
+        private readonly DispatcherTimer _scOptMenuTimer = new();
+
+        /// <summary>
         /// 处理任务锁。
         /// </summary>
         private readonly object _processingLock = new();

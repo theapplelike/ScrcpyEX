@@ -16,7 +16,6 @@
     <Window.Resources>
         <Style x:Key="LstBtn" TargetType="Button" BasedOn="{StaticResource MenuBtn}">
             <Setter Property="Height" Value="30"/>
-            <Setter Property="Margin" Value="0"/>
             <Setter Property="Width" Value="40"/>
         </Style>
     </Window.Resources>

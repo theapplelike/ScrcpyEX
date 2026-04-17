@@ -4,16 +4,14 @@
     <!--菜单栏的按钮样式-->
     <Style x:Key="MenuBtn" TargetType="Button">
         <Setter Property="Width" Value="50"/>
-        <!--<Setter Property="FontFamily" Value="幼圆"/>-->
         <!--字体资源的生成操作可以是Resource或内容，如果没有生效清理一下项目-->
         <Setter Property="FontFamily" Value="/ScrcpyEX;component/Resource/IconFont/SegoeFluentIcons.ttf#Segoe Fluent Icons"/>
         <Setter Property="FontSize" Value="20"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="Margin" Value="0,1,0,0"/>
         <Setter Property="Focusable" Value="False"/>
 
-        <!--隐藏鼠标悬停在按钮上显示的蓝色边框-->
+        <!--重写按钮的模板-->
         <Setter Property="Template">
             <Setter.Value>
                 <!--使用按钮原来的样式，不做更改-->
@@ -24,9 +22,9 @@
                             CornerRadius="4">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    <!-- 禁用焦点视觉样式 -->
+                    
                     <ControlTemplate.Triggers>
-                        <!--鼠标悬停时只显示背景颜色，这里不需要设置BorderBrush为Transparent，因为已经移除了焦点视觉样式-->
+                        <!--鼠标悬停时修改背景颜色，这里不需要设置BorderBrush为Transparent，因为已经移除了焦点视觉样式-->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="LightBlue"/>
                         </Trigger>
@@ -56,7 +54,7 @@
         <Setter Property="BorderBrush" Value="Gainsboro"/>
         <Setter Property="Margin" Value="0,0,0,0"/>
 
-        <!--隐藏鼠标悬停在按钮上显示的蓝色边框-->
+        <!---重写按钮的模板-->
         <Setter Property="Template">
             <Setter.Value>
                 <!--使用按钮原来的样式，不做更改-->
@@ -69,7 +67,7 @@
                     </Border>
                     <!-- 禁用焦点视觉样式 -->
                     <ControlTemplate.Triggers>
-                        <!--鼠标悬停时只显示背景颜色，这里不需要设置BorderBrush为Transparent，因为已经移除了焦点视觉样式-->
+                        <!--鼠标悬停时修改背景颜色，这里不需要设置BorderBrush为Transparent，因为已经移除了焦点视觉样式-->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="#EEEEEE"/>
                         </Trigger>
@@ -102,20 +100,20 @@
         <Setter Property="BorderBrush" Value="GhostWhite"/>
         <Setter Property="Margin" Value="0,1"/>
 
-        <!--隐藏鼠标悬停在按钮上显示的蓝色边框-->
+        <!---重写按钮的模板-->
         <Setter Property="Template">
             <Setter.Value>
                 <!--使用按钮原来的样式，不做更改-->
                 <ControlTemplate TargetType="Button">
                     <Border Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="2"
-                    CornerRadius="4">
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="2"
+                            CornerRadius="4">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <!-- 禁用焦点视觉样式 -->
                     <ControlTemplate.Triggers>
-                        <!--鼠标悬停时只显示背景颜色，这里不需要设置BorderBrush为Transparent，因为已经移除了焦点视觉样式-->
+                        <!--鼠标悬停时修改背景颜色，这里不需要设置BorderBrush为Transparent，因为已经移除了焦点视觉样式-->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="LightBlue"/>
                         </Trigger>
@@ -134,5 +132,5 @@
             </Setter.Value>
         </Setter>
     </Style>
-
+    
 </ResourceDictionary>

@@ -152,7 +152,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 {
                     sb.Append($"{arg} ");
                 }
-                Debug.WriteLine($"属性{prop.Name}：{prop.GetValue(MyCfg.Cfg.ScrcpySet)}，{arg}。");
+                //Debug.WriteLine($"属性{prop.Name}：{prop.GetValue(MyCfg.Cfg.ScrcpySet)}，{arg}。");
             }
 
             //键盘使用UHID可以输入中文，对安卓输入中文时电脑输入法必须为英文

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,9 @@ namespace ScrcpyEX.MyDefinition.MyControl
 
         public TimePopup()
         {
+            StaysOpen = true;
+            AllowsTransparency = true;
+
             _hideTimer.Tick += new EventHandler(Pop_Tick);
         }
 

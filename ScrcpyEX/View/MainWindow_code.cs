@@ -96,12 +96,13 @@ namespace ScrcpyEX.View
             MV.DpiScaleY = VisualTreeHelper.GetDpi(this).DpiScaleY;
 
             _mainHandle = new WindowInteropHelper(this).Handle;
-            bdRec.Visibility = Visibility.Hidden;
-            dplTip.Visibility = Visibility.Collapsed;
+            //bdRec.Visibility = Visibility.Hidden;
+            //dplTip.Visibility = Visibility.Collapsed;
 
             SetControlEvent();
             SetTimer();
             ReadCfg();
+            ScMainBtnInit();
             SetUISize(true);
             InputModeSwitcher.SwitchToEnglishMode(_mainHandle);
 
@@ -199,14 +200,21 @@ namespace ScrcpyEX.View
 
                 if (isWired)
                 {
+                    ExchangeMainBtn(btnWired);
                     await ScrcpyInit(true);
                 }
                 else
                 {
+                    ExchangeMainBtn(btnWirel);
                     await PrepareWireless();
                 }
 
+                MyCfg.Cfg.IsUseWiredInLast = isWired;
                 btnWired.IsEnabled = btnWirel.IsEnabled = true;
+            }
+            else
+            {
+                popMid.Show("Scrcpy已经启动");
             }
         }
 
@@ -216,12 +224,11 @@ namespace ScrcpyEX.View
         private void CheckScrcpy()
         {
             // 查询指定名称的进程（无需包含.exe扩展名）
-            Process[] processes = Process.GetProcessesByName("Scrcpy");
-
-            if (processes.Length > 0)
+            Process[] prc = Process.GetProcessesByName("Scrcpy");
+            if (prc.Length > 0)
             {
-                //Debug.WriteLine($"进程ID: {processes[0].Id}，路径：{processes[0].MainModule?.FileName}");
-                processes[0].Kill();
+                //Debug.WriteLine($"进程ID:{prc[0].Id}，路径:{prc[0].MainModule?.FileName}");
+                prc[0].Kill();
             }
         }
 
@@ -469,15 +476,16 @@ namespace ScrcpyEX.View
         /// </summary>
         private async void WirelessDebug()
         {
-            popMid.Show("正在打开无线调试，请保持USB连接稳定。");
-            if (await OpenWirelessDebug())
-            {
-                popMid.Show("匹配完成，正在启动Scrcpy。");
-            }
-            else
-            {
-                popMid.Show("没有USB连接的设备或设备未打开USB调试。");
-            }
+            popMid.Show("请保持USB连接稳定。");
+            await OpenWirelessDebug();
+            //if (await OpenWirelessDebug())
+            //{
+            //    popMid.Show("匹配完成，正在启动Scrcpy。");
+            //}
+            //else
+            //{
+            //    popMid.Show("没有USB连接的设备或设备未打开USB调试。");
+            //}
         }
 
         /// <summary>
@@ -486,38 +494,50 @@ namespace ScrcpyEX.View
         /// <returns>设备无线调试是否打开成功。</returns>
         private async Task<bool> OpenWirelessDebug()
         {
-            List<string> devices = ParseAdbDevicesLinq(await MyGM.Adb($"devices"));
-
-            foreach (string device in devices)
+            List<string> devices = await GetAdbDevices();
+            foreach (string dev in devices)
             {
                 //判断是序列号还是IP，序列号代表是USB连接
-                if (!device.Contains(":") || !IPAddress.TryParse(device.Split(':')[0], out _))
+                if (!dev.Contains(":") || !IPAddress.TryParse(dev.Split(':')[0], out _))
                 {
                     //获得指定设备IP，awk 是一个文本处理工具，按行处理文本
                     //{print $9}表示打印每一行的第9个字段，字段默认以空格或制表符分隔
-                    string ip = (await MyGM.Adb($@"-s {device} shell ip route | awk '{{print $9}}'")).Trim();
-                    await MyGM.Adb($"-s {device} tcpip 5555");
+                    string ip = (await MyGM.Adb($@"-s {dev} shell ip route | awk '{{print $9}}'")).Trim();
+                    if (ip == "")
+                    {
+                        popMid.Show("未获得设备IP地址，请检查是否在同一网络中。");
+                        return false; ;
+                    }
+
+                    //将安卓设备上的 ADB 服务从 USB 模式切换为网络模式
+                    await MyGM.Adb($"-s {dev} tcpip 5555");
+
+                    //连接指定 IP 地址和端口上的 Android 设备，须在同一局域网中
                     await MyGM.Adb($"connect {ip}:5555");
 
                     CloseScrcpy();
                     await Task.Delay(1000);
                     StartScrcpy(false);
 
+                    popMid.Show("匹配完成，正在启动Scrcpy。");
                     return true;
                 }
             }
+
+            popMid.Show("没有设备或未打开USB调试。");
             return false;
         }
 
         /// <summary>
-        /// 使用LINQ解析从Adb获得的设备列表。
+        /// 所有当前连接到电脑的 Android 设备或模拟器。
+        /// USB连接的物理设备，是其序列号；网络连接的设备，格式为 IP地址:端口号；模拟器是 emulator-端口号。
         /// </summary>
-        private List<string> ParseAdbDevicesLinq(string output)
+        private async Task<List<string>> GetAdbDevices()
         {
-            if (string.IsNullOrEmpty(output)) return [];
-
-            return output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
-                .Where(line => !line.StartsWith("List of devices attached") && !string.IsNullOrWhiteSpace(line))
+            string output = await MyGM.Adb("devices");
+            return output
+                .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+                .Where(line => !line.StartsWith("List of devices") && !string.IsNullOrWhiteSpace(line))
                 .Select(line => line.Split(['\t', ' '], StringSplitOptions.RemoveEmptyEntries))
                 .Where(parts => parts.Length >= 2 && parts[1] == "device")
                 .Select(parts => parts[0].Trim())
@@ -546,6 +566,175 @@ namespace ScrcpyEX.View
                 if (select.ShowDialog() == true)
                 {
                     await ScrcpyInit(false, devices[select.Index]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 窗口尺寸改变后要进行的操作。
+        /// </summary>
+        /// <param name="e">SizeChanged事件相关的数据。</param>
+        private void WindowSizeChanged(SizeChangedEventArgs e)
+        {
+            Debug.WriteLine($"现在的宽度：{e.NewSize.Width}");
+
+            _vm.Scaling = $"缩放比例 {ScRatioX:P}:{ScRatioY:P}";
+            if (!IsScClosed)
+            {
+                _resizeTimer.Start();
+            }
+
+            //计算菜单栏右侧按钮是否需要放入溢出菜单
+            if (e.NewSize.Width >= 300)
+            {
+                MoveOutOvfMenu();
+            }
+            else if (e.NewSize.Width < 300 && e.NewSize.Width >= 200)
+            {
+                if (stpRightMenu.Children.Count > 2)
+                {
+                    MoveInOvfMenu(false);
+                }
+                else if (stpRightMenu.Children.Count < 2)
+                {
+                    MoveOutOvfMenu();
+                }
+            }
+            else if (e.NewSize.Width < 200)
+            {
+                if (stpRightMenu.Children.Count > 1)
+                {
+                    MoveInOvfMenu(true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 将按钮移入右侧溢出菜单。
+        /// </summary>
+        /// <param name="isFrontmost">加入溢出菜单的按钮是否放到最前面。</param>
+        private void MoveInOvfMenu(bool isFrontmost = true)
+        {
+            Button btn = stpRightMenu.Children[stpRightMenu.Children.Count - 1] as Button;
+            stpRightMenu.Children.Remove(btn);
+            btn.Margin = new(0, 1, 0, 0);
+
+            StackPanel stp = popRightOvfMenu.Child.FindVisualChild<StackPanel>();
+            if (isFrontmost)
+            {
+                stp.Children.Insert(0, btn);
+            }
+            else
+            {
+                stp.Children.Add(btn);
+            }
+        }
+
+        /// <summary>
+        /// 将按钮移出右侧溢出菜单。
+        /// </summary>
+        private void MoveOutOvfMenu()
+        {
+            StackPanel stp = popRightOvfMenu.Child.FindVisualChild<StackPanel>();
+            if (stp.Children.Count > 0)
+            {
+                if (stp.Children[0] is Button btn)
+                {
+                    stp.Children.Remove(btn);
+                    btn.Margin = new(0);
+
+                    stpRightMenu.Children.Add(btn);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 初始化Scrcpy的主要功能按钮和附属Popup菜单。
+        /// </summary>
+        private void ScMainBtnInit()
+        {
+            if (MyCfg.Cfg.IsUseWiredInLast)
+            {
+                ProcessButton(btnWired);
+            }
+            else
+            {
+                ProcessButton(btnWirel);
+            }
+        }
+
+        /// <summary>
+        /// 处理Scrcpy相关的按钮。
+        /// </summary>
+        /// <param name="mainBtn">作为主要功能的按钮。</param>
+        private void ProcessButton(Button mainBtn)
+        {
+            ScMainBtnSet(mainBtn);
+
+            //非主要按钮加入Popup菜单
+            List<Button> buttons = dcpScMain.Children.OfType<Button>().Where(b => b.Name != mainBtn.Name).ToList();
+            foreach (Button b in buttons)
+            {
+                MoveInScMenu(b);
+            }
+        }
+
+        /// <summary>
+        /// Scrcpy主要功能按钮设置其属性和事件，并作为Popup菜单的绑定目标。
+        /// </summary>
+        /// <param name="mainBtn">作为主要功能的按钮。</param>
+        private void ScMainBtnSet(Button mainBtn)
+        {
+            mainBtn.Tag = "MainBtn";
+            mainBtn.Margin = new(0);
+            mainBtn.MouseEnter += BtnScMain_MouseEnter;
+            mainBtn.MouseLeave += BtnScMain_MouseLeave;
+            popScOpt.PlacementTarget = mainBtn;
+        }
+
+        /// <summary>
+        /// 指定按钮加入Scrcpy功能菜单。
+        /// </summary>
+        /// <param name="btn">要加入菜单的按钮。</param>
+        private void MoveInScMenu(Button btn)
+        {
+            dcpScMain.Children.Remove(btn);
+            btn.Margin = new(0, 1, 0, 0);
+            btn.Click += (sender, e) => popScOpt.IsOpen = false;
+
+            StackPanel stp = popScOpt.Child.FindVisualChild<StackPanel>();
+            stp.Children.Add(btn);
+        }
+
+        /// <summary>
+        /// 交换主要功能按钮。
+        /// </summary>
+        /// <param name="mainBtn">下一个主要功能按钮。</param>
+        private void ExchangeMainBtn(Button mainBtn)
+        {
+            if (mainBtn.Tag != null && mainBtn.Tag.ToString() == "MainBtn")
+            {
+                Debug.WriteLine($"已经是主要按钮了");
+                return;//已经是主要按钮了
+            }
+
+            if (mainBtn.Parent is StackPanel stp)
+            {
+                if (dcpScMain.Children[0] is Button prevBtn)//获得之前的主要按钮
+                {
+                    //现在的主要按钮设置属性、事件
+                    stp.Children.Remove(mainBtn);
+                    ScMainBtnSet(mainBtn);
+
+                    //前一个主要按钮取消属性、事件
+                    dcpScMain.Children.Remove(prevBtn);
+                    prevBtn.Tag = "";
+                    prevBtn.Margin = new(0, 1, 0, 0);
+                    prevBtn.MouseEnter -= BtnScMain_MouseEnter;
+                    prevBtn.MouseLeave -= BtnScMain_MouseLeave;
+
+                    dcpScMain.Children.Add(mainBtn);
+                    stp.Children.Insert(0, prevBtn);
                 }
             }
         }
