@@ -55,6 +55,14 @@ namespace ScrcpyEX.View
         /// <returns>如果鼠标在Scrcpy中，返回鼠标在Scrcpy中的坐标；否则返回null。</returns>
         public Point? GetPointInScrcpy()
         {
+            //判定是否点击在Scrcpy上，如果上层有Popup等窗口遮挡则返回null
+            IntPtr hWndUnderMouse = DLL.WindowFromPoint(System.Windows.Forms.Cursor.Position);
+            if (hWndUnderMouse != ScHandle)
+            {
+                //Debug.WriteLine($"点击在非Scrcpy窗口");
+                return null;
+            }
+
             (double x, double y) = GetPointRelativeToScrcpy();
             double maxW = ScActualWidth * MV.DpiScaleX;
             double maxH = ScActualHeight * MV.DpiScaleY;
@@ -63,7 +71,7 @@ namespace ScrcpyEX.View
             //这样可以让用户在任意尺寸下录制的脚本在任意尺寸下都可以正确播放
             double actuclX = x / ScRatioX;
             double actuclY = y / ScRatioY;
-            //Console.WriteLine($"鼠标在程序中坐标%：({x}, {y})；Scrcpy尺寸%：({maxW}, {maxH})，和初始尺寸的比例：（{ScRatioX},{ScRatioY}），实际保存点：（{actuclX},{actuclY}）");
+            //Debug.WriteLine($"鼠标在程序中坐标：({x}, {y})；Scrcpy尺寸：({maxW}, {maxH})，和初始尺寸的比例：（{ScRatioX},{ScRatioY}），实际保存点：（{actuclX},{actuclY}）");
             
             if (x > 0 && x < maxW && y > 0 && y < maxH)
             {
@@ -73,7 +81,7 @@ namespace ScrcpyEX.View
             }
             else
             {
-                return null;
+                return null;//边缘位置无效，比如0
             }
         }
 
@@ -129,7 +137,7 @@ namespace ScrcpyEX.View
                     RemoveBlack();
                     bdRec.Visibility = Visibility.Visible;
                     btnImgCompare.Visibility = Visibility.Collapsed;
-                    popMid.Show("已开启录制操作，录制时会自动消除黑边。");
+                    popMid.Show("开启录制，并消除黑边。");
                 }
                 else
                 {
@@ -459,8 +467,8 @@ namespace ScrcpyEX.View
             }
             else
             {
-                if (popMenu.IsOpen) { popMenu.IsOpen = false; }
-                if (popRec.IsOpen) { popRec.IsOpen = false; }
+                if (popSize.IsOpen) { popSize.IsOpen = false; }
+                if (popFunc.IsOpen) { popFunc.IsOpen = false; }
             }
 
             foreach (KeyMapping m in mappings)

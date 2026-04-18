@@ -146,29 +146,14 @@ namespace ScrcpyEX.View
             MyGM.SetSameColor(dpl, Brushes.Transparent, ((Button)sender).Tag);
         }
 
-        private void BtnLocate_Click(object sender, RoutedEventArgs e)
-        {
-            Locate();
-        }
+        //private void BtnLocate_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Locate();
+        //}
 
         private void BtnLocOpt_Click(object sender, RoutedEventArgs e)
         {
-            Button btn = sender as Button;
-
-            //在溢出菜单中时，不再依赖按钮，在鼠标位置弹出菜单
-            if (ToolBar.GetIsOverflowItem(btn))
-            {
-                popMenu.PlacementTarget = null;
-                popMenu.Placement = PlacementMode.MousePoint;
-                
-            }
-            else
-            {
-                popMenu.PlacementTarget = btnLocOpt;
-                popMenu.Placement = PlacementMode.Bottom;
-            }
-
-            popMenu.IsOpen = true;
+            OpenMenu(sender as Button, popSize);
         }
 
         private void BtnRecManage_Click(object sender, RoutedEventArgs e)
@@ -176,9 +161,9 @@ namespace ScrcpyEX.View
             OpenRecordManage();
         }
 
-        private void BtnRecOption_Click(object sender, RoutedEventArgs e)
+        private void BtnFuncOpt_Click(object sender, RoutedEventArgs e)
         {
-            popRec.IsOpen = true;
+            OpenMenu(sender as Button, popFunc);
         }
 
         private void BtnRecStop_Click(object sender, RoutedEventArgs e)
@@ -192,13 +177,14 @@ namespace ScrcpyEX.View
         }
         #endregion
 
-        #region 弹出菜单事件
-
+        #region 提示Popup事件
         private void PopMid_Opened(object sender, EventArgs e)
         {
             popMid.VerticalOffset = (ExtraHeightTop + popMid.Child.RenderSize.Height) / 2 + gShow.Margin.Top;
         }
+        #endregion
 
+        #region 位置和大小的菜单
         private void Pop_Closed(object sender, EventArgs e)
         {
             MyGM.SetSameColor(dpl, Brushes.Transparent, ((Popup)sender).Tag);
@@ -207,26 +193,14 @@ namespace ScrcpyEX.View
         private void BtnQuarterLoc_Click(object sender, RoutedEventArgs e)
         {
             QuarterMove();
-            popMenu.IsOpen = false;
+            popSize.IsOpen = false;
         }
 
         private void BtnOriginalLoc_Click(object sender, RoutedEventArgs e)
         {
             SetUISize();
             Locate();
-            popMenu.IsOpen = false;
-        }
-
-        private void BtnRemoveBlack_Click(object sender, RoutedEventArgs e)
-        {
-            RemoveBlack();
-            popMenu.IsOpen = false;
-        }
-
-        private void BtnScGotFocus_Click(object sender, RoutedEventArgs e)
-        {
-            ScGotFocus(null);
-            popMenu.IsOpen = false;
+            popSize.IsOpen = false;
         }
 
         private void BtnReduce_Click(object sender, RoutedEventArgs e)
@@ -238,14 +212,21 @@ namespace ScrcpyEX.View
         {
             AmplifySize();
         }
+        #endregion
+
+        #region 功能菜单
+        private void BtnSet_Click(object sender, RoutedEventArgs e)
+        {
+            new Setup().ShowDialog();
+        }
 
         /// <summary>
         /// 开始录制脚本。
         /// </summary>
-        private void BtnScr_Click(object sender, RoutedEventArgs e)
+        private void BtnRecScr_Click(object sender, RoutedEventArgs e)
         {
             StartRecord();
-            popRec.IsOpen = false;
+            popFunc.IsOpen = false;
         }
 
         /// <summary>
@@ -256,9 +237,16 @@ namespace ScrcpyEX.View
             WirelessDebug();
         }
 
-        private void BtnSet_Click(object sender, RoutedEventArgs e)
+        private void BtnRemoveBlack_Click(object sender, RoutedEventArgs e)
         {
-            new Setup().ShowDialog();
+            RemoveBlack();
+            //popMenu.IsOpen = false;
+        }
+
+        private void BtnScGotFocus_Click(object sender, RoutedEventArgs e)
+        {
+            ScGotFocus(null);
+            //popMenu.IsOpen = false;
         }
 
         /// <summary>

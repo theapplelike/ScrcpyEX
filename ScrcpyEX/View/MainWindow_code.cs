@@ -96,8 +96,8 @@ namespace ScrcpyEX.View
             MV.DpiScaleY = VisualTreeHelper.GetDpi(this).DpiScaleY;
 
             _mainHandle = new WindowInteropHelper(this).Handle;
-            //bdRec.Visibility = Visibility.Hidden;
-            //dplTip.Visibility = Visibility.Collapsed;
+            bdRec.Visibility = Visibility.Hidden;
+            dplTip.Visibility = Visibility.Collapsed;
 
             SetControlEvent();
             SetTimer();
@@ -585,11 +585,11 @@ namespace ScrcpyEX.View
             }
 
             //计算菜单栏右侧按钮是否需要放入溢出菜单
-            if (e.NewSize.Width >= 300)
+            if (e.NewSize.Width >= 329)
             {
                 MoveOutOvfMenu();
             }
-            else if (e.NewSize.Width < 300 && e.NewSize.Width >= 200)
+            else if (e.NewSize.Width < 329 && e.NewSize.Width >= 223)
             {
                 if (stpRightMenu.Children.Count > 2)
                 {
@@ -600,7 +600,7 @@ namespace ScrcpyEX.View
                     MoveOutOvfMenu();
                 }
             }
-            else if (e.NewSize.Width < 200)
+            else if (e.NewSize.Width < 223)
             {
                 if (stpRightMenu.Children.Count > 1)
                 {
@@ -714,7 +714,6 @@ namespace ScrcpyEX.View
         {
             if (mainBtn.Tag != null && mainBtn.Tag.ToString() == "MainBtn")
             {
-                Debug.WriteLine($"已经是主要按钮了");
                 return;//已经是主要按钮了
             }
 
@@ -737,6 +736,29 @@ namespace ScrcpyEX.View
                     stp.Children.Insert(0, prevBtn);
                 }
             }
+        }
+
+        /// <summary>
+        /// 打开指定菜单，在溢出菜单中时，不再依赖按钮，在鼠标位置弹出菜单。
+        /// </summary>
+        /// <param name="btn">打开菜单的按钮。</param>
+        /// <param name="pop">需要打开的菜单。</param>
+        private void OpenMenu(Button btn, Popup pop)
+        {
+            //在溢出菜单中时，不再依赖按钮，在鼠标位置弹出菜单
+            if (ToolBar.GetIsOverflowItem(btn))
+            {
+                pop.PlacementTarget = null;
+                pop.Placement = PlacementMode.MousePoint;
+
+            }
+            else
+            {
+                pop.PlacementTarget = btn;
+                pop.Placement = PlacementMode.Bottom;
+            }
+
+            pop.IsOpen = true;
         }
 
     }

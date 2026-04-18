@@ -187,6 +187,15 @@ namespace ScrcpyEX.MyDefinition
         [DllImport("user32.dll")]
         public static extern short VkKeyScan(char ch);
 
+        /// <summary>
+        /// 检索包含指定点的窗口的句柄。
+        /// </summary>
+        /// <param name="point">System.Drawing.Point类型的坐标点。</param>
+        /// <returns>返回值是包含点的窗口的句柄。如果给定点不存在窗口，则返回值为IntPtr.Zero。</returns>
+        [DllImport("user32.dll")]
+        public static extern IntPtr WindowFromPoint(System.Drawing.Point point);
+
+
         [DllImport("user32.dll")]
         public static extern IntPtr GetDesktopWindow();
 

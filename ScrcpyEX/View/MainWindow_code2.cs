@@ -346,14 +346,14 @@ namespace ScrcpyEX.View
                 popMid.Show("此脚本未截取图片，不能进行比对。");
                 return;
             }
-
+            
             CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, _recInfo.CropRect);
             if (scWindow == null)
             {
                 popMid.Show("获取Scrcpy截图失败。");
                 return;
             }
-
+            
             ShowImg showImg = new(recInfo, scWindow);
             showImg.ShowDialog();
         }

@@ -69,7 +69,7 @@
         </mycontrol:TimePopup>
 
         <!--位置和大小的菜单-->
-        <Popup x:Name="popMenu" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnLocOpt}" Tag="g1" Closed="Pop_Closed">
+        <Popup x:Name="popSize" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnLocOpt}" Closed="Pop_Closed">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel Background="White">
                     <TextBlock Text="{Binding Resolution}" Background="White" Padding="5"/>
@@ -84,10 +84,6 @@
                     <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并定位"/>
                     <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="▣默认原始尺寸并定位"/>
 
-                    <!--<UniformGrid Rows="1" Columns="2">
-                        <Button x:Name="btnRemoveBlack" Click="BtnRemoveBlack_Click" Style="{StaticResource ItemBtn}" Content="消除投屏黑边"/>
-                        <Button x:Name="btnScGotFocus"  Click="BtnScGotFocus_Click"  Style="{StaticResource ItemBtn}" Content="激活投屏输入(F1)"/>
-                    </UniformGrid>-->
                     <UniformGrid Rows="1" Columns="2">
                         <Button x:Name="btnReduce"  Click="BtnReduce_Click"  Style="{StaticResource ItemBtn}" Content="缩小尺寸"/>
                         <Button x:Name="btnAmplify" Click="BtnAmplify_Click" Style="{StaticResource ItemBtn}" Content="放大尺寸"/>
@@ -98,22 +94,18 @@
         </Popup>
         
         <!--功能菜单-->
-        <Popup x:Name="popRec" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnRecOpt}" Tag="g2" Closed="Pop_Closed">
+        <Popup x:Name="popFunc" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnFuncOpt}" Closed="Pop_Closed">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel Background="White">
                     <TextBlock Text="功能菜单" Background="AliceBlue" Padding="10"/>
                     <Button x:Name="btnSet" Click="BtnSet_Click" Style="{StaticResource ItemBtn}" Content="功能设置"/>
-
-                    <UniformGrid Rows="1" Columns="2">
-                        <Button x:Name="btnScr" Click="BtnScr_Click" Style="{StaticResource ItemBtn}" Content="录制脚本"/>
-                        <Button x:Name="btnOpenWireless" Click="BtnOpenWireless_Click" Style="{StaticResource ItemBtn}" Content="开启无线调试" ToolTip="将USB连接电脑的设备开启无线调试，开启可以进行无线连接，设备和电脑需要处于一个网络中。"/>
-                    </UniformGrid>
+                    <Button x:Name="btnScGotFocus" Click="BtnScGotFocus_Click" Style="{StaticResource ItemBtn}" Content="激活投屏输入(F1)"/>
 
                     <UniformGrid Rows="1" Columns="2">
                         <Button x:Name="btnRemoveBlack" Click="BtnRemoveBlack_Click" Style="{StaticResource ItemBtn}" Content="消除投屏黑边"/>
-                        <Button x:Name="btnScGotFocus"  Click="BtnScGotFocus_Click"  Style="{StaticResource ItemBtn}" Content="激活投屏输入(F1)"/>
+                        <Button x:Name="btnOpenWireless" Click="BtnOpenWireless_Click" Style="{StaticResource ItemBtn}" Content="开启无线调试" ToolTip="将USB连接电脑的设备开启无线调试，开启后可以进行无线连接，设备和电脑需要处于一个网络中。"/>
                     </UniformGrid>
-
+                    
                     <UniformGrid Rows="1" Columns="3">
                         <Button x:Name="btnMappingEdit" Click="BtnMappingEdit_Click" Style="{StaticResource ItemBtn}" Content="映射编辑"/>
                         <Button x:Name="btnMappingBack" Click="BtnMappingBack_Click" Style="{StaticResource ItemBtn}" Content="取消修改" IsEnabled="False"/>
@@ -154,18 +146,20 @@
                     </DockPanel>
                     <Rectangle Style="{StaticResource sep}"/><!---->
 
-                    <mycontrol:IconButton x:Name="btnLocOpt" Click="BtnLocOpt_Click" MainIcon="&#xe78a;" CornerIcon="&#xE7bc;" ToolTip="位置与大小选项"/>
-                    <mycontrol:IconButton x:Name="btnRecOpt" Click="BtnRecOption_Click" MainIcon="&#xe835;" CornerIcon="&#xE7bc;" ToolTip="功能菜单"/>
-                    
+                    <mycontrol:IconButton x:Name="btnLocOpt"  Click="BtnLocOpt_Click"  MainIcon="&#xe78a;" CornerIcon="&#xE7bc;" ToolTip="位置与大小选项"/>
+                    <mycontrol:IconButton x:Name="btnFuncOpt" Click="BtnFuncOpt_Click" MainIcon="&#xebd2;" CornerIcon="&#xE7bc;" ToolTip="功能菜单"/>
+                    <Rectangle Style="{StaticResource sep}"/>
 
-                    <Button x:Name="btnRecManage" Click="BtnRecManage_Click" Style="{StaticResource thisBtn}" Content="&#xea40;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="40" ToolTip="脚本管理"/>
+                    <mycontrol:IconButton x:Name="btnRecManage" Click="BtnRecManage_Click" MainIcon="&#xea40;" CornerIcon="&#xE712;" ToolTip="脚本管理"/>
+                    <Button x:Name="btnRecScr" Click="BtnRecScr_Click" Content="&#xe9a1;" Style="{StaticResource thisBtn}" ToolTip="录制脚本"/>
                     <!--
+                    <Button x:Name="btnRecManage" Click="BtnRecManage_Click" Style="{StaticResource thisBtn}" Content="&#xea40;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="40" ToolTip="脚本管理"/>
+                    
                     <Button x:Name="btnRecOption1" Click="BtnRecOption_Click" Style="{StaticResource thisBtn}" Content="&#xeb11;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="22" ToolTip="功能菜单"/>
                     
                     <Rectangle Style="{StaticResource sep}"/>-->
 
-                    <Button x:Name="btnTest" Style="{StaticResource thisBtn}" Content="&#xEC26;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
-
+                    <Button x:Name="btnTest" Style="{StaticResource thisBtn}" Content="&#xf133;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
                     <Border x:Name="bdRec" HorizontalAlignment="Right" BorderBrush="SteelBlue" BorderThickness="4">
                         <DockPanel>
                             <Button x:Name="btnImgCompare" Click="BtnImgCompare_Click" Style="{StaticResource thisBtn}" Content="&#xf58c;" Foreground="SteelBlue" Height="22" ToolTip="查看脚本比对图像"/>
@@ -177,7 +171,7 @@
                                 <TextBlock Text="秒" VerticalAlignment="Center" FontSize="16" Margin="0,0,2,0"/>
                                 <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
                             </DockPanel>
-                            <Button x:Name="btnRecStop" Click="BtnRecStop_Click" Style="{StaticResource thisBtn}" Content="&#xe769;" Foreground="SteelBlue" Height="22"/>
+                            <Button x:Name="btnRecStop" Click="BtnRecStop_Click" Style="{StaticResource thisBtn}" Content="&#xe769;" Foreground="SteelBlue" Height="22" ToolTip="停止脚本/录制"/>
                         </DockPanel>
                     </Border>
                     
