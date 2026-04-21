@@ -94,7 +94,7 @@ namespace ScrcpyEX.View
             {
                 _scriptTimer.Stop();
                 _countTimer.Stop();
-                bdRec.Visibility = Visibility.Hidden;
+                bdRec.Visibility = Visibility.Collapsed;
                 dplTip.Visibility = Visibility.Collapsed;
             }
             if (MouseScript.HookID != IntPtr.Zero)

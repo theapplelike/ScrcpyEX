@@ -53,6 +53,21 @@ namespace ScrcpyEX.MyDefinition.MyControl
         private TextBlock _tbkDisplayChar;
 
         /// <summary>
+        /// 当前Popup对应的按键信息映射类。
+        /// </summary>
+        private readonly KeyMapping _mapping;
+
+        /// <summary>
+        /// Popup中控件的缩放比例。
+        /// </summary>
+        private readonly double _ratio;
+
+        /// <summary>
+        /// Popup初始是否为编辑状态。
+        /// </summary>
+        private readonly bool _isInitEdit;
+
+        /// <summary>
         /// 是否可以移出逻辑父级。
         /// </summary>
         private readonly bool _isLeaveParent;
@@ -116,20 +131,31 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// <param name="isLeaveParent">是否可以移出逻辑父级。</param>
         public DragPopup(KeyMapping mapping, double ratio, bool isInitEdit, bool isLeaveParent = false)
         {
-            VkCode = mapping.VkCode;
+            _mapping = mapping;
+            _ratio = ratio;
+            _isInitEdit = isInitEdit;
             _isLeaveParent = isLeaveParent;
 
-            ControlInit(mapping.Char, ratio);
+            VkCode = mapping.VkCode;
+            Loaded += Popup_Loaded;
+        }
+
+        /// <summary>
+        /// 控件加载完成时发生。
+        /// </summary>
+        private void Popup_Loaded(object sender, RoutedEventArgs e)
+        {
+            ControlInit(_ratio, 0.3);
             ControlEventBinding();
-            SetEditingStatus(isInitEdit);
+            SetEditingStatus(_isInitEdit);
         }
 
         /// <summary>
         /// DragPopup中包含的控件进行初始化。
         /// </summary>
-        /// <param name="ch">映射的字符。</param>
-        /// <param name="ratio">映射Popup的直径。</param>
-        private void ControlInit(string ch, double ratio)
+        /// <param name="ratio">Popup中控件的缩放比例。</param>
+        /// <param name="limit">缩放比例的上下限。</param>
+        private void ControlInit(double ratio, double limit)
         {
             //提供最外层边框
             _bdOuter = new()
@@ -137,7 +163,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
                 BorderBrush = Brushes.Black,
                 BorderThickness = new(1),
-                CornerRadius = new(50 * ratio),
+                CornerRadius = new(Width),
             };
 
             //提供装多个控件的容器
@@ -146,11 +172,9 @@ namespace ScrcpyEX.MyDefinition.MyControl
             //提供输入
             _txtInput = new()
             {
-                Text = ch,
-                //Width = 15,
-                Width = MyGM.RatioClamp(15 , ratio, 0.2),
-                //FontSize = 16,
-                FontSize = MyGM.RatioClamp(16, ratio, 0.2),
+                Text = _mapping.Char,
+                Width = MyGM.RatioClamp(15 , ratio, limit),
+                FontSize = MyGM.RatioClamp(16, ratio, limit),
                 FontFamily = new FontFamily("Consolas"),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
@@ -170,22 +194,19 @@ namespace ScrcpyEX.MyDefinition.MyControl
             {
                 FontSize = 8,
                 Content = "X",
-                //Height = 14,
-                //Width = 14,
-                Height = MyGM.RatioClamp(14, ratio, 0.2),
-                Width = MyGM.RatioClamp(14, ratio, 0.2),
+                Height = MyGM.RatioClamp(14, ratio, 0.5),
+                Width = MyGM.RatioClamp(14, ratio, 0.5),
                 VerticalAlignment = VerticalAlignment.Top,
                 HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new(0, -2, -2, 0),
                 //Visibility = Visibility.Collapsed,
             };
 
             //显示映射按键字符的边框
             _bdChar = new()
             {
-                //Width = 20,
-                //Height = 20,
-                Height = MyGM.RatioClamp(20, ratio, 0.2),
-                Width = MyGM.RatioClamp(20, ratio, 0.2),
+                Height = MyGM.RatioClamp(20, ratio, limit),
+                Width = MyGM.RatioClamp(20, ratio, limit),
                 Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
                 BorderBrush = Brushes.Black,
                 CornerRadius = new(20),
@@ -194,12 +215,11 @@ namespace ScrcpyEX.MyDefinition.MyControl
             //显示映射按键的字符
             _tbkDisplayChar = new()
             {
-                Text = ch,
+                Text = _mapping.Char,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 FontWeight = FontWeights.Black,
-                //FontSize = 16,
-                FontSize = MyGM.RatioClamp(16, ratio, 0.2),
+                FontSize = MyGM.RatioClamp(16, ratio, limit),
                 FontFamily = new FontFamily("Consolas"),
             };
 

@@ -93,9 +93,9 @@ namespace ScrcpyEX.View
 
         #region 自定义菜单栏按钮事件
         /// <summary>
-        /// 点击自定义标题栏拖拽窗口。
+        /// 点击自定义菜单栏拖拽窗口。
         /// </summary>
-        private void Dpl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void GMenu_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DragMove();
         }
@@ -133,22 +133,17 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 定位的两个按钮颜色联动，鼠标进入时同时修改背景色。
         /// </summary>
-        private void Btn_MouseEnter(object sender, MouseEventArgs e)
-        {
-            MyGM.SetSameColor(dpl, Brushes.LightBlue, ((Button)sender).Tag);
-        }
+        //private void Btn_MouseEnter(object sender, MouseEventArgs e)
+        //{
+        //    MyGM.SetSameColor(gMenu, Brushes.LightBlue, ((Button)sender).Tag);
+        //}
 
         /// <summary>
         /// 定位的两个按钮颜色联动，鼠标离开时同时修改背景色。
         /// </summary>
-        private void Btn_MouseLeave(object sender, MouseEventArgs e)
-        {
-            MyGM.SetSameColor(dpl, Brushes.Transparent, ((Button)sender).Tag);
-        }
-
-        //private void BtnLocate_Click(object sender, RoutedEventArgs e)
+        //private void Btn_MouseLeave(object sender, MouseEventArgs e)
         //{
-        //    Locate();
+        //    MyGM.SetSameColor(gMenu, Brushes.Transparent, ((Button)sender).Tag);
         //}
 
         private void BtnLocOpt_Click(object sender, RoutedEventArgs e)
@@ -156,14 +151,14 @@ namespace ScrcpyEX.View
             OpenMenu(sender as Button, popSize);
         }
 
-        private void BtnRecManage_Click(object sender, RoutedEventArgs e)
-        {
-            OpenRecordManage();
-        }
-
         private void BtnFuncOpt_Click(object sender, RoutedEventArgs e)
         {
             OpenMenu(sender as Button, popFunc);
+        }
+
+        private void BtnRecManage_Click(object sender, RoutedEventArgs e)
+        {
+            OpenRecordManage();
         }
 
         private void BtnRecStop_Click(object sender, RoutedEventArgs e)
@@ -185,10 +180,10 @@ namespace ScrcpyEX.View
         #endregion
 
         #region 位置和大小的菜单
-        private void Pop_Closed(object sender, EventArgs e)
-        {
-            MyGM.SetSameColor(dpl, Brushes.Transparent, ((Popup)sender).Tag);
-        }
+        //private void Pop_Closed(object sender, EventArgs e)
+        //{
+        //    MyGM.SetSameColor(gMenu, Brushes.Transparent, ((Popup)sender).Tag);
+        //}
 
         private void BtnQuarterLoc_Click(object sender, RoutedEventArgs e)
         {
@@ -240,13 +235,13 @@ namespace ScrcpyEX.View
         private void BtnRemoveBlack_Click(object sender, RoutedEventArgs e)
         {
             RemoveBlack();
-            //popMenu.IsOpen = false;
+            popFunc.IsOpen = false;
         }
 
         private void BtnScGotFocus_Click(object sender, RoutedEventArgs e)
         {
             ScGotFocus(null);
-            //popMenu.IsOpen = false;
+            popFunc.IsOpen = false;
         }
 
         /// <summary>
@@ -265,61 +260,6 @@ namespace ScrcpyEX.View
         private void BtnMappingBack_Click(object sender, RoutedEventArgs e)
         {
             MappingCancel();
-        }
-        #endregion
-
-        #region 右侧溢出菜单
-        private void PopRightOvfMenu_MouseEnter(object sender, MouseEventArgs e)
-        {
-            _rightOvfMenuTimer.Stop();
-        }
-
-        private void PopRightOvfMenu_MouseLeave(object sender, MouseEventArgs e)
-        {
-            _rightOvfMenuTimer.Start();
-        }
-
-        private void BtnClosePrg_MouseEnter(object sender, MouseEventArgs e)
-        {
-            _rightOvfMenuTimer.Stop();
-            popRightOvfMenu.IsOpen = true;
-        }
-
-        private void BtnClosePrg_MouseLeave(object sender, MouseEventArgs e)
-        {
-            _rightOvfMenuTimer.Start();
-        }
-        #endregion
-
-        #region Scrcpy功能菜单
-        private void PopScOpt_MouseEnter(object sender, MouseEventArgs e)
-        {
-            _scOptMenuTimer.Stop();
-        }
-
-        private void PopScOpt_MouseLeave(object sender, MouseEventArgs e)
-        {
-            _scOptMenuTimer.Start();
-        }
-
-        /// <summary>
-        /// 此事件由主要Scrcpy功能按钮绑定。
-        /// </summary>
-        private void BtnScMain_MouseEnter(object sender, MouseEventArgs e)
-        {
-            _scOptMenuTimer.Stop();
-            popScOpt.IsOpen = true;
-
-            Debug.WriteLine($"主按钮触发：BtnScMain_MouseEnter+++");
-        }
-
-        /// <summary>
-        /// 此事件由主要Scrcpy功能按钮绑定。
-        /// </summary>
-        private void BtnScMain_MouseLeave(object sender, MouseEventArgs e)
-        {
-            _scOptMenuTimer.Start();
-            Debug.WriteLine($"主按钮触发：BtnScMain_MouseLeave---");
         }
         #endregion
 

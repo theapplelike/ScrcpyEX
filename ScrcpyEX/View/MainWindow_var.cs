@@ -59,16 +59,6 @@ namespace ScrcpyEX.View
         private readonly DispatcherTimer _locationChangeTimer = new();
 
         /// <summary>
-        /// 关闭右侧Popup溢出菜单的计时器，Ovf->Overflow。
-        /// </summary>
-        private readonly DispatcherTimer _rightOvfMenuTimer = new();
-
-        /// <summary>
-        /// 关闭Scrcpy相关功能菜单的计时器，Opt->Option。
-        /// </summary>
-        private readonly DispatcherTimer _scOptMenuTimer = new();
-
-        /// <summary>
         /// 处理任务锁。
         /// </summary>
         private readonly object _processingLock = new();
@@ -160,11 +150,11 @@ namespace ScrcpyEX.View
             {
                 if (gShow.CheckAccess()) //检查是否在UI线程
                 {
-                    return dpl.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom;
+                    return gMenu.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom;
                 }
                 else
                 {
-                    return Dispatcher.Invoke(() => dpl.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom);
+                    return Dispatcher.Invoke(() => gMenu.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom);
                 }
             }
         }
@@ -177,7 +167,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 窗口除开Scrcpy的额外上方高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
-        private double ExtraHeightTop => dpl.ActualHeight + gShow.Margin.Top;
+        private double ExtraHeightTop => gMenu.ActualHeight + gShow.Margin.Top;
 
         /// <summary>
         /// 屏幕X轴上的DPI比例。

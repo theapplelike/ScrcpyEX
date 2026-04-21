@@ -196,11 +196,11 @@ namespace ScrcpyEX.MyDefinition
         public static extern IntPtr WindowFromPoint(System.Drawing.Point point);
 
 
-        [DllImport("user32.dll")]
-        public static extern IntPtr GetDesktopWindow();
+        //[DllImport("user32.dll")]
+        //public static extern IntPtr GetDesktopWindow();
 
-        [DllImport("user32.dll")]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);
+        //[DllImport("user32.dll")]
+        //public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         //[DllImport("user32.dll", CharSet = CharSet.Auto)]
         //public static extern bool PostThreadMessage(uint idThread, uint Msg, IntPtr wParam, IntPtr lParam);

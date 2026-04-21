@@ -96,13 +96,13 @@ namespace ScrcpyEX.View
             MV.DpiScaleY = VisualTreeHelper.GetDpi(this).DpiScaleY;
 
             _mainHandle = new WindowInteropHelper(this).Handle;
-            bdRec.Visibility = Visibility.Hidden;
+            bdRec.Visibility = Visibility.Collapsed;
             dplTip.Visibility = Visibility.Collapsed;
 
             SetControlEvent();
             SetTimer();
             ReadCfg();
-            ScMainBtnInit();
+            ScOptInit();
             SetUISize(true);
             InputModeSwitcher.SwitchToEnglishMode(_mainHandle);
 
@@ -200,12 +200,12 @@ namespace ScrcpyEX.View
 
                 if (isWired)
                 {
-                    ExchangeMainBtn(btnWired);
+                    popScOpt.ExchangeMainBtn(btnWired);
                     await ScrcpyInit(true);
                 }
                 else
                 {
-                    ExchangeMainBtn(btnWirel);
+                    popScOpt.ExchangeMainBtn(btnWirel);
                     await PrepareWireless();
                 }
 
@@ -576,7 +576,7 @@ namespace ScrcpyEX.View
         /// <param name="e">SizeChanged事件相关的数据。</param>
         private void WindowSizeChanged(SizeChangedEventArgs e)
         {
-            Debug.WriteLine($"现在的宽度：{e.NewSize.Width}");
+            //Debug.WriteLine($"现在的宽度：{e.NewSize.Width}");
 
             _vm.Scaling = $"缩放比例 {ScRatioX:P}:{ScRatioY:P}";
             if (!IsScClosed)
@@ -587,71 +587,47 @@ namespace ScrcpyEX.View
             //计算菜单栏右侧按钮是否需要放入溢出菜单
             if (e.NewSize.Width >= 329)
             {
-                MoveOutOvfMenu();
+                MoveOutSysMenu();
             }
             else if (e.NewSize.Width < 329 && e.NewSize.Width >= 223)
             {
                 if (stpRightMenu.Children.Count > 2)
                 {
-                    MoveInOvfMenu(false);
+                    MoveInSysMenu(false);
                 }
                 else if (stpRightMenu.Children.Count < 2)
                 {
-                    MoveOutOvfMenu();
+                    MoveOutSysMenu();
                 }
             }
             else if (e.NewSize.Width < 223)
             {
                 if (stpRightMenu.Children.Count > 1)
                 {
-                    MoveInOvfMenu(true);
+                    MoveInSysMenu(true);
                 }
             }
         }
 
         /// <summary>
-        /// 将按钮移入右侧溢出菜单。
+        /// 将系统按钮加入系统悬停菜单。
         /// </summary>
-        /// <param name="isFrontmost">加入溢出菜单的按钮是否放到最前面。</param>
-        private void MoveInOvfMenu(bool isFrontmost = true)
+        /// <param name="isTopmost">加入溢出菜单的按钮是否放到最前面。</param>
+        private void MoveInSysMenu(bool isTopmost = true)
         {
             Button btn = stpRightMenu.Children[stpRightMenu.Children.Count - 1] as Button;
-            stpRightMenu.Children.Remove(btn);
-            btn.Margin = new(0, 1, 0, 0);
-
-            StackPanel stp = popRightOvfMenu.Child.FindVisualChild<StackPanel>();
-            if (isFrontmost)
-            {
-                stp.Children.Insert(0, btn);
-            }
-            else
-            {
-                stp.Children.Add(btn);
-            }
+            popSysOpt.Add(btn, isTopmost);
         }
 
         /// <summary>
-        /// 将按钮移出右侧溢出菜单。
+        /// 将系统按钮移出系统悬停菜单。
         /// </summary>
-        private void MoveOutOvfMenu()
-        {
-            StackPanel stp = popRightOvfMenu.Child.FindVisualChild<StackPanel>();
-            if (stp.Children.Count > 0)
-            {
-                if (stp.Children[0] is Button btn)
-                {
-                    stp.Children.Remove(btn);
-                    btn.Margin = new(0);
-
-                    stpRightMenu.Children.Add(btn);
-                }
-            }
-        }
+        private void MoveOutSysMenu() => popSysOpt.MoveOutTo(stpRightMenu);
 
         /// <summary>
         /// 初始化Scrcpy的主要功能按钮和附属Popup菜单。
         /// </summary>
-        private void ScMainBtnInit()
+        private void ScOptInit()
         {
             if (MyCfg.Cfg.IsUseWiredInLast)
             {
@@ -669,72 +645,13 @@ namespace ScrcpyEX.View
         /// <param name="mainBtn">作为主要功能的按钮。</param>
         private void ProcessButton(Button mainBtn)
         {
-            ScMainBtnSet(mainBtn);
+            popScOpt.PlacementTarget = mainBtn;
 
             //非主要按钮加入Popup菜单
             List<Button> buttons = dcpScMain.Children.OfType<Button>().Where(b => b.Name != mainBtn.Name).ToList();
             foreach (Button b in buttons)
             {
-                MoveInScMenu(b);
-            }
-        }
-
-        /// <summary>
-        /// Scrcpy主要功能按钮设置其属性和事件，并作为Popup菜单的绑定目标。
-        /// </summary>
-        /// <param name="mainBtn">作为主要功能的按钮。</param>
-        private void ScMainBtnSet(Button mainBtn)
-        {
-            mainBtn.Tag = "MainBtn";
-            mainBtn.Margin = new(0);
-            mainBtn.MouseEnter += BtnScMain_MouseEnter;
-            mainBtn.MouseLeave += BtnScMain_MouseLeave;
-            popScOpt.PlacementTarget = mainBtn;
-        }
-
-        /// <summary>
-        /// 指定按钮加入Scrcpy功能菜单。
-        /// </summary>
-        /// <param name="btn">要加入菜单的按钮。</param>
-        private void MoveInScMenu(Button btn)
-        {
-            dcpScMain.Children.Remove(btn);
-            btn.Margin = new(0, 1, 0, 0);
-            btn.Click += (sender, e) => popScOpt.IsOpen = false;
-
-            StackPanel stp = popScOpt.Child.FindVisualChild<StackPanel>();
-            stp.Children.Add(btn);
-        }
-
-        /// <summary>
-        /// 交换主要功能按钮。
-        /// </summary>
-        /// <param name="mainBtn">下一个主要功能按钮。</param>
-        private void ExchangeMainBtn(Button mainBtn)
-        {
-            if (mainBtn.Tag != null && mainBtn.Tag.ToString() == "MainBtn")
-            {
-                return;//已经是主要按钮了
-            }
-
-            if (mainBtn.Parent is StackPanel stp)
-            {
-                if (dcpScMain.Children[0] is Button prevBtn)//获得之前的主要按钮
-                {
-                    //现在的主要按钮设置属性、事件
-                    stp.Children.Remove(mainBtn);
-                    ScMainBtnSet(mainBtn);
-
-                    //前一个主要按钮取消属性、事件
-                    dcpScMain.Children.Remove(prevBtn);
-                    prevBtn.Tag = "";
-                    prevBtn.Margin = new(0, 1, 0, 0);
-                    prevBtn.MouseEnter -= BtnScMain_MouseEnter;
-                    prevBtn.MouseLeave -= BtnScMain_MouseLeave;
-
-                    dcpScMain.Children.Add(mainBtn);
-                    stp.Children.Insert(0, prevBtn);
-                }
+                popScOpt.Add(b);
             }
         }
 
@@ -745,19 +662,16 @@ namespace ScrcpyEX.View
         /// <param name="pop">需要打开的菜单。</param>
         private void OpenMenu(Button btn, Popup pop)
         {
-            //在溢出菜单中时，不再依赖按钮，在鼠标位置弹出菜单
             if (ToolBar.GetIsOverflowItem(btn))
             {
                 pop.PlacementTarget = null;
                 pop.Placement = PlacementMode.MousePoint;
-
             }
             else
             {
                 pop.PlacementTarget = btn;
                 pop.Placement = PlacementMode.Bottom;
             }
-
             pop.IsOpen = true;
         }
 

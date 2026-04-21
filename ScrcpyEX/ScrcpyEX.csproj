@@ -99,6 +99,7 @@
     <Compile Include="MyDefinition\MyClass\OpenCv.cs" />
     <Compile Include="MyDefinition\MyClass\ScrcpyHost.cs" />
     <Compile Include="MyDefinition\MyControl\DragPopup.cs" />
+    <Compile Include="MyDefinition\MyControl\HoverPopup.cs" />
     <Compile Include="MyDefinition\MyControl\IconButton.cs" />
     <Compile Include="MyDefinition\MyControl\TimePopup.cs" />
     <Compile Include="MyDefinition\WindowsAPI\DLL.cs" />
