@@ -70,7 +70,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             await StartScrcpy();
             if (ScHandle == IntPtr.Zero)
             {
-                MV.MainWin.popMid.Show("Scrcpy启动失败。");
+                MyGM.MidPOP("Scrcpy启动失败。");
                 return null;
             }
 
@@ -246,11 +246,11 @@ namespace ScrcpyEX.MyDefinition.MyClass
         
             if (e.Data.Contains("A popup should open on the device to request authorization."))
             {
-                MV.MainWin.popMid.Show("请在设备上同意授权后再试。");
+                MyGM.MidPOP("请在设备上同意授权后再试。");
             }
             else if (e.Data.Contains("INSTALL_FAILED_NO_MATCHING_ABIS: Failed to extract native libraries, res=-113"))
             {
-                MV.MainWin.popMid.Show("安装的APK文件与设备CPU架构不匹配。");
+                MyGM.MidPOP("安装的APK文件与设备CPU架构不匹配。");
             }
         }
 
@@ -268,11 +268,10 @@ namespace ScrcpyEX.MyDefinition.MyClass
             //获得当前分辨率，第一个参数是宽，第二个参数是高
             if (e.Data.Contains("Texture"))
             {
-                //Console.WriteLine($"分辨率改变，内部");
                 MV.MainWin.ShowResolutionDesc(e.Data);
 
                 //Scrcpy在横竖屏转换的时候会导致坐标错位，需要重绘窗口，并调用基类的方法
-                _hwndHost?.RefreshWindow();
+                _hwndHost?.RefreshScWindow();
             }
         }
 
@@ -281,7 +280,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         public void RefreshScrcpy()
         {
-            _hwndHost?.RefreshWindow();
+            _hwndHost?.RefreshScWindow();
         }
 
         /// <summary>
@@ -381,9 +380,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
             }
 
             /// <summary>
-            /// 刷新窗口，重新绘制窗口后通知基类方法。
+            /// 刷新Scrcpy窗口，重新绘制窗口后通知基类方法。
             /// </summary>
-            public void RefreshWindow()
+            public void RefreshScWindow()
             {
                 DLL.MoveWindow(_scHandle, 0, 0, (int)_lastRect.Width, (int)_lastRect.Height, true);
                 base.OnWindowPositionChanged(_lastRect);

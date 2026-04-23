@@ -271,7 +271,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
 
                 //发送鼠标按下消息
                 DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, _lp);
-                DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_LBUTTONDOWN, (IntPtr)MK.MK_LBUTTON, _lp);
+                DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_LBUTTONDOWN, (IntPtr)MK.LBUTTON, _lp);
             }
 
             //double radius = 50 * MV.MainWin.ScRatioX / 2;

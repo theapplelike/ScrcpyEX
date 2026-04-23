@@ -234,7 +234,7 @@ namespace ScrcpyEX.View
 
         private void BtnRemoveBlack_Click(object sender, RoutedEventArgs e)
         {
-            RemoveBlack();
+            RemoveScBlack(true);
             popFunc.IsOpen = false;
         }
 

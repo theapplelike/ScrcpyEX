@@ -109,6 +109,16 @@ namespace ScrcpyEX.ExtensionMethod
         public bool IsUseWiredInLast { get; set; } = true;
 
         /// <summary>
+        /// 是否使用上一次退出时的位置和大小。
+        /// </summary>
+        public bool IsUseLastSize { get; set; } = true;
+
+        /// <summary>
+        /// 是否保持横屏。
+        /// </summary>
+        public bool IsKeepLandscape { get; set; } = false;
+
+        /// <summary>
         /// 保持清醒，防止设备进入休眠状态（无线连接时无效）。
         /// </summary>
         //[CommandLine("--stay-awake")]

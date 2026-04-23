@@ -42,6 +42,7 @@ namespace ScrcpyEX
         {
             HandleException(e.Exception, "UI线程异常");
             e.Handled = true; //设置为ture可以防止程序终止
+            MyGM.ShwError($"UI线程异常：{e.Exception}");
         }
 
         /// <summary>
@@ -50,6 +51,7 @@ namespace ScrcpyEX
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             HandleException(e.ExceptionObject as Exception, "非UI线程异常");
+            MyGM.ShwError($"非UI线程异常：{e.ExceptionObject as Exception}");
         }
 
         /// <summary>
@@ -59,6 +61,7 @@ namespace ScrcpyEX
         {
             HandleException(e.Exception, "未观察到的Task异常");
             e.SetObserved(); //标记未观察到的任务异常已被开发者显式处理，防止程序终止
+            MyGM.ShwError($"未观察到的Task异常：{e.Exception}");
         }
 
         /// <summary>

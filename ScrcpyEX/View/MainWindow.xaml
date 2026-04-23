@@ -9,7 +9,7 @@
         xmlns:wfI="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel" 
         xmlns:mycontrol="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
-        Title="MainWindow" Height="488" Width="970" WindowStartupLocation="CenterScreen"
+        Title="MainWindow" Height="493" Width="970" WindowStartupLocation="CenterScreen" 
         Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged"
         StateChanged="Window_StateChanged" Activated="Window_Activated" Deactivated="Window_Deactivated"
         LocationChanged="Window_LocationChanged">

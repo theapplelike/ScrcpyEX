@@ -103,7 +103,7 @@ namespace ScrcpyEX.View
             SetTimer();
             ReadCfg();
             ScOptInit();
-            SetUISize(true);
+            SetUISize(MyCfg.Cfg.IsUseLastSize);
             InputModeSwitcher.SwitchToEnglishMode(_mainHandle);
 
             //快捷键
@@ -354,13 +354,17 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 消除投屏的黑边。
+        /// 消除Scrcpy的黑边。
         /// </summary>
-        private void RemoveBlack()
+        private void RemoveScBlack(bool isForcedAdjustment = false)
         {
             if (IsScClosed)
             {
-                popMid.Show("未进行投屏，不能进行调整。");
+                popMid.Show("未投屏，无需消除黑边。");
+                return;
+            }
+            if (!isForcedAdjustment && MyCfg.Cfg.IsKeepLandscape)
+            {
                 return;
             }
 
@@ -406,7 +410,7 @@ namespace ScrcpyEX.View
             Width -= _horizontalRatio * step;
             Height -= _verticalRatio * step;
             Locate();
-            RemoveBlack();
+            RemoveScBlack();
         }
 
         /// <summary>
@@ -448,7 +452,7 @@ namespace ScrcpyEX.View
             }
 
             Locate();
-            RemoveBlack();
+            RemoveScBlack();
         }
 
         /// <summary>

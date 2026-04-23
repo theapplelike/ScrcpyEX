@@ -112,6 +112,8 @@ namespace ScrcpyEX.View
             {
                 StopScriptAndRecord();
             });
+
+            Dispatcher.BeginInvoke(StopScriptAndRecord);
         }
 
         /// <summary>
@@ -134,14 +136,14 @@ namespace ScrcpyEX.View
             {
                 if (MouseScript.RegisterHook())
                 {
-                    RemoveBlack();
+                    RemoveScBlack();
                     bdRec.Visibility = Visibility.Visible;
                     btnImgCompare.Visibility = Visibility.Collapsed;
-                    popMid.Show("开启录制，并消除黑边。");
+                    popMid.Show("开启脚本录制。");
                 }
                 else
                 {
-                    popMid.Show("钩子注册失败，未能启动录制。");
+                    popMid.Show("鼠标钩子注册失败，未能启动录制。");
                 }
             }
             else
@@ -209,7 +211,7 @@ namespace ScrcpyEX.View
         private void ScriptBefore(RecInfo recInfo)
         {
             //消除黑边，有黑边时会有偏移
-            RemoveBlack();
+            RemoveScBlack();
 
             //UI和变量初始化
             _vm.Running = 0;
@@ -482,7 +484,7 @@ namespace ScrcpyEX.View
 
                 IntPtr lp = new((centreY << 16) + centreX);
                 DLL.PostMessage(scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
-                DLL.PostMessage(scHandle, WM.WM_LBUTTONDOWN, (IntPtr)MK.MK_LBUTTON, lp);
+                DLL.PostMessage(scHandle, WM.WM_LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
                 DLL.PostMessage(scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
                 
                 //如果标志位为true，则让鼠标左键处于按下状态
@@ -507,9 +509,9 @@ namespace ScrcpyEX.View
         /// </summary>
         private void ScGotFocus(object parameter)
         {
-            DLL.SetFocus(ScHandle);
+            IntPtr intPtr = DLL.SetFocus(ScHandle);
             //bool a = DLL.SetForegroundWindow(ScHandle);
-            Debug.WriteLine($"让Scrcpy获得焦点");
+            Debug.WriteLine($"让Scrcpy获得焦点，{intPtr}");
         }
 
 

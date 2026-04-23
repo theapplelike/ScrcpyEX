@@ -42,7 +42,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         }
 
         /// <summary>
-        /// 在 PlacementTarget 依赖属性的值实际发生变化时触发。
+        /// 在PlacementTarget依赖属性的值实际发生变化时触发。
         /// </summary>
         /// <param name="d">发生属性变化的依赖对象实例，即属性的拥有者。</param>
         /// <param name="e">提供属性变化前后的值以及属性本身的信息。</param>

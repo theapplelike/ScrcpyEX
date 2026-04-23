@@ -50,13 +50,13 @@ namespace ScrcpyEX.View
             Regex reg = new("[0-9]+");
             MatchCollection mc = reg.Matches(texture);
 
-            _vm.Resolution = $"投屏分辨率 {mc[0].Value}*{mc[1].Value}，{GetRatio(mc)}";
+            _vm.Resolution = $"投屏分辨率 {mc[0].Value}*{mc[1].Value}，{GetResolutionRatio(mc)}";
         }
 
         /// <summary>
         /// 获得分辨率的最小比例值、宽和高的比例。
         /// </summary>
-        private string GetRatio(MatchCollection mc)
+        private string GetResolutionRatio(MatchCollection mc)
         {
             int.TryParse(mc[0].Value, out int a);
             int.TryParse(mc[1].Value, out int b);
@@ -143,7 +143,7 @@ namespace ScrcpyEX.View
         private async Task ImageScript_Tick(RecInfo recInfo)
         {
             // 防止重叠执行
-            lock (_processingLock)
+            lock (_imageScriptLock)
             {
                 if (_isProcessing) { return; }
                 _isProcessing = true;
@@ -151,7 +151,7 @@ namespace ScrcpyEX.View
 
             try
             {
-                Debug.WriteLine($"进入新一轮，已产生的间隔：{_vm.Running}。");
+                //Debug.WriteLine($"进入新一轮，已产生的间隔：{_vm.Running}。");
                 _vm.ScriptInterval = 0;
 
                 CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, recInfo.CropRect);
@@ -179,9 +179,9 @@ namespace ScrcpyEX.View
             }
             finally
             {
-                Debug.WriteLine($"自适应间隔:{_vm.ScriptInterval}豪秒。");
+                //Debug.WriteLine($"自适应间隔:{_vm.ScriptInterval}豪秒。");
                 _scriptTimer.Interval = _vm.ScriptInterval;
-                lock (_processingLock)
+                lock (_imageScriptLock)
                 {
                     _isProcessing = false;
                 }
@@ -211,7 +211,7 @@ namespace ScrcpyEX.View
 
         /// <summary>
         /// 执行点击脚本，PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
-        /// 点击的实际位置会根据实际大小和Scrcpy的初始大小的比值进行调整，但有黑边时仍会偏移。
+        /// 点击的实际位置会根据ScRatioX/ScRatioY进行调整，但有黑边时仍会偏移。
         /// </summary>
         /// <param name="recInfo">当前要执行的脚本。</param>
         private async Task ExecuteClickScript(RecInfo recInfo, IntPtr scHandle)
@@ -228,7 +228,7 @@ namespace ScrcpyEX.View
 
                 IntPtr lp = new((y << 16) + x);
                 DLL.PostMessage(scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
-                DLL.PostMessage(scHandle, WM.WM_LBUTTONDOWN, (IntPtr)MK.MK_LBUTTON, lp);
+                DLL.PostMessage(scHandle, WM.WM_LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
                 DLL.PostMessage(scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
             }
 
@@ -236,6 +236,7 @@ namespace ScrcpyEX.View
             if (recInfo.IsLimited && recInfo.CycleNumber <= _vm.CycleNum)
             {
                 ThreadStopScriptAndRecord();
+                await Dispatcher.BeginInvoke(StopScriptAndRecord);
             }
         }
 
@@ -265,8 +266,7 @@ namespace ScrcpyEX.View
                 originalRect.Width * ScRatioX,
                 originalRect.Height * ScRatioY);
 
-            //Console.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}，" +
-            //    $"比例：{DpiScaleX},{DpiScaleY}，" +
+            //Debug.WriteLine($"非工作区：{SystemParameters.WindowNonClientFrameThickness.Left},{SystemParameters.WindowNonClientFrameThickness.Right}，" + 
             //    $"起点：{cropRect.X},{cropRect.Y}，" +
             //    $"宽高：{cropRect.Width},{cropRect.Height}，" +
             //    $"终点：{cropRect.X + cropRect.Width},{cropRect.Y + cropRect.Height}，" +
@@ -276,10 +276,6 @@ namespace ScrcpyEX.View
             //检查范围，获得最终的截图区域
             CheckRect(ref cropRect, scBitmap.Width, scBitmap.Height);
             CroppedBitmap temp = new(scBitmap, MyGM.ConvertToInt32Rect(cropRect));
-            //if (Debugger.IsAttached)
-            //{
-            //    MyGM.SavaImg("scBitmap.png", scBitmap);
-            //}
 
             return temp;
         }
@@ -323,15 +319,22 @@ namespace ScrcpyEX.View
                 return;
             }
             
-            CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, _recInfo.CropRect);
-            if (scWindow == null)
+            try
             {
-                popMid.Show("获取Scrcpy截图失败。");
-                return;
+                CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, _recInfo.CropRect);
+                if (scWindow == null)
+                {
+                    popMid.Show("获取Scrcpy截图失败。");
+                    return;
+                }
+
+                ShowImg showImg = new(recInfo, scWindow);
+                showImg.ShowDialog();
             }
-            
-            ShowImg showImg = new(recInfo, scWindow);
-            showImg.ShowDialog();
+            catch (Exception ex)
+            {
+                MyGM.ShwInfo($"在对比图像时异常：{ex}");
+            }
         }
 
         /// <summary>

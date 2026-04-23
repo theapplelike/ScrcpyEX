@@ -35,6 +35,31 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
+        /// 在中间位置显示Popup提示，重复执行时覆盖上一个提示。
+        /// </summary>
+        /// <param name="text">要显示的文本。</param>
+        public static void MidPOP(string text)
+        {
+            MV.MainWin.popMid.Show(text);
+        }
+
+        /// <summary>
+        /// 显示信息弹窗。
+        /// </summary>
+        public static void ShwInfo(string txt, string cpt = "已处理异常")
+        {
+            MessageBox.Show(txt, cpt, MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        /// <summary>
+        /// 显示错误弹窗。
+        /// </summary>
+        public static void ShwError(string txt, string cpt = "未处理异常")
+        {
+            MessageBox.Show(txt, cpt, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        /// <summary>
         /// 指定元素下Tag属性相同的Button设置一样的背景色。
         /// </summary>
         /// <param name="obj">指定的父级元素。</param>

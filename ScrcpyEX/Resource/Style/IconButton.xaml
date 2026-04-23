@@ -20,15 +20,14 @@
                                    Text="{TemplateBinding MainIcon}"
                                    Style="{StaticResource txtIcon}"
                                    FontSize="20"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"/>
+                                   HorizontalAlignment="Center"/>
                             <!-- 角标图标（初始透明） -->
                             <TextBlock x:Name="PART_CornerIcon"
                                    Text="{TemplateBinding CornerIcon}"
                                    Style="{StaticResource txtIcon}"
                                    FontSize="12"
-                                   HorizontalAlignment="Right"
                                    VerticalAlignment="Bottom"
+                                   HorizontalAlignment="Right"
                                    Opacity="0" Margin="0,0,1,1"/>
                         </Grid>
                     </Border>

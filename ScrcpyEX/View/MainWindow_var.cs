@@ -59,12 +59,12 @@ namespace ScrcpyEX.View
         private readonly DispatcherTimer _locationChangeTimer = new();
 
         /// <summary>
-        /// 处理任务锁。
+        /// 图像脚本任务锁。
         /// </summary>
-        private readonly object _processingLock = new();
+        private readonly object _imageScriptLock = new();
 
         /// <summary>
-        /// Timer脚本是否正在处理任务。
+        /// 图像脚本是否正在处理任务。
         /// </summary>
         private volatile bool _isProcessing = false;
 
@@ -94,7 +94,7 @@ namespace ScrcpyEX.View
         private readonly Timer _testTimer = new();
 
         /// <summary>
-        /// Scrcpy的默认初始宽高（在100%缩放下），使用比例为15：7。
+        /// Scrcpy的默认初始宽高（在100%缩放下），使用比例为15：7，华为nova 4e。
         /// </summary>
         private readonly int _scWidth = 960, _scHeight = 448;
 
