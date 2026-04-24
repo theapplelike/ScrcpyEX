@@ -106,15 +106,15 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 停止执行脚本的计时器，如果当前正在录制，也会停止录制操作，子线程调用此方法。
         /// </summary>
-        private void ThreadStopScriptAndRecord()
-        {
-            Dispatcher.BeginInvoke(() =>
-            {
-                StopScriptAndRecord();
-            });
-
-            Dispatcher.BeginInvoke(StopScriptAndRecord);
-        }
+        //private void ThreadStopScriptAndRecord()
+        //{
+        //    Dispatcher.BeginInvoke(() =>
+        //    {
+        //        StopScriptAndRecord();
+        //    });
+        //
+        //    Dispatcher.BeginInvoke(StopScriptAndRecord);
+        //}
 
         /// <summary>
         /// 注册鼠标钩子进行录制脚本操作，如果已注册鼠标钩子，则注销鼠标钩子并保存录制的脚本。
@@ -185,16 +185,16 @@ namespace ScrcpyEX.View
                 return;
             }
                     
-            if (manage.TempRecInfo.IsTime)
+            if (manage.CurrRecInfo.IsTime)
             {
-                ScriptBefore(manage.TempRecInfo);
+                ScriptBefore(manage.CurrRecInfo);
                 TimedScript();
             }
             else
             {
-                if (manage.TempRecInfo.ImgName != "")
+                if (manage.CurrRecInfo.ImgName != "")
                 {
-                    ScriptBefore(manage.TempRecInfo);
+                    ScriptBefore(manage.CurrRecInfo);
                     ImageScript();
                 }
                 else

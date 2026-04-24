@@ -172,13 +172,6 @@ namespace ScrcpyEX.View
         }
         #endregion
 
-        #region 提示Popup事件
-        private void PopMid_Opened(object sender, EventArgs e)
-        {
-            popMid.VerticalOffset = (ExtraHeightTop + popMid.Child.RenderSize.Height) / 2 + gShow.Margin.Top;
-        }
-        #endregion
-
         #region 位置和大小的菜单
         //private void Pop_Closed(object sender, EventArgs e)
         //{

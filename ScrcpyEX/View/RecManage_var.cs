@@ -43,9 +43,9 @@ namespace ScrcpyEX.View
         private IntPtr _scHandle = IntPtr.Zero;
 
         /// <summary>
-        /// 临时存储正在编辑的脚本信息。
+        /// 当前选中的脚本信息。
         /// </summary>
-        public RecInfo TempRecInfo { get; set; } = null;
+        public RecInfo CurrRecInfo { get; set; } = null;
 
 
     }

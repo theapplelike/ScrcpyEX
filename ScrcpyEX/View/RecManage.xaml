@@ -58,12 +58,12 @@
                             <Border BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="155" />
-                                        <ColumnDefinition Width="40" />
-                                        <ColumnDefinition Width="10" />
-                                        <ColumnDefinition Width="40" />
-                                        <ColumnDefinition Width="40" />
-                                        <ColumnDefinition Width="40" />
+                                        <ColumnDefinition Width="155"/>
+                                        <ColumnDefinition Width="40"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="40"/>
+                                        <ColumnDefinition Width="40"/>
+                                        <ColumnDefinition Width="40"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock x:Name="tbkEdit" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="10,0" VerticalAlignment="Center"/>
                                     <TextBox x:Name="txtEdit" Text="{Binding Name}" Visibility="Hidden" VerticalAlignment="Center" Margin="10,0"/>

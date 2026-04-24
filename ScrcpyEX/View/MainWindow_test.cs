@@ -48,60 +48,7 @@ namespace ScrcpyEX.View
 
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
-            //MyGM.GetHandleRect(ScHandle);
-            //Console.WriteLine($"SC的实际宽高：{ScActualWidth * DpiScaleX},{ScActualHeight *DpiScaleY},{DpiScaleX}");
-
-            //Console.WriteLine($"比例：{ScRatioX},{ScActualWidth},{ActualWidth - ExtraWidth}");
-
-
-            //闪烁截屏
-            //ReduceSize();
-            //RecInfo recInfo = MyCfg.Cfg.RecInfos[2];
-            //TestCompareImage(recInfo.CropRect, recInfo.ImgName);
-            //AmplifySize();
-
-            //await MatrixComparison(MyCfg.Cfg.RecInfos[2]);
-            //for (int i = -1; i <= 1; i++)
-            //{
-            //    for (int j = -1; j <= 1; j++)
-            //    {
-            //        Rect rect = MyCfg.Cfg.RecInfos[2].CropRect;
-            //        Console.Write($"测试参数：{i},{j}。");
-            //        rect.X += i;
-            //        rect.Y += j;
-            //        TestCompareImage(rect, MyCfg.Cfg.RecInfos[2].ImgName);
-            //    }
-            //        
-            //}
-            //Console.WriteLine($"完成//////////////。");
-
-            //int x = (int)(pt1.X + (_limitPop.HorizontalOffset + ExtraWidthLeft + 50) * DpiScaleX);
-            //int y = (int)(pt1.Y + (_limitPop.VerticalOffset + ExtraHeightTop + 50) * DpiScaleY);
-            //DLL.SetCursorPos(x, y);
-            //await AdbTest1();
-            //Console.WriteLine($"工作区：{SystemParameters.WorkArea.Width}，{SystemParameters.WorkArea.Height}。");
-            //Console.WriteLine($"程序宽高：{ActualWidth}，{ActualHeight}。");
-            _testTimer.Start();
             await Task.Delay(1);
-        }
-
-        private async void TestCompareImage(Rect rect, string imgName)
-        {
-            //WPoint pt1 = PointToScreen(new WPoint(0, 0));
-            //Console.WriteLine($"程序左上角：{pt1.X},{pt1.Y}。");
-
-            CroppedBitmap scBitmap = await GetScriptImg(ScHandle, _mainHandle, rect);
-            Console.WriteLine($"图像脚本原始参数,起始坐标:({rect.X},{rect.Y}),宽高:({rect.Width},{rect.Height})");
-            if (scBitmap != null)
-            {
-                double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{imgName}", scBitmap);
-                Console.WriteLine($"图像脚本完毕，相似度：{ssim:F8}");
-            }
-            if (Debugger.IsAttached)
-            {
-                MyGM.SavaImg("tempPic.png", scBitmap);
-            }
-            //Console.WriteLine($"完成。");
         }
 
         /// <summary>

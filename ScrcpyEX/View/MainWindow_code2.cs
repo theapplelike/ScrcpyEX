@@ -235,7 +235,7 @@ namespace ScrcpyEX.View
             //如果为有限次循环，检查是否到循环次数
             if (recInfo.IsLimited && recInfo.CycleNumber <= _vm.CycleNum)
             {
-                ThreadStopScriptAndRecord();
+                //ThreadStopScriptAndRecord();
                 await Dispatcher.BeginInvoke(StopScriptAndRecord);
             }
         }

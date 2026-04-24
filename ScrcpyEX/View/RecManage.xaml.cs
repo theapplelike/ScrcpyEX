@@ -84,7 +84,7 @@ namespace ScrcpyEX.View
 
         private void Img_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            ShowImg showImg = new(TempRecInfo);
+            ShowImg showImg = new(CurrRecInfo);
             showImg.ShowDialog();
         }
 

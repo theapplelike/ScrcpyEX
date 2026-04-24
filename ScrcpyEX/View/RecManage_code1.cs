@@ -27,7 +27,7 @@ namespace ScrcpyEX.View
                 //    Console.WriteLine($"遍历：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
                 //}
                 //Console.WriteLine($"循环次数：{recInfo.CycleNumber}，循环间隔：{recInfo.CycleInterval}");
-                TempRecInfo = recInfo;
+                CurrRecInfo = recInfo;
                 DialogResult = true;
             }
         }
@@ -43,7 +43,7 @@ namespace ScrcpyEX.View
                 ValToUI(recInfo);
                 SetCurrentColor(btn);
 
-                TempRecInfo = recInfo;
+                CurrRecInfo = recInfo;
                 _vm.SetParam(recInfo);
             }
         }
@@ -56,7 +56,7 @@ namespace ScrcpyEX.View
         {
             if (btn.CommandParameter is RecInfo recInfo)
             {
-                TempRecInfo = null;
+                CurrRecInfo = null;
                 _vm.DelRec(recInfo);
             }
         }

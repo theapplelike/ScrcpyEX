@@ -58,7 +58,7 @@
         </mycontrol:TimePopup>
 
         <!--主界面使用的居中提示-->
-        <mycontrol:TimePopup x:Name="popMid" PopupAnimation="Slide" Placement="Center" PlacementTarget="{Binding ElementName=gMenu}" Opened="PopMid_Opened">
+        <mycontrol:TimePopup x:Name="popMid" PopupAnimation="Slide" Placement="Center" PlacementTarget="{Binding ElementName=gMenu}">
             <Border MinHeight="10" MinWidth="10" CornerRadius="10" BorderThickness="4" BorderBrush="{StaticResource Scb2}" Background="{StaticResource Scb1}" Margin="5">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="10" ShadowDepth="0" Color="Gray"/>
@@ -114,11 +114,11 @@
             </Border>
         </Popup>
 
-        <!--放置右侧按钮的溢出悬停菜单-->
+        <!--放置右侧按钮的悬停菜单-->
         <mycontrol:HoverPopup x:Name="popSysOpt" PlacementTarget="{Binding ElementName=btnClosePrg}">
         </mycontrol:HoverPopup>
 
-        <!--Scrcpy功能选项菜单-->
+        <!--Scrcpy功能选项悬停菜单-->
         <mycontrol:HoverPopup x:Name="popScOpt">
         </mycontrol:HoverPopup>
 
@@ -210,12 +210,7 @@
             </Border>
         </DockPanel>-->
 
-        <!--<Grid x:Name="gShow" Grid.Row="1" Margin="5">
-            <WindowsFormsHost x:Name="wfh" Background="Gray">
-                <wf:Panel x:Name="pnlShow" Dock="Fill" AutoSize="True"/>
-            </WindowsFormsHost>
-        </Grid>-->
-
+        <!--承载Scrcpy的Grid和Border不能设置固定大小，否则Scrcpy会错位-->
         <Grid x:Name="gShow" Grid.Row="1" Margin="5">
             <Border x:Name="bdShow" Background="Gray"/>
         </Grid>

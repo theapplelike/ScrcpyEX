@@ -25,8 +25,20 @@ namespace ScrcpyEX.MyDefinition.MyControl
         {
             StaysOpen = true;
             AllowsTransparency = true;
+            Opened += Pop_Opened;
 
-            _hideTimer.Tick += new EventHandler(Pop_Tick);
+            _hideTimer.Tick += Pop_Tick;
+        }
+
+        /// <summary>
+        /// Popup居中显示时，向下偏移一段距离。
+        /// </summary>
+        private void Pop_Opened(object sender, EventArgs e)
+        {
+            if (Placement == PlacementMode.Center && PlacementTarget is FrameworkElement fe)
+            {
+                VerticalOffset = (fe.ActualHeight + Child.RenderSize.Height) / 2 + 5;
+            }
         }
 
         /// <summary>
