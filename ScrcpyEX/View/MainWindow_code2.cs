@@ -143,10 +143,9 @@ namespace ScrcpyEX.View
         private async Task ImageScript_Tick(RecInfo recInfo)
         {
             // 防止重叠执行
-            lock (_imageScriptLock)
+            if (!Monitor.TryEnter(_imageScriptLock))
             {
-                if (_isProcessing) { return; }
-                _isProcessing = true;
+                return;
             }
 
             try
@@ -181,10 +180,7 @@ namespace ScrcpyEX.View
             {
                 //Debug.WriteLine($"自适应间隔:{_vm.ScriptInterval}豪秒。");
                 _scriptTimer.Interval = _vm.ScriptInterval;
-                lock (_imageScriptLock)
-                {
-                    _isProcessing = false;
-                }
+                Monitor.Exit(_imageScriptLock);
             }
         }
 
@@ -210,7 +206,7 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 执行点击脚本，PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
+        /// 执行点击操作，PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
         /// 点击的实际位置会根据ScRatioX/ScRatioY进行调整，但有黑边时仍会偏移。
         /// </summary>
         /// <param name="recInfo">当前要执行的脚本。</param>
