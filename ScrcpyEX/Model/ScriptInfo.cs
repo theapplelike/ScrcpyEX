@@ -8,15 +8,10 @@ using System.Windows;
 namespace ScrcpyEX.Model
 {
     /// <summary>
-    /// 录制脚本信息类，保存录制的脚本信息。
+    /// 脚本信息类，保存脚本相关信息。
     /// </summary>
-    public class RecInfo
+    public class ScriptInfo : ScriptItem, ICloneable
     {
-        /// <summary>
-        /// 录制名称。
-        /// </summary>
-        public string Name { get; set; } = $"脚本{DateTime.Now:yyMMddhhmmss}";
-
         /// <summary>
         /// true--进行有限次的循环；false--进行无限次的循环，直到手动停止。
         /// </summary>
@@ -68,20 +63,40 @@ namespace ScrcpyEX.Model
         /// <summary>
         /// 录制的坐标点信息列表。
         /// </summary>
-        public List<PointInfo> Infos { get; set; } = [];
+        public List<PointInfo> PointInfos { get; set; } = [];
 
         /// <summary>
-        /// 默认构造函数。
+        /// 脚本信息类默认构造函数。
         /// </summary>
-        public RecInfo() { }
+        public ScriptInfo() { }
 
         /// <summary>
         /// 使用坐标点信息列表构造类。
         /// </summary>
-        /// <param name="infos">录制的坐标点信息列表。</param>
-        public RecInfo(List<PointInfo> infos)
+        /// <param name="points">录制的坐标点信息列表。</param>
+        public ScriptInfo(List<PointInfo> points)
         {
-            Infos = [.. infos];//创建独立的数据副本
+            Name = $"脚本{DateTime.Now:yyMMddhhmmss}";
+            PointInfos = [.. points];//创建独立的数据副本
         }
+
+        public object Clone()
+        {
+            return new ScriptInfo
+            {
+                Name = Name,
+                IsLimited = IsLimited,
+                CycleNumber = CycleNumber,
+                IsTime = IsTime,
+                CycleInterval = CycleInterval,
+                ImgName = ImgName,
+                CropRect = CropRect,
+                IsAdaptive = IsAdaptive,
+                Similarity = Similarity,
+                PointInfos = PointInfos,
+            };
+        }
+
+
     }
 }

@@ -1,15 +1,20 @@
 ﻿using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows;
-using ScrcpyEX.MyDefinition;
-using System.Diagnostics;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
+using Path = System.IO.Path;
 
 namespace ScrcpyEX.View
 {
@@ -17,15 +22,44 @@ namespace ScrcpyEX.View
     {
         private void MyInit()
         {
-            _vm.RecInfos = new(MyCfg.Cfg.RecInfos);
+            _vm.ScriptItems = new(MyCfg.Cfg.Scripts);
             gSuboption.Visibility = Visibility.Hidden;
+            cmbMultipleScript.Visibility = Visibility.Collapsed;
+
+            _pointDt.Columns.Add("LastTime", typeof(double));
+            _pointDt.Columns.Add("XAxis", typeof(double));
+            _pointDt.Columns.Add("YAxis", typeof(double));
+            dgPoint.ItemsSource = _pointDt.DefaultView;
+        }
+
+        private void MyClose()
+        {
+            MyCfg.Cfg.Scripts = [.. _vm.ScriptItems];
+            MyCfg.Save();
+        }
+
+        /// <summary>
+        /// 获得当前选中的脚本列表。
+        /// </summary>
+        /// <returns>脚本信息列表。</returns>
+        public List<ScriptInfo> GetSelectScript()
+        {
+            if (_currScript is ScriptInfo info)
+            {
+                return [info];
+            }
+            else if (_currScript is ScriptGroup group)
+            {
+                return [.. group.Scripts];
+            }
+            return [];
         }
 
         /// <summary>
         /// 编辑脚本名称，对于未编辑的项会初始化。
         /// </summary>
         /// <param name="currentItem">当前编辑项的数据源。</param>
-        private void EditName(RecInfo currentItem)
+        private void EditName(ScriptItem currentItem)
         {
             foreach (var item in lst.Items)
             {
@@ -52,25 +86,25 @@ namespace ScrcpyEX.View
                 
                 if (item == currentItem)
                 {
-                    if (_lastItem == currentItem)
+                    if (_lastItem == currentItem && txt.Visibility != Visibility.Hidden)
                     {
                         ItemInit(btn, txt, tbk);
-                        //Console.WriteLine("当前项，停止编辑");
+                        //Debug.WriteLine("当前项，停止编辑");
                     }
                     else
                     {
                         ItemEdit(btn, txt, tbk);
-                        //Console.WriteLine("当前项，进行编辑");
+                        //Debug.WriteLine("当前项，进行编辑");
                     }
                 }
                 else
                 {
                     ItemInit(btn, txt, tbk);
-                    //Console.WriteLine("不是当前项，初始化");
+                    //Debug.WriteLine("不是当前项，初始化");
                 }
             }
             _lastItem = currentItem;
-            //Console.WriteLine("-----------------");
+            //Debug.WriteLine("-----------------");
         }
 
         /// <summary>
@@ -97,23 +131,23 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 将指定脚本的数据赋值给界面。
+        /// 将指定脚本的数据赋值给界面，切换脚本时调用此方法。
         /// </summary>
-        /// <param name="recInfo">指定的脚本实体类。</param>
-        private void ValToUI(RecInfo recInfo)
+        /// <param name="info">指定的脚本信息类。</param>
+        private void ValToUI(ScriptInfo info)
         {
-            rdoLimited.IsChecked = recInfo.IsLimited;
-            rdoHandStop.IsChecked = !recInfo.IsLimited;
-            txtCycleNum.Text = recInfo.CycleNumber.ToString();
-            rdoTime.IsChecked = recInfo.IsTime;
-            rdoImage.IsChecked = !recInfo.IsTime;
-            txtCycleInterval.Text = recInfo.CycleInterval.ToString();
-            img.Source = MyGM.GetImage(recInfo.ImgName);
-            txtSimilarity.Text = recInfo.Similarity.ToString();
-            chkAdaptive.IsChecked = recInfo.IsAdaptive;
-            _cropRect = recInfo.CropRect;
+            rdoLimited.IsChecked = info.IsLimited;
+            rdoHandStop.IsChecked = !info.IsLimited;
+            txtCycleNum.Text = info.CycleNumber.ToString();
+            rdoTime.IsChecked = info.IsTime;
+            rdoImage.IsChecked = !info.IsTime;
+            txtCycleInterval.Text = info.CycleInterval.ToString();
+            img.Source = MyGM.GetImage(info.ImgName);
+            txtSimilarity.Text = info.Similarity.ToString();
+            chkAdaptive.IsChecked = info.IsAdaptive;
+            _cropRect = Rect.Empty;
 
-            Debug.WriteLine($"图片名：{recInfo.ImgName}，范围：{recInfo.CropRect}，{recInfo.Similarity}。");
+            //Debug.WriteLine($"选择脚本图片名：{info.ImgName}，范围：{info.CropRect}，{info.Similarity}。");
         }
 
         /// <summary>
@@ -121,6 +155,11 @@ namespace ScrcpyEX.View
         /// </summary>
         private async void DoScreenshot()
         {
+            if (_scHandle == IntPtr.Zero)
+            {
+                return;
+            }
+
             Opacity = 0;
             await Task.Delay(500);//让当前窗体有足够时间隐藏
 
@@ -134,6 +173,101 @@ namespace ScrcpyEX.View
             Opacity = 1;
         }
 
+        /// <summary>
+        /// 拖动ListBox中的项。
+        /// </summary>
+        /// <param name="currentItem">当前拖拽的ListBox项。</param>
+        /// <param name="e">MouseMove事件数据提供。</param>
+        private void DragListBoxItem(ListBoxItem currentItem, MouseEventArgs e)
+        {
+            // 只有左键按下，并且存在有效的拖拽源时才可能开始拖拽
+            if (e.LeftButton != MouseButtonState.Pressed || _dragSourceItem == null)
+            {
+                return;
+            }
+
+            // 当前移动的项必须与按下时的源项是同一个
+            if (currentItem != _dragSourceItem)
+            {
+                return;
+            }
+
+            Point position = e.GetPosition(null);
+            if (Math.Abs(position.X - _dragStartPoint.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                Math.Abs(position.Y - _dragStartPoint.Y) > SystemParameters.MinimumVerticalDragDistance)
+            {
+                // 只有单脚本（ScriptInfo）允许拖拽
+                if (_dragSourceItem.DataContext is ScriptInfo info)
+                {
+                    DragDrop.DoDragDrop(_dragSourceItem, info, DragDropEffects.Copy);
+                }
+
+                // 拖拽已启动或不允许拖拽，清空源记录，避免重复
+                _dragSourceItem = null;
+            }
+        }
+
+        /// <summary>
+        /// 创建组脚本。
+        /// </summary>
+        /// <param name="targetData">目标项的数据上下文。</param>
+        /// <param name="sourceData">源项的数据上下文。</param>
+        private void CreatGroupScript(object targetData, object sourceData)
+        {
+            // 源数据必须是单脚本
+            if (sourceData is not ScriptInfo source)
+            {
+                return;
+            }
+
+            // 目标数据可以是单脚本或组脚本
+            if (targetData is ScriptInfo target)
+            {
+                ScriptGroup newGroup = new()
+                {
+                    Name = $"{target.Name}&{source.Name}",
+                    Scripts = [(ScriptInfo)target.Clone(), (ScriptInfo)source.Clone()]
+                };
+                _vm.ScriptItems.Add(newGroup);
+                CopyScriptImage([..newGroup.Scripts]);
+            }
+            else if (targetData is ScriptGroup targetGroup)
+            {
+                targetGroup.Name = $"{targetGroup.Name}&{source.Name}";
+                targetGroup.Scripts.Add((ScriptInfo)source.Clone());
+                CopyScriptImage(targetGroup.Scripts.Last());
+            }
+        }
+
+        /// <summary>
+        /// 如果脚本有图片，则复制源图片为一张新图片，并且使用新图片名。
+        /// </summary>
+        /// <param name="info">脚本信息类。</param>
+        private void CopyScriptImage(ScriptInfo info)
+        {
+            if (info.ImgName == "")
+            {
+                return;
+            }
+
+            string srcName = @$"{MV.ScriptPath}\{info.ImgName}";
+            string destName = @$"{MV.ScriptPath}\Pic{DateTime.Now:yyMMddhhmm_ssfff}.png";
+            File.Copy(srcName, destName, true);
+            info.ImgName = Path.GetFileName(destName);
+        }
+
+        /// <summary>
+        /// 如果脚本有图片，则复制源图片为一张新图片，并且使用新图片名。
+        /// </summary>
+        /// <param name="infos">脚本信息类列表。</param>
+        private async void CopyScriptImage(List<ScriptInfo> infos)
+        {
+            foreach (ScriptInfo si in infos)
+            {
+                CopyScriptImage(si);
+                await Task.Delay(50);
+            }
+        }
 
     }
 }

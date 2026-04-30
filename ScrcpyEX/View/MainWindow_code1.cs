@@ -137,6 +137,7 @@ namespace ScrcpyEX.View
                 if (MouseScript.RegisterHook())
                 {
                     RemoveScBlack();
+                    HideKeyMapping();
                     bdRec.Visibility = Visibility.Visible;
                     btnImgCompare.Visibility = Visibility.Collapsed;
                     popMid.Show("开启脚本录制。");
@@ -158,6 +159,7 @@ namespace ScrcpyEX.View
         private void StopRecord()
         {
             MouseScript.CancelHook();
+            ShowKeyMapping();
             bdRec.Visibility = Visibility.Hidden;
             popMid.Show("已停止录制操作。");
         }
@@ -172,29 +174,29 @@ namespace ScrcpyEX.View
             {
                 return;
             }
-            
             if (IsScClosed)
             {
                 popMid.Show("未进行投屏，不能执行脚本。");
                 return;
             }
-            
             if (MouseScript.HookID != IntPtr.Zero)
             {
                 popMid.Show("已开启录制操作，不能执行脚本。");
                 return;
             }
-                    
-            if (manage.CurrRecInfo.IsTime)
+
+            List<ScriptInfo> infos = manage.GetSelectScript();
+            
+            if (infos[0].IsTime)
             {
-                ScriptBefore(manage.CurrRecInfo);
+                ScriptBefore(infos);
                 TimedScript();
             }
             else
             {
-                if (manage.CurrRecInfo.ImgName != "")
+                if (infos[0].ImgName != "")
                 {
-                    ScriptBefore(manage.CurrRecInfo);
+                    ScriptBefore(infos);
                     ImageScript();
                 }
                 else
@@ -202,13 +204,58 @@ namespace ScrcpyEX.View
                     popMid.Show("未截取图片，不能执行图片脚本。");
                 }
             }
+            
+
+            //if (manage.CurrScript.IsTime)
+            //{
+            //    ScriptBefore(manage.CurrScript);
+            //    TimedScript();
+            //}
+            //else
+            //{
+            //    if (manage.CurrScript.ImgName != "")
+            //    {
+            //        ScriptBefore(manage.CurrScript);
+            //        ImageScript();
+            //    }
+            //    else
+            //    {
+            //        popMid.Show("未截取图片，不能执行图片脚本。");
+            //    }
+            //}
         }
 
         /// <summary>
         /// 脚本执行前要执行的操作。
         /// </summary>
         /// <param name="recInfo">要执行的脚本信息。</param>
-        private void ScriptBefore(RecInfo recInfo)
+        //private void ScriptBefore(ScriptInfo recInfo)
+        //{
+        //    //消除黑边，有黑边时会有偏移
+        //    RemoveScBlack();
+        //
+        //    //UI和变量初始化
+        //    _vm.Running = 0;
+        //    _vm.CycleNum = 0;
+        //    _recInfo = recInfo;
+        //    _stopwatch = Stopwatch.StartNew();
+        //    bdRec.Visibility = Visibility.Visible;
+        //    dplTip.Visibility = Visibility.Visible;
+        //    btnImgCompare.Visibility = Visibility.Visible;
+        //
+        //    //如果脚本已执行则关闭
+        //    if (_countTimer.Enabled)
+        //    {
+        //        _scriptTimer.Stop();
+        //        _countTimer.Stop();
+        //    }
+        //
+        //    //移除计时脚本和图像脚本，避免重复注册
+        //    _scriptTimer.Elapsed -= _timedHandler;
+        //    _scriptTimer.Elapsed -= _imageHandler;
+        //}
+
+        private void ScriptBefore(List<ScriptInfo> infos)
         {
             //消除黑边，有黑边时会有偏移
             RemoveScBlack();
@@ -216,7 +263,7 @@ namespace ScrcpyEX.View
             //UI和变量初始化
             _vm.Running = 0;
             _vm.CycleNum = 0;
-            _recInfo = recInfo;
+            _scriptInfos = infos;
             _stopwatch = Stopwatch.StartNew();
             bdRec.Visibility = Visibility.Visible;
             dplTip.Visibility = Visibility.Visible;
@@ -237,14 +284,23 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 注册计时脚本并执行。
         /// </summary>
+        //private async void TimedScript()
+        //{
+        //    _scriptTimer.Elapsed += _timedHandler;
+        //    _scriptTimer.Interval = _recInfo.CycleInterval * 1000;
+        //    await TimedScript_Tick(_recInfo);//立刻执行一次脚本
+        //
+        //    _scriptTimer.Start();
+        //    _countTimer.Start();
+        //}
         private async void TimedScript()
         {
             _scriptTimer.Elapsed += _timedHandler;
-            _scriptTimer.Interval = _recInfo.CycleInterval * 1000;
-            await TimedScript_Tick(_recInfo);//立刻执行一次脚本
-
+            _scriptTimer.Interval = _scriptInfos[0].CycleInterval * 1000;
             _scriptTimer.Start();
             _countTimer.Start();
+
+            await TimedScript_Tick(_scriptInfos);//立刻执行一次脚本
         }
 
         /// <summary>
@@ -252,6 +308,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void ImageScript()
         {
+            _si = 0;
             _scriptTimer.Elapsed += _imageHandler;
             _scriptTimer.Interval = 10;//第一次执行的间隔
             _scriptTimer.Start();

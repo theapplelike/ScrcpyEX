@@ -21,7 +21,9 @@ namespace ScrcpyEX.ExtensionMethod
         /// </summary>
         public static MyCfg Cfg { get; set; } = null;
 
-        //全局配置保存路径
+        /// <summary>
+        /// 全局配置保存路径。
+        /// </summary>
         private static readonly string _cfgPath = @".\main\Local\UserData\config.json";
 
         static MyCfg()
@@ -41,7 +43,12 @@ namespace ScrcpyEX.ExtensionMethod
             }
 
             using StreamReader reader = File.OpenText(_cfgPath);
-            return JsonConvert.DeserializeObject<MyCfg>(reader.ReadToEnd());
+            JsonSerializerSettings set = new()
+            {
+                TypeNameHandling = TypeNameHandling.All
+            };
+
+            return JsonConvert.DeserializeObject<MyCfg>(reader.ReadToEnd(), set);
         }
 
         /// <summary>
@@ -50,7 +57,13 @@ namespace ScrcpyEX.ExtensionMethod
         public static void Save()
         {
             Directory.CreateDirectory(Path.GetDirectoryName(_cfgPath));
-            File.WriteAllText(_cfgPath, JsonConvert.SerializeObject(Cfg));
+
+            JsonSerializerSettings set = new()
+            {
+                TypeNameHandling = TypeNameHandling.Auto,   //对象的运行时类型与声明类型不一致时添加Type信息
+                Formatting = Formatting.Indented,           //添加缩进
+            };
+            File.WriteAllText(_cfgPath, JsonConvert.SerializeObject(Cfg, set));
         }
 
         /// <summary>
@@ -91,7 +104,12 @@ namespace ScrcpyEX.ExtensionMethod
         /// <summary>
         /// 录制操作信息的集合。
         /// </summary>
-        public List<RecInfo> RecInfos { get; set; } = [];
+        //public List<ScriptInfo> RecInfos { get; set; } = [];
+
+        /// <summary>
+        /// 脚本信息的集合。
+        /// </summary>
+        public List<ScriptItem> Scripts { get; set; } = [];
 
         /// <summary>
         /// 键盘映射信息类列表，用于保存键盘映射信息。

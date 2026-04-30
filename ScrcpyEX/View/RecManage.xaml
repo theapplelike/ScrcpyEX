@@ -40,7 +40,7 @@
 
     <!--设置圆角需要窗体背景色为透明，背景色需要在Border设置-->
     <Border BorderThickness="3" BorderBrush="#5B9DF0" CornerRadius="10" Background="White">
-        <Grid>
+        <Grid x:Name="g" MouseLeftButtonDown="G_MouseLeftButtonDown">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="360"/>
                 <ColumnDefinition Width="280"/>
@@ -52,7 +52,15 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="脚本列表（有黑边时执行脚本会导致错位）：" Margin="10,0,0,0"/>
-                <ListBox x:Name="lst" ItemsSource="{Binding RecInfos}" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                <ListBox x:Name="lst" ItemsSource="{Binding ScriptItems}" Grid.Row="1" SelectionChanged="Lst_SelectionChanged"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden" AllowDrop="True">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListBoxItem_PreviewMouseLeftButtonDown"/>
+                            <EventSetter Event="MouseMove" Handler="ListBoxItem_MouseMove"/>
+                            <EventSetter Event="DragEnter" Handler="ListBoxItem_DragEnter"/>
+                            <EventSetter Event="Drop" Handler="ListBoxItem_Drop"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Border BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2">
@@ -65,8 +73,10 @@
                                         <ColumnDefinition Width="40"/>
                                         <ColumnDefinition Width="40"/>
                                     </Grid.ColumnDefinitions>
+                                    <!---->
                                     <TextBlock x:Name="tbkEdit" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="10,0" VerticalAlignment="Center"/>
                                     <TextBox x:Name="txtEdit" Text="{Binding Name}" Visibility="Hidden" VerticalAlignment="Center" Margin="10,0"/>
+                                    
                                     <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="1" Content="&#xe8ac;" Style="{StaticResource LstBtn}"/>
                                     <TextBlock Text="|" FontSize="20" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
 
@@ -82,18 +92,23 @@
 
             <Grid Grid.Column="1" Margin="10">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="30"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="详细信息：" Margin="10,0,0,0"/>
 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding PointDt}" AutoGenerateColumns="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                    <TextBlock Text="详细信息：" />
+                    <!--显示组脚本中的脚本列表-->
+                    <ComboBox x:Name="cmbMultipleScript" SelectionChanged="CmbMultipleScript_SelectionChanged" Margin="10,2" Width="140"/>
+                </StackPanel>
+
+                <DataGrid x:Name="dgPoint" Grid.Row="1" AutoGenerateColumns="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="延时（秒）" Binding="{Binding LastTime}" Width="*" />
-                        <DataGridTextColumn Header="坐标点X" Binding="{Binding XAxis}" Width="*" />
-                        <DataGridTextColumn Header="坐标点Y" Binding="{Binding YAxis}" Width="*" />
+                        <DataGridTextColumn Header="延时（秒）" Binding="{Binding LastTime}" Width="*"/>
+                        <DataGridTextColumn Header="坐标点X" Binding="{Binding XAxis}" Width="*"/>
+                        <DataGridTextColumn Header="坐标点Y" Binding="{Binding YAxis}" Width="*"/>
                     </DataGrid.Columns>
                 </DataGrid>
 

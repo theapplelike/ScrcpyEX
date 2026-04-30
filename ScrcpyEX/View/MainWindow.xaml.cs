@@ -168,7 +168,7 @@ namespace ScrcpyEX.View
 
         private void BtnImgCompare_Click(object sender, RoutedEventArgs e)
         {
-            ImgCompare(_recInfo);
+            ImgCompare(_scriptInfos[0]);
         }
         #endregion
 

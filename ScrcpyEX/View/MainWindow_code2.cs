@@ -93,8 +93,8 @@ namespace ScrcpyEX.View
             _locationChangeTimer.Tick += new EventHandler(LocationChange_Tick);
             _locationChangeTimer.Interval = TimeSpan.FromSeconds(0.1);
 
-            _timedHandler = async (sender, e) => await TimedScript_Tick(_recInfo);
-            _imageHandler = async (sender, e) => await ImageScript_Tick(_recInfo);
+            _timedHandler = async (sender, e) => await TimedScript_Tick(_scriptInfos);
+            _imageHandler = async (sender, e) => await ImageScript_Tick(_scriptInfos);
 
             _countTimer.Elapsed += (sender, e) => Count_Tick();
             _countTimer.Interval = 1000;
@@ -127,23 +127,93 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
+        /// 执行脚本时，说明已产生的间隔。
+        /// </summary>
+        private void Count_Tick() => _vm.Running = (int)_stopwatch.Elapsed.TotalSeconds;
+
+        //private void Count_Tick()
+        //{
+        //    _vm.Running = (int)_stopwatch.Elapsed.TotalSeconds;
+        //    Debug.WriteLine($"计时：{_vm.Running}");
+        //}
+
+        /// <summary>
         /// 执行计时脚本。
         /// </summary>
-        private async Task TimedScript_Tick(RecInfo recInfo)
+        //private async Task TimedScript_Tick(ScriptInfo info)
+        //{
+        //    _vm.CycleNum++;
+        //    _stopwatch = Stopwatch.StartNew();
+        //    await ExecuteClickScript(info, ScHandle);
+        //    //Debug.WriteLine("计时脚本执行完毕...");
+        //}
+        private async Task TimedScript_Tick(List<ScriptInfo> infos)
         {
+            //Debug.WriteLine($"Time进入新一轮，已产生的间隔：{_vm.Running}。");
             _vm.CycleNum++;
             _stopwatch = Stopwatch.StartNew();
-            await ExecuteClickScript(recInfo, ScHandle);
-            //Debug.WriteLine("计时脚本执行完毕...");
+
+            foreach (ScriptInfo i in infos)
+            {
+                await ExecuteClickScript(i, ScHandle);
+            }
+            await CheckExit(infos[0]);
         }
-        
+
         /// <summary>
         /// 执行图像脚本。
         /// </summary>
-        private async Task ImageScript_Tick(RecInfo recInfo)
+        //private async Task ImageScript_Tick(ScriptInfo info)
+        //{
+        //    // 防止重叠执行
+        //    if (!await _imageScriptLock.WaitAsync(0))
+        //    {
+        //        return;
+        //    }
+        //
+        //    try
+        //    {
+        //        //Debug.WriteLine($"进入新一轮，已产生的间隔：{_vm.Running}。");
+        //        _vm.ScriptInterval = 5;
+        //
+        //        CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, info.CropRect);
+        //        if (scWindow == null)
+        //        {
+        //            popMid.Show("获取Scrcpy脚本截图失败。");
+        //            return;
+        //        }
+        //
+        //        double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
+        //        if (ssim >= info.Similarity / 100)
+        //        {
+        //            await NextImageScript(info);
+        //            Debug.WriteLine($"单次对比通过，相似度：{ssim:F8}");
+        //        }
+        //        //else if (await MatrixComparison(recInfo))
+        //        //{
+        //        //    await NextImageScript(recInfo);
+        //        //    Debug.WriteLine($"多次对比通过");
+        //        //}
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"执行图像脚本时异常：{ex}。");
+        //    }
+        //    finally
+        //    {
+        //        //Debug.WriteLine($"自适应间隔:{_vm.ScriptInterval}豪秒。");
+        //        _scriptTimer.Interval = _vm.ScriptInterval;
+        //        _imageScriptLock.Release(); // 释放锁
+        //    }
+        //}
+
+        /// <summary>
+        /// 执行图像脚本。
+        /// </summary>
+        private async Task ImageScript_Tick(List<ScriptInfo> infos)
         {
             // 防止重叠执行
-            if (!Monitor.TryEnter(_imageScriptLock))
+            if (!await _imageScriptLock.WaitAsync(0))
             {
                 return;
             }
@@ -151,75 +221,71 @@ namespace ScrcpyEX.View
             try
             {
                 //Debug.WriteLine($"进入新一轮，已产生的间隔：{_vm.Running}。");
-                _vm.ScriptInterval = 0;
-
-                CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, recInfo.CropRect);
-                if (scWindow == null)
-                {
-                    popMid.Show("获取Scrcpy脚本截图失败。");
-                    return;
-                }
-
-                double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", scWindow);
-                if (ssim >= recInfo.Similarity / 100)
-                {
-                    await NextImageScript(recInfo);
-                    Debug.WriteLine($"单次对比通过，相似度：{ssim:F8}");
-                }
-                //else if (await MatrixComparison(recInfo))
-                //{
-                //    await NextImageScript(recInfo);
-                //    Debug.WriteLine($"多次对比通过");
-                //}
+                _vm.ScriptInterval = 5;
+                await ImageCompare(infos[_si++ % infos.Count]);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"执行图像脚本时异常：{ex}。");
+                if (!Debugger.IsAttached) { MyGM.ShwError($"执行图像脚本时异常：{ex}。"); }
             }
             finally
             {
-                //Debug.WriteLine($"自适应间隔:{_vm.ScriptInterval}豪秒。");
+                //Debug.WriteLine($"自适应间隔:{_vm.ScriptInterval / 1000}秒。");
                 _scriptTimer.Interval = _vm.ScriptInterval;
-                Monitor.Exit(_imageScriptLock);
+                _imageScriptLock.Release(); // 释放锁
+            }
+        }
+
+        private async Task ImageCompare(ScriptInfo info)
+        {
+            CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, info.CropRect);
+            if (scWindow == null)
+            {
+                popMid.Show("获取Scrcpy脚本截图失败。");
+                return;
+            }
+
+            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
+            if (ssim >= info.Similarity / 100)
+            {
+                await NextImageScript(info);
+                Debug.WriteLine($"单次对比通过，相似度：{ssim:F8}");
             }
         }
 
         /// <summary>
-        /// 执行脚本时，说明已产生的间隔。
-        /// </summary>
-        private void Count_Tick() => _vm.Running = (int)_stopwatch.Elapsed.TotalSeconds;
-
-        /// <summary>
         /// 图像比对通过，进行脚本下一轮循环。
         /// </summary>
-        /// <param name="recInfo">脚本信息。</param>
-        private async Task NextImageScript(RecInfo recInfo)
+        /// <param name="info">脚本信息。</param>
+        private async Task NextImageScript(ScriptInfo info)
         {
-            if (recInfo.IsAdaptive)
+            if (info.IsAdaptive)
             {
                 _vm.ScriptInterval = _vm.Running * 1000 * 0.9;//每次将上一次间隔的90%作为自适应间隔
             }
 
             _vm.CycleNum++;
             _stopwatch = Stopwatch.StartNew();
-            await ExecuteClickScript(recInfo, ScHandle);
+            await ExecuteClickScript(info, ScHandle);
+            await CheckExit(info);
         }
 
         /// <summary>
         /// 执行点击操作，PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
         /// 点击的实际位置会根据ScRatioX/ScRatioY进行调整，但有黑边时仍会偏移。
         /// </summary>
-        /// <param name="recInfo">当前要执行的脚本。</param>
-        private async Task ExecuteClickScript(RecInfo recInfo, IntPtr scHandle)
+        /// <param name="info">当前要执行的脚本。</param>
+        private async Task ExecuteClickScript(ScriptInfo info, IntPtr scHandle)
         {
-            foreach (PointInfo info in recInfo.Infos)
+            foreach (PointInfo p in info.PointInfos)
             {
-                await Task.Delay(TimeSpan.FromSeconds(info.LastTime));
-                //Debug.WriteLine($"Timer点击：{info.LastTime}-{info.Pt.X},{info.Pt.Y}");
+                await Task.Delay(TimeSpan.FromSeconds(p.LastTime));
+                //Debug.WriteLine($"Timer点击：{p.LastTime}-{p.Pt.X},{p.Pt.Y}");
 
                 //保存的坐标数据都是以默认尺寸为准，使用时需要乘以当前尺寸和默认尺寸的比例
-                int x = (int)(info.Pt.X * ScRatioX);
-                int y = (int)(info.Pt.Y * ScRatioY);
+                int x = (int)(p.Pt.X * ScRatioX);
+                int y = (int)(p.Pt.Y * ScRatioY);
                 //Debug.WriteLine($"比例：（{ScRatioX},{ScRatioY}），实际点击：（{x},{y}）。");
 
                 IntPtr lp = new((y << 16) + x);
@@ -229,10 +295,23 @@ namespace ScrcpyEX.View
             }
 
             //如果为有限次循环，检查是否到循环次数
-            if (recInfo.IsLimited && recInfo.CycleNumber <= _vm.CycleNum)
+            //if (info.IsLimited && info.CycleNumber <= _vm.CycleNum)
+            //{
+            //    //ThreadStopScriptAndRecord();
+            //    await Dispatcher.BeginInvoke(StopScriptAndRecord);
+            //}
+        }
+
+        /// <summary>
+        /// 如果为有限次循环，检查是否到循环次数。
+        /// </summary>
+        /// <param name="info">脚本信息，组脚本则是第一个脚本。</param>
+        private async Task CheckExit(ScriptInfo info)
+        {
+            if (info.IsLimited && info.CycleNumber <= _vm.CycleNum)
             {
-                //ThreadStopScriptAndRecord();
                 await Dispatcher.BeginInvoke(StopScriptAndRecord);
+                //Debug.WriteLine("脚本执行完毕...");
             }
         }
 
@@ -306,10 +385,10 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 在一个窗口中显示脚本和对比图像。
         /// </summary>
-        /// <param name="recInfo">当前执行的脚本。</param>
-        private async void ImgCompare(RecInfo recInfo)
+        /// <param name="info">当前执行的脚本。</param>
+        private async void ImgCompare(ScriptInfo info)
         {
-            if (recInfo.ImgName == "")
+            if (info.ImgName == "")
             {
                 popMid.Show("此脚本未截取图片，不能进行比对。");
                 return;
@@ -317,19 +396,19 @@ namespace ScrcpyEX.View
             
             try
             {
-                CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, _recInfo.CropRect);
+                CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, info.CropRect);
                 if (scWindow == null)
                 {
                     popMid.Show("获取Scrcpy截图失败。");
                     return;
                 }
 
-                ShowImg showImg = new(recInfo, scWindow);
+                ShowImg showImg = new(info, scWindow);
                 showImg.ShowDialog();
             }
             catch (Exception ex)
             {
-                MyGM.ShwInfo($"在对比图像时异常：{ex}");
+                MyGM.ShwInfo($"尝试对比图像时异常：{ex}");
             }
         }
 
@@ -338,34 +417,34 @@ namespace ScrcpyEX.View
         /// </summary>
         /// <param name="recInfo">脚本信息。</param>
         /// <returns>其中任意一张图片的像素度在指定阈值以上时，返回true，否则返回false。</returns>
-        private async Task<bool> MatrixComparison(RecInfo recInfo)
-        {
-            List<double> matrixs = [];
-            string imgName = recInfo.ImgName;
-
-            for (int i = -1; i <= 1; i++)
-            {
-                for (int j = -1; j <= 1; j++)
-                {
-                    Rect rect = recInfo.CropRect;
-                    rect.X += i;
-                    rect.Y += j;
-
-                    CroppedBitmap scBitmap = await GetScriptImg(ScHandle, _mainHandle, rect);
-                    if (scBitmap == null)
-                    {
-                        matrixs.Add(0);
-                        continue;
-                    }
-
-                    double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{imgName}", scBitmap);
-                    matrixs.Add(ssim);
-                }
-            }
-
-            Debug.WriteLine($"多次比对：{string.Join(", ", matrixs.Select(n => $"{n:F2}"))}");
-            return matrixs.Max() >= 0.7;
-        }
+        //private async Task<bool> MatrixComparison(ScriptInfo recInfo)
+        //{
+        //    List<double> matrixs = [];
+        //    string imgName = recInfo.ImgName;
+        //
+        //    for (int i = -1; i <= 1; i++)
+        //    {
+        //        for (int j = -1; j <= 1; j++)
+        //        {
+        //            Rect rect = recInfo.CropRect;
+        //            rect.X += i;
+        //            rect.Y += j;
+        //
+        //            CroppedBitmap scBitmap = await GetScriptImg(ScHandle, _mainHandle, rect);
+        //            if (scBitmap == null)
+        //            {
+        //                matrixs.Add(0);
+        //                continue;
+        //            }
+        //
+        //            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{imgName}", scBitmap);
+        //            matrixs.Add(ssim);
+        //        }
+        //    }
+        //
+        //    Debug.WriteLine($"多次比对：{string.Join(", ", matrixs.Select(n => $"{n:F2}"))}");
+        //    return matrixs.Max() >= 0.7;
+        //}
 
 
     }

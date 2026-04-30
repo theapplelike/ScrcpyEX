@@ -133,19 +133,19 @@
                 <ToolBar ToolBarTray.IsLocked="True">
 
                     <DockPanel x:Name="dcpScMain">
-                        <Button x:Name="btnWired" Click="BtnWired_Click" Style="{StaticResource thisBtn}" Content="&#xF0B9;" ToolTip="有线连接"/>
-                        <Button x:Name="btnWirel" Click="BtnWirel_Click" Style="{StaticResource thisBtn}" Content="&#xe93e;" ToolTip="无线连接"/>
-                        <Button x:Name="btnStop"  Click="BtnStop_Click"  Style="{StaticResource thisBtn}" Content="&#xECCB;" ToolTip="停止投屏"/>
+                        <Button x:Name="btnWired" Click="BtnWired_Click" Content="&#xF0B9;" Style="{StaticResource thisBtn}" ToolTip="有线连接"/>
+                        <Button x:Name="btnWirel" Click="BtnWirel_Click" Content="&#xe93e;" Style="{StaticResource thisBtn}" ToolTip="无线连接"/>
+                        <Button x:Name="btnStop"  Click="BtnStop_Click"  Content="&#xECCB;" Style="{StaticResource thisBtn}" ToolTip="停止投屏"/>
                     </DockPanel>
                     <Rectangle Style="{StaticResource sep}"/><!---->
 
-                    <mycontrol:IconButton x:Name="btnLocOpt"  Click="BtnLocOpt_Click"  MainIcon="&#xe78a;" CornerIcon="&#xE7bc;" ToolTip="位置与大小选项"/>
-                    <mycontrol:IconButton x:Name="btnFuncOpt" Click="BtnFuncOpt_Click" MainIcon="&#xebd2;" CornerIcon="&#xE7bc;" ToolTip="功能菜单"/>
-                    <Rectangle Style="{StaticResource sep}"/>
-
                     <mycontrol:IconButton x:Name="btnRecManage" Click="BtnRecManage_Click" MainIcon="&#xea40;" CornerIcon="&#xE712;" ToolTip="脚本管理"/>
                     <Button x:Name="btnRecScr" Click="BtnRecScr_Click" Content="&#xe9a1;" Style="{StaticResource thisBtn}" ToolTip="录制脚本"/>
+                    <Rectangle Style="{StaticResource sep}"/>
 
+                    <mycontrol:IconButton x:Name="btnLocOpt"  Click="BtnLocOpt_Click"  MainIcon="&#xe78a;" CornerIcon="&#xE7bc;" ToolTip="位置与大小选项"/>
+                    <mycontrol:IconButton x:Name="btnFuncOpt" Click="BtnFuncOpt_Click" MainIcon="&#xebd2;" CornerIcon="&#xE7bc;" ToolTip="功能菜单"/>
+                    
                     <Button x:Name="btnTest" Style="{StaticResource thisBtn}" Content="&#xf133;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
                     <Border x:Name="bdRec" HorizontalAlignment="Right" BorderBrush="SteelBlue" BorderThickness="4">
                         <DockPanel>

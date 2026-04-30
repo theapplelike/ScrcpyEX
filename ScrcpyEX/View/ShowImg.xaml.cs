@@ -23,28 +23,38 @@ namespace ScrcpyEX.View
     /// </summary>
     public partial class ShowImg : Window
     {
-        public ShowImg(RecInfo recInfo)
+        public ShowImg(ScriptInfo info)
         {
             InitializeComponent();
-            img.Source = MyGM.GetImage(recInfo.ImgName);
+            img.Source = MyGM.GetImage(info.ImgName);
             tbkDesc.Visibility = Visibility.Collapsed;
             tbkParam.Text = 
-                $"起始坐标：({recInfo.CropRect.X},{recInfo.CropRect.Y})，" +
-                $"图片宽高：({recInfo.CropRect.Width},{recInfo.CropRect.Height})。";
+                $"起始坐标：({info.CropRect.X},{info.CropRect.Y})，" +
+                $"图片宽高：({info.CropRect.Width},{info.CropRect.Height})。";
         }
 
-        public ShowImg(RecInfo recInfo, BitmapSource bitmap)
+        public ShowImg(ImageSource source, Rect rect)
+        {
+            InitializeComponent();
+            img.Source = source;
+            tbkDesc.Visibility = Visibility.Collapsed;
+            tbkParam.Text =
+                $"起始坐标：({rect.X},{rect.Y})，" +
+                $"图片宽高：({rect.Width},{rect.Height})。";
+        }
+
+        public ShowImg(ScriptInfo info, BitmapSource bitmap)
         {
             InitializeComponent();
 
-            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{recInfo.ImgName}", bitmap);
+            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{info.ImgName}", bitmap);
             Image img1 = new() { Margin = new Thickness(5), Source = bitmap };
 
             ufg.Children.Add(img1);
-            img.Source = MyGM.GetImage(recInfo.ImgName);
+            img.Source = MyGM.GetImage(info.ImgName);
             tbkParam.Text =
-                $"起始坐标：({recInfo.CropRect.X},{recInfo.CropRect.Y})，" +
-                $"图片宽高：({recInfo.CropRect.Width},{recInfo.CropRect.Height})，" +
+                $"起始坐标：({info.CropRect.X},{info.CropRect.Y})，" +
+                $"图片宽高：({info.CropRect.Width},{info.CropRect.Height})，" +
                 $"相似程度：{ssim:F8}。";
         }
     }

@@ -46,7 +46,7 @@ namespace ScrcpyEX.MyDefinition
         /// <summary>
         /// 显示信息弹窗。
         /// </summary>
-        public static void ShwInfo(string txt, string cpt = "已处理异常")
+        public static void ShwInfo(string txt, string cpt = "提示信息")
         {
             MessageBox.Show(txt, cpt, MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -263,7 +263,7 @@ namespace ScrcpyEX.MyDefinition
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载脚本图片失败: {ex.Message}");
+                ShwError($"加载脚本图片失败: {ex.Message}", "错误信息");
                 return null;
             }
         }

@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Interop;
@@ -61,7 +62,12 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 图像脚本任务锁。
         /// </summary>
-        private readonly object _imageScriptLock = new();
+        //private readonly object _imageScriptLock = new();
+
+        /// <summary>
+        /// 图像脚本任务锁。
+        /// </summary>
+        private readonly SemaphoreSlim _imageScriptLock = new(1, 1);
 
         /// <summary>
         /// 图像脚本是否正在处理任务。
@@ -81,17 +87,17 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 脚本计时器，可能会绑定计时脚本或图像脚本。
         /// </summary>
-        private readonly Timer _scriptTimer = new();
+        private readonly System.Timers.Timer _scriptTimer = new();
 
         /// <summary>
         /// 对每次脚本间隔进行计数。
         /// </summary>
-        private readonly Timer _countTimer = new();
+        private readonly System.Timers.Timer _countTimer = new();
 
         /// <summary>
         /// 测试用计时器。
         /// </summary>
-        private readonly Timer _testTimer = new();
+        private readonly System.Timers.Timer _testTimer = new();
 
         /// <summary>
         /// Scrcpy的默认初始宽高（在100%缩放下），使用比例为15：7，华为nova 4e。
@@ -116,7 +122,13 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 保存已选中的脚本。
         /// </summary>
-        private RecInfo _recInfo = null;
+        //private ScriptInfo _recInfo = null;
+        private List<ScriptInfo> _scriptInfos = null;
+
+        /// <summary>
+        /// ScriptInfo，执行图像组脚本时计数的变量。
+        /// </summary>
+        private int _si = 0;
 
         /// <summary>
         /// 鼠标左键是否处于按下状态。
