@@ -29,11 +29,6 @@ namespace ScrcpyEX.View
         private readonly DataTable _pointDt = new();
 
         /// <summary>
-        /// 是否处于脚本名称的编辑状态。
-        /// </summary>
-        //private bool _isEditing = false;
-
-        /// <summary>
         /// 说明截图结果位置大小的矩形。
         /// </summary>
         private Rect _cropRect = Rect.Empty;
@@ -62,11 +57,6 @@ namespace ScrcpyEX.View
         /// ListBox中按下时的源项。
         /// </summary>
         private ListBoxItem _dragSourceItem;
-
-        /// <summary>
-        /// 是否正在拖动。
-        /// </summary>
-        //private bool _isDragging = false;
 
         /// <summary>
         /// 当前选中的脚本信息。

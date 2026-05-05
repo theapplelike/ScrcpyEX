@@ -50,7 +50,7 @@ namespace ScrcpyEX.View
 
         private void G_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            //DragMove();
+            DragMove();
         }
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)

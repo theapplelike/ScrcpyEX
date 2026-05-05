@@ -43,38 +43,10 @@ namespace ScrcpyEX.View
             Width = rect.Width / DpiScaleX;
             Height = rect.Height / DpiScaleY;
 
-            //Left = MV.MainWin.Left;
-            //Top = MV.MainWin.Top;
-            //Width = MV.MainWin.Width;
-            //Height = MV.MainWin.Height;
-
-            //gBack.Background = new ImageBrush(MyGM.CaptureProcessArea(DpiScaleX, DpiScaleY))
-            //{
-            //    Stretch = Stretch.Fill
-            //};
             gBack.Background = new ImageBrush(MyGM.GetHandleImage(scHandle))
             {
                 Stretch = Stretch.Fill
             };
-
-            //覆盖整个屏幕，使用VirtualScreenWidth会覆盖所有显示器，PrimaryScreenWidth只能覆盖主显示器
-            //Left = 0;
-            //Top = 0;
-            //Width = SystemParameters.VirtualScreenWidth;
-            //Height = SystemParameters.VirtualScreenHeight;
-            //Width = SystemParameters.PrimaryScreenWidth;
-            //Height = SystemParameters.PrimaryScreenHeight;
-
-            //Console.WriteLine($"主屏幕：" +
-            //    $"{SystemParameters.PrimaryScreenWidth}，" +
-            //    $"{SystemParameters.PrimaryScreenHeight}," +
-            //    $"{SystemParameters.VirtualScreenWidth}," +
-            //    $"{SystemParameters.VirtualScreenHeight}");
-            //
-            //gBack.Background = new ImageBrush(CaptureCurrentScreen())
-            //{
-            //    Stretch = Stretch.Fill
-            //};
 
             //放大镜根据DPI缩放
             _d = (int)(50 * DpiScaleX);
@@ -88,7 +60,7 @@ namespace ScrcpyEX.View
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-            CompositionTarget.Rendering -= OnRendering;
+            MyClose();
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -122,11 +94,11 @@ namespace ScrcpyEX.View
             DialogResult = false;
         }
 
-        private void BtnYes_Click(object sender, RoutedEventArgs e)
+        private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
             CaptureComplete();
         }
 
-        
+
     }
 }

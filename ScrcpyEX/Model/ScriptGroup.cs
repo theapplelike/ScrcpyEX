@@ -24,14 +24,17 @@ namespace ScrcpyEX.Model
         /// </summary>
         public ScriptGroup() { }
 
-        public object Clone()
+        object ICloneable.Clone() => Clone(); //显式接口实现
+
+        /// <summary>
+        /// 公共强类型方法，创建当前实例副本的新对象。
+        /// </summary>
+        /// <returns>返回此实例副本的新对象。</returns>
+        public ScriptGroup Clone() => new()
         {
-            return new ScriptGroup
-            {
-                Name = Name,
-                Scripts = [.. Scripts.Select(s => (ScriptInfo)s.Clone())]
-            };
-        }
+            Name = Name,
+            Scripts = [.. Scripts.Select(s => s.Clone())],
+        };
 
 
     }

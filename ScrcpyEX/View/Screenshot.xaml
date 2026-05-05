@@ -26,19 +26,23 @@
             <Rectangle x:Name="rct" Stroke="Green" StrokeThickness="1" Visibility="Hidden"/>
 
             <!--截图完成后显示的操作菜单-->
-            <StackPanel x:Name="stp" Orientation="Horizontal" Visibility="Hidden">
-                <Button x:Name="btnNo" Click="BtnNo_Click" Content="&#xe947;" Style="{StaticResource WhiteBtn}" Foreground="Red"/>
-                <Button x:Name="btnYes" Click="BtnYes_Click" Content="&#xe94b;" Style="{StaticResource WhiteBtn}" Foreground="Green"/>
-            </StackPanel>
+            <Popup x:Name="popTool" IsOpen="False" AllowsTransparency="True">
+                <StackPanel x:Name="stp" Orientation="Horizontal">
+                    <Button x:Name="btnNo" Click="BtnNo_Click" Content="&#xe947;" Style="{StaticResource WhiteBtn}" Foreground="Red"/>
+                    <Button x:Name="btnOk" Click="BtnOk_Click" Content="&#xe94b;" Style="{StaticResource WhiteBtn}" Foreground="Green"/>
+                </StackPanel>
+            </Popup>
 
             <!--放大镜控件-->
-            <Grid x:Name="gMagnifier" Width="150" Height="150">
-                <Image x:Name="img"/>
+            <Popup x:Name="popMagnifier" Placement="Absolute" AllowsTransparency="True">
+                <Grid x:Name="gMagnifier" Width="150" Height="150">
+                    <Image x:Name="img"/>
 
-                <!--放大镜边框和绿色十字线-->
-                <Border BorderBrush="Green" BorderThickness="1"/>
-                <Path Stroke="Green" StrokeThickness="1" Data="M75,0 L75,150 M0,75 L150,75"/>
-            </Grid>
+                    <!--放大镜边框和绿色十字线-->
+                    <Border BorderBrush="Green" BorderThickness="1"/>
+                    <Path Stroke="Green" StrokeThickness="1" Data="M75,0 L75,150 M0,75 L150,75"/>
+                </Grid>
+            </Popup>
         </Canvas>
         
     </Grid>

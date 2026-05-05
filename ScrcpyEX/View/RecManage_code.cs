@@ -226,7 +226,7 @@ namespace ScrcpyEX.View
                 ScriptGroup newGroup = new()
                 {
                     Name = $"{target.Name}&{source.Name}",
-                    Scripts = [(ScriptInfo)target.Clone(), (ScriptInfo)source.Clone()]
+                    Scripts = [target.Clone(), source.Clone()]
                 };
                 _vm.ScriptItems.Add(newGroup);
                 CopyScriptImage([..newGroup.Scripts]);
@@ -234,7 +234,7 @@ namespace ScrcpyEX.View
             else if (targetData is ScriptGroup targetGroup)
             {
                 targetGroup.Name = $"{targetGroup.Name}&{source.Name}";
-                targetGroup.Scripts.Add((ScriptInfo)source.Clone());
+                targetGroup.Scripts.Add(source.Clone());
                 CopyScriptImage(targetGroup.Scripts.Last());
             }
         }

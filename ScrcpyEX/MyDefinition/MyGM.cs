@@ -81,13 +81,22 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
-        /// 获得光标的当前坐标，以屏幕为基准，且此值已乘以了DPI比例（与DPI相关）。
+        /// 获得光标的当前坐标，以屏幕为基准，且此值已乘以了DPI比例（与DPI相关），WPF框架。
         /// </summary>
         /// <returns>一个System.Windows.Point类型的值。</returns>
-        public static Point GetPosition()
+        public static System.Windows.Point GetPosnW()
         {
             System.Drawing.Point point = System.Windows.Forms.Cursor.Position;
-            return new Point(point.X, point.Y);
+            return new System.Windows.Point(point.X, point.Y);
+        }
+
+        /// <summary>
+        /// 获得光标的当前坐标，以屏幕为基准，且此值已乘以了DPI比例（与DPI相关），WinForms框架。
+        /// </summary>
+        /// <returns>一个System.Drawing.Point类型的值。</returns>
+        public static System.Drawing.Point GetPosnD()
+        {
+            return System.Windows.Forms.Cursor.Position;
         }
 
         /// <summary>

@@ -105,11 +105,6 @@ namespace ScrcpyEX.View
         private readonly int _scWidth = 960, _scHeight = 448;
 
         /// <summary>
-        /// 说明当前投屏的状态，true--横屏；false--竖屏。
-        /// </summary>
-        //private bool _isLandscape = false;
-
-        /// <summary>
         /// 投屏分辨率的横向比例。
         /// </summary>
         private int _horizontalRatio;
@@ -122,7 +117,6 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 保存已选中的脚本。
         /// </summary>
-        //private ScriptInfo _recInfo = null;
         private List<ScriptInfo> _scriptInfos = null;
 
         /// <summary>

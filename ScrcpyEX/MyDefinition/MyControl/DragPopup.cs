@@ -262,7 +262,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 SelectAll(_txtInput);
 
                 //记录当前坐标为上一次的坐标
-                _lastPoint = MyGM.GetPosition();
+                _lastPoint = MyGM.GetPosnW();
             }
             else
             {
@@ -307,7 +307,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         {
             if (_isDragging && _isEdit)
             {
-                _nowPoint = MyGM.GetPosition();//现在的坐标
+                _nowPoint = MyGM.GetPosnW();//现在的坐标
 
                 double newX = HorizontalOffset + (_nowPoint.X - _lastPoint.X) / MV.DpiScaleX;
                 double newY = VerticalOffset + (_nowPoint.Y - _lastPoint.Y) / MV.DpiScaleY;

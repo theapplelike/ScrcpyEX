@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using ScrcpyEX.MyDefinition;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace ScrcpyEX.View
 {
@@ -28,7 +29,7 @@ namespace ScrcpyEX.View
             rct.Visibility = Visibility.Visible;
             rctMask.Visibility = Visibility.Visible;
 
-            stp.Visibility = Visibility.Hidden;
+            popTool.IsOpen = false;
             //Console.WriteLine($"开始的位置:{_startPoint.X},{_startPoint.Y}。");
         }
 
@@ -37,7 +38,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void RightClick()
         {
-            if (stp.Visibility == Visibility.Visible)
+            if (popTool.IsOpen)
             {
                 Recapture();
             }
@@ -99,9 +100,9 @@ namespace ScrcpyEX.View
         {
             _endPoint = endPoint;
 
-            stp.Margin = new Thickness(endPoint.X - stp.ActualWidth, GetY(endPoint), 0, 0);
-            stp.Visibility = Visibility.Visible;
-            //Console.WriteLine($"截图结束位置：{endPoint.X}，{endPoint.Y}。");
+            popTool.HorizontalOffset = endPoint.X + 10;
+            popTool.VerticalOffset = GetY(endPoint);
+            popTool.IsOpen = true;
         }
 
         /// <summary>
@@ -146,36 +147,85 @@ namespace ScrcpyEX.View
         /// <param name="curPoint">鼠标的当前位置。</param>
         private void UpdateMagnifier(Point curPoint)
         {
-            int sourceX = (int)(curPoint.X * DpiScaleX - _d / 2);
-            int sourceY = (int)(curPoint.Y * DpiScaleY - _d / 2);
+            // 以鼠标为中心计算请求的源矩形
+            int requestX = (int)(curPoint.X * DpiScaleX - _d / 2);
+            int requestY = (int)(curPoint.Y * DpiScaleY - _d / 2);
+            Int32Rect requestRect = new(requestX, requestY, _d, _d);
+
+            // 源位图的有效区域
+            Int32Rect sourceBounds = new(0, 0, _sourceBitmap.PixelWidth, _sourceBitmap.PixelHeight);
+
+            // 求交集（如果请求区域完全在屏幕外，则交集为空）
+            Int32Rect intersect = GetIntersection(requestRect, sourceBounds);
+
+            // 先将整个放大镜位图填充为黑色透明(BGRA = 0,0,0,0)
+            int stride = _magnifierBitmap.BackBufferStride;
+            byte[] blackPixels = new byte[stride * _d];
+            _magnifierBitmap.WritePixels(new Int32Rect(0, 0, _d, _d), blackPixels, stride, 0);
+
+            // 如果有交集，将其从源位图复制到放大镜位图的对应位置
+            if (!intersect.IsEmpty)
+            {
+                // 目标矩形：交集在放大镜中的偏移
+                Int32Rect destRect = new(
+                    intersect.X - requestX,
+                    intersect.Y - requestY,
+                    intersect.Width,
+                    intersect.Height);
+
+                // 将交集像素复制到临时数组（按目标 stride 存放，方便直接写入）
+                byte[] srcPixels = new byte[stride * intersect.Height];
+                _sourceBitmap.CopyPixels(intersect, srcPixels, stride, 0);
+
+                // 写入放大镜位图的有效部分（周围已为黑色透明）
+                _magnifierBitmap.WritePixels(destRect, srcPixels, stride, 0);
+            }
 
             // 边界检查
-            sourceX = MyGM.Clamp(sourceX, 0, _sourceBitmap.PixelWidth - _d);
-            sourceY = MyGM.Clamp(sourceY, 0, _sourceBitmap.PixelHeight - _d);
-            try
-            {
-                _magnifierBitmap.Lock();
+            //sourceX = MyGM.Clamp(sourceX, 0, _sourceBitmap.PixelWidth - _d);
+            //sourceY = MyGM.Clamp(sourceY, 0, _sourceBitmap.PixelHeight - _d);
+            //try
+            //{
+            //    _magnifierBitmap.Lock();
+            //
+            //    // 将源背景图的指定像素直接复制给放大镜位图
+            //    _sourceBitmap.CopyPixels(
+            //        new Int32Rect(sourceX, sourceY, _d, _d),
+            //        _magnifierBitmap.BackBuffer,
+            //        _magnifierBitmap.BackBufferStride * _d,
+            //        _magnifierBitmap.BackBufferStride);
+            //
+            //    _magnifierBitmap.AddDirtyRect(new Int32Rect(0, 0, _d, _d));
+            //}
+            //finally
+            //{
+            //    _magnifierBitmap.Unlock();
+            //}
 
-                // 将源背景图的指定像素直接复制给放大镜位图
-                _sourceBitmap.CopyPixels(
-                    new Int32Rect(sourceX, sourceY, _d, _d),
-                    _magnifierBitmap.BackBuffer,
-                    _magnifierBitmap.BackBufferStride * _d,
-                    _magnifierBitmap.BackBufferStride);
-
-                _magnifierBitmap.AddDirtyRect(new Int32Rect(0, 0, _d, _d));
-            }
-            finally
-            {
-                _magnifierBitmap.Unlock();
-            }
-
-            (double left, double top) = GetLocation(curPoint, 15);
-            gMagnifier.Margin = new Thickness(left, top, 0, 0);
+            (double left, double top) = GetLocation(PointToScreen(curPoint), 15);
+            popMagnifier.HorizontalOffset = left;
+            popMagnifier.VerticalOffset = top;
         }
 
         /// <summary>
-        /// 获得放大镜的位置，和程序相对的左和上的位置，会确保放大镜始终在可视范围内。
+        /// 获得两个Int32Rect的交集。
+        /// </summary>
+        /// <param name="r1">第一个Int32Rect。</param>
+        /// <param name="r2">第二个Int32Rect。</param>
+        /// <returns>两个Int32Rect的交集。</returns>
+        private Int32Rect GetIntersection(Int32Rect r1, Int32Rect r2)
+        {
+            int x = Math.Max(r1.X, r2.X);
+            int y = Math.Max(r1.Y, r2.Y);
+            int right = Math.Min(r1.X + r1.Width, r2.X + r2.Width);
+            int bottom = Math.Min(r1.Y + r1.Height, r2.Y + r2.Height);
+            int width = Math.Max(0, right - x);
+            int height = Math.Max(0, bottom - y);
+            return new Int32Rect(x, y, width, height);
+        }
+
+        /// <summary>
+        /// 获得放大镜的位置，会确保放大镜始终在可视范围内。
         /// </summary>
         /// <param name="curPoint">鼠标的当前位置。</param>
         /// <param name="r">放大镜和鼠标的距离。</param>
@@ -183,7 +233,9 @@ namespace ScrcpyEX.View
         private (double, double) GetLocation(Point curPoint, double r)
         {
             double left, top;
-            if (curPoint.X + r + gMagnifier.Width > Width)
+            System.Drawing.Rectangle rect = Screen.FromPoint(MyGM.GetPosnD()).WorkingArea;
+
+            if (curPoint.X + r + gMagnifier.Width > rect.Width)
             {
                 left = curPoint.X - r - gMagnifier.Width;
             }
@@ -191,7 +243,7 @@ namespace ScrcpyEX.View
             {
                 left = curPoint.X + r;
             }
-            if (curPoint.Y + r + gMagnifier.Height > Height)
+            if (curPoint.Y + r + gMagnifier.Height > rect.Height)
             {
                 top = curPoint.Y - r - gMagnifier.Height;
             }
@@ -199,6 +251,7 @@ namespace ScrcpyEX.View
             {
                 top = curPoint.Y + r;
             }
+
             return (left, top);
         }
 

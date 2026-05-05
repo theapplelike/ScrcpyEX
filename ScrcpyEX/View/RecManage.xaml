@@ -40,11 +40,13 @@
 
     <!--设置圆角需要窗体背景色为透明，背景色需要在Border设置-->
     <Border BorderThickness="3" BorderBrush="#5B9DF0" CornerRadius="10" Background="White">
-        <Grid x:Name="g" MouseLeftButtonDown="G_MouseLeftButtonDown">
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="360"/>
                 <ColumnDefinition Width="280"/>
             </Grid.ColumnDefinitions>
+
+            <Grid MouseLeftButtonDown="G_MouseLeftButtonDown" Width="100" Height="20" Background="Beige" Grid.ColumnSpan="2" VerticalAlignment="Top"/>
 
             <Grid Margin="10">
                 <Grid.RowDefinitions>

@@ -80,22 +80,25 @@ namespace ScrcpyEX.Model
             PointInfos = [.. points];//创建独立的数据副本
         }
 
-        public object Clone()
+        object ICloneable.Clone() => Clone(); //显式接口实现
+
+        /// <summary>
+        /// 公共强类型方法，创建当前实例副本的新对象。
+        /// </summary>
+        /// <returns>返回此实例副本的新对象。</returns>
+        public ScriptInfo Clone() => new()
         {
-            return new ScriptInfo
-            {
-                Name = Name,
-                IsLimited = IsLimited,
-                CycleNumber = CycleNumber,
-                IsTime = IsTime,
-                CycleInterval = CycleInterval,
-                ImgName = ImgName,
-                CropRect = CropRect,
-                IsAdaptive = IsAdaptive,
-                Similarity = Similarity,
-                PointInfos = PointInfos,
-            };
-        }
+            Name = Name,
+            IsLimited = IsLimited,
+            CycleNumber = CycleNumber,
+            IsTime = IsTime,
+            CycleInterval = CycleInterval,
+            ImgName = ImgName,
+            CropRect = CropRect,
+            IsAdaptive = IsAdaptive,
+            Similarity = Similarity,
+            PointInfos = PointInfos,
+        };
 
 
     }

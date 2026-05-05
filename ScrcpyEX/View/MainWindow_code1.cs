@@ -37,7 +37,7 @@ namespace ScrcpyEX.View
         public (double, double) GetPointRelativeToScrcpy()
         {
             Point pt1 = PointToScreen(new Point(0, 0)); //获得程序左上角相对于屏幕的位置，获得的值与DPI相关
-            Point pt2 = MyGM.GetPosition();             //获取鼠标相对于屏幕的位置
+            Point pt2 = MyGM.GetPosnW();                //获取鼠标相对于屏幕的位置
 
             double x = pt2.X - pt1.X - ExtraWidthLeft * MV.DpiScaleX + SystemParameters.WindowNonClientFrameThickness.Left * MV.DpiScaleX;
             double y = pt2.Y - pt1.Y - ExtraHeightTop * MV.DpiScaleY;

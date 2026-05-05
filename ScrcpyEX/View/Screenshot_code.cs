@@ -21,6 +21,9 @@ namespace ScrcpyEX.View
 {
     public partial class Screenshot//code
     {
+        /// <summary>
+        /// 自定义初始化。
+        /// </summary>
         private void MyInit()
         {
             //捕获背景层的快照，存储在一个WriteableBitmap中，直接操作WriteableBitmap可以提高性能
@@ -35,6 +38,15 @@ namespace ScrcpyEX.View
 
             //每一帧都将触发的事件
             CompositionTarget.Rendering += OnRendering;
+            popMagnifier.IsOpen = true;
+        }
+
+        /// <summary>
+        /// 自定义关闭事件。
+        /// </summary>
+        private void MyClose()
+        {
+            CompositionTarget.Rendering -= OnRendering;
         }
 
         /// <summary>
@@ -42,9 +54,25 @@ namespace ScrcpyEX.View
         /// </summary>
         private void OnRendering(object sender, EventArgs e)
         {
-            if (stp.Visibility != Visibility.Visible)
+            if (!popTool.IsOpen)
             {
-                UpdateMagnifier(Mouse.GetPosition(gBack));
+                System.Windows.Point mousePos = Mouse.GetPosition(this);
+
+                if (mousePos.X >= 0 && mousePos.X <= ActualWidth &&
+                    mousePos.Y >= 0 && mousePos.Y <= ActualHeight)
+                {
+                    // 鼠标在窗口内，打开放大镜（如果已关闭则重新打开）
+                    if (!popMagnifier.IsOpen) { popMagnifier.IsOpen = true; }
+                    UpdateMagnifier(mousePos);
+                }
+                else
+                {
+                    if (popMagnifier.IsOpen) { popMagnifier.IsOpen = false; }
+                }
+            }
+            else
+            {
+                if (popMagnifier.IsOpen) { popMagnifier.IsOpen = false; }
             }
         }
 
@@ -52,27 +80,28 @@ namespace ScrcpyEX.View
         /// 获取当前截屏。
         /// </summary>
         /// <returns>返回BitmapImage对象。</returns>
-        public BitmapImage CaptureCurrentScreen()
-        {
-            //创建与屏幕大小相同的位图对象，SystemParameters与DPI无关，需要乘以DPI系数
-            Bitmap bmp = new((int)(SystemParameters.VirtualScreenWidth * DpiScaleX), (int)(SystemParameters.VirtualScreenHeight * DpiScaleY), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            //Bitmap bmp = new((int)(SystemParameters.PrimaryScreenWidth * DpiScaleX), (int)(SystemParameters.PrimaryScreenHeight * DpiScaleY), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-
-            //使用位图对象来创建Graphics的对象
-            using (Graphics g = Graphics.FromImage(bmp))
-            {
-                g.SmoothingMode = SmoothingMode.AntiAlias;                  //设置平滑模式，抗锯齿
-                g.CompositingQuality = CompositingQuality.HighQuality;      //设置合成质量
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic; //设置插值模式
-                g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;   //设置文本呈现的质量
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;            //设置呈现期间，像素偏移的方式
-
-                //利用CopyFromScreen将当前屏幕截图内容存储在位图中
-                g.CopyFromScreen(0, 0, 0, 0, bmp.Size, CopyPixelOperation.SourceCopy);
-            }
-
-            return BitmapConvert(bmp);
-        }
+        //public BitmapImage CaptureCurrentScreen()
+        //{
+        //    //创建与屏幕大小相同的位图对象，SystemParameters与DPI无关，需要乘以DPI系数
+        //    //使用VirtualScreenWidth会覆盖所有显示器，PrimaryScreenWidth只能覆盖主显示器
+        //    Bitmap bmp = new((int)(SystemParameters.VirtualScreenWidth * DpiScaleX), (int)(SystemParameters.VirtualScreenHeight * DpiScaleY), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+        //    //Bitmap bmp = new((int)(SystemParameters.PrimaryScreenWidth * DpiScaleX), (int)(SystemParameters.PrimaryScreenHeight * DpiScaleY), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+        //
+        //    //使用位图对象来创建Graphics的对象
+        //    using (Graphics g = Graphics.FromImage(bmp))
+        //    {
+        //        g.SmoothingMode = SmoothingMode.AntiAlias;                  //设置平滑模式，抗锯齿
+        //        g.CompositingQuality = CompositingQuality.HighQuality;      //设置合成质量
+        //        g.InterpolationMode = InterpolationMode.HighQualityBicubic; //设置插值模式
+        //        g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;   //设置文本呈现的质量
+        //        g.PixelOffsetMode = PixelOffsetMode.HighQuality;            //设置呈现期间，像素偏移的方式
+        //
+        //        //利用CopyFromScreen将当前屏幕截图内容存储在位图中
+        //        g.CopyFromScreen(0, 0, 0, 0, bmp.Size, CopyPixelOperation.SourceCopy);
+        //    }
+        //
+        //    return BitmapConvert(bmp);
+        //}
 
         /// <summary>
         /// 将System.Drawing.Bitmap转换为System.Windows.Media.Imaging.BitmapImage。
@@ -80,24 +109,24 @@ namespace ScrcpyEX.View
         /// </summary>
         /// <param name="bmp">System.Drawing.Bitmap对象。</param>
         /// <returns>System.Windows.Media.Imaging.BitmapImage对象。</returns>
-        private BitmapImage BitmapConvert(Bitmap bmp)
-        {
-            BitmapImage bitmapImage;
-
-            using (MemoryStream stream = new())
-            {
-                bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                stream.Position = 0;
-
-                bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = stream;
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.EndInit();
-            }
-
-            return bitmapImage;
-        }
+        //private BitmapImage BitmapConvert(Bitmap bmp)
+        //{
+        //    BitmapImage bitmapImage;
+        //
+        //    using (MemoryStream stream = new())
+        //    {
+        //        bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+        //        stream.Position = 0;
+        //
+        //        bitmapImage = new BitmapImage();
+        //        bitmapImage.BeginInit();
+        //        bitmapImage.StreamSource = stream;
+        //        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+        //        bitmapImage.EndInit();
+        //    }
+        //
+        //    return bitmapImage;
+        //}
 
         /// <summary>
         /// 重新进行截图。
@@ -110,7 +139,7 @@ namespace ScrcpyEX.View
             rctMask.Clip = null;
             rctMask.Visibility = Visibility.Hidden;
 
-            stp.Visibility = Visibility.Hidden;
+            popTool.IsOpen = false;
             tbk.Text = string.Empty;
         }
 
@@ -122,10 +151,10 @@ namespace ScrcpyEX.View
             //Console.WriteLine($"开始点：{_startPoint.X}，{_startPoint.Y}，结束点：{_endPoint.X}，{_endPoint.Y}。");
 
             Rect cropRect = new(
-                (Math.Min(_startPoint.X, _endPoint.X) * DpiScaleX),
-                (Math.Min(_startPoint.Y, _endPoint.Y) * DpiScaleY),
-                (Math.Abs(_endPoint.X - _startPoint.X) * DpiScaleX),
-                (Math.Abs(_endPoint.Y - _startPoint.Y) * DpiScaleY));
+                Math.Min(_startPoint.X, _endPoint.X) * DpiScaleX,
+                Math.Min(_startPoint.Y, _endPoint.Y) * DpiScaleY,
+                Math.Abs(_endPoint.X - _startPoint.X) * DpiScaleX,
+                Math.Abs(_endPoint.Y - _startPoint.Y) * DpiScaleY);
 
             //未截取任何内容时退出
             if (cropRect.Width == 0 || cropRect.Height == 0)

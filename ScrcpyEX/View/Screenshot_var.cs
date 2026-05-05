@@ -39,16 +39,6 @@ namespace ScrcpyEX.View
         private readonly WriteableBitmap _magnifierBitmap;
 
         /// <summary>
-        /// 最后的截图结果。
-        /// </summary>
-        public CroppedBitmap Crop { get; set; }
-
-        /// <summary>
-        /// 说明截图结果位置大小的矩形。
-        /// </summary>
-        public Rect CropRect { get; set; }
-
-        /// <summary>
         /// 屏幕X轴上的DPI比例。
         /// </summary>
         private double DpiScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;
@@ -67,6 +57,16 @@ namespace ScrcpyEX.View
         /// 沿Y轴的DPI。
         /// </summary>
         private double PixelsPerInchY => VisualTreeHelper.GetDpi(this).PixelsPerInchY;
+
+        /// <summary>
+        /// 最后的截图结果。
+        /// </summary>
+        public CroppedBitmap Crop { get; set; }
+
+        /// <summary>
+        /// 说明截图结果位置大小的矩形。
+        /// </summary>
+        public Rect CropRect { get; set; }
 
 
     }
