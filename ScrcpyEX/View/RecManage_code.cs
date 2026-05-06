@@ -36,6 +36,7 @@ namespace ScrcpyEX.View
         {
             MyCfg.Cfg.Scripts = [.. _vm.ScriptItems];
             MyCfg.Save();
+            MyGM.POP();
         }
 
         /// <summary>

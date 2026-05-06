@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ScrcpyEX.View"
+        xmlns:converter="clr-namespace:ScrcpyEX.MyDefinition.MyConverter"
         mc:Ignorable="d"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
         Title="脚本管理" Height="450" Width="640" x:Name="root" 
@@ -16,6 +17,9 @@
     </Window.DataContext>
 
     <Window.Resources>
+        <SolidColorBrush x:Key="Scb1" Color="#5B9DF0" Opacity="0.25"/>
+        <converter:IsScriptGroupConverter x:Key="ScriptTypeConverter"/>
+        
         <Style x:Key="LstBtn" TargetType="Button" BasedOn="{StaticResource MenuBtn}">
             <Setter Property="Height" Value="30"/>
             <Setter Property="Width" Value="40"/>
@@ -36,6 +40,26 @@
         <Style TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
+        <Style TargetType="TextBox">
+            <EventSetter Event="GotFocus" Handler="TextBox_GotFocus"/>
+        </Style>
+
+        <DrawingBrush x:Key="StripeBrush" TileMode="Tile" Viewport="0,0,30,30" ViewportUnits="Absolute" Viewbox="0,0,30,30" ViewboxUnits="Absolute">
+            <DrawingBrush.Drawing>
+                <GeometryDrawing Brush="{StaticResource Scb1}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry>
+                            <PathFigure StartPoint="0,30" IsClosed="True">
+                                <LineSegment Point="0,15"/>
+                                <QuadraticBezierSegment Point1="7.5,5" Point2="15,15"/>
+                                <QuadraticBezierSegment Point1="22.5,25" Point2="30,15"/>
+                                <LineSegment Point="30,30"/>
+                            </PathFigure>
+                        </PathGeometry>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
     </Window.Resources>
 
     <!--设置圆角需要窗体背景色为透明，背景色需要在Border设置-->
@@ -65,7 +89,7 @@
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2">
+                            <Border x:Name="borderRoot" BorderBrush="LightSteelBlue" BorderThickness="0,0,0,2">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="155"/>
@@ -75,10 +99,9 @@
                                         <ColumnDefinition Width="40"/>
                                         <ColumnDefinition Width="40"/>
                                     </Grid.ColumnDefinitions>
-                                    <!---->
                                     <TextBlock x:Name="tbkEdit" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="10,0" VerticalAlignment="Center"/>
                                     <TextBox x:Name="txtEdit" Text="{Binding Name}" Visibility="Hidden" VerticalAlignment="Center" Margin="10,0"/>
-                                    
+
                                     <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="1" Content="&#xe8ac;" Style="{StaticResource LstBtn}"/>
                                     <TextBlock Text="|" FontSize="20" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
 
@@ -87,6 +110,11 @@
                                     <Button x:Name="btnDel" Click="BtnDel_Click" CommandParameter="{Binding}" Grid.Column="5" Content="&#xe74d;" Style="{StaticResource LstBtn}"/>
                                 </Grid>
                             </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Path=., Converter={StaticResource ScriptTypeConverter}}" Value="True">
+                                    <Setter TargetName="borderRoot" Property="Background" Value="{StaticResource StripeBrush}"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -175,6 +203,7 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
+                    <Button x:Name="btnFouce" Width="10" Height="10"/>
                     <Button x:Name="btnSave" Click="BtnSave_Click" Content="保存" Style="{StaticResource Btn}"/>
                     <Button x:Name="btnExit" Click="BtnExit_Click" Content="关闭" Style="{StaticResource Btn}" Grid.Column="1"/>
                 </Grid>

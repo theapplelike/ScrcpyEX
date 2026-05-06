@@ -91,7 +91,6 @@ namespace ScrcpyEX.View
         private void MyInit()
         {
             MV.MainWin = this;
-            MV.Pop = pop;
             MV.DpiScaleX = VisualTreeHelper.GetDpi(this).DpiScaleX;
             MV.DpiScaleY = VisualTreeHelper.GetDpi(this).DpiScaleY;
 

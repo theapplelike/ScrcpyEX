@@ -104,6 +104,7 @@
     <Compile Include="MyDefinition\MyControl\HoverPopup.cs" />
     <Compile Include="MyDefinition\MyControl\IconButton.cs" />
     <Compile Include="MyDefinition\MyControl\TimePopup.cs" />
+    <Compile Include="MyDefinition\MyConverter\IsScriptGroupConverter.cs" />
     <Compile Include="MyDefinition\WindowsAPI\DLL.cs" />
     <Compile Include="MyDefinition\MV.cs" />
     <Compile Include="MyDefinition\MyAttribute\ArgumentsAttribute.cs" />

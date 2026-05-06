@@ -94,6 +94,17 @@ namespace ScrcpyEX.MyDefinition.MyControl
             _hideTimer.Start();
         }
 
+        /// <summary>
+        /// 如果当前Popup是显示状态，则立刻隐藏。
+        /// </summary>
+        public void Close()
+        {
+            if (IsOpen)
+            {
+                IsOpen = false;
+            }
+        }
+
 
     }
 }

@@ -45,7 +45,7 @@ namespace ScrcpyEX.Model
         /// <summary>
         /// 图像脚本是否使用自适应间隔。
         /// </summary>
-        public bool IsAdaptive { get; set; } = false;
+        public bool IsAdaptive { get; set; } = true;
 
         /// <summary>
         /// 阈值相似度，范围限定在0~100。

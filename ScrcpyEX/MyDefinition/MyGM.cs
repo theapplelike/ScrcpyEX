@@ -31,7 +31,15 @@ namespace ScrcpyEX.MyDefinition
         /// <param name="time">Popup控件显示的时间，单位s。</param>
         public static void POP(string text, int time = 3)
         {
-            MV.Pop.Show(text, time);
+            MV.MainWin.pop.Show(text, time);
+        }
+
+        /// <summary>
+        /// 立刻关闭随鼠标显示的Popup。
+        /// </summary>
+        public static void POP()
+        {
+            MV.MainWin.pop.Close();
         }
 
         /// <summary>

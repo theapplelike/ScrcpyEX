@@ -154,15 +154,14 @@ namespace ScrcpyEX.View
                 MyGM.POP("未指定脚本，不能保存。");
                 return;
             }
-
+            
             if (_currScript is ScriptInfo info)
             {
                 SaveScriptInfo(info);
             }
             else if (_currScript is ScriptGroup group)
             {
-                ScriptInfo si = group.Scripts[cmbMultipleScript.SelectedIndex];
-                SaveScriptInfo(si);
+                SaveScriptGroup(group);
             }
 
             MyGM.POP("脚本已保存。");
@@ -174,40 +173,17 @@ namespace ScrcpyEX.View
         /// <param name="si">单脚本的引用。</param>
         private void SaveScriptInfo(ScriptInfo si)
         {
+            btnFouce.Focus();
             int.TryParse(txtCycleNum.Text, out int num);
             int.TryParse(txtCycleInterval.Text, out int interval);
             double.TryParse(txtSimilarity.Text, out double similarity);
-            //ScriptInfo info = new()
-            //{
-            //    Name = _vm.ScriptItems[_index].Name,
-            //    IsLimited = (bool)rdoLimited.IsChecked,
-            //    CycleNumber = num,
-            //    IsTime = (bool)rdoTime.IsChecked,
-            //    CycleInterval = interval,
-            //    ImgName = img.Source == null ? "" : $"Pic{DateTime.Now:yyMMddhhmmss}.png",
-            //    Similarity = similarity,
-            //    IsAdaptive = (bool)chkAdaptive.IsChecked,
-            //    CropRect = _cropRect,
-            //    PointInfos = SavePointInfos(),
-            //};
 
-            //ReplaceImg(GetCurrScript().ImgName, info.ImgName);
-            //if (img.Source != null)
-            //{
-            //    MyGM.SavaImg(info.ImgName, (BitmapSource)img.Source);
-            //}
-            //
-            //_vm.ScriptItems[_index] = info;
-
-            //ScriptInfo si = _vm.ScriptItems[_index] as ScriptInfo;
             si.IsLimited = (bool)rdoLimited.IsChecked;
             si.CycleNumber = num;
             si.IsTime = (bool)rdoTime.IsChecked;
             si.CycleInterval = interval;
             si.Similarity = similarity;
             si.IsAdaptive = (bool)chkAdaptive.IsChecked;
-            //si.ImgName = img.Source == null ? "" : $"ScriptPic{DateTime.Now:yyMMddhhmmss}.png";
-            //si.CropRect = _cropRect;
             si.PointInfos = SavePointInfos();
 
             //如果有新截取的图片，则删除旧图片，保存新图片
@@ -219,6 +195,28 @@ namespace ScrcpyEX.View
                 MyGM.SavaImg(newName, (BitmapSource)img.Source);
                 si.ImgName = newName;
                 si.CropRect = _cropRect;
+            }
+        }
+
+        /// <summary>
+        /// 保存组脚本信息，除了当前项保存修改外，每组当中的循环次数参数保持一致。
+        /// </summary>
+        /// <param name="group">组脚本实例。</param>
+        private void SaveScriptGroup(ScriptGroup group)
+        {
+            foreach (ScriptInfo si in group.Scripts)
+            {
+                if (si == cmbMultipleScript.SelectedItem)
+                {
+                    SaveScriptInfo(si);
+                }
+                else
+                {
+                    int.TryParse(txtCycleNum.Text, out int num);
+
+                    si.CycleNumber = num;
+                    si.IsLimited = (bool)rdoLimited.IsChecked;
+                }
             }
         }
 
@@ -264,7 +262,7 @@ namespace ScrcpyEX.View
                 double r2 = double.Parse(dr["YAxis"].ToString());
                 double r3 = double.Parse(dr["LastTime"].ToString());
 
-                tempInfo.Add(new PointInfo(new Point(r1, r2), r3));
+                tempInfo.Add(new PointInfo(r1, r2, r3));
             }
 
             return tempInfo;

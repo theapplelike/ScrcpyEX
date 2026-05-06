@@ -55,7 +55,7 @@ namespace ScrcpyEX.ExtensionMethod
         /// <summary>
         /// 全局提示控件，在鼠标位置显示信息。
         /// </summary>
-        public static TimePopup Pop { get; set; }
+        //public static TimePopup Pop { get; set; }
 
         /// <summary>
         /// 按键映射Popup列表。

@@ -19,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace ScrcpyEX.View
 {
@@ -156,5 +157,19 @@ namespace ScrcpyEX.View
         {
             EditScript(e.AddedItems[0]);
         }
+
+        /// <summary>
+        /// 文本框获得焦点的时候选择其中所有内容。
+        /// </summary>
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox txt)
+            {
+                txt.SelectAll();
+                Dispatcher.BeginInvoke(() => txt.SelectAll(), DispatcherPriority.Input);
+            }
+        }
+
+
     }
 }
