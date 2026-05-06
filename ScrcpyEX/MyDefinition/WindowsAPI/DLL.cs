@@ -196,13 +196,6 @@ namespace ScrcpyEX.MyDefinition
         public static extern IntPtr WindowFromPoint(System.Drawing.Point point);
 
 
-        public const int SW_HIDE = 0;
-        public const int SW_SHOW = 5;
-        public const int SW_SHOWNORMAL = 1;
-
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
-
         //[DllImport("user32.dll")]
         //public static extern IntPtr GetDesktopWindow();
 

@@ -1,5 +1,4 @@
-﻿using OpenCvSharp.Internal;
-using ScrcpyEX.ExtensionMethod;
+﻿using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.ExtensionMethod.MyAttribute;
 using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition.WindowsAPI;
@@ -110,10 +109,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                     {
                         if (_prc.MainWindowHandle != IntPtr.Zero)
                         {
-                            DLL.ShowWindowAsync(_prc.MainWindowHandle, DLL.SW_HIDE);
                             ScHandle = _prc.MainWindowHandle;
-                            Debug.WriteLine($"Hideeeeeeeeeeeeeeeee");
-
                             return;
                         }
                         //if (FindScrcpyHandle())//26.4.10
