@@ -14,6 +14,9 @@ namespace ScrcpyEX.View
         /// </summary>
         private readonly SetupVM _vm;
 
-
+        /// <summary>
+        /// 原来的IsCanResize属性。
+        /// </summary>
+        private bool _oldIsCanResize = false;
     }
 }

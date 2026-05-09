@@ -91,7 +91,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
                 // 检查鼠标事件类型
                 switch ((uint)wParam)
                 {
-                    case WM.WM_LBUTTONDOWN: RecordPosition(); break;
+                    case WM.LBUTTONDOWN: RecordPosition(); break;
                     //case MP.WM_LBUTTONUP: break;
                     //case MP.WM_RBUTTONDOWN: break;
                     //case MP.WM_RBUTTONUP: break;

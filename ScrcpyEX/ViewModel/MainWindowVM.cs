@@ -50,7 +50,7 @@ namespace ScrcpyEX.ViewModel
         private int _running = 0;
 
         /// <summary>
-        /// 用于图像脚本计时器的自适应间隔，最小为5秒。
+        /// 用于图像脚本计时器的自适应间隔，单位是毫秒，最小为5000豪秒。
         /// </summary>
         public double ScriptInterval
         {

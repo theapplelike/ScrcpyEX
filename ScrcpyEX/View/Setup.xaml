@@ -137,6 +137,10 @@
                         </StackPanel>
                     </CheckBox>
                     <Border/>
+
+                    <CheckBox IsChecked="{Binding Cfg.IsCanResize}" Content="是否允许程序边缘调整大小"/>
+                    <Border/>
+
                     <!--<StackPanel Style="{StaticResource stpBox}">
                         <TextBlock Text="无线连接-IP地址" Style="{StaticResource tbkDesc}"/>
                         <TextBox Text="{Binding Cfg.IP}" Style="{StaticResource txt}"/>

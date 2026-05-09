@@ -30,14 +30,15 @@ namespace ScrcpyEX.View
     public partial class MainWindow//test
     {
         /// <summary>
-        /// 测试专用。
+        /// 虚拟屏幕，标题栏每个按钮快捷键。
+        /// 记录连接过的手机，可以选择手机在连接时是否开启USB网络，adb实现
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {
             //IntPtr intPtr = DLL.GetForegroundWindow();
             Dispatcher.BeginInvoke(() =>
             {
-                //Console.WriteLine($"窗体/SC：{IsActive}，{intPtr == ScHandle}。");
+                //Debug.WriteLine($"窗体/SC：{IsActive}，{intPtr == ScHandle}。");
             });
         }
 
@@ -62,7 +63,7 @@ namespace ScrcpyEX.View
         //    double y = centreY / ScActualHeight * 1080 / DpiScaleY;
         //    await AdbTest1(x, y);
         //
-        //    Console.WriteLine($"安卓坐标:({x},{y})，程序实际宽高：({ScActualWidth},{ScActualHeight})，");
+        //    Debug.WriteLine($"安卓坐标:({x},{y})，程序实际宽高：({ScActualWidth},{ScActualHeight})，");
         //}
 
         /// <summary>
@@ -86,7 +87,7 @@ namespace ScrcpyEX.View
         //    Process adbPrc = Process.Start(processStartInfo);
         //    string output = adbPrc.StandardOutput.ReadToEnd();
         //
-        //    Console.WriteLine($"{adbClickCommand}，命令已发送，命令结果：\n{output}");
+        //    Debug.WriteLine($"{adbClickCommand}，命令已发送，命令结果：\n{output}");
         //    await Task.Delay(1);
         //}
 
@@ -118,19 +119,19 @@ namespace ScrcpyEX.View
         //
         //        sw = _adbPrc.StandardInput;
         //        sw.Write(adbClickCommand);
-        //        Console.WriteLine($"创建adb,{sw.BaseStream.CanWrite}.");
+        //        Debug.WriteLine($"创建adb,{sw.BaseStream.CanWrite}.");
         //    }
         //    else
         //    {
         //        sw = _adbPrc.StandardInput;
         //        sw.Write(adbClickCommand);
-        //        Console.WriteLine($"对adb发送命令,{sw.BaseStream.CanWrite}.");
+        //        Debug.WriteLine($"对adb发送命令,{sw.BaseStream.CanWrite}.");
         //    }
         //
         //    string output = _adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
         //    string Error = _adbPrc.StandardError.ReadToEnd();
         //    await Task.Delay(1);
-        //    Console.WriteLine($"输出：{output}。  错误：{Error}。{_adbPrc.HasExited}。");
+        //    Debug.WriteLine($"输出：{output}。  错误：{Error}。{_adbPrc.HasExited}。");
         //}
 
         /// <summary>
@@ -145,8 +146,8 @@ namespace ScrcpyEX.View
 
             // 发送"help"命令以获取支持的ADB命令列表
             string helpResponse = await communicator.SendCommandAsync(adbClickCommand);
-            Console.WriteLine("重定向输出:");
-            Console.WriteLine(helpResponse);
+            Debug.WriteLine("重定向输出:");
+            Debug.WriteLine(helpResponse);
 
             communicator.Disconnect();
         }
@@ -180,12 +181,12 @@ namespace ScrcpyEX.View
                 CreateNoWindow = true,          // 不创建窗口
             };
             Process adbPrc = Process.Start(processStartInfo);
-            Console.WriteLine($"创建adb.");
+            Debug.WriteLine($"创建adb.");
 
             string output = adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
             string Error = adbPrc.StandardError.ReadToEnd();
             await Task.Delay(1);
-            Console.WriteLine($"输出：{output}。错误：{Error}。{adbPrc.HasExited}。");
+            Debug.WriteLine($"输出：{output}。错误：{Error}。{adbPrc.HasExited}。");
         }
     }
 }

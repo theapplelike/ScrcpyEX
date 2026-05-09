@@ -175,7 +175,7 @@ namespace ScrcpyEX.MyDefinition
         /// <param name="Msg">要发送的消息。</param>
         /// <param name="wParam">其他的消息特定信息。</param>
         /// <param name="lParam">其他的消息特定信息。</param>
-        /// <returns>返回值指定消息处理的结果;这取决于发送的消息。</returns>
+        /// <returns>返回值指定消息处理的结果，这取决于发送的消息。</returns>
         [DllImport("User32.dll", EntryPoint = "SendMessage", SetLastError = true)]
         public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 

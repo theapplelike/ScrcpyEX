@@ -39,7 +39,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         {
             if (nCode >= 0)
             {
-                if ((int)wParam == WM.WM_KEYDOWN)
+                if ((int)wParam == WM.KEYDOWN)
                 {
                     int vkCode = Marshal.ReadInt32(lParam);
                     //Debug.WriteLine($"Key: {(Keys)vkCode}/{vkCode}, wParam: {(int)wParam:X}。");

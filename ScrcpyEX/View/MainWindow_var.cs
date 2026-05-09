@@ -62,17 +62,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 图像脚本任务锁。
         /// </summary>
-        //private readonly object _imageScriptLock = new();
-
-        /// <summary>
-        /// 图像脚本任务锁。
-        /// </summary>
         private readonly SemaphoreSlim _imageScriptLock = new(1, 1);
-
-        /// <summary>
-        /// 图像脚本是否正在处理任务。
-        /// </summary>
-        //private volatile bool _isProcessing = false;
 
         /// <summary>
         /// 计时脚本对应的委托。

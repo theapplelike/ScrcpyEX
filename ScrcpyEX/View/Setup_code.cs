@@ -1,13 +1,15 @@
 ﻿using ScrcpyEX.ExtensionMethod;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Animation;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace ScrcpyEX.View
 {
@@ -18,42 +20,33 @@ namespace ScrcpyEX.View
             stp1.Visibility = Visibility.Collapsed;
             stp2.Visibility = Visibility.Collapsed;
             _vm.Cfg = MyCfg.Cfg;
+            _oldIsCanResize = MyCfg.Cfg.IsCanResize;
         }
 
         private void MyClose()
         {
             MyCfg.Save();
+
+            if (_oldIsCanResize != MyCfg.Cfg.IsCanResize)
+            {
+                AdjResizeMode(MV.MainWin);
+            }
         }
 
         /// <summary>
-        /// 菜单状态转换，如果菜单显示，持续减少高度后隐藏；如果菜单隐藏，显示菜单后，持续增加高度到最大值。
+        /// 调整主窗口的ResizeMode属性。
         /// </summary>
-        /// <param name="pnl">要进行状态转换的菜单。</param>
-        //private async void MenuStateTransition(StackPanel stp)
-        //{
-        //    if (stp.IsVisible)
-        //    {
-        //        stp.Height = stp.ActualHeight;
-        //        for (int i = 0; i < 5; i++)
-        //        {
-        //            stp.Height -= (int)(stp.Height * 0.2);
-        //            //Console.WriteLine($"降低高度：{stp.Height},{stp.ActualHeight}。");
-        //            await Task.Delay(10);
-        //        }
-        //        stp.Visibility = Visibility.Collapsed;
-        //    }
-        //    else
-        //    {
-        //        stp.Visibility = Visibility.Visible;
-        //        for (int i = 0; i < 5; i++)
-        //        {
-        //            stp.Height += (int)(stp.Height * 0.2);
-        //            //Console.WriteLine($"++增加高度：{stp.Height},{stp.ActualHeight}。");
-        //            await Task.Delay(10);
-        //        }
-        //        stp.Height = stp.ActualHeight;
-        //    }
-        //}
+        private void AdjResizeMode(MainWindow main)
+        {
+            if (MyCfg.Cfg.IsCanResize)
+            {
+                main.ResizeMode = ResizeMode.CanResize;
+            }
+            else
+            {
+                main.ResizeMode = ResizeMode.CanMinimize;
+            }
+        }
 
         /// <summary>
         /// 菜单显示状态转换，使用动画过度效果。
@@ -104,20 +97,6 @@ namespace ScrcpyEX.View
                 stp.BeginAnimation(HeightProperty, animation);
             }
         }
-
-        /// <summary>
-        /// 确保控件有可用的 TranslateTransform。
-        /// </summary>
-        /// <param name="element">指定的控件。</param>
-        //private void EnsureTransform(UIElement element)
-        //{
-        //    if (element.RenderTransform == null ||
-        //        element.RenderTransform is not TranslateTransform ||
-        //        element.RenderTransform.IsFrozen)
-        //    {
-        //        element.RenderTransform = new TranslateTransform();
-        //    }
-        //}
 
 
     }

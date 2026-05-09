@@ -19,6 +19,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using DBrushes = System.Drawing.Brushes;
 using DPoint = System.Drawing.Point;  //Windows Forms的Point
 using DRectangle = System.Drawing.Rectangle;
@@ -44,7 +45,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 显示分辨率信息到界面上。
         /// </summary>
-        /// <param name="texture">代表分辨率参数的字符串。</param>
+        /// <param name="texture">当前分辨率，第一个参数是宽，第二个参数是高。</param>
         public void ShowResolutionDesc(string texture)
         {
             Regex reg = new("[0-9]+");
@@ -108,7 +109,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Resize_Tick(object sender, EventArgs e)
         {
-            Debug.WriteLine("程序大小已改变，重新定位映射pop。");
+            //Debug.WriteLine("程序大小已改变，重新定位映射pop。");
 
             _resizeTimer.Stop();
             CreateSavedPop(btnMappingAdd.IsEnabled);
@@ -119,7 +120,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void LocationChange_Tick(object sender, EventArgs e)
         {
-            Debug.WriteLine("程序位置已改变，重新定位映射pop。");
+            //Debug.WriteLine("程序位置已改变，重新定位映射pop。");
 
             _locationChangeTimer.Stop();
             HideKeyMapping();
@@ -131,81 +132,21 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Count_Tick() => _vm.Running = (int)_stopwatch.Elapsed.TotalSeconds;
 
-        //private void Count_Tick()
-        //{
-        //    _vm.Running = (int)_stopwatch.Elapsed.TotalSeconds;
-        //    Debug.WriteLine($"计时：{_vm.Running}");
-        //}
-
         /// <summary>
         /// 执行计时脚本。
         /// </summary>
-        //private async Task TimedScript_Tick(ScriptInfo info)
-        //{
-        //    _vm.CycleNum++;
-        //    _stopwatch = Stopwatch.StartNew();
-        //    await ExecuteClickScript(info, ScHandle);
-        //    //Debug.WriteLine("计时脚本执行完毕...");
-        //}
         private async Task TimedScript_Tick(List<ScriptInfo> infos)
         {
-            //Debug.WriteLine($"Time进入新一轮，已产生的间隔：{_vm.Running}。");
+            //Debug.WriteLine($"Timed进入新一轮，已产生的间隔：{_vm.Running}。");
             _vm.CycleNum++;
             _stopwatch = Stopwatch.StartNew();
 
-            foreach (ScriptInfo i in infos)
+            for (int i = 0; i < infos.Count; i++)
             {
-                await ExecuteClickScript(i, ScHandle);
+                //最后一个脚本时判断是否应该退出
+                await ExecuteClickScript(infos[i], ScHandle, i == infos.Count - 1);
             }
-            await CheckExit(infos[0]);
         }
-
-        /// <summary>
-        /// 执行图像脚本。
-        /// </summary>
-        //private async Task ImageScript_Tick(ScriptInfo info)
-        //{
-        //    // 防止重叠执行
-        //    if (!await _imageScriptLock.WaitAsync(0))
-        //    {
-        //        return;
-        //    }
-        //
-        //    try
-        //    {
-        //        //Debug.WriteLine($"进入新一轮，已产生的间隔：{_vm.Running}。");
-        //        _vm.ScriptInterval = 5;
-        //
-        //        CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, info.CropRect);
-        //        if (scWindow == null)
-        //        {
-        //            popMid.Show("获取Scrcpy脚本截图失败。");
-        //            return;
-        //        }
-        //
-        //        double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
-        //        if (ssim >= info.Similarity / 100)
-        //        {
-        //            await NextImageScript(info);
-        //            Debug.WriteLine($"单次对比通过，相似度：{ssim:F8}");
-        //        }
-        //        //else if (await MatrixComparison(recInfo))
-        //        //{
-        //        //    await NextImageScript(recInfo);
-        //        //    Debug.WriteLine($"多次对比通过");
-        //        //}
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine($"执行图像脚本时异常：{ex}。");
-        //    }
-        //    finally
-        //    {
-        //        //Debug.WriteLine($"自适应间隔:{_vm.ScriptInterval}豪秒。");
-        //        _scriptTimer.Interval = _vm.ScriptInterval;
-        //        _imageScriptLock.Release(); // 释放锁
-        //    }
-        //}
 
         /// <summary>
         /// 执行图像脚本。
@@ -220,14 +161,13 @@ namespace ScrcpyEX.View
 
             try
             {
-                //Debug.WriteLine($"进入新一轮，已产生的间隔：{_vm.Running}。");
-                _vm.ScriptInterval = 5;
+                //Debug.WriteLine($"Image进入新一轮，已产生的间隔：{_vm.Running}。");
+                _vm.ScriptInterval = 5000;
                 await ImageCompare(infos[_si++ % infos.Count]);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"执行图像脚本时异常：{ex}。");
-                if (!Debugger.IsAttached) { MyGM.ShwError($"执行图像脚本时异常：{ex}。"); }
+                MyGM.ShwError($"执行图像脚本时异常：{ex}。");
             }
             finally
             {
@@ -237,6 +177,10 @@ namespace ScrcpyEX.View
             }
         }
 
+        /// <summary>
+        /// 使用脚本图像和当前Scrcpy的截图进行比对。
+        /// </summary>
+        /// <param name="info">脚本信息类实例。</param>
         private async Task ImageCompare(ScriptInfo info)
         {
             CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, info.CropRect);
@@ -268,7 +212,6 @@ namespace ScrcpyEX.View
             _vm.CycleNum++;
             _stopwatch = Stopwatch.StartNew();
             await ExecuteClickScript(info, ScHandle);
-            await CheckExit(info);
         }
 
         /// <summary>
@@ -276,12 +219,14 @@ namespace ScrcpyEX.View
         /// 点击的实际位置会根据ScRatioX/ScRatioY进行调整，但有黑边时仍会偏移。
         /// </summary>
         /// <param name="info">当前要执行的脚本。</param>
-        private async Task ExecuteClickScript(ScriptInfo info, IntPtr scHandle)
+        /// <param name="scHandle">Scrcpy的句柄。</param>
+        /// <param name="isCheckExit">是否需要检查退出。</param>
+        private async Task ExecuteClickScript(ScriptInfo info, IntPtr scHandle, bool isCheckExit = true)
         {
             foreach (PointInfo p in info.PointInfos)
             {
                 await Task.Delay(TimeSpan.FromSeconds(p.LastTime));
-                //Debug.WriteLine($"Timer点击：{p.LastTime}-{p.Pt.X},{p.Pt.Y}");
+                //Debug.WriteLine($"点击：{p.LastTime}-{p.Pt.X},{p.Pt.Y}");
 
                 //保存的坐标数据都是以默认尺寸为准，使用时需要乘以当前尺寸和默认尺寸的比例
                 int x = (int)(p.Pt.X * ScRatioX);
@@ -289,29 +234,15 @@ namespace ScrcpyEX.View
                 //Debug.WriteLine($"比例：（{ScRatioX},{ScRatioY}），实际点击：（{x},{y}）。");
 
                 IntPtr lp = new((y << 16) + x);
-                DLL.PostMessage(scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
-                DLL.PostMessage(scHandle, WM.WM_LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
-                DLL.PostMessage(scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
+                DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
+                DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
+                DLL.PostMessage(scHandle, WM.LBUTTONUP, IntPtr.Zero, lp);
             }
 
             //如果为有限次循环，检查是否到循环次数
-            //if (info.IsLimited && info.CycleNumber <= _vm.CycleNum)
-            //{
-            //    //ThreadStopScriptAndRecord();
-            //    await Dispatcher.BeginInvoke(StopScriptAndRecord);
-            //}
-        }
-
-        /// <summary>
-        /// 如果为有限次循环，检查是否到循环次数。
-        /// </summary>
-        /// <param name="info">脚本信息，组脚本则是第一个脚本。</param>
-        private async Task CheckExit(ScriptInfo info)
-        {
-            if (info.IsLimited && info.CycleNumber <= _vm.CycleNum)
+            if (isCheckExit && info.IsLimited && info.CycleNumber <= _vm.CycleNum)
             {
                 await Dispatcher.BeginInvoke(StopScriptAndRecord);
-                //Debug.WriteLine("脚本执行完毕...");
             }
         }
 
@@ -408,7 +339,7 @@ namespace ScrcpyEX.View
             }
             catch (Exception ex)
             {
-                MyGM.ShwInfo($"尝试对比图像时异常：{ex}");
+                MyGM.ShwError($"尝试对比图像时异常：{ex}");
             }
         }
 

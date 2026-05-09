@@ -104,19 +104,6 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 停止执行脚本的计时器，如果当前正在录制，也会停止录制操作，子线程调用此方法。
-        /// </summary>
-        //private void ThreadStopScriptAndRecord()
-        //{
-        //    Dispatcher.BeginInvoke(() =>
-        //    {
-        //        StopScriptAndRecord();
-        //    });
-        //
-        //    Dispatcher.BeginInvoke(StopScriptAndRecord);
-        //}
-
-        /// <summary>
         /// 注册鼠标钩子进行录制脚本操作，如果已注册鼠标钩子，则注销鼠标钩子并保存录制的脚本。
         /// </summary>
         private void StartRecord()
@@ -186,7 +173,6 @@ namespace ScrcpyEX.View
             }
 
             List<ScriptInfo> infos = manage.GetSelectScript();
-            
             if (infos[0].IsTime)
             {
                 ScriptBefore(infos);
@@ -204,57 +190,12 @@ namespace ScrcpyEX.View
                     popMid.Show("未截取图片，不能执行图片脚本。");
                 }
             }
-            
-
-            //if (manage.CurrScript.IsTime)
-            //{
-            //    ScriptBefore(manage.CurrScript);
-            //    TimedScript();
-            //}
-            //else
-            //{
-            //    if (manage.CurrScript.ImgName != "")
-            //    {
-            //        ScriptBefore(manage.CurrScript);
-            //        ImageScript();
-            //    }
-            //    else
-            //    {
-            //        popMid.Show("未截取图片，不能执行图片脚本。");
-            //    }
-            //}
         }
 
         /// <summary>
         /// 脚本执行前要执行的操作。
         /// </summary>
-        /// <param name="recInfo">要执行的脚本信息。</param>
-        //private void ScriptBefore(ScriptInfo recInfo)
-        //{
-        //    //消除黑边，有黑边时会有偏移
-        //    RemoveScBlack();
-        //
-        //    //UI和变量初始化
-        //    _vm.Running = 0;
-        //    _vm.CycleNum = 0;
-        //    _recInfo = recInfo;
-        //    _stopwatch = Stopwatch.StartNew();
-        //    bdRec.Visibility = Visibility.Visible;
-        //    dplTip.Visibility = Visibility.Visible;
-        //    btnImgCompare.Visibility = Visibility.Visible;
-        //
-        //    //如果脚本已执行则关闭
-        //    if (_countTimer.Enabled)
-        //    {
-        //        _scriptTimer.Stop();
-        //        _countTimer.Stop();
-        //    }
-        //
-        //    //移除计时脚本和图像脚本，避免重复注册
-        //    _scriptTimer.Elapsed -= _timedHandler;
-        //    _scriptTimer.Elapsed -= _imageHandler;
-        //}
-
+        /// <param name="infos">要执行的脚本信息。</param>
         private void ScriptBefore(List<ScriptInfo> infos)
         {
             //消除黑边，有黑边时会有偏移
@@ -284,15 +225,6 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 注册计时脚本并执行。
         /// </summary>
-        //private async void TimedScript()
-        //{
-        //    _scriptTimer.Elapsed += _timedHandler;
-        //    _scriptTimer.Interval = _recInfo.CycleInterval * 1000;
-        //    await TimedScript_Tick(_recInfo);//立刻执行一次脚本
-        //
-        //    _scriptTimer.Start();
-        //    _countTimer.Start();
-        //}
         private async void TimedScript()
         {
             _scriptTimer.Elapsed += _timedHandler;
@@ -540,9 +472,9 @@ namespace ScrcpyEX.View
                 int centreY = (int)(m.OffsetY * ratio * MV.DpiScaleY + radius);
 
                 IntPtr lp = new((centreY << 16) + centreX);
-                DLL.PostMessage(scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp);
-                DLL.PostMessage(scHandle, WM.WM_LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
-                DLL.PostMessage(scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, lp);
+                DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
+                DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
+                DLL.PostMessage(scHandle, WM.LBUTTONUP, IntPtr.Zero, lp);
                 
                 //如果标志位为true，则让鼠标左键处于按下状态
                 //if (_isPressMouse)
@@ -558,7 +490,7 @@ namespace ScrcpyEX.View
             //逻辑鼠标回到物理鼠标的位置
             (double originX, double originY) = GetPointRelativeToScrcpy();
             IntPtr lp1 = new(((int)originY << 16) + (int)originX);
-            DLL.PostMessage(scHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, lp1);
+            DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp1);
         }
 
         /// <summary>

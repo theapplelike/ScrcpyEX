@@ -64,7 +64,7 @@ namespace ScrcpyEX.View
 
             switch (msg)
             {
-                case WM.WM_ACTIVATE:
+                case WM.ACTIVATE:
                     //wParam高字节为0X20，低字节为1时，说明窗口被激活，但处于最小化
                     if ((int)wParam == 0X200001)
                     {
@@ -72,7 +72,7 @@ namespace ScrcpyEX.View
                         Debug.WriteLine($"拦截消息：{msg:X4}，{(int)wParam:X4}，{(int)lParam:X4}，窗口被激活，但处于最小化");
                     }
                     break;
-                case WM.WM_DPICHANGED:
+                case WM.DPICHANGED:
                     MV.DpiScaleX = VisualTreeHelper.GetDpi(this).DpiScaleX;
                     MV.DpiScaleY = VisualTreeHelper.GetDpi(this).DpiScaleY;
                     Debug.WriteLine($"DPI 改变了，重新获取当前窗口的 DPI");
@@ -138,6 +138,11 @@ namespace ScrcpyEX.View
         /// </summary>
         private void ReadCfg()
         {
+            if (!MyCfg.Cfg.IsCanResize)
+            {
+                ResizeMode = ResizeMode.CanMinimize;
+            }
+
             rdoLoc1.IsChecked = MyCfg.Cfg.Locate1;
             rdoLoc2.IsChecked = MyCfg.Cfg.Locate2;
             rdoLoc3.IsChecked = MyCfg.Cfg.Locate3;

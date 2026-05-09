@@ -103,8 +103,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
                 do
                 {
-                    await Task.Delay(250);
-
+                    await Task.Delay(500);
                     try
                     {
                         if (_prc.MainWindowHandle != IntPtr.Zero)
@@ -124,7 +123,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                         break;
                     }
                 }
-                while (!_prc.HasExited && i < 60);
+                while (!_prc.HasExited && i < 30);
             }
         }
 
@@ -156,9 +155,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             }
 
             //键盘使用UHID可以输入中文，对安卓输入中文时电脑输入法必须为英文
-            //_scName = $"{DateTime.Now:HHmmss}mook";
-            //sb.Append($"--keyboard=uhid --window-title={_scName} ");
-            sb.Append($"--keyboard=uhid ");
+            sb.Append($"--keyboard=uhid --window-x 0 --window-y {SystemParameters.PrimaryScreenHeight} ");
         
             if (_isWired)
             {
@@ -268,10 +265,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
             //获得当前分辨率，第一个参数是宽，第二个参数是高
             if (e.Data.Contains("Texture"))
             {
-                MV.MainWin.ShowResolutionDesc(e.Data);
-
-                //Scrcpy在横竖屏转换的时候会导致坐标错位，需要重绘窗口，并调用基类的方法
+                //Scrcpy在横竖屏转换的时候会导致坐标错位，鼠标点击失效，需要重绘窗口
                 _hwndHost?.RefreshScWindow();
+                MV.MainWin.ShowResolutionDesc(e.Data);
             }
         }
 
@@ -355,7 +351,6 @@ namespace ScrcpyEX.MyDefinition.MyClass
             {
                 if (rcBoundingBox == _lastRect)
                 {
-                    //Console.WriteLine("Scrcpy尺寸未变");
                     return;
                 }
                 
@@ -380,13 +375,16 @@ namespace ScrcpyEX.MyDefinition.MyClass
             }
 
             /// <summary>
-            /// 刷新Scrcpy窗口，重新绘制窗口后通知基类方法。
+            /// 刷新Scrcpy窗口，需要重新指定位置和尺寸，重绘前窗口后通知基类方法。
             /// </summary>
             public void RefreshScWindow()
             {
+                DLL.SendMessage(_scHandle, WM.SETREDRAW, (IntPtr)0, IntPtr.Zero);
                 DLL.MoveWindow(_scHandle, 0, 0, (int)_lastRect.Width, (int)_lastRect.Height, true);
                 base.OnWindowPositionChanged(_lastRect);
-                //Console.WriteLine("刷新Scrcpy窗口");
+
+                DLL.SendMessage(_scHandle, WM.SETREDRAW, (IntPtr)1, IntPtr.Zero);
+                //Debug.WriteLine("刷新Scrcpy窗口");
             }
         }
 

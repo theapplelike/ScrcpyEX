@@ -270,8 +270,8 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 _lp = new(((int)originY << 16) + (int)originX);
 
                 //发送鼠标按下消息
-                DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_MOUSEMOVE, IntPtr.Zero, _lp);
-                DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_LBUTTONDOWN, (IntPtr)MK.LBUTTON, _lp);
+                DLL.PostMessage(MV.MainWin.ScHandle, WM.MOUSEMOVE, IntPtr.Zero, _lp);
+                DLL.PostMessage(MV.MainWin.ScHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, _lp);
             }
 
             //double radius = 50 * MV.MainWin.ScRatioX / 2;
@@ -295,7 +295,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 if (_lp != IntPtr.Zero)
                 {
                     //发送鼠标抬起消息
-                    DLL.PostMessage(MV.MainWin.ScHandle, WM.WM_LBUTTONUP, IntPtr.Zero, _lp);
+                    DLL.PostMessage(MV.MainWin.ScHandle, WM.LBUTTONUP, IntPtr.Zero, _lp);
                 }
             }
         }

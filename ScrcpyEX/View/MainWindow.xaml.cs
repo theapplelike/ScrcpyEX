@@ -52,7 +52,7 @@ namespace ScrcpyEX.View
         private void Window_StateChanged(object sender, EventArgs e)
         {
             //Console.WriteLine($"-------------窗口状态改变：{WindowState}");
-            RefreshScrcpy();
+            //RefreshScrcpy();
         }
 
         private void Window_Activated(object sender, EventArgs e)
@@ -65,12 +65,12 @@ namespace ScrcpyEX.View
                 if (DLL.GetForegroundWindow() == _mainHandle)
                 {
                     ShowKeyMapping();
-                    Debug.WriteLine($"窗口是Z轴最顶端窗口，top yes。");
+                    //Debug.WriteLine($"窗口是Z轴最顶端窗口，top yes。");
                 }
                 else
                 {
                     WindowState = WindowState.Minimized;
-                    Debug.WriteLine($"窗口非Z轴最顶端窗口，top no。");
+                    //Debug.WriteLine($"窗口非Z轴最顶端窗口，top no。");
                 }
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
@@ -83,7 +83,6 @@ namespace ScrcpyEX.View
 
         private void Window_LocationChanged(object sender, EventArgs e)
         {
-            //Console.WriteLine($"窗口位置改变,{IsActive}");
             if (!IsScClosed && IsActive)
             {
                 _locationChangeTimer.Start();
@@ -256,6 +255,6 @@ namespace ScrcpyEX.View
         }
         #endregion
 
-        
+
     }
 }

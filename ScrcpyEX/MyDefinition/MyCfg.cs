@@ -137,6 +137,11 @@ namespace ScrcpyEX.ExtensionMethod
         public bool IsKeepLandscape { get; set; } = false;
 
         /// <summary>
+        /// 是否允许程序边缘调整大小。
+        /// </summary>
+        public bool IsCanResize { get; set; } = false;
+
+        /// <summary>
         /// 保持清醒，防止设备进入休眠状态（无线连接时无效）。
         /// </summary>
         //[CommandLine("--stay-awake")]
