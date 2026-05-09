@@ -7,12 +7,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Keys = System.Windows.Forms.Keys;
 
 namespace ScrcpyEX.MyDefinition.MyControl
@@ -95,7 +97,17 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// <summary>
         /// 记录位置信息的句柄，用于PostMessage函数。
         /// </summary>
-        private IntPtr _lp = IntPtr.Zero;
+        //private IntPtr _lp = IntPtr.Zero;
+
+        /// <summary>
+        /// 50%透明度的白色。
+        /// </summary>
+        private readonly Brush _argb50 = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255));
+
+        /// <summary>
+        /// 每隔一段时间检测鼠标是否离开，鼠标如果离开显示Popup。
+        /// </summary>
+        private readonly DispatcherTimer _showTimer = new();
 
         /// <summary>
         /// 是否已释放资源。
@@ -138,6 +150,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
 
             VkCode = mapping.VkCode;
             Loaded += Popup_Loaded;
+            MouseEnter += Popup_MouseEnter;
         }
 
         /// <summary>
@@ -160,7 +173,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
             //提供最外层边框
             _bdOuter = new()
             {
-                Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
+                Background = _argb50,
                 BorderBrush = Brushes.Black,
                 BorderThickness = new(1),
                 CornerRadius = new(Width),
@@ -207,7 +220,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
             {
                 Height = MyGM.RatioClamp(20, ratio, limit),
                 Width = MyGM.RatioClamp(20, ratio, limit),
-                Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
+                Background = _argb50,
                 BorderBrush = Brushes.Black,
                 CornerRadius = new(20),
             };
@@ -244,6 +257,9 @@ namespace ScrcpyEX.MyDefinition.MyControl
 
             _btnDelete.Click += BtnDelete_Click;
 
+            _showTimer.Tick += Pop_Tick;
+            _showTimer.Interval = TimeSpan.FromSeconds(1);
+
             MouseDown += Pop_MouseDown;
             MouseUp += Pop_MouseUp;
             MouseMove += Pop_MouseMove;
@@ -264,15 +280,15 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 //记录当前坐标为上一次的坐标
                 _lastPoint = MyGM.GetPosnW();
             }
-            else
-            {
-                (double originX, double originY) = MV.MainWin.GetPointRelativeToScrcpy();
-                _lp = new(((int)originY << 16) + (int)originX);
-
-                //发送鼠标按下消息
-                DLL.PostMessage(MV.MainWin.ScHandle, WM.MOUSEMOVE, IntPtr.Zero, _lp);
-                DLL.PostMessage(MV.MainWin.ScHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, _lp);
-            }
+            //else
+            //{
+            //    (double originX, double originY) = MV.MainWin.GetPointRelativeToScrcpy();
+            //    _lp = new(((int)originY << 16) + (int)originX);
+            //    Debug.WriteLine($"句柄：{_lp}");
+            //    //发送鼠标按下消息
+            //    DLL.PostMessage(MV.MainWin.ScHandle, WM.MOUSEMOVE, IntPtr.Zero, _lp);
+            //    DLL.PostMessage(MV.MainWin.ScHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, _lp);
+            //}
 
             //double radius = 50 * MV.MainWin.ScRatioX / 2;
             //double radius = 50 / 2;//根据现在的比例计算半径，还需要乘以Scrcpy当前宽度和默认宽度的比值，这里默认这个比值为1，这个值仅用于输出调试内容，所以没有传入
@@ -290,14 +306,14 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 Mouse.Capture(null);
                 _isDragging = false;
             }
-            else
-            {
-                if (_lp != IntPtr.Zero)
-                {
-                    //发送鼠标抬起消息
-                    DLL.PostMessage(MV.MainWin.ScHandle, WM.LBUTTONUP, IntPtr.Zero, _lp);
-                }
-            }
+            //else
+            //{
+            //    if (_lp != IntPtr.Zero)
+            //    {
+            //        //发送鼠标抬起消息
+            //        DLL.PostMessage(MV.MainWin.ScHandle, WM.LBUTTONUP, IntPtr.Zero, _lp);
+            //    }
+            //}
         }
 
         /// <summary>
@@ -436,6 +452,63 @@ namespace ScrcpyEX.MyDefinition.MyControl
         }
 
         /// <summary>
+        /// 鼠标进入Popup时让其中的控件不可见，鼠标点击事件可以直接发给Scrcpy。
+        /// 但Popup不能使用IsOpen=false隐藏，否则后续不能检测Popup。
+        /// </summary>
+        private void Popup_MouseEnter(object sender, MouseEventArgs e)
+        {
+            _bdChar.Background = Brushes.Transparent;
+            _tbkDisplayChar.Visibility = Visibility.Collapsed;
+            _showTimer.Start();
+
+            //Debug.WriteLine($"DragPopup_MouseEnter触发,{IsMouseOverPopup(this)},yyyyyyyyyyy");
+        }
+
+        /// <summary>
+        /// 提示控件显示指定时间后消失。
+        /// </summary>
+        private void Pop_Tick(object sender, EventArgs e)
+        {
+            if (!IsMouseOverPopup(this))
+            {
+                _showTimer.Stop();
+                //Console.WriteLine($"显示。。。。");
+
+                _bdChar.Background = _argb50;
+                _tbkDisplayChar.Visibility = Visibility.Visible;
+            }
+            //else
+            //{
+            //    Console.WriteLine($"不显示。。。。");
+            //}
+        }
+
+        /// <summary>
+        /// 鼠标是否在指定Popup控件上方。
+        /// </summary>
+        /// <param name="popup">指定的Popup控件。</param>
+        /// <returns>true--鼠标在Popup控件上方；false--鼠标在其他地方。</returns>
+        private bool IsMouseOverPopup(Popup popup)
+        {
+            if (!popup.IsOpen || popup.Child == null)
+            {
+                return false;
+            }
+
+            if (popup.Child is not FrameworkElement child || !child.IsVisible)
+            {
+                return false;
+            }
+
+            //获得Popup子元素的屏幕坐标和尺寸来比对
+            Point topLeft = child.PointToScreen(new Point(0, 0));
+            Size size = new(child.ActualWidth, child.ActualHeight);
+            Rect popupRect = new(topLeft, size);
+
+            return popupRect.Contains(MyGM.GetPosnW());
+        }
+
+        /// <summary>
         /// 将元素坐标限制在逻辑父级当中，
         /// </summary>
         /// <param name="newX">左边距＜newX＜左边距+父级宽度。</param>
@@ -472,19 +545,19 @@ namespace ScrcpyEX.MyDefinition.MyControl
             _isEdit = isEdit;
             if (isEdit)
             {
-                _bdOuter.Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255));
+                _bdOuter.Background = _argb50;
                 _bdOuter.BorderThickness = new(1);
                 _txtInput.Visibility = Visibility.Visible;
                 _btnDelete.Visibility = Visibility.Visible;
-                _bdChar.Visibility = Visibility.Hidden;
-                _tbkDisplayChar.Visibility = Visibility.Hidden;
+                _bdChar.Visibility = Visibility.Collapsed;
+                _tbkDisplayChar.Visibility = Visibility.Collapsed;
             }
             else
             {
                 _bdOuter.Background = Brushes.Transparent;
                 _bdOuter.BorderThickness = new(0);
-                _txtInput.Visibility = Visibility.Hidden;
-                _btnDelete.Visibility = Visibility.Hidden;
+                _txtInput.Visibility = Visibility.Collapsed;
+                _btnDelete.Visibility = Visibility.Collapsed;
                 _bdChar.Visibility = Visibility.Visible;
                 _tbkDisplayChar.Visibility = Visibility.Visible;
             }
@@ -505,9 +578,11 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 // 取消所有事件订阅
                 _txtInput.PreviewTextInput -= TextBox_PreviewTextInput;
                 _txtInput.TextChanged -= TextBox_TextChanged;
-            
                 _btnDelete.Click -= BtnDelete_Click;
-            
+                _showTimer.Tick -= Pop_Tick;
+
+                Loaded -= Popup_Loaded;
+                MouseEnter -= Popup_MouseEnter;
                 MouseDown -= Pop_MouseDown;
                 MouseMove -= Pop_MouseMove;
                 MouseUp -= Pop_MouseUp;
