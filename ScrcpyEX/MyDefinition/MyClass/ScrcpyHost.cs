@@ -155,8 +155,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
             }
 
             //键盘使用UHID可以输入中文，对安卓输入中文时电脑输入法必须为英文
-            sb.Append($"--keyboard=uhid --window-x 0 --window-y {SystemParameters.PrimaryScreenHeight} ");
-        
+            sb.Append($"--keyboard=uhid ");
+            sb.Append($"--window-x 0 --window-y {SystemParameters.PrimaryScreenHeight * MV.DpiScaleY} --window-width=800 ");
+
             if (_isWired)
             {
                 sb.Append("--select-usb");

@@ -453,15 +453,13 @@ namespace ScrcpyEX.MyDefinition.MyControl
 
         /// <summary>
         /// 鼠标进入Popup时让其中的控件不可见，鼠标点击事件可以直接发给Scrcpy。
-        /// 但Popup不能使用IsOpen=false隐藏，否则后续不能检测Popup。
+        /// 但Popup不能使用IsOpen=false隐藏，否则后续不能检测Popup内的控件。
         /// </summary>
         private void Popup_MouseEnter(object sender, MouseEventArgs e)
         {
             _bdChar.Background = Brushes.Transparent;
             _tbkDisplayChar.Visibility = Visibility.Collapsed;
             _showTimer.Start();
-
-            //Debug.WriteLine($"DragPopup_MouseEnter触发,{IsMouseOverPopup(this)},yyyyyyyyyyy");
         }
 
         /// <summary>
@@ -472,40 +470,30 @@ namespace ScrcpyEX.MyDefinition.MyControl
             if (!IsMouseOverPopup(this))
             {
                 _showTimer.Stop();
-                //Console.WriteLine($"显示。。。。");
 
                 _bdChar.Background = _argb50;
                 _tbkDisplayChar.Visibility = Visibility.Visible;
             }
-            //else
-            //{
-            //    Console.WriteLine($"不显示。。。。");
-            //}
         }
 
         /// <summary>
-        /// 鼠标是否在指定Popup控件上方。
+        /// 鼠标是否在Popup中指定控件的上方。
         /// </summary>
-        /// <param name="popup">指定的Popup控件。</param>
-        /// <returns>true--鼠标在Popup控件上方；false--鼠标在其他地方。</returns>
+        /// <param name="popup">顶级Popup控件。</param>
+        /// <returns>true--鼠标在控件上方；false--鼠标在其他地方。</returns>
         private bool IsMouseOverPopup(Popup popup)
         {
-            if (!popup.IsOpen || popup.Child == null)
+            if (!popup.IsOpen)
             {
                 return false;
             }
 
-            if (popup.Child is not FrameworkElement child || !child.IsVisible)
-            {
-                return false;
-            }
+            //获得指定子元素的屏幕坐标和尺寸来比对
+            Point topLeft = _bdChar.PointToScreen(new Point(0, 0));
+            Size size = new(_bdChar.ActualWidth * MV.DpiScaleX, _bdChar.ActualHeight * MV.DpiScaleY);
+            Rect charRect = new(topLeft, size);
 
-            //获得Popup子元素的屏幕坐标和尺寸来比对
-            Point topLeft = child.PointToScreen(new Point(0, 0));
-            Size size = new(child.ActualWidth, child.ActualHeight);
-            Rect popupRect = new(topLeft, size);
-
-            return popupRect.Contains(MyGM.GetPosnW());
+            return charRect.Contains(MyGM.GetPosnW());
         }
 
         /// <summary>
