@@ -231,7 +231,7 @@ namespace ScrcpyEX.View
                 //保存的坐标数据都是以默认尺寸为准，使用时需要乘以当前尺寸和默认尺寸的比例
                 int x = (int)(p.Pt.X * ScRatioX);
                 int y = (int)(p.Pt.Y * ScRatioY);
-                //Debug.WriteLine($"比例：（{ScRatioX},{ScRatioY}），实际点击：（{x},{y}）。");
+                //Debug.WriteLine($"比例:({ScRatioX},{ScRatioY})，实际点击:({x},{y})。");
 
                 IntPtr lp = new((y << 16) + x);
                 DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
@@ -262,7 +262,6 @@ namespace ScrcpyEX.View
                 DLL.ShowWindow(mainHandle, SW.SW_SHOWNOACTIVATE);
                 await Task.Delay(50);
             }
-            //Console.WriteLine($"是否最小化:{DLL.IsIconic(mainHandle)}。");
 
             //获得Scrcpy窗口截图，并计算截取的区域
             BitmapSource scBitmap = MyGM.GetHandleImage(scHandle);

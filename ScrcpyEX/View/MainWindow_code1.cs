@@ -97,7 +97,7 @@ namespace ScrcpyEX.View
                 bdRec.Visibility = Visibility.Collapsed;
                 dplTip.Visibility = Visibility.Collapsed;
             }
-            if (MouseScript.HookID != IntPtr.Zero)
+            if (MRS_Hook.HookID != IntPtr.Zero)
             {
                 StopRecord();
             }
@@ -119,9 +119,9 @@ namespace ScrcpyEX.View
                 return;
             }
 
-            if (MouseScript.HookID == IntPtr.Zero)
+            if (MRS_Hook.HookID == IntPtr.Zero)
             {
-                if (MouseScript.RegisterHook())
+                if (MRS_Hook.RegisterHook())
                 {
                     RemoveScBlack();
                     HideKeyMapping();
@@ -145,7 +145,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void StopRecord()
         {
-            MouseScript.CancelHook();
+            MRS_Hook.CancelHook();
             ShowKeyMapping();
             bdRec.Visibility = Visibility.Hidden;
             popMid.Show("已停止录制操作。");
@@ -166,7 +166,7 @@ namespace ScrcpyEX.View
                 popMid.Show("未进行投屏，不能执行脚本。");
                 return;
             }
-            if (MouseScript.HookID != IntPtr.Zero)
+            if (MRS_Hook.HookID != IntPtr.Zero)
             {
                 popMid.Show("已开启录制操作，不能执行脚本。");
                 return;
@@ -272,7 +272,7 @@ namespace ScrcpyEX.View
 
             gShow.Children.Add(pop);//这里的父级要和pop.PlacementTarget属性一致
             //Debug.WriteLine($"映射Popup原始左上:({mapping.OffsetX},{mapping.OffsetY}),比例:({ScRatioX},{ScRatioY}),最终左上:({pop.HorizontalOffset},{pop.VerticalOffset})。");
-
+            
             return pop;
         }
 
@@ -475,7 +475,7 @@ namespace ScrcpyEX.View
                 DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
                 DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
                 DLL.PostMessage(scHandle, WM.LBUTTONUP, IntPtr.Zero, lp);
-                
+
                 //如果标志位为true，则让鼠标左键处于按下状态
                 //if (_isPressMouse)
                 //{
@@ -484,7 +484,7 @@ namespace ScrcpyEX.View
                 //}
 
                 //ADB_Click(centreX, centreY);
-                //Console.WriteLine($"圆心点:({centreX},{centreY})。");
+                //Debug.WriteLine($"圆心点:({centreX},{centreY})。");
             }
 
             //逻辑鼠标回到物理鼠标的位置

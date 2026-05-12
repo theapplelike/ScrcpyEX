@@ -130,7 +130,7 @@ namespace ScrcpyEX.View
                 Left = (SystemParameters.WorkArea.Width - ActualWidth) / 2;
                 Top = (SystemParameters.WorkArea.Height - ActualHeight) / 2;
             }
-            //Console.WriteLine($"窗体尺寸：{Width},{Height}。");
+            //Debug.WriteLine($"窗体尺寸：{Width},{Height}。");
         }
 
         /// <summary>
@@ -177,18 +177,7 @@ namespace ScrcpyEX.View
         private void MyClose()
         {
             SaveCfg();
-            CloseOther();
-        }
-
-        /// <summary>
-        /// 关闭其他一些程序使用的资源。
-        /// </summary>
-        private void CloseOther()
-        {
-            if (MouseScript.HookID != IntPtr.Zero)
-            {
-                MouseScript.CancelHook();
-            }
+            MRS_Hook.CancelHook();
         }
 
         /// <summary>
@@ -248,12 +237,13 @@ namespace ScrcpyEX.View
             if (bdShow.Child != null)
             {
                 bool isActivate = Activate();
-                Debug.WriteLine($"窗口是否激活：{isActivate}");
-                CreateSavedPop(false, DLL.GetForegroundWindow() == _mainHandle);
-                KeyboardHook.RegisterHook();
 
-                //Console.WriteLine($"窗体句柄：{_mainHandle},Scrcpy句柄：{_scrcpyHost.ScHandle},前台窗口句柄：{DLL.GetForegroundWindow()}");
-                //Console.WriteLine($"前台窗口句柄：{DLL.GetForegroundWindow()}");
+                CreateSavedPop(false, DLL.GetForegroundWindow() == _mainHandle);
+                KMC_Hook.RegisterHook();
+                MDC_Hook.RegisterHook(ScHandle);
+
+                Debug.WriteLine($"激活:{isActivate}，主:{_mainHandle}，SC:{ScHandle}");
+                //Debug.WriteLine($"前台窗口句柄：{DLL.GetForegroundWindow()}");
             }
         }
 
@@ -340,7 +330,6 @@ namespace ScrcpyEX.View
             Width = SystemParameters.WorkArea.Width / 2;
             Height = (Width - ExtraWidth) * 1.0 / 15 * 7 + ExtraHeight;
             Locate();
-            //Console.WriteLine($"宽高：{Width},{Height}。");
         }
 
         /// <summary>
@@ -360,6 +349,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 消除Scrcpy的黑边。
         /// </summary>
+        /// <param name="isForcedAdjustment">是否强制调整黑边，如果为false则根据设置判断是否调整。</param>
         private void RemoveScBlack(bool isForcedAdjustment = false)
         {
             if (IsScClosed)
@@ -462,22 +452,22 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 从最小化恢复时可能导致Scrcpy窗口向左偏移，所以恢复时刷新Scrcpy窗口。
         /// </summary>
-        private void RefreshScrcpy()
-        {
-            switch (WindowState)
-            {
-                case WindowState.Minimized:
-                    //Debug.WriteLine("窗口已最小化");
-                    break;
-                case WindowState.Normal:
-                    //Debug.WriteLine("窗口已恢复正常状态");
-                    _scrcpyHost?.RefreshScrcpy();
-                    break;
-                case WindowState.Maximized:
-                    //Debug.WriteLine("窗口已最大化");
-                    break;
-            }
-        }
+        //private void RefreshScrcpy()
+        //{
+        //    switch (WindowState)
+        //    {
+        //        case WindowState.Minimized:
+        //            //Debug.WriteLine("窗口已最小化");
+        //            break;
+        //        case WindowState.Normal:
+        //            //Debug.WriteLine("窗口已恢复正常状态");
+        //            _scrcpyHost?.RefreshScrcpy();
+        //            break;
+        //        case WindowState.Maximized:
+        //            //Debug.WriteLine("窗口已最大化");
+        //            break;
+        //    }
+        //}
 
         /// <summary>
         /// 打开设备的无线调试功能，开启后可以无线连接，需要在同一个网络中。

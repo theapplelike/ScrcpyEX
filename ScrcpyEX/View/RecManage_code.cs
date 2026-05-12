@@ -128,7 +128,6 @@ namespace ScrcpyEX.View
             tbk.Visibility = Visibility.Hidden;
 
             txt.Focus();
-            txt.Select(txt.Text.Length, 0);
         }
 
         /// <summary>

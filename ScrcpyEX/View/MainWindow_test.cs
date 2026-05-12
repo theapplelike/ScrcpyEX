@@ -30,6 +30,7 @@ namespace ScrcpyEX.View
     public partial class MainWindow//test
     {
         /// <summary>
+        /// border和scrcpy相同大小，监听SDL的消息
         /// 虚拟屏幕，标题栏每个按钮快捷键。
         /// 记录连接过的手机，可以选择手机在连接时是否开启USB网络，adb实现
         /// </summary>

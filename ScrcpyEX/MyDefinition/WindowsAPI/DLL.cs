@@ -195,6 +195,20 @@ namespace ScrcpyEX.MyDefinition
         [DllImport("user32.dll")]
         public static extern IntPtr WindowFromPoint(System.Drawing.Point point);
 
+        /// <summary>
+        /// 获取当前系统设置中，两次鼠标点击被认定为“双击”的最大时间间隔（毫秒）。
+        /// </summary>
+        /// <returns>“双击”的最大时间间隔（毫秒）。</returns>
+        [DllImport("user32.dll")]
+        public static extern uint GetDoubleClickTime();
+
+        /// <summary>
+        /// 检索系统各种尺寸和配置值。
+        /// </summary>
+        /// <param name="nIndex">配置值的索引。</param>
+        /// <returns>成功--返回请求的值；失败--返回值为0。</returns>
+        [DllImport("user32.dll")]
+        public static extern int GetSystemMetrics(int nIndex);
 
         //[DllImport("user32.dll")]
         //public static extern IntPtr GetDesktopWindow();

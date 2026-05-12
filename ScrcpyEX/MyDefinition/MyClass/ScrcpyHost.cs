@@ -224,10 +224,8 @@ namespace ScrcpyEX.MyDefinition.MyClass
             _prc.CancelErrorRead();
             ScHandle = IntPtr.Zero;
 
-            if (KeyboardHook.HookID != IntPtr.Zero)
-            {
-                KeyboardHook.CancelHook();
-            }
+            KMC_Hook.CancelHook();
+            MDC_Hook.CancelHook();
             Debug.WriteLine($"ScrcpyHost：Process的Exieted事件执行结束。");
         }
 

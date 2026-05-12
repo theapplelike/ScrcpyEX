@@ -95,12 +95,12 @@ namespace ScrcpyEX.View
         private readonly int _scWidth = 960, _scHeight = 448;
 
         /// <summary>
-        /// 投屏分辨率的横向比例。
+        /// 投屏分辨率的水平比例。
         /// </summary>
         private int _horizontalRatio;
 
         /// <summary>
-        /// 投屏分辨率的纵向比例。
+        /// 投屏分辨率的垂直比例。
         /// </summary>
         private int _verticalRatio;
 
