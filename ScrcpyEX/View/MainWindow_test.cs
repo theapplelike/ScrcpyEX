@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -30,9 +32,11 @@ namespace ScrcpyEX.View
     public partial class MainWindow//test
     {
         /// <summary>
-        /// border和scrcpy相同大小，监听SDL的消息
-        /// 虚拟屏幕，标题栏每个按钮快捷键。
+        /// border和scrcpy相同大小，监听SDL的消息-x
+        /// 虚拟屏幕
+        /// 标题栏每个按钮快捷键-y
         /// 记录连接过的手机，可以选择手机在连接时是否开启USB网络，adb实现
+        /// sc突然断线要清理资源
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -51,6 +55,15 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
+
+            //bool fo = RunAdbCommand();
+            //Debug.WriteLine($"焦点：{fo}");
+
+            //btnFouce.Focus();
+            //InputLanguageManager.SetInputLanguage(gMain, new CultureInfo("en-US"));
+            CultureInfo info = InputLanguageManager.GetInputLanguage(btnFouce);
+            Debug.WriteLine($"语言：{info.Name}");
+            //InputLanguageManager.Current.CurrentInputLanguage = CultureInfo.GetCultureInfo("en-US");
         }
 
         /// <summary>
@@ -138,56 +151,107 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 通过端口发送命令。
         /// </summary>
-        private async Task AdbTest3(double x, double y)
-        {
-            string adbClickCommand = $"shell input tap {x} {y}";
-
-            ADBSocketCommunicator communicator = new ADBSocketCommunicator();
-            await communicator.ConnectAsync();
-
-            // 发送"help"命令以获取支持的ADB命令列表
-            string helpResponse = await communicator.SendCommandAsync(adbClickCommand);
-            Debug.WriteLine("重定向输出:");
-            Debug.WriteLine(helpResponse);
-
-            communicator.Disconnect();
-        }
+        //private async Task AdbTest3(double x, double y)
+        //{
+        //    string adbClickCommand = $"shell input tap {x} {y}";
+        //
+        //    ADBSocketCommunicator communicator = new();
+        //    await communicator.ConnectAsync();
+        //
+        //    // 发送"help"命令以获取支持的ADB命令列表
+        //    string helpResponse = await communicator.SendCommandAsync(adbClickCommand);
+        //    Debug.WriteLine("重定向输出:");
+        //    Debug.WriteLine(helpResponse);
+        //
+        //    communicator.Disconnect();
+        //}
 
         /// <summary>
         /// 据说可以降低延迟，但权限被拒绝：sendevent: /dev/input/event2: Permission denied。
         /// </summary>
-        private async Task AdbTest4(double x, double y)
-        {
-            StringBuilder sb = new();
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 1 $((0x14a)) 1");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x30)) $((0x15))");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x39)) 0");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x35)) {x}");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x36)) {y}");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 2 0");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 0 0");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 1 $((0x14a)) 0");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 2 0");
-            sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 0 0");
+        //private async Task AdbTest4(double x, double y)
+        //{
+        //    StringBuilder sb = new();
+        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 1 $((0x14a)) 1");
+        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x30)) $((0x15))");
+        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x39)) 0");
+        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x35)) {x}");
+        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x36)) {y}");
+        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 2 0");
+        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 0 0");
+        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 1 $((0x14a)) 0");
+        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 2 0");
+        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 0 0");
+        //
+        //    // 创建一个新的进程启动信息
+        //    ProcessStartInfo processStartInfo = new()
+        //    {
+        //        FileName = "cmd.exe",         //使用命令提示符来执行ADB命令
+        //        Arguments = $"/c {sb}",    //(/c)表示执行完命令后关闭命令行窗口
+        //        RedirectStandardOutput = true, // 重定向输出
+        //        RedirectStandardError = true,  // 重定向错误
+        //        RedirectStandardInput = true,  //重定向输入
+        //        UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
+        //        CreateNoWindow = true,          // 不创建窗口
+        //    };
+        //    Process adbPrc = Process.Start(processStartInfo);
+        //    Debug.WriteLine($"创建adb.");
+        //
+        //    string output = adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
+        //    string Error = adbPrc.StandardError.ReadToEnd();
+        //    await Task.Delay(1);
+        //    Debug.WriteLine($"输出：{output}。错误：{Error}。{adbPrc.HasExited}。");
+        //}
 
-            // 创建一个新的进程启动信息
-            ProcessStartInfo processStartInfo = new()
-            {
-                FileName = "cmd.exe",         //使用命令提示符来执行ADB命令
-                Arguments = $"/c {sb}",    //(/c)表示执行完命令后关闭命令行窗口
-                RedirectStandardOutput = true, // 重定向输出
-                RedirectStandardError = true,  // 重定向错误
-                RedirectStandardInput = true,  //重定向输入
-                UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
-                CreateNoWindow = true,          // 不创建窗口
-            };
-            Process adbPrc = Process.Start(processStartInfo);
-            Debug.WriteLine($"创建adb.");
+        // 初始化持久化 shell
+        //private static Process _persistentShell;
+        //private static StreamWriter _shellWriter;
+        //private static StreamReader _shellReader;
+        //
+        //private void InitPersistentShell()
+        //{
+        //    _persistentShell = new Process
+        //    {
+        //        StartInfo = new ProcessStartInfo
+        //        {
+        //            FileName = MV.ADB_Path,
+        //            Arguments = "shell",
+        //            UseShellExecute = false,
+        //            RedirectStandardInput = true,
+        //            RedirectStandardOutput = true,
+        //            RedirectStandardError = true,
+        //            CreateNoWindow = true
+        //        }
+        //    };
+        //    _persistentShell.Start();
+        //    _shellWriter = _persistentShell.StandardInput;
+        //    _shellReader = _persistentShell.StandardOutput;
+        //}
+        //
+        //// 发送命令并读取直到特定结束标记
+        //private bool CheckInputShown()
+        //{
+        //    // 发送命令，末尾加一个唯一 echo 标记来定位结束行
+        //    string marker = Guid.NewGuid().ToString();
+        //    _shellWriter.WriteLine($"dumpsys input_method | grep mInputShown; echo {marker}");
+        //    _shellWriter.Flush();
+        //
+        //    string line;
+        //    
+        //    while ((line = _shellReader.ReadLine()) != null)
+        //    {
+        //        if (line.Contains(marker))
+        //            break;
+        //        if (line.Contains("mInputShown=true"))
+        //        {
+        //            Debug.WriteLine($"输出行：{line}");
+        //            return true;
+        //        }
+        //            
+        //    }
+        //    
+        //    return false;
+        //}
 
-            string output = adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
-            string Error = adbPrc.StandardError.ReadToEnd();
-            await Task.Delay(1);
-            Debug.WriteLine($"输出：{output}。错误：{Error}。{adbPrc.HasExited}。");
-        }
     }
 }

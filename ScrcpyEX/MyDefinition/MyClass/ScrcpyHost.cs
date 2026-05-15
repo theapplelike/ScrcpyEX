@@ -75,7 +75,11 @@ namespace ScrcpyEX.MyDefinition.MyClass
             }
 
             // 创建真正的HwndHost
-            return _hwndHost = new InternalHwndHost(ScHandle, _prc);
+            _hwndHost = new InternalHwndHost(ScHandle, _prc);
+            KMC_Hook.IsMapping = true;
+            MDC_Hook.RegisterHook(ScHandle);
+            
+            return _hwndHost;
         }
 
         /// <summary>
@@ -111,15 +115,11 @@ namespace ScrcpyEX.MyDefinition.MyClass
                             ScHandle = _prc.MainWindowHandle;
                             return;
                         }
-                        //if (FindScrcpyHandle())//26.4.10
-                        //{
-                        //    return;
-                        //}
                         Debug.WriteLine($">>>>>>>>>>>>>>{++i}：尝试启动Scrcpy。");
                     }
                     catch(InvalidOperationException)
                     {
-                        Debug.WriteLine($"第{i}次时启动失败，进程已退出。");
+                        MyGM.MidPOP($"第{i}次时启动失败，进程已退出。");
                         break;
                     }
                 }
@@ -187,23 +187,6 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private bool ConvToBool(object val) => val is bool result && result;
 
         /// <summary>
-        /// 查找Scrcpy的句柄。
-        /// </summary>
-        /// <returns>Scrcpy的句柄，未找到返回IntPtr.Zero。</returns>
-        //private bool FindScrcpyHandle()//26.4.10
-        //{
-        //    // 查询指定名称的进程（无需包含.exe扩展名）
-        //    Process[] processes = Process.GetProcessesByName("Scrcpy");
-        //    //Console.WriteLine($"进程的数量：{processes.Length}。");
-        //    if (processes.Length > 0 && processes[0].MainWindowHandle != IntPtr.Zero)
-        //    {
-        //        ScHandle = processes[0].MainWindowHandle;
-        //        return true;
-        //    }
-        //    return false;
-        //}
-
-        /// <summary>
         /// 设置第三方程序的退出、信息读取事件。
         /// </summary>
         private void SetProcess()
@@ -223,8 +206,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             _prc.CancelOutputRead();
             _prc.CancelErrorRead();
             ScHandle = IntPtr.Zero;
-
-            KMC_Hook.CancelHook();
+            KMC_Hook.IsMapping = false;
             MDC_Hook.CancelHook();
             Debug.WriteLine($"ScrcpyHost：Process的Exieted事件执行结束。");
         }

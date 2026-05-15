@@ -7,6 +7,7 @@ using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -20,6 +21,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
 
 namespace ScrcpyEX.View
 {
@@ -28,11 +30,11 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 添加消息钩子监听程序的所有消息。
         /// </summary>
-        private void OnSourceInitialized(object sender, EventArgs e)
-        {
-            _hwndSource = PresentationSource.FromVisual(this) as HwndSource;
-            _hwndSource?.AddHook(WndProc);
-        }
+        //private void OnSourceInitialized(object sender, EventArgs e)
+        //{
+        //    //_hwndSource = PresentationSource.FromVisual(this) as HwndSource;
+        //    //_hwndSource?.AddHook(WndProc);
+        //}
 
         /// <summary>
         /// 拦截和处理发送到窗口的所有Windows消息。
@@ -77,9 +79,9 @@ namespace ScrcpyEX.View
                     MV.DpiScaleY = VisualTreeHelper.GetDpi(this).DpiScaleY;
                     Debug.WriteLine($"DPI 改变了，重新获取当前窗口的 DPI");
                     break;
-                //default:
-                //    Debug.WriteLine($"MEG：{msg:X4}，{(long)wParam:X4}，{(long)lParam:X4}");
-                //    break;
+                default:
+                    //Debug.WriteLine($"MEG：{msg:X4}，{(long)wParam:X4}，{(long)lParam:X4}");
+                    break;
             }
 
             return IntPtr.Zero;
@@ -94,7 +96,6 @@ namespace ScrcpyEX.View
             MV.DpiScaleX = VisualTreeHelper.GetDpi(this).DpiScaleX;
             MV.DpiScaleY = VisualTreeHelper.GetDpi(this).DpiScaleY;
 
-            _mainHandle = new WindowInteropHelper(this).Handle;
             bdRec.Visibility = Visibility.Collapsed;
             dplTip.Visibility = Visibility.Collapsed;
 
@@ -103,10 +104,33 @@ namespace ScrcpyEX.View
             ReadCfg();
             ScOptInit();
             SetUISize(MyCfg.Cfg.IsUseLastSize);
-            InputModeSwitcher.SwitchToEnglishMode(_mainHandle);
 
-            //快捷键
-            InputBindings.Add(new KeyBinding(new RelayCommand(ScGotFocus), Key.F1, ModifierKeys.None));
+            //添加消息钩子监听程序的所有消息
+            _hwndSource = PresentationSource.FromVisual(this) as HwndSource;
+            _hwndSource?.AddHook(WndProc);
+            _mainHandle = _hwndSource.Handle;
+
+            //输入法设置为英文模式
+            //InputModeSwitcher.SwitchToEnglishMode(_mainHandle);
+            InputLanguageManager.SetInputLanguage(gMain, new CultureInfo("en-US"));
+            btnFouce.Focus();
+
+            //注册键盘钩子
+            HashSet<int> hs = [.. MyCfg.Cfg.KeyMappings.Select(k => (int)k.VkCode)];
+            KMC_Hook.RegisterHook(_mainHandle, hs);
+        }
+
+        /// <summary>
+        /// 保存数据、清理使用的系统资源。
+        /// </summary>
+        private void MyClose()
+        {
+            _hwndSource.RemoveHook(WndProc);
+            SaveCfg();
+            
+            KMC_Hook.CancelHook();
+            MRS_Hook.CancelHook();
+            MDC_Hook.CancelHook();
         }
 
         /// <summary>
@@ -172,15 +196,6 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 保存数据、清理使用的系统资源。
-        /// </summary>
-        private void MyClose()
-        {
-            SaveCfg();
-            MRS_Hook.CancelHook();
-        }
-
-        /// <summary>
         /// 启动Scrcpy。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
@@ -238,9 +253,9 @@ namespace ScrcpyEX.View
             {
                 bool isActivate = Activate();
 
-                CreateSavedPop(false, DLL.GetForegroundWindow() == _mainHandle);
-                KMC_Hook.RegisterHook();
-                MDC_Hook.RegisterHook(ScHandle);
+                //CreateSavedPop(false, DLL.GetForegroundWindow() == _mainHandle);
+                CreateSavedPop(false, isActivate);
+                //InputModeSwitcher.SwitchToEnglishMode(ScHandle);
 
                 Debug.WriteLine($"激活:{isActivate}，主:{_mainHandle}，SC:{ScHandle}");
                 //Debug.WriteLine($"前台窗口句柄：{DLL.GetForegroundWindow()}");
@@ -533,13 +548,12 @@ namespace ScrcpyEX.View
         private async Task<List<string>> GetAdbDevices()
         {
             string output = await MyGM.Adb("devices");
-            return output
+            return [.. output
                 .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
                 .Where(line => !line.StartsWith("List of devices") && !string.IsNullOrWhiteSpace(line))
                 .Select(line => line.Split(['\t', ' '], StringSplitOptions.RemoveEmptyEntries))
                 .Where(parts => parts.Length >= 2 && parts[1] == "device")
-                .Select(parts => parts[0].Trim())
-                .ToList();
+                .Select(parts => parts[0].Trim())];
         }
 
         /// <summary>
@@ -646,10 +660,10 @@ namespace ScrcpyEX.View
             popScOpt.PlacementTarget = mainBtn;
 
             //非主要按钮加入Popup菜单
-            List<Button> buttons = dcpScMain.Children.OfType<Button>().Where(b => b.Name != mainBtn.Name).ToList();
-            foreach (Button b in buttons)
+            List<Button> buttons = [.. dcpScMain.Children.OfType<Button>().Where(b => b.Name != mainBtn.Name)];
+            foreach (Button btn in buttons)
             {
-                popScOpt.Add(b);
+                popScOpt.Add(btn);
             }
         }
 
@@ -672,6 +686,46 @@ namespace ScrcpyEX.View
             }
             pop.IsOpen = true;
         }
+
+        /// <summary>
+        /// 焦点在SC上时使用Alt+Tab切换窗口，SC会收到Alt按下事件，但不会收到抬起事件，
+        /// 导致Alt+Tab回来后SC即使有焦点也不能触发键盘输入，如果此时按下H会触发Alt+H快捷键。
+        /// Win+Tab不会导致问题，鼠标切换也不会导致问题。
+        /// 所以需要向SC发送Alt键抬起消息。
+        /// </summary>
+        /// <param name="hWnd">目标窗口句柄。</param>
+        /// <param name="isRightAlt">是否为右Alt。</param>
+        public void SendAltKeyUp(IntPtr hWnd, bool isRightAlt)
+        {
+            uint vk = isRightAlt ? VK_RMENU : VK_LMENU;
+            uint scanCode = DLL.MapVirtualKey(vk, 0);
+            uint extended = isRightAlt ? 1u : 0u;
+
+            IntPtr lParamUp = BuildLParam(1, scanCode, extended, 0, 1, 1);
+            DLL.PostMessage(hWnd, WM.SYSKEYUP, (IntPtr)vk, lParamUp);
+        }
+
+        /// <summary>
+        /// 组装WM_KEYDOWN、WM_KEYUP、WM_SYSKEYDOWN、WM_SYSKEYUP键盘消息的 lParam 参数。
+        /// </summary>
+        /// <param name="repeatCount">0-15：重复次数。</param>
+        /// <param name="scanCode">16-23：OEM 扫描码。</param>
+        /// <param name="extendedKey">24：扩展键标志(是扩展键，值为1；否则为0)，左Alt为0，右Alt为1。</param>
+        /// <param name="contextCode">29：上下文码（仅当消息为 WM_SYSKEYDOWN 或 WM_SYSKEYUP，并且 Alt 键被按住时，值才为 1）。</param>
+        /// <param name="previousState">30：前一个键状态（0=之前是抬起，1=之前是按下）。</param>
+        /// <param name="transitionState">31：转换状态（0=本次按下，1=本次抬起）。</param>
+        /// <returns>IntPtr类型的 lParam 参数。</returns>
+        private IntPtr BuildLParam(uint repeatCount, uint scanCode, uint extendedKey, uint contextCode, uint previousState, uint transitionState)
+        {
+            uint lParam = (scanCode << 16)
+                        | (extendedKey << 24)
+                        | (contextCode << 29)
+                        | (previousState << 30)
+                        | (transitionState << 31)
+                        | (repeatCount & 0x0000FFFF);
+            return (IntPtr)lParam;
+        }
+
 
     }
 }

@@ -18,5 +18,10 @@ namespace ScrcpyEX.View
         /// 原来的IsCanResize属性。
         /// </summary>
         private bool _oldIsCanResize = false;
+
+        /// <summary>
+        /// 记录每组菜单是否展开的数组。
+        /// </summary>
+        private bool[] _isExpands = [false, false];
     }
 }

@@ -62,7 +62,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <summary>
         /// 鼠标钩子回调函数。
         /// </summary>
-        /// <param name="nCode">如果nCode小于零，则钩子过程必须将消息传递给CallNextHookEx函数，而无需进一步处理，并且应返回CallNextHookEx返回的值。</param>
+        /// <param name="nCode">如果为HC_ACTION(0)，表示 wParam 和 lParam 包含有效信息，否则应返回CallNextHookEx的处理值。</param>
         /// <param name="wParam">鼠标消息的标识符。例如WM_LBUTTONDOWN等常量。</param>
         /// <param name="lParam">指向MSLLHOOKSTRUCT结构的指针。</param>
         /// <returns>CallNextHookEx函数的处理值。</returns>

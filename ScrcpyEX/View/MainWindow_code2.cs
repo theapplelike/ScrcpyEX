@@ -21,10 +21,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using DBrushes = System.Drawing.Brushes;
-using DPoint = System.Drawing.Point;  //Windows Forms的Point
-using DRectangle = System.Drawing.Rectangle;
 using WBrushes = System.Windows.Media.Brushes;
+using DPoint = System.Drawing.Point;  //Windows Forms的Point
 using WPoint = System.Windows.Point;  //WPF的Point
+using DRectangle = System.Drawing.Rectangle;
 using WRectangle = System.Windows.Shapes.Rectangle;
 
 namespace ScrcpyEX.View

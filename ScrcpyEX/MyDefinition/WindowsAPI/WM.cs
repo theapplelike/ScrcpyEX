@@ -21,6 +21,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// </summary>
         public const int SETREDRAW = 0x000B;
 
+        #region 键盘L相关的消息常量。
         /// <summary>
         /// 按下一个非系统键，wParam代表虚拟键码，lParam代表额外的参数。
         /// </summary>
@@ -32,16 +33,17 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         public const int KEYUP = 0x0101;
 
         /// <summary>
-        /// 按下一个系统键，包括Alt、Alt组合键（Alt + F4；Alt + Tab）、F10。
+        /// 按下一个系统键，包括Alt、Alt组合键（Alt + F4；Alt + Tab等）、F10。
         /// </summary>
         public const int SYSKEYDOWN = 0x0104;
 
         /// <summary>
-        /// 释放一个系统键。
+        /// 释放一个系统键，包括Alt、Alt组合键（Alt + F4；Alt + Tab等）、F10。
         /// </summary>
         public const int SYSKEYUP = 0x0105;
+        #endregion
 
-        #region 鼠标相关的消息常量，wParam：MK消息组合的具体状态，lParam：低16位存X坐标，高16位存Y坐标
+        #region 鼠标相关的消息常量
         /// <summary>
         /// 鼠标移动消息。
         /// </summary>

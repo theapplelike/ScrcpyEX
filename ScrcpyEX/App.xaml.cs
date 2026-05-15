@@ -3,11 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace ScrcpyEX
@@ -22,7 +24,9 @@ namespace ScrcpyEX
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
             GlobalException();
+            InputLanguageManager.Current.CurrentInputLanguage = CultureInfo.GetCultureInfo("en-US");
         }
 
         /// <summary>

@@ -403,16 +403,33 @@ namespace ScrcpyEX.View
         /// <param name="vkCode">捕获的虚拟键码。</param>
         public void KeyboardMapping(Keys vkCode)
         {
-            //Debug.WriteLine($"窗口是否活动：{IsActive}，是否有焦点：{IsFocused}");
-            //Debug.WriteLine($"主句柄：{DLL.GetForegroundWindow() == _mainHandle}，子句柄：{DLL.GetForegroundWindow() == ScHandle}");
-            if (IsActive && ScHandle != IntPtr.Zero)
-            {
-                //if (key =="Q")//按下Q使用鼠标控制方向
-                //{
-                //    PressMouse();
-                //}
+            //if (key =="Q")//按下Q使用鼠标控制方向
+            //{
+            //    PressMouse();
+            //}
                 
-                DoKeyMapping(vkCode, ScRatioX, ScHandle);
+            DoKeyMapping(vkCode, ScRatioX, ScHandle);
+            Debug.WriteLine($"映射键：{MV.St.ElapsedMilliseconds}ms");
+        }
+
+        /// <summary>
+        /// 触发快捷键。
+        /// </summary>
+        /// <param name="vkCode">虚拟键码。</param>
+        public void ShortcutKey(Keys vkCode)
+        {
+            switch (vkCode)
+            {
+                case Keys.F1: StartScrcpy(true); break;
+                case Keys.F2: StartScrcpy(false); break;
+                case Keys.F3: CloseScrcpy(); break;
+                case Keys.F4: StartRecord(); break;
+                case Keys.F5: OpenRecordManage(); break;
+                case Keys.F6: new Setup().ShowDialog(); break;
+                case Keys.F7: OpenMenu(btnSizeOpt, popSize); break;
+                case Keys.F8: OpenMenu(btnFuncOpt, popFunc); break;
+                case Keys.F11: ScGotFocus(); break;
+                case Keys.F12: BtnTest_Click(null, null); break;
             }
         }
 
@@ -450,7 +467,7 @@ namespace ScrcpyEX.View
         /// <param name="scHandle">Scrcpy的句柄。</param>
         private void DoKeyMapping(Keys vkCode, double ratio, IntPtr scHandle)
         {
-            List<KeyMapping> mappings = MyCfg.Cfg.KeyMappings.Where(a => a.VkCode == vkCode).ToList();
+            List<KeyMapping> mappings = [.. MyCfg.Cfg.KeyMappings.Where(k => k.VkCode == vkCode)];
 
             if (mappings.Count <= 0)
             {
@@ -494,13 +511,14 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// Scrcpy窗口获得焦点，Scrcpy有焦点时才能触发安卓的输入法。
+        /// Scrcpy窗口获得焦点，Scrcpy有焦点时才能触发安卓的输入法，且电脑输入法需要是英文模式。
         /// </summary>
-        private void ScGotFocus(object parameter)
+        private void ScGotFocus()
         {
-            IntPtr intPtr = DLL.SetFocus(ScHandle);
-            //bool a = DLL.SetForegroundWindow(ScHandle);
-            Debug.WriteLine($"让Scrcpy获得焦点，{intPtr}");
+            IntPtr hwnd = DLL.SetFocus(ScHandle);
+            InputModeSwitcher.SwitchToEnglishMode(ScHandle);
+
+            Debug.WriteLine($"让Scrcpy获得焦点，{hwnd}");
         }
 
 

@@ -97,12 +97,25 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         }
 
         /// <summary>
+        /// KBDLLHOOKSTRUCT 结构体定义，用于接收键盘事件数据。
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct KBDLLHOOKSTRUCT
+        {
+            public uint vkCode;      // 虚拟键码
+            public uint scanCode;    // 硬件扫描码
+            public uint flags;       // 事件标志
+            public uint time;        // 时间戳
+            public UIntPtr dwExtraInfo; // 额外信息
+        }
+
+        /// <summary>
         /// 定义一个委托来表示鼠标钩子回调函数。
         /// </summary>
-        /// <param name="nCode">事件状态码，如果小于0则挂钩过程必须将消息传递给CallNextHookEx函数，而无需进一步处理，并且应返回CallNextHookEx返回的值。</param>
-        /// <param name="wParam">鼠标消息的标识符。可以是WM_LBUTTONDOWN等常量。</param>
-        /// <param name="lParam">指向MSLLHOOKSTRUCT结构的指针。</param>
-        /// <returns>0--允许该事件继续传播；大于0--此事件到此为止，不再向下传播。建议使用CallNextHookEx函数的处理值。</returns>
+        /// <param name="nCode">如果为0，表示 wParam 和 lParam 包含有效信息；如果nCode<0，必须调用CallNextHookEx并直接返回其结果。</param>
+        /// <param name="wParam">一个整数，根据钩子类型可以是 键盘/鼠标 的消息。</param>
+        /// <param name="lParam">一个指针，根据钩子类型可以是 KBDLLHOOKSTRUCT/MSLLHOOKSTRUCT 结构体。</param>
+        /// <returns>0--允许该消息继续传播；大于0--此消息到此为止，不再向下传播。无特殊处理时使用CallNextHookEx函数的处理值。</returns>
         public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
         /// <summary>

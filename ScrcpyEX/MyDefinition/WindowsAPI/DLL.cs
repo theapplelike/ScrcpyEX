@@ -8,7 +8,10 @@ using System.Windows;
 
 namespace ScrcpyEX.MyDefinition
 {
-    internal class DLL
+    /// <summary>
+    /// 系统的DLL声明在此类中。
+    /// </summary>
+    public class DLL
     {
         /// <summary>
         /// 获得一个与给定名称相匹配的顶层窗口的句柄，不查找子窗口，查找时不区分大小写。至少需要其中一个参数。
@@ -157,7 +160,7 @@ namespace ScrcpyEX.MyDefinition
         /// <param name="hwnd">要销毁的窗口的句柄。</param>
         /// <returns>true--函数成功；false--函数失败。</returns>
         [DllImport("user32.dll", EntryPoint = "DestroyWindow", CharSet = CharSet.Unicode)]
-        internal static extern bool DestroyWindow(IntPtr hwnd);
+        public static extern bool DestroyWindow(IntPtr hwnd);
 
         /// <summary>
         /// 将键盘焦点设置为指定的窗口。 窗口必须附加到调用线程的消息队列。
@@ -210,6 +213,37 @@ namespace ScrcpyEX.MyDefinition
         [DllImport("user32.dll")]
         public static extern int GetSystemMetrics(int nIndex);
 
+        /// <summary>
+        /// 如果窗口附加到调用线程的消息队列，则检索具有键盘焦点的窗口的句柄。
+        /// </summary>
+        /// <returns>具有键盘焦点的窗口的句柄</returns>
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetFocus();
+
+        /// <summary>
+        /// 在虚拟键码、扫描码和字符之间进行转换。
+        /// </summary>
+        /// <param name="uCode">要转换的码（虚拟键码 或 扫描码，取决于uMapType）。</param>
+        /// <param name="uMapType">映射类型，指明转换方向。0 (MAPVK_VK_TO_VSC)，虚拟键码 → 扫描码。其他参考：https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-mapvirtualkeya</param>
+        /// <returns>返回虚拟键码、扫描码和字符，取决于uMapType。</returns>
+        [DllImport("user32.dll")]
+        public static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
+        /// <summary>
+        /// 获取指定虚拟键在当前消息产生时刻的状态（而非实时物理状态）。
+        /// </summary>
+        /// <param name="nVirtKey">虚拟键码。</param>
+        /// <returns>最高位(bit 15)：1 = 按下，0 = 抬起；最低位(bit 0)用于切换键：1 = 开启（如 Caps Lock 开启），0 = 关闭。</returns>
+        [DllImport("user32.dll")]
+        public static extern short GetKeyState(int nVirtKey);
+
+        /// <summary>
+        /// 获取指定虚拟键在当前消息产生时刻的状态（而非实时物理状态）。
+        /// </summary>
+        /// <param name="nVirtKey">虚拟键码。</param>
+        /// <returns>最高位(bit 15)：1 = 按下，0 = 抬起；最低位(bit 0)用于切换键：1 = 开启（如 Caps Lock 开启），0 = 关闭。</returns>
+        public static short GetKeyState(uint nVirtKey) => GetKeyState((int)nVirtKey);
+
         //[DllImport("user32.dll")]
         //public static extern IntPtr GetDesktopWindow();
 
@@ -224,10 +258,6 @@ namespace ScrcpyEX.MyDefinition
         //
         //[DllImport("user32.dll")]
         //public static extern int SetCursorPos(int x, int y);//让鼠标移动到指定位置
-
-        //[DllImport("user32.dll")]
-        //[return: MarshalAs(UnmanagedType.Bool)]
-        //public static extern bool SetForegroundWindow(IntPtr hWnd);
 
     }
 }

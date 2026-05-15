@@ -26,22 +26,22 @@ namespace ScrcpyEX.ViewModel
         private MyCfg cfg;
 
         /// <summary>
-        /// 绑定第一个菜单的显示属性，需要双向绑定。
+        /// 绑定第一个菜单的Tag属性，null为折叠状态，非null为展开状态，需要双向绑定。
         /// </summary>
-        public Visibility VisibleStp1
+        public object Tag1
         {
-            get { return visibleStp1; }
+            get { return tag1; }
             set
             {
-                visibleStp1 = value;
-                CharBtn1 = visibleStp1 == Visibility.Visible ? "\ue70e" : "\ue70d";
+                tag1 = value;
+                CharBtn1 = tag1 != null ? "\ue70e" : "\ue70d";
                 RaisePropertyChanged();
             }
         }
-        private Visibility visibleStp1;
+        private object tag1;
 
         /// <summary>
-        /// 第一个菜单按钮右边的字符，通过第一个菜单的显示属性控制。
+        /// 第一个菜单按钮右边的字符，通过第一个菜单的指定属性控制。
         /// </summary>
         public string CharBtn1
         {
@@ -52,25 +52,25 @@ namespace ScrcpyEX.ViewModel
                 RaisePropertyChanged();
             }
         }
-        private string charBtn1 = "\ue70e";
+        private string charBtn1 = "\ue70d";
 
         /// <summary>
-        /// 绑定第二个菜单的显示属性，需要双向绑定。
+        /// 绑定第二个菜单的Tag属性，null为折叠状态，非null为展开状态，需要双向绑定。
         /// </summary>
-        public Visibility VisibleStp2
+        public object Tag2
         {
-            get { return visibleStp2; }
+            get { return tag2; }
             set
             {
-                visibleStp2 = value;
-                CharBtn2 = visibleStp2 == Visibility.Visible ? "\ue70e" : "\ue70d";
+                tag2 = value;
+                CharBtn2 = tag2 != null ? "\ue70e" : "\ue70d";
                 RaisePropertyChanged();
             }
         }
-        private Visibility visibleStp2;
+        private object tag2;
 
         /// <summary>
-        /// 第二个菜单按钮右边的字符，通过第二个菜单的显示属性控制。
+        /// 第二个菜单按钮右边的字符，通过第二个菜单的指定属性控制。
         /// </summary>
         public string CharBtn2
         {
@@ -81,7 +81,7 @@ namespace ScrcpyEX.ViewModel
                 RaisePropertyChanged();
             }
         }
-        private string charBtn2 = "\ue70e";
+        private string charBtn2 = "\ue70d";
 
 
     }

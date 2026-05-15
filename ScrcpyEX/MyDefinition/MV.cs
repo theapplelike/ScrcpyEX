@@ -3,6 +3,7 @@ using ScrcpyEX.MyDefinition.MyControl;
 using ScrcpyEX.View;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -53,9 +54,9 @@ namespace ScrcpyEX.ExtensionMethod
         public static MainWindow MainWin { get; set; }
 
         /// <summary>
-        /// 全局提示控件，在鼠标位置显示信息。
+        /// 测量时间。
         /// </summary>
-        //public static TimePopup Pop { get; set; }
+        public static Stopwatch St { get; set; }
 
         /// <summary>
         /// 按键映射Popup列表。

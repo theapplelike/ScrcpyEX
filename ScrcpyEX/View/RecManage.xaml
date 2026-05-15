@@ -78,7 +78,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="脚本列表（有黑边时执行脚本会导致错位）：" Margin="10,0,0,0"/>
-                <ListBox x:Name="lst" ItemsSource="{Binding ScriptItems}" Grid.Row="1" SelectionChanged="Lst_SelectionChanged"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden" AllowDrop="True">
+                <ListBox x:Name="lst" ItemsSource="{Binding ScriptItems}" Grid.Row="1" SelectionChanged="Lst_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden" AllowDrop="True">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListBoxItem_PreviewMouseLeftButtonDown"/>

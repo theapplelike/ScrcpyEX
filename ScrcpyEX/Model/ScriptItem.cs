@@ -13,7 +13,7 @@ namespace ScrcpyEX.Model
     public class ScriptItem : NotificationObject
     {
         /// <summary>
-        /// 单次脚本执行后已产生的时间，单位是秒。
+        /// 脚本的名称。
         /// </summary>
         public string Name
         {

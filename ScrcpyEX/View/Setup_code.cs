@@ -52,14 +52,15 @@ namespace ScrcpyEX.View
         /// 菜单显示状态转换，使用动画过度效果。
         /// </summary>
         /// <param name="stp">要进行状态转换的菜单。</param>
-        private void MenuStateTransition(StackPanel stp)
+        private void MenuStateTransition(StackPanel stp, int i)
         {
             // 停止可能正在进行的动画，避免冲突
             stp.BeginAnimation(HeightProperty, null);
-
-            if (stp.IsVisible) // 当前可见 → 折叠
+            
+            if (_isExpands[i]) // 当前可见 → 折叠
             {
-                // 获取当前实际高度作为动画起始值
+                _isExpands[i] = false;
+                stp.Tag = null;
                 double fromHeight = stp.ActualHeight;
 
                 DoubleAnimation animation = new()
@@ -70,19 +71,13 @@ namespace ScrcpyEX.View
                     EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
                 };
 
-                animation.Completed += (s, _) => stp.Visibility = Visibility.Collapsed;
                 stp.BeginAnimation(HeightProperty, animation);
             }
             else // 当前隐藏 → 展开
             {
-                // 必须先设为可见，让面板参与布局，才能获取正确的目标高度
+                _isExpands[i] = true;
+                stp.Tag = 1;
                 stp.Visibility = Visibility.Visible;
-
-                // 强制立即更新布局，确保 ActualHeight 准确
-                // 注意：UpdateLayout 可能较耗时，但在简单场景下可用；也可使用 Dispatcher.BeginInvoke 延迟执行动画，给布局更新留出时间
-                stp.UpdateLayout();
-
-                // 获取内容实际高度（目标高度）
                 double targetHeight = stp.ActualHeight;
 
                 // 准备动画从 0 到目标高度

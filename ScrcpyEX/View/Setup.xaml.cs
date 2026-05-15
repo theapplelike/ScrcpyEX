@@ -38,14 +38,17 @@ namespace ScrcpyEX.View
 
         private void BtnScrcpy_Click(object sender, RoutedEventArgs e)
         {
-            MenuStateTransition(stp1);
+            MenuStateTransition(stp1, 0);
         }
 
         private void BtnProg_Click(object sender, RoutedEventArgs e)
         {
-            MenuStateTransition(stp2);
+            MenuStateTransition(stp2, 1);
         }
 
-        
+        private void BtnExit_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+        }
     }
 }

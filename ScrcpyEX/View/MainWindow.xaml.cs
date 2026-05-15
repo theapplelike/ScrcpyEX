@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
 
 namespace ScrcpyEX.View
 {
@@ -29,7 +30,7 @@ namespace ScrcpyEX.View
         public MainWindow()
         {
             InitializeComponent();
-            SourceInitialized += OnSourceInitialized;
+            //SourceInitialized += OnSourceInitialized;
             _vm = (MainWindowVM)DataContext;
         }
 
@@ -51,13 +52,13 @@ namespace ScrcpyEX.View
 
         private void Window_StateChanged(object sender, EventArgs e)
         {
-            //Console.WriteLine($"-------------窗口状态改变：{WindowState}");
+            //Debug.WriteLine($"-------------窗口状态改变：{WindowState}");
             //RefreshScrcpy();
         }
 
         private void Window_Activated(object sender, EventArgs e)
         {
-            //Console.WriteLine($"++++++++++窗口激活,{IsActive},{DLL.GetForegroundWindow()}");
+            //Debug.WriteLine($"++++++++++窗口激活,{IsActive},{DLL.GetForegroundWindow()}");
 
             // 延迟检查，确保窗口已经完全激活
             Dispatcher.BeginInvoke(new Action(() =>
@@ -74,11 +75,27 @@ namespace ScrcpyEX.View
                 }
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
-        
+
         private void Window_Deactivated(object sender, EventArgs e)
         {
-            //Console.WriteLine($"++++++++++窗口失活,{IsActive},{WindowState}");
+            //Debug.WriteLine($"**********窗口失活,{IsActive},");
             HideKeyMapping();
+
+            //主界面上需要有控件能接收焦点，这样可以拿走SC的焦点
+            //bool a = btnFouce.Focus();
+            //IntPtr intPtr1 = DLL.GetFocus();
+            //Debug.WriteLine($"GetFocus检查，{intPtr1},焦点回到主：{a}");
+
+            if ((DLL.GetKeyState(VK_LMENU) & 0x8000) != 0)
+            {
+                Debug.WriteLine($"左 Alt 卡住");
+                SendAltKeyUp(ScHandle, false);
+            }
+            else if ((DLL.GetKeyState(VK_RMENU) & 0x8000) != 0)
+            {
+                Debug.WriteLine($"右 Alt 卡住");
+                SendAltKeyUp(ScHandle, true);
+            }
         }
 
         private void Window_LocationChanged(object sender, EventArgs e)
@@ -144,8 +161,17 @@ namespace ScrcpyEX.View
         //{
         //    MyGM.SetSameColor(gMenu, Brushes.Transparent, ((Button)sender).Tag);
         //}
+        private void BtnRecManage_Click(object sender, RoutedEventArgs e)
+        {
+            OpenRecordManage();
+        }
 
-        private void BtnLocOpt_Click(object sender, RoutedEventArgs e)
+        private void BtnSetManage_Click(object sender, RoutedEventArgs e)
+        {
+            new Setup().ShowDialog();
+        }
+
+        private void BtnSizeOpt_Click(object sender, RoutedEventArgs e)
         {
             OpenMenu(sender as Button, popSize);
         }
@@ -153,11 +179,6 @@ namespace ScrcpyEX.View
         private void BtnFuncOpt_Click(object sender, RoutedEventArgs e)
         {
             OpenMenu(sender as Button, popFunc);
-        }
-
-        private void BtnRecManage_Click(object sender, RoutedEventArgs e)
-        {
-            OpenRecordManage();
         }
 
         private void BtnRecStop_Click(object sender, RoutedEventArgs e)
@@ -202,11 +223,6 @@ namespace ScrcpyEX.View
         #endregion
 
         #region 功能菜单
-        private void BtnSet_Click(object sender, RoutedEventArgs e)
-        {
-            new Setup().ShowDialog();
-        }
-
         /// <summary>
         /// 开始录制脚本。
         /// </summary>
@@ -232,7 +248,7 @@ namespace ScrcpyEX.View
 
         private void BtnScGotFocus_Click(object sender, RoutedEventArgs e)
         {
-            ScGotFocus(null);
+            ScGotFocus();
             popFunc.IsOpen = false;
         }
 

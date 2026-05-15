@@ -45,117 +45,138 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Width" Value="200"/>
         </Style>
+        <Style x:Key="Btn" TargetType="{x:Type Button}" BasedOn="{StaticResource MenuBtn}">
+            <Setter Property="FontFamily" Value="幼圆"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Background" Value="LightSteelBlue"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
     </Window.Resources>
 
     <Grid>
-        <StackPanel>
-            <Grid Margin="0,0,0,10" Panel.ZIndex="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
 
-                <Button x:Name="btnScrcpy" Click="BtnScrcpy_Click" Style="{StaticResource BigBtn}" Grid.Row="0" Panel.ZIndex="9">
-                    <Button.Content>
-                        <Grid Width="{Binding ElementName=btnScrcpy,Path=ActualWidth}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="25"/>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="25"/>
-                            </Grid.ColumnDefinitions>
+        <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+                <Grid Margin="0,0,0,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                            <TextBlock Text="&#xec16;" Style="{StaticResource txtIcon}" Grid.Column="1" HorizontalAlignment="Left"/>
-                            <TextBlock Text="投屏" Grid.Column="2"/>
-                            <TextBlock Text="{Binding CharBtn1}" Style="{StaticResource txtIcon}" Grid.Column="2" HorizontalAlignment="Right"/>
-                        </Grid>
-                    </Button.Content>
-                </Button>
-                <StackPanel x:Name="stp1" Visibility="{Binding VisibleStp1,Mode=TwoWay}" Grid.Row="1" Panel.ZIndex="8">
-                    <CheckBox IsChecked="{Binding Cfg.ScrcpySet.StayAwake}">
-                        <StackPanel>
-                            <TextBlock Text="保持唤醒"/>
-                            <TextBlock Text="投屏时防止设备休眠，仅对有线连接有效" Style="{StaticResource tbkSmall}"/>
-                        </StackPanel>
-                    </CheckBox>
-                    <Border/>
+                    <Button x:Name="btnScrcpy" Click="BtnScrcpy_Click" Style="{StaticResource BigBtn}" Grid.Row="0">
+                        <Button.Content>
+                            <Grid Width="{Binding ElementName=btnScrcpy,Path=ActualWidth}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="25"/>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="25"/>
+                                </Grid.ColumnDefinitions>
 
-                    <CheckBox IsChecked="{Binding Cfg.ScrcpySet.TurnScreenOff}">
-                        <StackPanel>
-                            <TextBlock Text="关闭屏幕"/>
-                            <TextBlock Text="投屏时关闭设备屏幕，但不会进入休眠状态" Style="{StaticResource tbkSmall}"/>
-                        </StackPanel>
-                    </CheckBox>
-                    <Border/>
+                                <TextBlock Text="&#xec16;" Style="{StaticResource txtIcon}" Grid.Column="1" HorizontalAlignment="Left"/>
+                                <TextBlock Text="投屏" Grid.Column="2"/>
+                                <TextBlock Text="{Binding CharBtn1}" Style="{StaticResource txtIcon}" Grid.Column="2" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Button.Content>
+                    </Button>
+                    <StackPanel x:Name="stp1" Tag="{Binding Tag1,Mode=TwoWay}" Grid.Row="1">
+                        <CheckBox IsChecked="{Binding Cfg.ScrcpySet.StayAwake}">
+                            <StackPanel>
+                                <TextBlock Text="保持唤醒"/>
+                                <TextBlock Text="投屏时防止设备休眠，仅对有线连接有效" Style="{StaticResource tbkSmall}"/>
+                            </StackPanel>
+                        </CheckBox>
+                        <Border/>
 
-                    <CheckBox IsChecked="{Binding Cfg.ScrcpySet.ShowTouches}">
-                        <StackPanel>
-                            <TextBlock Text="显示触摸点"/>
-                            <TextBlock Text="投屏时手指在触碰设备的地方显示触摸点" Style="{StaticResource tbkSmall}"/>
-                        </StackPanel>
-                    </CheckBox>
-                    <Border/>
+                        <CheckBox IsChecked="{Binding Cfg.ScrcpySet.TurnScreenOff}">
+                            <StackPanel>
+                                <TextBlock Text="关闭屏幕"/>
+                                <TextBlock Text="投屏时关闭设备屏幕，但不会进入休眠状态" Style="{StaticResource tbkSmall}"/>
+                            </StackPanel>
+                        </CheckBox>
+                        <Border/>
 
-                    <CheckBox IsChecked="{Binding Cfg.ScrcpySet.PowerOffOnClose}" Content="设备停止投屏时进入休眠"/>
-                    <Border/>
+                        <CheckBox IsChecked="{Binding Cfg.ScrcpySet.ShowTouches}">
+                            <StackPanel>
+                                <TextBlock Text="显示触摸点"/>
+                                <TextBlock Text="投屏时手指在触碰设备的地方显示触摸点" Style="{StaticResource tbkSmall}"/>
+                            </StackPanel>
+                        </CheckBox>
+                        <Border/>
 
-                    <CheckBox IsChecked="{Binding Cfg.ScrcpySet.DisablScreensaver}" Content="设备投屏时电脑禁用屏幕保护"/>
-                    <Border/>
-                </StackPanel>
-            </Grid>
+                        <CheckBox IsChecked="{Binding Cfg.ScrcpySet.PowerOffOnClose}" Content="设备停止投屏时进入休眠"/>
+                        <Border/>
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Button x:Name="btnProg" Click="BtnProg_Click" Style="{StaticResource BigBtn}" Grid.Row="0" Panel.ZIndex="2" Grid.ColumnSpan="2">
-                    <Button.Content>
-                        <Grid Width="{Binding ElementName=btnScrcpy,Path=ActualWidth}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="25"/>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="25"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock Text="&#xEC26;" Style="{StaticResource txtIcon}" Grid.Column="1" HorizontalAlignment="Left"/>
-                            <TextBlock Text="程序" Grid.Column="2"/>
-                            <TextBlock Text="{Binding CharBtn2}" Style="{StaticResource txtIcon}" Grid.Column="2" HorizontalAlignment="Right"/>
-                        </Grid>
-                    </Button.Content>
-                </Button>
-                <StackPanel x:Name="stp2" Visibility="{Binding VisibleStp2,Mode=TwoWay}" Grid.Row="1" Panel.ZIndex="1" Grid.ColumnSpan="2">
-                    <CheckBox IsChecked="{Binding Cfg.IsUseLastSize}" Content="记住上一次退出时的位置和大小"/>
-                    <Border/>
-
-                    <CheckBox IsChecked="{Binding Cfg.IsKeepLandscape}">
-                        <StackPanel>
-                            <TextBlock Text="是否保持横屏"/>
-                            <TextBlock Text="除了手动消除黑边，其他操作不会自动消除黑边" Style="{StaticResource tbkSmall}"/>
-                        </StackPanel>
-                    </CheckBox>
-                    <Border/>
-
-                    <CheckBox IsChecked="{Binding Cfg.IsCanResize}" Content="是否允许程序边缘调整大小"/>
-                    <Border/>
-
-                    <!--<StackPanel Style="{StaticResource stpBox}">
-                        <TextBlock Text="无线连接-IP地址" Style="{StaticResource tbkDesc}"/>
-                        <TextBox Text="{Binding Cfg.IP}" Style="{StaticResource txt}"/>
+                        <CheckBox IsChecked="{Binding Cfg.ScrcpySet.DisablScreensaver}" Content="设备投屏时电脑禁用屏幕保护"/>
+                        <Border/>
                     </StackPanel>
-                    <Border/>
+                </Grid>
 
-                    <StackPanel Style="{StaticResource stpBox}">
-                        <TextBlock Text="无线连接-端口号" Style="{StaticResource tbkDesc}"/>
-                        <TextBox Text="{Binding Cfg.Port}" Style="{StaticResource txt}"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Button x:Name="btnProg" Click="BtnProg_Click" Style="{StaticResource BigBtn}" Grid.Row="0">
+                        <Button.Content>
+                            <Grid Width="{Binding ElementName=btnScrcpy,Path=ActualWidth}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="25"/>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="25"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="&#xEC26;" Style="{StaticResource txtIcon}" Grid.Column="1" HorizontalAlignment="Left"/>
+                                <TextBlock Text="程序" Grid.Column="2"/>
+                                <TextBlock Text="{Binding CharBtn2}" Style="{StaticResource txtIcon}" Grid.Column="2" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Button.Content>
+                    </Button>
+                    <StackPanel x:Name="stp2" Tag="{Binding Tag2,Mode=TwoWay}" Grid.Row="1">
+                        <CheckBox IsChecked="{Binding Cfg.IsUseLastSize}" Content="记住上一次退出时的位置和大小"/>
+                        <Border/>
+
+                        <CheckBox IsChecked="{Binding Cfg.IsKeepLandscape}">
+                            <StackPanel>
+                                <TextBlock Text="是否保持横屏"/>
+                                <TextBlock Text="除了手动消除黑边，其他操作不会自动消除黑边" Style="{StaticResource tbkSmall}"/>
+                            </StackPanel>
+                        </CheckBox>
+                        <Border/>
+
+                        <CheckBox IsChecked="{Binding Cfg.IsCanResize}" Content="是否允许程序边缘调整大小"/>
+                        <Border/>
+
+                        <!--<StackPanel Style="{StaticResource stpBox}">
+                <TextBlock Text="无线连接-IP地址" Style="{StaticResource tbkDesc}"/>
+                <TextBox Text="{Binding Cfg.IP}" Style="{StaticResource txt}"/>
+            </StackPanel>
+            <Border/>
+
+            <StackPanel Style="{StaticResource stpBox}">
+                <TextBlock Text="无线连接-端口号" Style="{StaticResource tbkDesc}"/>
+                <TextBox Text="{Binding Cfg.Port}" Style="{StaticResource txt}"/>
+            </StackPanel>
+            <Border/>-->
                     </StackPanel>
-                    <Border/>-->
-                </StackPanel>
-            </Grid>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+        
 
+        <Rectangle Grid.Row="1" Height="2" Fill="CornflowerBlue"/>
+        
+        <StackPanel Grid.Row="2" Orientation="Horizontal" FlowDirection="RightToLeft" Margin="10,10,20,10">
+            <Button x:Name="btnExit" Click="BtnExit_Click" Content="关闭窗口" Style="{StaticResource Btn}"/>
         </StackPanel>
-    </Grid>
 
+    </Grid>
 </Window>
