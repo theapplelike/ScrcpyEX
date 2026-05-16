@@ -114,8 +114,7 @@ namespace ScrcpyEX.View
             btnFouce.Focus();
 
             //注册键盘钩子
-            HashSet<int> hs = [.. MyCfg.Cfg.KeyMappings.Select(k => (int)k.VkCode)];
-            KMC_Hook.RegisterHook(_mainHandle, hs);
+            KMC_Hook.RegisterHook(_mainHandle);
         }
 
         /// <summary>
@@ -242,8 +241,8 @@ namespace ScrcpyEX.View
         /// <param name="isWired">是否使用有线形式启动。</param>
         private async Task ScrcpyInit(bool isWired, string ip = "", string port = "5555")
         {
-            _scrcpyHost = new ScrcpyHost();
-            bdShow.Child = await _scrcpyHost.StartScrcpyAsync(isWired, ip, port);
+            _scHost = new ScrcpyHost();
+            bdShow.Child = await _scHost.StartScrcpyAsync(isWired, ip, port);
 
             if (bdShow.Child != null)
             {
@@ -251,7 +250,7 @@ namespace ScrcpyEX.View
 
                 CreateSavedPop(false, DLL.GetForegroundWindow() == _mainHandle);
                 //CreateSavedPop(false, isActivate);
-                //InputModeSwitcher.SwitchToEnglishMode(ScHandle);
+                InputModeSwitcher.SwitchToEnglishMode(ScHandle);
 
                 Debug.WriteLine($"-*-激活:{isActivate}，主:{_mainHandle}，SC:{ScHandle}");
             }
@@ -349,7 +348,7 @@ namespace ScrcpyEX.View
         {
             if (!IsScClosed)
             {
-                _scrcpyHost.DisposeScrcpy();
+                _scHost.DisposeScrcpy();
                 btnFouce.Focus();
                 bdShow.Child = null;
                 StopScriptAndRecord();

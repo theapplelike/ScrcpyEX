@@ -342,6 +342,8 @@ namespace ScrcpyEX.View
                 Debug.WriteLine($"映射字符：{ch}，虚拟键：{vkCode}/{(int)vkCode}，保存偏移:（{offsetX:F2}，{offsetY:F2}）。");
             }
 
+            HashSet<int> hs = [.. MyCfg.Cfg.KeyMappings.Select(k => (int)k.VkCode)];
+            KMC_Hook.InitUserHotkeys(hs);
             Debug.WriteLine($"已有映射数量：{MyCfg.Cfg.KeyMappings.Count}。");
         }
 
@@ -501,7 +503,7 @@ namespace ScrcpyEX.View
                 //}
 
                 //ADB_Click(centreX, centreY);
-                //Debug.WriteLine($"圆心点:({centreX},{centreY})。");
+                Debug.WriteLine($"圆心点:({centreX},{centreY})。");
             }
 
             //逻辑鼠标回到物理鼠标的位置

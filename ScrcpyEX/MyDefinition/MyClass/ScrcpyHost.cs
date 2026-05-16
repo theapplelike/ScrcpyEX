@@ -76,9 +76,10 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
             // 创建真正的HwndHost
             _hwndHost = new InternalHwndHost(ScHandle, _prc);
-            KMC_Hook.IsMapping = true;
+            HashSet<int> hs = [.. MyCfg.Cfg.KeyMappings.Select(k => (int)k.VkCode)];
+            KMC_Hook.InitUserHotkeys(hs);
             MDC_Hook.RegisterHook(ScHandle);
-            
+
             return _hwndHost;
         }
 
@@ -133,7 +134,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private string GetCommandLine()
         {
             StringBuilder sb = new();
-        
+
             //根据用户设置获得的命令行参数26.4.10
             //foreach (PropertyInfo prop in typeof(MyCfg).GetProperties())
             //{
@@ -167,7 +168,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 sb.Append($"--tcpip={_ip}:{_port}");
             }
 
-            Debug.WriteLine($"ScrcpyHost命令行：{sb}。");
+            Debug.WriteLine($"ScHost命令行：{sb}。");
             return sb.ToString();
         }
 
@@ -206,9 +207,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
             _prc.CancelOutputRead();
             _prc.CancelErrorRead();
             ScHandle = IntPtr.Zero;
-            KMC_Hook.IsMapping = false;
+            KMC_Hook.ClearUserHotkeys();
             MDC_Hook.CancelHook();
-            Debug.WriteLine($"ScrcpyHost：Process的Exieted事件执行结束。");
+            Debug.WriteLine($"ScHost：Process的Exieted事件执行结束。");
         }
 
         /// <summary>

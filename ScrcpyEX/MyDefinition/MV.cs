@@ -31,17 +31,17 @@ namespace ScrcpyEX.ExtensionMethod
         /// <summary>
         /// Scrcpy的版本号。
         /// </summary>
-        public static string ScrcpyVersion = "v3.1";
+        public static string ScrcpyVersion = "v4.0";
 
         /// <summary>
         /// Scrcpy的路径。
         /// </summary>
-        public static string ScrcpyPath { get; set; } = @".\scrcpy-win64\scrcpy.exe";
+        public static string ScrcpyPath { get; set; } = @$".\scrcpy-win64-{ScrcpyVersion}\scrcpy.exe";
 
         /// <summary>
         /// adb的路径。
         /// </summary>
-        public static string ADB_Path { get; set; } = @".\scrcpy-win64\adb.exe";
+        public static string ADB_Path { get; set; } = @$".\scrcpy-win64-{ScrcpyVersion}\adb.exe";
 
         /// <summary>
         /// 脚本图片的保存路径。

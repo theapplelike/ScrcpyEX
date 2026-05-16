@@ -38,7 +38,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <summary>
         /// 用户定义的映射键集合。
         /// </summary>
-        private static HashSet<int> UserHotkeys;
+        private static HashSet<int> UserHotkeys = [];
 
         /// <summary>
         /// 程序使用的快捷键集合。
@@ -58,21 +58,20 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         ];
 
         /// <summary>
-        /// 是否启用按键映射。
+        /// SC是否拥有焦点。
         /// </summary>
-        public static bool IsMapping { get; set; } = false;
+        public static bool IsScHasFocus { get; set; } = false;
 
         /// <summary>
         /// 注册监听键盘消息的句柄。
         /// </summary>
         /// <returns>true--注册成功；false--注册失败。</returns>
-        public static bool RegisterHook(IntPtr mainHandle, HashSet<int> hs)
+        public static bool RegisterHook(IntPtr mainHandle)
         {
             //IntPtr hMod = GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName);
             IntPtr hMod = Marshal.GetHINSTANCE(typeof(KMC_Hook).Module);
             _hookId = SetWindowsHookEx(WH_KEYBOARD_LL, HookCallback, hMod, 0);
             _mainHandle = mainHandle;
-            UserHotkeys = hs;
 
             return _hookId != IntPtr.Zero;
         }
@@ -107,23 +106,46 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
 
                 if ((isSysKey || isUserKey) && DLL.GetForegroundWindow() == _mainHandle)
                 {
-                    if (isUserKey && (int)wParam == WM.KEYDOWN && MV.MainWin.ScHandle != IntPtr.Zero)
+                    //if (isUserKey && (int)wParam == WM.KEYDOWN && MV.MainWin.ScHandle != IntPtr.Zero)
+                    if (isUserKey)
                     {
-                        Application.Current.Dispatcher.BeginInvoke(() => MV.MainWin.KeyboardMapping((Keys)vkCode));
+                        if ((int)wParam == WM.KEYDOWN && !IsScHasFocus)
+                        {
+                            Application.Current.Dispatcher.BeginInvoke(() => MV.MainWin.KeyboardMapping((Keys)vkCode));
+                        }
                     }
-                    else if (isSysKey && (int)wParam == WM.KEYUP)
+                    else if (isSysKey)
                     {
-                        Application.Current.Dispatcher.BeginInvoke(() => MV.MainWin.ShortcutKey((Keys)vkCode));
+                        if ((int)wParam == WM.KEYUP)
+                        {
+                            Application.Current.Dispatcher.BeginInvoke(() => MV.MainWin.ShortcutKey((Keys)vkCode));
+                        }
+                        // 拦截热键的按下和抬起（成对拦截），避免SC收到这些键
+                        return (IntPtr)1;
                     }
                     //Debug.WriteLine($"前台：{MV.St.ElapsedMilliseconds}ms");
-                    // 拦截热键的按下和抬起，避免SC收到这些键
-                    //return (IntPtr)1;
                 }
             }
             //Debug.WriteLine($"继续：{MV.St.ElapsedMilliseconds}ms");
             return CallNextHookEx(_hookId, nCode, wParam, lParam);
         }
 
+        /// <summary>
+        /// 使用集合初始化用户热键集合。
+        /// </summary>
+        /// <param name="hs">用户热键集合。</param>
+        public static void InitUserHotkeys(HashSet<int> hs)
+        {
+            UserHotkeys = hs;
+        }
+
+        /// <summary>
+        /// 清空用户热键集合。
+        /// </summary>
+        public static void ClearUserHotkeys()
+        {
+            UserHotkeys.Clear();
+        }
 
     }
 }

@@ -36,16 +36,17 @@ namespace ScrcpyEX.View
         /// 虚拟屏幕
         /// 标题栏每个按钮快捷键-y
         /// 记录连接过的手机，可以选择手机在连接时是否开启USB网络，adb实现
-        /// sc突然断线要清理资源
-        /// 添加新的按键映射后更新到KMC_Hook的热键列表
-        /// F11会触发安卓的截图，可以考虑拦截
+        /// sc突然断线要清理资源-y
+        /// 添加新的按键映射后更新到KMC_Hook的热键列表-y
+        /// F11会触发安卓的截图，可以考虑拦截-y
+        /// sc有焦点时显示安卓图标
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {
-            //IntPtr intPtr = DLL.GetForegroundWindow();
+            //IntPtr hwnd = DLL.GetForegroundWindow();
             Dispatcher.BeginInvoke(() =>
             {
-                //Debug.WriteLine($"窗体/SC：{IsActive}，{intPtr == ScHandle}。");
+                //Debug.WriteLine($"窗体/SC：{IsActive}，{hwnd}，{hwnd == ScHandle}。");
             });
         }
 
@@ -57,7 +58,7 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
-
+            await MyGM.Adb(@"shell svc usb setFunctions rndis");
             //btnFouce.Focus();
             //InputLanguageManager.SetInputLanguage(gMain, new CultureInfo("en-US"));
             //CultureInfo info = InputLanguageManager.GetInputLanguage(btnFouce);

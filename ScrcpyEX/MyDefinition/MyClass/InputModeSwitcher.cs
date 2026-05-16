@@ -26,9 +26,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private const uint IME_CMODE_ALPHANUMERIC = 0x0000; //英文模式
 
         /// <summary>
-        /// 切换微软拼音到英文模式
+        /// 切换微软拼音到英文模式。
         /// </summary>
-        /// <param name="hWnd">需要需要切换模式窗口的句柄。</param>
+        /// <param name="hWnd">需要切换到英文模式窗口的句柄。</param>
         public static void SwitchToEnglishMode(IntPtr hWnd)
         {
             IntPtr hIMEWnd = ImmGetDefaultIMEWnd(hWnd);

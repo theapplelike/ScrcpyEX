@@ -1,6 +1,7 @@
 ﻿using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.MyClass;
+using ScrcpyEX.MyDefinition.WindowsAPI;
 using ScrcpyEX.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -174,12 +175,14 @@ namespace ScrcpyEX.View
         private void BtnFouce_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             _isScHasFouce = false;
+            KMC_Hook.IsScHasFocus = false;
             //Debug.WriteLine($"主界面收到焦点");
         }
 
         private void BtnFouce_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             _isScHasFouce = true;
+            KMC_Hook.IsScHasFocus = true;
             //Debug.WriteLine($"主界面失去焦点，可能焦点给到SC");
         }
         #endregion

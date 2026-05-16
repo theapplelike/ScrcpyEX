@@ -22,7 +22,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// Scrcpy主机，封装Scrcpy启动、关闭、大小调整的功能。
         /// </summary>
-        private ScrcpyHost _scrcpyHost = null;
+        private ScrcpyHost _scHost = null;
 
         /// <summary>
         /// 窗体对应的ViewModel。
@@ -178,7 +178,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// Scrcpy是否处于关闭状态，true--关闭状态；false--启动状态。
         /// </summary>
-        private bool IsScClosed => _scrcpyHost == null || _scrcpyHost.ScHandle == IntPtr.Zero;
+        private bool IsScClosed => _scHost == null || _scHost.ScHandle == IntPtr.Zero;
 
         /// <summary>
         /// 圆形DragPopup的直径。
@@ -188,7 +188,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。
         /// </summary>
-        public IntPtr ScHandle => _scrcpyHost?.ScHandle ?? IntPtr.Zero;
+        public IntPtr ScHandle => _scHost?.ScHandle ?? IntPtr.Zero;
 
         /// <summary>
         /// Scrcpy当前宽度和默认宽度的比值。

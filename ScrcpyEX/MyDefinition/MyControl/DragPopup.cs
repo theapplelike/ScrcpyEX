@@ -350,11 +350,11 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// </summary>
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            if (sender is TextBox textBox)
+            if (sender is TextBox txt)
             {
-                if (textBox.Text.Length >= 1)
+                if (txt.Text.Length >= 1)
                 {
-                    if (IsAllTextSelected(textBox))
+                    if (IsAllTextSelected(txt))
                     {
                         VkCode = CharToVirtualKey(e.Text[0]);
                         _tbkDisplayChar.Text = e.Text;
@@ -386,19 +386,19 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// </summary>
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (sender is TextBox textBox)
+            if (sender is TextBox txt)
             {
-                if (textBox.Text.Length > 1)
+                if (txt.Text.Length > 1)
                 {
-                    textBox.Text = textBox.Text.Substring(0, 1);//如果长度超过一，只保留第一个
-                    textBox.CaretIndex = 1;
+                    txt.Text = txt.Text.Substring(0, 1);//如果长度超过一，只保留第一个
+                    txt.CaretIndex = 1;
                 }
-                else if (textBox.Text.Length == 1)
+                else if (txt.Text.Length == 1)
                 {
-                    if (char.IsLower(textBox.Text[0]))
+                    if (char.IsLower(txt.Text[0]))
                     {
-                        textBox.Text = textBox.Text.ToUpper();
-                        textBox.CaretIndex = 1;
+                        txt.Text = txt.Text.ToUpper();
+                        txt.CaretIndex = 1;
                     }
                 }
             }
@@ -426,11 +426,11 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// <summary>
         /// 将字符转换为虚拟键码。
         /// </summary>
-        /// <param name="character">需要转化的字符。</param>
+        /// <param name="ch">需要转化的字符。</param>
         /// <returns>Keys枚举。</returns>
-        private Keys CharToVirtualKey(char character)
+        private Keys CharToVirtualKey(char ch)
         {
-            short result = DLL.VkKeyScan(character);
+            short result = DLL.VkKeyScan(ch);
 
             if (result != -1)
             {
