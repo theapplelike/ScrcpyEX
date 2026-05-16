@@ -37,6 +37,8 @@ namespace ScrcpyEX.View
         /// 标题栏每个按钮快捷键-y
         /// 记录连接过的手机，可以选择手机在连接时是否开启USB网络，adb实现
         /// sc突然断线要清理资源
+        /// 添加新的按键映射后更新到KMC_Hook的热键列表
+        /// F11会触发安卓的截图，可以考虑拦截
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -56,14 +58,14 @@ namespace ScrcpyEX.View
         {
             await Task.Delay(1);
 
-            //bool fo = RunAdbCommand();
-            //Debug.WriteLine($"焦点：{fo}");
-
             //btnFouce.Focus();
             //InputLanguageManager.SetInputLanguage(gMain, new CultureInfo("en-US"));
-            CultureInfo info = InputLanguageManager.GetInputLanguage(btnFouce);
-            Debug.WriteLine($"语言：{info.Name}");
-            //InputLanguageManager.Current.CurrentInputLanguage = CultureInfo.GetCultureInfo("en-US");
+            //CultureInfo info = InputLanguageManager.GetInputLanguage(btnFouce);
+            //Debug.WriteLine($"语言：{info.Name}");
+
+            IntPtr fore = DLL.GetForegroundWindow();
+            IntPtr focus = DLL.GetFocus();
+            Debug.WriteLine($"GetFocus检查：{focus}，前台：{fore}");
         }
 
         /// <summary>

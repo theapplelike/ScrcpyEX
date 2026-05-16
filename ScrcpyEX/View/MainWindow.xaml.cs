@@ -81,11 +81,6 @@ namespace ScrcpyEX.View
             //Debug.WriteLine($"**********窗口失活,{IsActive},");
             HideKeyMapping();
 
-            //主界面上需要有控件能接收焦点，这样可以拿走SC的焦点
-            //bool a = btnFouce.Focus();
-            //IntPtr intPtr1 = DLL.GetFocus();
-            //Debug.WriteLine($"GetFocus检查，{intPtr1},焦点回到主：{a}");
-
             if ((DLL.GetKeyState(VK_LMENU) & 0x8000) != 0)
             {
                 Debug.WriteLine($"左 Alt 卡住");
@@ -146,21 +141,6 @@ namespace ScrcpyEX.View
             WindowState = WindowState.Minimized;
         }
 
-        /// <summary>
-        /// 定位的两个按钮颜色联动，鼠标进入时同时修改背景色。
-        /// </summary>
-        //private void Btn_MouseEnter(object sender, MouseEventArgs e)
-        //{
-        //    MyGM.SetSameColor(gMenu, Brushes.LightBlue, ((Button)sender).Tag);
-        //}
-
-        /// <summary>
-        /// 定位的两个按钮颜色联动，鼠标离开时同时修改背景色。
-        /// </summary>
-        //private void Btn_MouseLeave(object sender, MouseEventArgs e)
-        //{
-        //    MyGM.SetSameColor(gMenu, Brushes.Transparent, ((Button)sender).Tag);
-        //}
         private void BtnRecManage_Click(object sender, RoutedEventArgs e)
         {
             OpenRecordManage();
@@ -189,6 +169,18 @@ namespace ScrcpyEX.View
         private void BtnImgCompare_Click(object sender, RoutedEventArgs e)
         {
             ImgCompare(_scriptInfos[0]);
+        }
+
+        private void BtnFouce_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            _isScHasFouce = false;
+            //Debug.WriteLine($"主界面收到焦点");
+        }
+
+        private void BtnFouce_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            _isScHasFouce = true;
+            //Debug.WriteLine($"主界面失去焦点，可能焦点给到SC");
         }
         #endregion
 
@@ -271,6 +263,6 @@ namespace ScrcpyEX.View
         }
         #endregion
 
-
+        
     }
 }

@@ -110,9 +110,7 @@ namespace ScrcpyEX.View
             _hwndSource?.AddHook(WndProc);
             _mainHandle = _hwndSource.Handle;
 
-            //输入法设置为英文模式
-            //InputModeSwitcher.SwitchToEnglishMode(_mainHandle);
-            InputLanguageManager.SetInputLanguage(gMain, new CultureInfo("en-US"));
+            //输入法设置为英文模式，通过焦点按钮实现
             btnFouce.Focus();
 
             //注册键盘钩子
@@ -231,11 +229,9 @@ namespace ScrcpyEX.View
         /// </summary>
         private void CheckScrcpy()
         {
-            // 查询指定名称的进程（无需包含.exe扩展名）
             Process[] prc = Process.GetProcessesByName("Scrcpy");
             if (prc.Length > 0)
             {
-                //Debug.WriteLine($"进程ID:{prc[0].Id}，路径:{prc[0].MainModule?.FileName}");
                 prc[0].Kill();
             }
         }
@@ -253,12 +249,11 @@ namespace ScrcpyEX.View
             {
                 bool isActivate = Activate();
 
-                //CreateSavedPop(false, DLL.GetForegroundWindow() == _mainHandle);
-                CreateSavedPop(false, isActivate);
+                CreateSavedPop(false, DLL.GetForegroundWindow() == _mainHandle);
+                //CreateSavedPop(false, isActivate);
                 //InputModeSwitcher.SwitchToEnglishMode(ScHandle);
 
-                Debug.WriteLine($"激活:{isActivate}，主:{_mainHandle}，SC:{ScHandle}");
-                //Debug.WriteLine($"前台窗口句柄：{DLL.GetForegroundWindow()}");
+                Debug.WriteLine($"-*-激活:{isActivate}，主:{_mainHandle}，SC:{ScHandle}");
             }
         }
 
@@ -348,13 +343,14 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 关闭Scrcpy。
+        /// 关闭Scrcpy，同时回收焦点。
         /// </summary>
         private void CloseScrcpy()
         {
             if (!IsScClosed)
             {
                 _scrcpyHost.DisposeScrcpy();
+                btnFouce.Focus();
                 bdShow.Child = null;
                 StopScriptAndRecord();
                 Debug.WriteLine($"用户结束Scrcpy程序。");

@@ -68,7 +68,7 @@
         </mycontrol:TimePopup>
 
         <!--位置和大小的菜单-->
-        <Popup x:Name="popSize" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnLocOpt}">
+        <Popup x:Name="popSize" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnSizeOpt}">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel Background="White">
                     <TextBlock Text="{Binding Resolution}" Background="White" Padding="5"/>
@@ -167,7 +167,7 @@
             </ToolBarTray>
 
             <!---->
-            <Button x:Name="btnFouce" Grid.Column="1" Width="1" Height="1" InputMethod.IsInputMethodEnabled="False"/>
+            <Button x:Name="btnFouce" Grid.Column="1" Width="1" Height="1" InputMethod.IsInputMethodEnabled="False" PreviewGotKeyboardFocus="BtnFouce_PreviewGotKeyboardFocus" LostKeyboardFocus="BtnFouce_LostKeyboardFocus"/>
             <StackPanel x:Name="stpRightMenu" Grid.Column="1" Orientation="Horizontal" FlowDirection="RightToLeft">
                 <Button x:Name="btnClosePrg" Click="BtnClosePrg_Click" Style="{StaticResource thisBtn}" Content="&#xe711;"/>
                 <Button x:Name="btnMaximize" Click="BtnMaximize_Click" Style="{StaticResource thisBtn}" Content="&#xe922;"/>

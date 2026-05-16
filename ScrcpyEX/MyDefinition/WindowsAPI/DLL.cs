@@ -216,7 +216,7 @@ namespace ScrcpyEX.MyDefinition
         /// <summary>
         /// 如果窗口附加到调用线程的消息队列，则检索具有键盘焦点的窗口的句柄。
         /// </summary>
-        /// <returns>具有键盘焦点的窗口的句柄</returns>
+        /// <returns>具有键盘焦点的窗口的句柄。</returns>
         [DllImport("user32.dll")]
         public static extern IntPtr GetFocus();
 

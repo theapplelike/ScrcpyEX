@@ -268,6 +268,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             _prc.CloseMainWindow();
             _prc.WaitForExit();
             _prc.Dispose();
+            _hwndHost.Dispose();
         }
 
         /// <summary>

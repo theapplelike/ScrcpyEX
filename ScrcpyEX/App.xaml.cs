@@ -24,9 +24,7 @@ namespace ScrcpyEX
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
             GlobalException();
-            InputLanguageManager.Current.CurrentInputLanguage = CultureInfo.GetCultureInfo("en-US");
         }
 
         /// <summary>

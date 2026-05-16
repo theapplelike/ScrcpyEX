@@ -409,7 +409,7 @@ namespace ScrcpyEX.View
             //}
                 
             DoKeyMapping(vkCode, ScRatioX, ScHandle);
-            Debug.WriteLine($"映射键：{MV.St.ElapsedMilliseconds}ms");
+            //Debug.WriteLine($"映射键：{MV.St.ElapsedMilliseconds}ms");
         }
 
         /// <summary>
@@ -511,14 +511,22 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// Scrcpy窗口获得焦点，Scrcpy有焦点时才能触发安卓的输入法，且电脑输入法需要是英文模式。
+        /// SC无输入焦点，则获得输入焦点；SC有输入焦点，主程序回收焦。
+        /// SC有输入焦点时才能触发安卓的输入法，且电脑输入法需要是英文模式。
         /// </summary>
         private void ScGotFocus()
         {
-            IntPtr hwnd = DLL.SetFocus(ScHandle);
-            InputModeSwitcher.SwitchToEnglishMode(ScHandle);
-
-            Debug.WriteLine($"让Scrcpy获得焦点，{hwnd}");
+            //if (DLL.GetFocus() == ScHandle)
+            if (_isScHasFouce)
+            {
+                bool isOk = btnFouce.Focus();
+                Debug.WriteLine($"F11，主程序获得焦点，{isOk}");
+            }
+            else
+            {
+                IntPtr hwnd = DLL.SetFocus(ScHandle);
+                Debug.WriteLine($"F11，让Scrcpy获得焦点，{hwnd}");
+            }
         }
 
 

@@ -100,7 +100,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         {
             if (nCode >= 0)
             {
-                MV.St = Stopwatch.StartNew();
+                //MV.St = Stopwatch.StartNew();
                 int vkCode = Marshal.ReadInt32(lParam);
                 bool isSysKey = SysHotkeys.Contains(vkCode);
                 bool isUserKey = UserHotkeys.Contains(vkCode);
@@ -115,12 +115,12 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
                     {
                         Application.Current.Dispatcher.BeginInvoke(() => MV.MainWin.ShortcutKey((Keys)vkCode));
                     }
-
+                    //Debug.WriteLine($"前台：{MV.St.ElapsedMilliseconds}ms");
                     // 拦截热键的按下和抬起，避免SC收到这些键
                     //return (IntPtr)1;
                 }
             }
-            Debug.WriteLine($"继续：{MV.St.ElapsedMilliseconds}ms");
+            //Debug.WriteLine($"继续：{MV.St.ElapsedMilliseconds}ms");
             return CallNextHookEx(_hookId, nCode, wParam, lParam);
         }
 
