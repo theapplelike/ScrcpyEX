@@ -35,11 +35,12 @@ namespace ScrcpyEX.View
         /// border和scrcpy相同大小，监听SDL的消息-x
         /// 虚拟屏幕
         /// 标题栏每个按钮快捷键-y
-        /// 记录连接过的手机，可以选择手机在连接时是否开启USB网络，adb实现
+        /// adb开启USB网络-y
         /// sc突然断线要清理资源-y
         /// 添加新的按键映射后更新到KMC_Hook的热键列表-y
         /// F11会触发安卓的截图，可以考虑拦截-y
-        /// sc有焦点时显示安卓图标
+        /// sc有焦点时显示图标-y
+        /// 缩放在竖屏下有问题
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -58,15 +59,15 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
-            await MyGM.Adb(@"shell svc usb setFunctions rndis");
+            //await MyGM.Adb(@"shell svc usb setFunctions rndis");
             //btnFouce.Focus();
             //InputLanguageManager.SetInputLanguage(gMain, new CultureInfo("en-US"));
             //CultureInfo info = InputLanguageManager.GetInputLanguage(btnFouce);
             //Debug.WriteLine($"语言：{info.Name}");
 
-            IntPtr fore = DLL.GetForegroundWindow();
-            IntPtr focus = DLL.GetFocus();
-            Debug.WriteLine($"GetFocus检查：{focus}，前台：{fore}");
+            //IntPtr fore = DLL.GetForegroundWindow();
+            //IntPtr focus = DLL.GetFocus();
+            //Debug.WriteLine($"GetFocus检查：{focus}，前台：{fore}");
         }
 
         /// <summary>

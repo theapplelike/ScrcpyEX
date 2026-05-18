@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ScrcpyEX.ViewModel
 {
@@ -61,6 +62,32 @@ namespace ScrcpyEX.ViewModel
             }
         }
         private double _scriptInterval = 5000;
+
+        /// <summary>
+        /// SC是否拥有键盘输入焦点。
+        /// </summary>
+        public bool IsScHasFouce
+        {
+            get => _isScHasFouce;
+            set
+            {
+                if (SetProperty(ref _isScHasFouce, value))
+                {
+                    IconVis = _isScHasFouce ? Visibility.Visible : Visibility.Hidden;
+                }
+            }
+        }
+        private bool _isScHasFouce = false;
+
+        /// <summary>
+        /// SC拥有键盘输入焦点时显示图标。
+        /// </summary>
+        public Visibility IconVis
+        {
+            get => _iconVis;
+            set => SetProperty(ref _iconVis, value);
+        }
+        private Visibility _iconVis = Visibility.Hidden;
 
 
     }

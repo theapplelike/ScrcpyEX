@@ -170,6 +170,13 @@ namespace ScrcpyEX.View
             }
         }
 
-
+        private void BtnHelp_Click(object sender, RoutedEventArgs e)
+        {
+            string desc = "执行组脚本时，如果其中第一个是计时脚本，则执行参数以第一个脚本为准。" +
+                "每次执行都会将其中所有脚本的点击操作执行一遍。" +
+                "如果第一个是图像脚本，则其中所有的脚本都需要是图像脚本，且有图像。" +
+                "如果有图像脚本包含（A，B），则会按照A-B-A-B的顺序比较图像相似度。";
+            MyGM.ShwInfo(desc);
+        }
     }
 }

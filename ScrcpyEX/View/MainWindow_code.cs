@@ -721,6 +721,14 @@ namespace ScrcpyEX.View
             return (IntPtr)lParam;
         }
 
+        /// <summary>
+        /// 通过ADB打开安卓的Remote NDIS。
+        /// </summary>
+        private async Task OpenRndis()
+        {
+            await MyGM.Adb(@"shell svc usb setFunctions rndis");
+        }
+
 
     }
 }

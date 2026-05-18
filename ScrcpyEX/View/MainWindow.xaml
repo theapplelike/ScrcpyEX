@@ -99,6 +99,7 @@
                     <TextBlock Text="功能菜单" Background="AliceBlue" Padding="10"/>
                     <!--&#xe9a1-->
                     <Button x:Name="btnRecScr" Click="BtnRecScr_Click" Style="{StaticResource ItemBtn}" Content="录制脚本(F4)"/>
+                    <Button x:Name="btnOpenRndis" Click="BtnOpenRndis_Click" Style="{StaticResource ItemBtn}" Content="打开USB网络共享(F9)"/>
                     <Button x:Name="btnScGotFocus" Click="BtnScGotFocus_Click" Style="{StaticResource ItemBtn}" Content="激活投屏输入(F11)"/>
 
                     <UniformGrid Rows="1" Columns="2">
@@ -175,6 +176,8 @@
             </StackPanel>
         </Grid>
 
+        <TextBlock Grid.Row="1" Text="&#xf0e2;" Visibility="{Binding IconVis}" Style="{StaticResource txtIcon}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+        
         <!--承载Scrcpy的Grid和Border不能设置固定大小，否则Scrcpy会错位-->
         <Grid x:Name="gShow" Grid.Row="1" Margin="5">
             <Border x:Name="bdShow" Background="Gray"/>

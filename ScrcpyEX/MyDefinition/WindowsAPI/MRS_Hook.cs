@@ -88,7 +88,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
             Point? point = MV.MainWin.GetPointInScrcpy();
             if (point is Point pt)
             {
-                _points.Add(new PointInfo(pt, 1.5));
+                _points.Add(new PointInfo(pt, _points.Count == 0 ? 0 : 1.5));
                 Debug.WriteLine($"添加点：{pt.X},{pt.Y}。");
             }
         }

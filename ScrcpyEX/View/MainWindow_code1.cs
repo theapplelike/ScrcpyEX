@@ -147,7 +147,7 @@ namespace ScrcpyEX.View
         {
             MRS_Hook.CancelHook();
             ShowKeyMapping();
-            bdRec.Visibility = Visibility.Hidden;
+            bdRec.Visibility = Visibility.Collapsed;
             popMid.Show("已停止录制操作。");
         }
 
@@ -418,7 +418,7 @@ namespace ScrcpyEX.View
         /// 触发快捷键。
         /// </summary>
         /// <param name="vkCode">虚拟键码。</param>
-        public void ShortcutKey(Keys vkCode)
+        public async void ShortcutKey(Keys vkCode)
         {
             switch (vkCode)
             {
@@ -430,6 +430,7 @@ namespace ScrcpyEX.View
                 case Keys.F6: new Setup().ShowDialog(); break;
                 case Keys.F7: OpenMenu(btnSizeOpt, popSize); break;
                 case Keys.F8: OpenMenu(btnFuncOpt, popFunc); break;
+                case Keys.F9: await OpenRndis(); break;
                 case Keys.F11: ScGotFocus(); break;
                 case Keys.F12: BtnTest_Click(null, null); break;
             }
@@ -518,8 +519,9 @@ namespace ScrcpyEX.View
         /// </summary>
         private void ScGotFocus()
         {
+            if (ScHandle == IntPtr.Zero) return;
             //if (DLL.GetFocus() == ScHandle)
-            if (_isScHasFouce)
+            if (_vm.IsScHasFouce)
             {
                 bool isOk = btnFouce.Focus();
                 Debug.WriteLine($"F11，主程序获得焦点，{isOk}");

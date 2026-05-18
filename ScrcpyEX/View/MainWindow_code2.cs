@@ -223,14 +223,17 @@ namespace ScrcpyEX.View
         /// <param name="isCheckExit">是否需要检查退出。</param>
         private async Task ExecuteClickScript(ScriptInfo info, IntPtr scHandle, bool isCheckExit = true)
         {
-            foreach (PointInfo p in info.PointInfos)
+            foreach (PointInfo pi in info.PointInfos)
             {
-                await Task.Delay(TimeSpan.FromSeconds(p.LastTime));
-                //Debug.WriteLine($"点击：{p.LastTime}-{p.Pt.X},{p.Pt.Y}");
+                if (pi.LastTime > 0)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(pi.LastTime));
+                }
+                //Debug.WriteLine($"点击：{pi.LastTime}-{pi.Pt.X},{pi.Pt.Y}");
 
                 //保存的坐标数据都是以默认尺寸为准，使用时需要乘以当前尺寸和默认尺寸的比例
-                int x = (int)(p.Pt.X * ScRatioX);
-                int y = (int)(p.Pt.Y * ScRatioY);
+                int x = (int)(pi.Pt.X * ScRatioX);
+                int y = (int)(pi.Pt.Y * ScRatioY);
                 //Debug.WriteLine($"比例:({ScRatioX},{ScRatioY})，实际点击:({x},{y})。");
 
                 IntPtr lp = new((y << 16) + x);

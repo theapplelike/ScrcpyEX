@@ -91,7 +91,7 @@ namespace ScrcpyEX.View
             if (obj is ScriptInfo info)
             {
                 _currScript = info;
-                cmbMultipleScript.Visibility = Visibility.Collapsed;
+                cmbMultipleScript.Visibility = Visibility.Hidden;
                 cmbMultipleScript.ItemsSource = null;
 
                 ValToUI(info);

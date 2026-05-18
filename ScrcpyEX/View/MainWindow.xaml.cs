@@ -174,14 +174,14 @@ namespace ScrcpyEX.View
 
         private void BtnFouce_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            _isScHasFouce = false;
+            _vm.IsScHasFouce = false;
             KMC_Hook.IsScHasFocus = false;
             //Debug.WriteLine($"主界面收到焦点");
         }
 
         private void BtnFouce_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            _isScHasFouce = true;
+            _vm.IsScHasFouce = true;
             KMC_Hook.IsScHasFocus = true;
             //Debug.WriteLine($"主界面失去焦点，可能焦点给到SC");
         }
@@ -228,6 +228,14 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
+        /// 打开Remote NDIS。
+        /// </summary>
+        private async void BtnOpenRndis_Click(object sender, RoutedEventArgs e)
+        {
+            await OpenRndis();
+        }
+
+        /// <summary>
         /// 打开无线调试。
         /// </summary>
         private void BtnOpenWireless_Click(object sender, RoutedEventArgs e)
@@ -264,6 +272,7 @@ namespace ScrcpyEX.View
         {
             MappingCancel();
         }
+
         #endregion
 
         

@@ -117,7 +117,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// Scrcpy是否拥有键盘输入焦点。
         /// </summary>
-        private bool _isScHasFouce = false;
+        //private bool _isScHasFouce = false;
 
         /// <summary>
         /// 窗口除开Scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
