@@ -135,16 +135,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         {
             StringBuilder sb = new();
 
-            //根据用户设置获得的命令行参数26.4.10
-            //foreach (PropertyInfo prop in typeof(MyCfg).GetProperties())
-            //{
-            //    string str = GetArg(prop.Name);
-            //    if (str != null && ConvToBool(prop.GetValue(MyCfg.Cfg)))
-            //    {
-            //        sb.Append($"{str} ");
-            //    }
-            //    Debug.WriteLine($"属性{prop.Name}：{prop.GetValue(MyCfg.Cfg)}，{GetArg(prop.Name)}。");
-            //}
+            //获得自定义命令行特性
             foreach (PropertyInfo prop in typeof(ScrcpySet).GetProperties())
             {
                 string arg = prop.GetCustomAttribute<CommandLineAttribute>().Arguments;
@@ -171,16 +162,6 @@ namespace ScrcpyEX.MyDefinition.MyClass
             Debug.WriteLine($"ScHost命令行：{sb}。");
             return sb.ToString();
         }
-
-        /// <summary>
-        /// 获得自定义命令行特性。属性（Property）的特性（Attribute），如果没有特性（Attribute）则返回null。
-        /// </summary>
-        /// <param name="prop">属性（Property）的名称。</param>
-        //private string GetArg(string prop)//26.4.10
-        //{
-        //    var info = typeof(ScrcpySet).GetProperty(prop).GetCustomAttribute<CommandLineAttribute>();
-        //    return info?.Arguments ?? null;
-        //}
 
         /// <summary>
         /// 判断传入的对象是否可以转化为bool，不能返回false，如果可以返回其bool值。

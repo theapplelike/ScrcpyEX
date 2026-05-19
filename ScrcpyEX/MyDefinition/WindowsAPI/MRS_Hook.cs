@@ -39,7 +39,6 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <returns>true--注册成功；false--注册失败。</returns>
         public static bool RegisterHook()
         {
-            //IntPtr hMod = GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName);
             IntPtr hMod = Marshal.GetHINSTANCE(typeof(MRS_Hook).Module);
             HookID = SetWindowsHookEx(WH_MOUSE_LL, HookCallback, hMod, 0);
 

@@ -28,15 +28,6 @@ namespace ScrcpyEX.View
     public partial class MainWindow//code
     {
         /// <summary>
-        /// 添加消息钩子监听程序的所有消息。
-        /// </summary>
-        //private void OnSourceInitialized(object sender, EventArgs e)
-        //{
-        //    //_hwndSource = PresentationSource.FromVisual(this) as HwndSource;
-        //    //_hwndSource?.AddHook(WndProc);
-        //}
-
-        /// <summary>
         /// 拦截和处理发送到窗口的所有Windows消息。
         /// </summary>
         /// <param name="hwnd">接收消息的窗口的句柄。</param>
@@ -107,7 +98,7 @@ namespace ScrcpyEX.View
 
             //添加消息钩子监听程序的所有消息
             _hwndSource = PresentationSource.FromVisual(this) as HwndSource;
-            _hwndSource?.AddHook(WndProc);
+            _hwndSource.AddHook(WndProc);
             _mainHandle = _hwndSource.Handle;
 
             //输入法设置为英文模式，通过焦点按钮实现
@@ -139,17 +130,17 @@ namespace ScrcpyEX.View
         {
             if (isUseLastSize && MyCfg.Cfg.Size.IsRecord)
             {
+                Top = MyCfg.Cfg.Size.Top;
+                Left = MyCfg.Cfg.Size.Left;
                 Width = MyCfg.Cfg.Size.Width;
                 Height = MyCfg.Cfg.Size.Height;
-                Left = MyCfg.Cfg.Size.Left;
-                Top = MyCfg.Cfg.Size.Top;
             }
             else
             {
+                Top = (SystemParameters.WorkArea.Height - ActualHeight) / 2;
+                Left = (SystemParameters.WorkArea.Width - ActualWidth) / 2;
                 Width = _scWidth + ExtraWidth;
                 Height = _scHeight + ExtraHeight;
-                Left = (SystemParameters.WorkArea.Width - ActualWidth) / 2;
-                Top = (SystemParameters.WorkArea.Height - ActualHeight) / 2;
             }
             //Debug.WriteLine($"窗体尺寸：{Width},{Height}。");
         }
@@ -183,10 +174,10 @@ namespace ScrcpyEX.View
             //窗体在正常状态下才记录其尺寸位置信息
             if (WindowState == WindowState.Normal)
             {
+                MyCfg.Cfg.Size.Top = Top;
+                MyCfg.Cfg.Size.Left = Left;
                 MyCfg.Cfg.Size.Width = Width;
                 MyCfg.Cfg.Size.Height = Height;
-                MyCfg.Cfg.Size.Left = Left;
-                MyCfg.Cfg.Size.Top = Top;
                 MyCfg.Cfg.Size.IsRecord = true;
             }
             MyCfg.Save();
@@ -231,7 +222,8 @@ namespace ScrcpyEX.View
             Process[] prc = Process.GetProcessesByName("Scrcpy");
             if (prc.Length > 0)
             {
-                prc[0].Kill();
+                prc[0].CloseMainWindow();
+                prc[0].Dispose();
             }
         }
 
@@ -246,13 +238,11 @@ namespace ScrcpyEX.View
 
             if (bdShow.Child != null)
             {
-                bool isActivate = Activate();
-
+                Activate();
                 CreateSavedPop(false, DLL.GetForegroundWindow() == _mainHandle);
-                //CreateSavedPop(false, isActivate);
                 InputModeSwitcher.SwitchToEnglishMode(ScHandle);
 
-                Debug.WriteLine($"-*-激活:{isActivate}，主:{_mainHandle}，SC:{ScHandle}");
+                Debug.WriteLine($"-*-激活:{IsActive}，主:{_mainHandle}，SC:{ScHandle}");
             }
         }
 
@@ -272,9 +262,9 @@ namespace ScrcpyEX.View
             else
             {
                 SaveTempSize();
+                Top = Left = 0;
                 Width = wd; 
                 Height = ht;
-                Left = Top = 0;
                 btnMaximize.Content = "\ue923";
             }
         }
@@ -282,7 +272,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 保存当前窗体的尺寸和位置到临时变量中。
         /// </summary>
-        private void SaveTempSize() => _tempSize = new(Width, Height, Left, Top);
+        private void SaveTempSize() => _tempSize = new(Top, Left, Width, Height);
 
         /// <summary>
         /// 应用临时变量中的窗体尺寸和位置。
@@ -296,10 +286,10 @@ namespace ScrcpyEX.View
                 return;
             }
 
+            Top = size.Top;
+            Left = size.Left;
             Width = size.Width;
             Height = size.Height;
-            Left = size.Left;
-            Top = size.Top;
         }
 
         /// <summary>
@@ -405,11 +395,11 @@ namespace ScrcpyEX.View
                 popMid.Show("未进行投屏，不能缩放尺寸。");
                 return;
             }
-            if (ScRatioX <= 0.25 || ScRatioY <= 0.25)
-            {
-                popMid.Show("不能再继续缩小。");
-                return;
-            }
+            //if (ScRatioX <= 0.25 || ScRatioY <= 0.25)
+            //{
+            //    popMid.Show("不能再继续缩小。");
+            //    return;
+            //}
 
             Width -= _horizontalRatio * step;
             Height -= _verticalRatio * step;
@@ -460,40 +450,12 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 从最小化恢复时可能导致Scrcpy窗口向左偏移，所以恢复时刷新Scrcpy窗口。
-        /// </summary>
-        //private void RefreshScrcpy()
-        //{
-        //    switch (WindowState)
-        //    {
-        //        case WindowState.Minimized:
-        //            //Debug.WriteLine("窗口已最小化");
-        //            break;
-        //        case WindowState.Normal:
-        //            //Debug.WriteLine("窗口已恢复正常状态");
-        //            _scrcpyHost?.RefreshScrcpy();
-        //            break;
-        //        case WindowState.Maximized:
-        //            //Debug.WriteLine("窗口已最大化");
-        //            break;
-        //    }
-        //}
-
-        /// <summary>
         /// 打开设备的无线调试功能，开启后可以无线连接，需要在同一个网络中。
         /// </summary>
         private async void WirelessDebug()
         {
             popMid.Show("请保持USB连接稳定。");
             await OpenWirelessDebug();
-            //if (await OpenWirelessDebug())
-            //{
-            //    popMid.Show("匹配完成，正在启动Scrcpy。");
-            //}
-            //else
-            //{
-            //    popMid.Show("没有USB连接的设备或设备未打开USB调试。");
-            //}
         }
 
         /// <summary>
@@ -669,6 +631,12 @@ namespace ScrcpyEX.View
         /// <param name="pop">需要打开的菜单。</param>
         private void OpenMenu(Button btn, Popup pop)
         {
+            if (pop.IsOpen)
+            {
+                pop.IsOpen = false;
+                return;
+            }
+
             if (ToolBar.GetIsOverflowItem(btn))
             {
                 pop.PlacementTarget = null;

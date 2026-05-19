@@ -31,7 +31,6 @@ namespace ScrcpyEX.View
         public MainWindow()
         {
             InitializeComponent();
-            //SourceInitialized += OnSourceInitialized;
             _vm = (MainWindowVM)DataContext;
         }
 
@@ -223,7 +222,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void BtnRecScr_Click(object sender, RoutedEventArgs e)
         {
-            StartRecord();
+            ScriptRecordSwitch();
             popFunc.IsOpen = false;
         }
 
@@ -232,6 +231,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private async void BtnOpenRndis_Click(object sender, RoutedEventArgs e)
         {
+            popFunc.IsOpen = false;
             await OpenRndis();
         }
 
@@ -251,7 +251,7 @@ namespace ScrcpyEX.View
 
         private void BtnScGotFocus_Click(object sender, RoutedEventArgs e)
         {
-            ScGotFocus();
+            ScFocusSwitch();
             popFunc.IsOpen = false;
         }
 

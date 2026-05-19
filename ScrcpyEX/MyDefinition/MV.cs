@@ -22,10 +22,7 @@ namespace ScrcpyEX.ExtensionMethod
     {
         static MV()
         {
-            if (!Directory.Exists(ScriptPath))
-            {
-                Directory.CreateDirectory(ScriptPath);
-            }
+            Directory.CreateDirectory(ScriptPath);
         }
 
         /// <summary>

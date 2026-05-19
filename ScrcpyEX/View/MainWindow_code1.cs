@@ -106,7 +106,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 注册鼠标钩子进行录制脚本操作，如果已注册鼠标钩子，则注销鼠标钩子并保存录制的脚本。
         /// </summary>
-        private void StartRecord()
+        private void ScriptRecordSwitch()
         {
             if (IsScClosed)
             {
@@ -425,13 +425,13 @@ namespace ScrcpyEX.View
                 case Keys.F1: StartScrcpy(true); break;
                 case Keys.F2: StartScrcpy(false); break;
                 case Keys.F3: CloseScrcpy(); break;
-                case Keys.F4: StartRecord(); break;
+                case Keys.F4: ScriptRecordSwitch(); break;
                 case Keys.F5: OpenRecordManage(); break;
                 case Keys.F6: new Setup().ShowDialog(); break;
                 case Keys.F7: OpenMenu(btnSizeOpt, popSize); break;
                 case Keys.F8: OpenMenu(btnFuncOpt, popFunc); break;
                 case Keys.F9: await OpenRndis(); break;
-                case Keys.F11: ScGotFocus(); break;
+                case Keys.F11: ScFocusSwitch(); break;
                 case Keys.F12: BtnTest_Click(null, null); break;
             }
         }
@@ -482,14 +482,14 @@ namespace ScrcpyEX.View
                 if (popFunc.IsOpen) { popFunc.IsOpen = false; }
             }
 
-            foreach (KeyMapping m in mappings)
+            foreach (KeyMapping mp in mappings)
             {
                 //根据现在的比例计算半径
                 double radius = PopupDiameter * MV.DpiScaleX / 2;
                 
                 //获得圆心坐标
-                int centreX = (int)(m.OffsetX * ratio * MV.DpiScaleX + radius);
-                int centreY = (int)(m.OffsetY * ratio * MV.DpiScaleY + radius);
+                int centreX = (int)(mp.OffsetX * ratio * MV.DpiScaleX + radius);
+                int centreY = (int)(mp.OffsetY * ratio * MV.DpiScaleY + radius);
 
                 IntPtr lp = new((centreY << 16) + centreX);
                 DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
@@ -517,7 +517,7 @@ namespace ScrcpyEX.View
         /// SC无输入焦点，则获得输入焦点；SC有输入焦点，主程序回收焦。
         /// SC有输入焦点时才能触发安卓的输入法，且电脑输入法需要是英文模式。
         /// </summary>
-        private void ScGotFocus()
+        private void ScFocusSwitch()
         {
             if (ScHandle == IntPtr.Zero) return;
             //if (DLL.GetFocus() == ScHandle)

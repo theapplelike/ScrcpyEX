@@ -41,6 +41,7 @@ namespace ScrcpyEX.View
         /// F11会触发安卓的截图，可以考虑拦截-y
         /// sc有焦点时显示图标-y
         /// 缩放在竖屏下有问题
+        /// 组图像脚本在手动比较的时候现在只传入了第一个
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -59,15 +60,7 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
-            //await MyGM.Adb(@"shell svc usb setFunctions rndis");
-            //btnFouce.Focus();
-            //InputLanguageManager.SetInputLanguage(gMain, new CultureInfo("en-US"));
-            //CultureInfo info = InputLanguageManager.GetInputLanguage(btnFouce);
-            //Debug.WriteLine($"语言：{info.Name}");
-
-            //IntPtr fore = DLL.GetForegroundWindow();
-            //IntPtr focus = DLL.GetFocus();
-            //Debug.WriteLine($"GetFocus检查：{focus}，前台：{fore}");
+            Debug.WriteLine($"窗口：{ActualWidth}，{ActualHeight}");
         }
 
         /// <summary>

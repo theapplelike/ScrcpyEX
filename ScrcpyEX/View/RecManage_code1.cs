@@ -173,7 +173,7 @@ namespace ScrcpyEX.View
         /// <param name="si">单脚本的引用。</param>
         private void SaveScriptInfo(ScriptInfo si)
         {
-            btnFouce.Focus();
+            btnFouce.Focus();//移走焦点，触发DataGrid的保存
             int.TryParse(txtCycleNum.Text, out int num);
             int.TryParse(txtCycleInterval.Text, out int interval);
             double.TryParse(txtSimilarity.Text, out double similarity);

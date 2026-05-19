@@ -22,6 +22,6 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 记录每组菜单是否展开的数组。
         /// </summary>
-        private bool[] _isExpands = [false, false];
+        private readonly bool[] _isExpands = [false, false];
     }
 }

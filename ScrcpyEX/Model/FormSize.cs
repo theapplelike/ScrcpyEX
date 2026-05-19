@@ -16,18 +16,28 @@ namespace ScrcpyEX.Model
         /// <summary>
         /// 初始化时提供尺寸和位置的值。
         /// </summary>
-        public FormSize(double width, double height, double left, double top)
+        public FormSize(double top, double left, double width, double height)
         {
+            Top = top;
+            Left = left;
             Width = width;
             Height = height;
-            Left = left;
-            Top = top;
         }
 
         /// <summary>
         /// 是否记录的有窗体的尺寸、位置信息。
         /// </summary>
         public bool IsRecord { get; set; } = false;
+
+        /// <summary>
+        /// 记录窗体的上侧距离。
+        /// </summary>
+        public double Top { get; set; }
+
+        /// <summary>
+        /// 记录窗体的左侧距离。
+        /// </summary>
+        public double Left { get; set; }
 
         /// <summary>
         /// 记录窗体的宽度。
@@ -39,14 +49,6 @@ namespace ScrcpyEX.Model
         /// </summary>
         public double Height { get; set; }
 
-        /// <summary>
-        /// 记录窗体的左侧距离。
-        /// </summary>
-        public double Left { get; set; }
 
-        /// <summary>
-        /// 记录窗体的上侧距离。
-        /// </summary>
-        public double Top { get; set; }
     }
 }

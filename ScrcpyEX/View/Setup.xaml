@@ -110,7 +110,7 @@
                         </CheckBox>
                         <Border/>
 
-                        <CheckBox IsChecked="{Binding Cfg.ScrcpySet.PowerOffOnClose}" Content="设备停止投屏时进入休眠"/>
+                        <CheckBox IsChecked="{Binding Cfg.ScrcpySet.PowerOffOnClose}" Content="停止投屏时设备进入休眠"/>
                         <Border/>
 
                         <CheckBox IsChecked="{Binding Cfg.ScrcpySet.DisablScreensaver}" Content="设备投屏时电脑禁用屏幕保护"/>

@@ -53,6 +53,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
             (int)Keys.F6,
             (int)Keys.F7,
             (int)Keys.F8,
+            (int)Keys.F9,
             (int)Keys.F11,
             (int)Keys.F12
         ];
@@ -68,7 +69,6 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <returns>true--注册成功；false--注册失败。</returns>
         public static bool RegisterHook(IntPtr mainHandle)
         {
-            //IntPtr hMod = GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName);
             IntPtr hMod = Marshal.GetHINSTANCE(typeof(KMC_Hook).Module);
             _hookId = SetWindowsHookEx(WH_KEYBOARD_LL, HookCallback, hMod, 0);
             _mainHandle = mainHandle;
