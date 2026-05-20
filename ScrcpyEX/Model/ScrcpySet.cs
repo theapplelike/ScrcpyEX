@@ -15,8 +15,14 @@ namespace ScrcpyEX.Model
         /// <summary>
         /// 保持清醒，防止设备进入休眠状态（无线连接时无效）。
         /// </summary>
-        [CommandLine("--stay-awake")]
-        public bool StayAwake { get; set; } = true;
+        //[CommandLine("--stay-awake")]
+        //public bool StayAwake { get; set; } = true;
+
+        /// <summary>
+        /// 保持活跃，为防止设备因长时间未活动而自动关闭，会定期向系统发送用户活动信号。
+        /// </summary>
+        [CommandLine("--keep-active")]
+        public bool KeepActive { get; set; } = true;
 
         /// <summary>
         /// 关闭屏幕，镜像时关闭设备屏幕，但不会进入休眠。

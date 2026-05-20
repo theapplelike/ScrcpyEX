@@ -168,7 +168,7 @@ namespace ScrcpyEX.View
 
         private void BtnImgCompare_Click(object sender, RoutedEventArgs e)
         {
-            ImgCompare(_scriptInfos[0]);
+            ImgCompare(_scriptInfos);
         }
 
         private void BtnFouce_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)

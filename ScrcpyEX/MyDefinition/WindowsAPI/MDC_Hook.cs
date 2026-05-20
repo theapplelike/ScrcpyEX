@@ -112,7 +112,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
                     {
                         Debug.WriteLine("目标窗口上检测到双击");
                         
-                        _lastClickTime = 0; // 重置状态，防止连续触发
+                        //_lastClickTime = 0; // 重置状态，防止连续触发
                         return (IntPtr)1;   // 吞掉双击的第二次点击
                     }
                 }

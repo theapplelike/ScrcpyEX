@@ -318,26 +318,42 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 在一个窗口中显示脚本和对比图像。
         /// </summary>
-        /// <param name="info">当前执行的脚本。</param>
-        private async void ImgCompare(ScriptInfo info)
+        /// <param name="infos">当前执行的脚本。</param>
+        private async void ImgCompare(List<ScriptInfo> infos)
         {
-            if (info.ImgName == "")
-            {
-                popMid.Show("此脚本未截取图片，不能进行比对。");
-                return;
-            }
+            //if (infos[0].ImgName == "")
+            //{
+            //    popMid.Show("不是图像脚本，不能进行比对。");
+            //    return;
+            //}
             
             try
             {
-                CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, info.CropRect);
-                if (scWindow == null)
+                List<BitmapSource> bmps = [];
+                foreach (ScriptInfo si in infos)
                 {
-                    popMid.Show("获取Scrcpy截图失败。");
-                    return;
+                    if (si.ImgName == "")
+                    {
+                        bmps.Add(null);
+                    }
+                    else
+                    {
+                        bmps.Add(await GetScriptImg(ScHandle, _mainHandle, si.CropRect));
+                    }
                 }
 
-                ShowImg showImg = new(info, scWindow);
+                ShowImg showImg = new(infos, bmps);
                 showImg.ShowDialog();
+
+                //CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, info.CropRect);
+                //if (scWindow == null)
+                //{
+                //    popMid.Show("获取Scrcpy截图失败。");
+                //    return;
+                //}
+
+                //ShowImg showImg = new(info, scWindow);
+                //showImg.ShowDialog();
             }
             catch (Exception ex)
             {

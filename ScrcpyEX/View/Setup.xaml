@@ -86,10 +86,10 @@
                         </Button.Content>
                     </Button>
                     <StackPanel x:Name="stp1" Tag="{Binding Tag1,Mode=TwoWay}" Grid.Row="1">
-                        <CheckBox IsChecked="{Binding Cfg.ScrcpySet.StayAwake}">
+                        <CheckBox IsChecked="{Binding Cfg.ScrcpySet.KeepActive}">
                             <StackPanel>
-                                <TextBlock Text="保持唤醒"/>
-                                <TextBlock Text="投屏时防止设备休眠，仅对有线连接有效" Style="{StaticResource tbkSmall}"/>
+                                <TextBlock Text="保持活跃"/>
+                                <TextBlock Text="防止设备因长时间未活动而自动关闭" Style="{StaticResource tbkSmall}"/>
                             </StackPanel>
                         </CheckBox>
                         <Border/>

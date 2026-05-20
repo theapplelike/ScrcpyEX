@@ -155,7 +155,10 @@ namespace ScrcpyEX.View
 
         private void Lst_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            EditScript(e.AddedItems[0]);
+            if (e.AddedItems.Count > 0)
+            {
+                EditScript(e.AddedItems[0]);
+            }
         }
 
         /// <summary>

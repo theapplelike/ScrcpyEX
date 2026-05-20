@@ -219,11 +219,11 @@ namespace ScrcpyEX.View
         /// </summary>
         private void CheckScrcpy()
         {
-            Process[] prc = Process.GetProcessesByName("Scrcpy");
-            if (prc.Length > 0)
+            Process[] prcs = Process.GetProcessesByName("Scrcpy");
+            foreach (Process prc in prcs)
             {
-                prc[0].CloseMainWindow();
-                prc[0].Dispose();
+                prc.CloseMainWindow();
+                prc.Dispose();
             }
         }
 

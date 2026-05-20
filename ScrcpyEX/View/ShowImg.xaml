@@ -5,20 +5,40 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ScrcpyEX.View"
         mc:Ignorable="d"
-        Title="图片详情" Height="450" Width="800" WindowStartupLocation="CenterScreen">
-    
-    <Grid Background="WhiteSmoke">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-        </Grid.RowDefinitions>
+        Title="图片详情" Width="800" Height="450" WindowStartupLocation="CenterScreen">
 
-        <UniformGrid x:Name="ufg" Rows="1">
-            <Image x:Name="img" Margin="5"/>
-        </UniformGrid>
+    <Window.Resources>
+        <Style x:Key="sepH" TargetType="Rectangle">
+            <Setter Property="Fill" Value="Gray"/>
+            <Setter Property="Height" Value="2"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+        </Style>
+        <Style x:Key="sepV" TargetType="Rectangle">
+            <Setter Property="Fill" Value="Gray"/>
+            <Setter Property="Width" Value="2"/>
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid x:Name="gMain" Background="WhiteSmoke">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
         
-        <TextBlock x:Name="tbkDesc" Text="脚本截图的起始坐标基于主程序左窗口上角，比对截图的起始坐标基于Scrcpy窗口左上角。" Grid.Row="1" Margin="10" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="tbkParam" Text="起始坐标" Grid.Row="2" Margin="10" HorizontalAlignment="Center"/>
+        <Grid x:Name="gOrig">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <Image x:Name="imgOrig" Margin="5"/>
+            <TextBlock x:Name="tbkOrigParam" Text="位置参数" Grid.Row="1" Margin="10" HorizontalAlignment="Center"/>
+        </Grid>
+
+        <Rectangle x:Name="sepV" Grid.Column="1" Grid.RowSpan="10" Style="{StaticResource sepV}"/>
+
     </Grid>
 </Window>

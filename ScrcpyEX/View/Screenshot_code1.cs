@@ -202,9 +202,10 @@ namespace ScrcpyEX.View
             //    _magnifierBitmap.Unlock();
             //}
 
+            //Popup控件的偏移和DPI相关，所以给出的原始值要与DPI无关
             (double left, double top) = GetLocation(PointToScreen(curPoint), 15);
-            popMagnifier.HorizontalOffset = left;
-            popMagnifier.VerticalOffset = top;
+            popMagnifier.HorizontalOffset = left / DpiScaleX;
+            popMagnifier.VerticalOffset = top / DpiScaleY;
         }
 
         /// <summary>

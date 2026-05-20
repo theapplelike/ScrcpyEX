@@ -41,7 +41,10 @@ namespace ScrcpyEX.View
         /// F11会触发安卓的截图，可以考虑拦截-y
         /// sc有焦点时显示图标-y
         /// 缩放在竖屏下有问题
-        /// 组图像脚本在手动比较的时候现在只传入了第一个
+        /// 组图像脚本在手动比较的时候现在只传入了第一个-y
+        /// 截图时放大镜在125%缩放的电脑偏移很大
+        /// mCurrentFocus=Window{cd57113 u0 com.bilibili.azurlane/com.manjuu.azurlane.MainActivity}
+        /// 图像脚本和自己组成组脚本，删除这个组脚本时会报错-y
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {

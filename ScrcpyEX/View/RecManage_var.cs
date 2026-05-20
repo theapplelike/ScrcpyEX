@@ -44,11 +44,6 @@ namespace ScrcpyEX.View
         private ScriptItem _lastItem = null;
 
         /// <summary>
-        /// 当前选中脚本的索引。
-        /// </summary>
-        //private int _index = -1;
-
-        /// <summary>
         /// ListBox项拖动起点。
         /// </summary>
         private Point _dragStartPoint;
@@ -57,11 +52,6 @@ namespace ScrcpyEX.View
         /// ListBox中按下时的源项。
         /// </summary>
         private ListBoxItem _dragSourceItem;
-
-        /// <summary>
-        /// 当前选中的脚本信息。
-        /// </summary>
-        //public ScriptItem CurrSc { get; set; } = null;
 
         /// <summary>
         /// 当前选中的脚本项的引用，使用时需要判断是单脚本还是组脚本。

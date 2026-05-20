@@ -67,16 +67,6 @@ namespace ScrcpyEX.ExtensionMethod
         }
 
         /// <summary>
-        /// 无线连接的IP地址。
-        /// </summary>
-        //public string IP { get; set; }
-
-        /// <summary>
-        /// 无线连接的端口号。
-        /// </summary>
-        //public string Port { get; set; } = "5555";
-
-        /// <summary>
         /// 定位到左上角。
         /// </summary>
         public bool Locate1 { get; set; } = false;
@@ -100,11 +90,6 @@ namespace ScrcpyEX.ExtensionMethod
         /// 记录窗体尺寸、位置信息。
         /// </summary>
         public FormSize Size { get; set; } = new();
-
-        /// <summary>
-        /// 录制操作信息的集合。
-        /// </summary>
-        //public List<ScriptInfo> RecInfos { get; set; } = [];
 
         /// <summary>
         /// 脚本信息的集合。
@@ -140,36 +125,6 @@ namespace ScrcpyEX.ExtensionMethod
         /// 是否允许程序边缘调整大小。
         /// </summary>
         public bool IsCanResize { get; set; } = false;
-
-        /// <summary>
-        /// 保持清醒，防止设备进入休眠状态（无线连接时无效）。
-        /// </summary>
-        //[CommandLine("--stay-awake")]
-        //public bool StayAwake { get; set; }
-        //
-        ///// <summary>
-        ///// 关闭屏幕，镜像时关闭设备屏幕，但不会进入休眠。
-        ///// </summary>
-        //[CommandLine("--turn-screen-off")]
-        //public bool OffScreen { get; set; }
-        //
-        ///// <summary>
-        ///// 显示触控，镜像时手指在触碰设备的地方显示接触点。
-        ///// </summary>
-        //[CommandLine("--show-touches")]
-        //public bool ShowTouches { get; set; }
-        //
-        ///// <summary>
-        ///// 停止镜像时关闭设备屏幕，让设备进入休眠状态。
-        ///// </summary>
-        //[CommandLine("--power-off-on-close")]
-        //public bool DeviceSleep { get; set; }
-        //
-        ///// <summary>
-        ///// Scrcpy运行时禁用屏幕保护。
-        ///// </summary>
-        //[CommandLine("--disable-screensaver")]
-        //public bool Disablecreensaver { get; set; }
 
 
     }
