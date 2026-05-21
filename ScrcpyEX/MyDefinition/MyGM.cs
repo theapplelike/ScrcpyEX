@@ -1,4 +1,5 @@
 ﻿using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace ScrcpyEX.MyDefinition
+namespace ScrcpyEX.MyDefinition.WindowsAPI
 {
     /// <summary>
     /// 系统的DLL声明在此类中。

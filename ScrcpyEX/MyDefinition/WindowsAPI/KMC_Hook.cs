@@ -1,17 +1,9 @@
 ﻿using ScrcpyEX.ExtensionMethod;
-using ScrcpyEX.MyDefinition.MyClass;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection.Emit;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Input;
+using static ScrcpyEX.MyDefinition.WindowsAPI.DLL;
 using static ScrcpyEX.MyDefinition.WindowsAPI.HookDLL;
 using Application = System.Windows.Application;
 
@@ -104,7 +96,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
                 bool isSysKey = SysHotkeys.Contains(vkCode);
                 bool isUserKey = UserHotkeys.Contains(vkCode);
 
-                if ((isSysKey || isUserKey) && DLL.GetForegroundWindow() == _mainHandle)
+                if ((isSysKey || isUserKey) && GetForegroundWindow() == _mainHandle)
                 {
                     //if (isUserKey && (int)wParam == WM.KEYDOWN && MV.MainWin.ScHandle != IntPtr.Zero)
                     if (isUserKey)

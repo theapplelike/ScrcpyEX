@@ -1,16 +1,10 @@
-﻿using Microsoft.Win32;
-using ScrcpyEX.ExtensionMethod;
+﻿using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
 using static ScrcpyEX.MyDefinition.WindowsAPI.HookDLL;
 
 namespace ScrcpyEX.MyDefinition.WindowsAPI

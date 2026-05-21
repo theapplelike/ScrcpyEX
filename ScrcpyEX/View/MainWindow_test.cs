@@ -45,6 +45,8 @@ namespace ScrcpyEX.View
         /// 截图时放大镜在125%缩放的电脑偏移很大
         /// mCurrentFocus=Window{cd57113 u0 com.bilibili.azurlane/com.manjuu.azurlane.MainActivity}
         /// 图像脚本和自己组成组脚本，删除这个组脚本时会报错-y
+        /// 横屏时拦截双击体验差，能否只拦截黑色区域的双击-会有20ms左右的延迟
+        /// 双击黑边SC会消失但不会关闭-目前SC消失时不能获得消息，使用双击拦截临时解决
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {

@@ -425,11 +425,13 @@ namespace ScrcpyEX.View
             }
             else if (Width + _horizontalRatio * step > SystemParameters.WorkArea.Width)
             {
-                Width = SystemParameters.WorkArea.Width;
+                //Width = SystemParameters.WorkArea.Width;
+                Debug.WriteLine($"最大宽：{SystemParameters.WorkArea.Width}");
             }
             else
             {
-                Width += _horizontalRatio * step;
+                //Width += _horizontalRatio * step;
+                Debug.WriteLine($"理论宽度：{Width + _horizontalRatio * step}");
             }
 
             if (ScRatioY >= 1.5)
@@ -438,15 +440,17 @@ namespace ScrcpyEX.View
             }
             else if (Height + _verticalRatio * step > SystemParameters.WorkArea.Height)
             {
-                Height = SystemParameters.WorkArea.Height;
+                //Height = SystemParameters.WorkArea.Height;
+                Debug.WriteLine($"最大高：{SystemParameters.WorkArea.Height}");
             }
             else
             {
-                Height += _verticalRatio * step;
+                //Height += _verticalRatio * step;
+                Debug.WriteLine($"理论高度：{Height + _verticalRatio * step}");
             }
 
-            Locate();
-            RemoveScBlack();
+            //Locate();
+            //RemoveScBlack();
         }
 
         /// <summary>

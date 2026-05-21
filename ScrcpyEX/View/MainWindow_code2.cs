@@ -64,6 +64,7 @@ namespace ScrcpyEX.View
             int max = GetGreatestCommonDivisor(a, b);
             _horizontalRatio = a / max;
             _verticalRatio = b / max;
+            MDC_Hook.Enable = a < b;
 
             return $"比例 {a / max}:{b / max}";
         }
