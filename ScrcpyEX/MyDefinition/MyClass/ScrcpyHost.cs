@@ -322,7 +322,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 DLL.MoveWindow(_scHandle, 0, 0, (int)rcBoundingBox.Width, (int)rcBoundingBox.Height, true);
                 base.OnWindowPositionChanged(rcBoundingBox);
 
-                Debug.WriteLine("InternalHwndHost：Scrcpy尺寸修改");
+                //Debug.WriteLine("InternalHwndHost：Scrcpy尺寸修改");
             }
 
             /// <summary>

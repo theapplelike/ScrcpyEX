@@ -95,14 +95,19 @@ namespace ScrcpyEX.View
         private readonly int _scWidth = 960, _scHeight = 448;
 
         /// <summary>
-        /// 投屏分辨率的水平比例。
+        /// SC投屏水平方向分辨率。
         /// </summary>
-        private int _horizontalRatio;
+        private int _horizontalReso;
 
         /// <summary>
-        /// 投屏分辨率的垂直比例。
+        /// SC投屏垂直方向分辨率。
         /// </summary>
-        private int _verticalRatio;
+        private int _verticalReso;
+
+        /// <summary>
+        /// 分辨率比例，由长边除以短边得到，reso->resolution。
+        /// </summary>
+        private double _resoRatio = 0;
 
         /// <summary>
         /// 保存已选中的脚本。

@@ -301,33 +301,43 @@ namespace ScrcpyEX.View
             if ((bool)rdoLoc1.IsChecked)
             {
                 //Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
-                Left = 0;
                 Top = 0;
+                Left = 0;
             }
             else if ((bool)rdoLoc2.IsChecked)
             {
-                Left = SystemParameters.WorkArea.Width - Width - 3;//完全贴合右边会导致截图脚本有偏移
                 Top = 0;
+                Left = SystemParameters.WorkArea.Width - Width - 3;//完全贴合右边会导致截图脚本有偏移
             }
             else if ((bool)rdoLoc3.IsChecked)
             {
-                Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
                 Top = SystemParameters.WorkArea.Height - Height;
+                Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
             }
             else if ((bool)rdoLoc4.IsChecked)
             {
-                Left = SystemParameters.WorkArea.Width - Width;
                 Top = SystemParameters.WorkArea.Height - Height;
+                Left = SystemParameters.WorkArea.Width - Width;
             }
         }
 
         /// <summary>
-        /// 窗体宽度修改为屏幕的四分之一并移动定位，高度根据15:7调整。
+        /// 窗体宽度修改为屏幕的四分之一并移动定位，高度根据短比调整。
         /// </summary>
         private void QuarterMove()
         {
+            double ratio;
+            if (_verticalReso > _horizontalReso)
+            {
+                ratio = 1.0 * _horizontalReso / _verticalReso;
+            }
+            else
+            {
+                ratio = 1.0 * _verticalReso / _horizontalReso;
+            }
+
             Width = SystemParameters.WorkArea.Width / 2;
-            Height = (Width - ExtraWidth) * 1.0 / 15 * 7 + ExtraHeight;
+            Height = (Width - ExtraWidth) * ratio + ExtraHeight;
             Locate();
         }
 
@@ -349,108 +359,131 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 消除Scrcpy的黑边。
         /// </summary>
-        /// <param name="isForcedAdjustment">是否强制调整黑边，如果为false则根据设置判断是否调整。</param>
-        private void RemoveScBlack(bool isForcedAdjustment = false)
+        private void RemoveScBlack()
         {
             if (IsScClosed)
             {
                 popMid.Show("未投屏，无需消除黑边。");
                 return;
             }
-            if (!isForcedAdjustment && MyCfg.Cfg.IsKeepLandscape)
+
+            if (MyCfg.Cfg.IsKeepLandscape)
             {
-                return;
+                double hope = ScActualHeight * _resoRatio + ExtraWidth;
+                if (hope < 0) return;
+
+                Width = hope;
+                Debug.WriteLine($"保持横屏，调整宽度，期望：{hope}，实际：{ActualWidth}");
             }
-
-            int scWidth = (int)ScActualWidth;
-            int scHeight = (int)ScActualHeight;
-            int max = GetGreatestCommonDivisor(scWidth, scHeight);
-
-            int xProportion = scWidth / max;
-            int yProportion = scHeight / max;
-            Debug.WriteLine($"消除黑边,当前Scrcpy的比例：({ScActualWidth / max}，{ScActualHeight / max})，期望比例:({_horizontalRatio},{_verticalRatio})。");
-            Debug.WriteLine($"当前Scrcpy的宽高：({ScActualWidth},{ScActualHeight})，\n和原始大小的比例：{ScRatioX}，{ScRatioY}");
-
-            //计算通分后的分子，如果标准分子大，应以宽为准，调整高度；反之调整宽度
-            int currentNumerator = xProportion * _verticalRatio;
-            int standardNumerator = yProportion * _horizontalRatio;
-            if (currentNumerator > standardNumerator)
+            else if (_horizontalReso < _verticalReso)
             {
-                Width = ScActualHeight / _verticalRatio * _horizontalRatio + ExtraWidth;
+                double currResoRatio = ScActualHeight / ScActualWidth;
+                if (currResoRatio > _resoRatio)
+                {
+                    Debug.WriteLine($"竖屏，上下有黑边，{currResoRatio}");
+                    AdjustHeight();
+                }
+                else
+                {
+                    Debug.WriteLine($"竖屏，左右有黑边，{currResoRatio}");
+                    AdjustWidth();
+                }
             }
-            else if (currentNumerator < standardNumerator)
+            else
             {
-                Height = ScActualWidth / _horizontalRatio * _verticalRatio + ExtraHeight;
+                double currResoRatio = ScActualWidth / ScActualHeight;
+                if (currResoRatio < _resoRatio)
+                {
+                    Debug.WriteLine($"横屏，上下有黑边，{currResoRatio}");
+                    AdjustHeight();
+                }
+                else
+                {
+                    Debug.WriteLine($"横屏，左右有黑边，{currResoRatio}");
+                    AdjustWidth();
+                }
             }
         }
 
         /// <summary>
-        /// 缩小指定步长的尺寸，以15:7为标准。
+        /// 黑边在上下，调整高度。
         /// </summary>
-        /// <param name="step">步长，默认为8。</param>
-        private void ReduceSize(int step = 8)
+        private void AdjustHeight()
+        {
+            double ratio = _verticalReso * 1.0 / _horizontalReso;
+            Height = ScActualWidth * ratio + ExtraHeight;
+            Debug.WriteLine($"调整高度：{ratio}，期望：{ScActualWidth * ratio + ExtraHeight}，实际：{ActualHeight}");
+        }
+
+        /// <summary>
+        /// 黑边在左右，调整宽度。
+        /// </summary>
+        private void AdjustWidth()
+        {
+            double ratio = _horizontalReso * 1.0 / _verticalReso;
+            Width = ScActualHeight * ratio + ExtraWidth;
+            Debug.WriteLine($"调整宽度：{ratio}，期望：{ScActualHeight * ratio + ExtraWidth}，实际：{ActualWidth}");
+        }
+
+        /// <summary>
+        /// 缩小程序指定步长的尺寸，以 宽边/短边 为步长基准。
+        /// </summary>
+        /// <param name="step">步长。</param>
+        private void ReduceSize(int step = 50)
         {
             if (IsScClosed)
             {
                 popMid.Show("未进行投屏，不能缩放尺寸。");
                 return;
             }
-            //if (ScRatioX <= 0.25 || ScRatioY <= 0.25)
-            //{
-            //    popMid.Show("不能再继续缩小。");
-            //    return;
-            //}
 
-            Width -= _horizontalRatio * step;
-            Height -= _verticalRatio * step;
+            double tgtWd = Width - _resoRatio * step;
+            double tgtHt = Height - step;
+            
+            if (tgtWd < 0 || tgtHt < 0)
+            {
+                return;
+            }
+
+            Width = tgtWd;
+            Height = tgtHt;
+            Debug.WriteLine($"缩小期望宽高：({tgtWd},{tgtHt})，实际：({ActualWidth},{ActualHeight})");
             Locate();
             RemoveScBlack();
         }
 
         /// <summary>
-        /// 放大指定步长的尺寸，以15:7为标准。
+        /// 放大程序指定步长的尺寸，以 宽边/短边 为步长基准。
         /// </summary>
-        /// <param name="step">步长，默认为8。</param>
-        private void AmplifySize(int step = 8)
+        /// <param name="step">步长。</param>
+        private void AmplifySize(int step = 50)
         {
             if (IsScClosed)
             {
                 popMid.Show("未进行投屏，不能缩放尺寸。");
                 return;
             }
-            if (ScRatioX >= 1.5)
+
+            if (Width + _resoRatio * step > SystemParameters.WorkArea.Width)
             {
-                popMid.Show("不能再继续放大。");
-                return;
-            }
-            else if (Width + _horizontalRatio * step > SystemParameters.WorkArea.Width)
-            {
-                //Width = SystemParameters.WorkArea.Width;
-                Debug.WriteLine($"最大宽：{SystemParameters.WorkArea.Width}");
+                Width = SystemParameters.WorkArea.Width;
             }
             else
             {
-                //Width += _horizontalRatio * step;
-                Debug.WriteLine($"理论宽度：{Width + _horizontalRatio * step}");
+                Width += _resoRatio * step;
             }
-
-            if (ScRatioY >= 1.5)
+            if (Height + step > SystemParameters.WorkArea.Height)
             {
-                //Y轴不能再放大
-            }
-            else if (Height + _verticalRatio * step > SystemParameters.WorkArea.Height)
-            {
-                //Height = SystemParameters.WorkArea.Height;
-                Debug.WriteLine($"最大高：{SystemParameters.WorkArea.Height}");
+                Height = SystemParameters.WorkArea.Height;
             }
             else
             {
-                //Height += _verticalRatio * step;
-                Debug.WriteLine($"理论高度：{Height + _verticalRatio * step}");
+                Height += step;
             }
+            Debug.WriteLine($"放大后：{ActualWidth},{ActualHeight}");
 
-            //Locate();
-            //RemoveScBlack();
+            Locate();
+            RemoveScBlack();
         }
 
         /// <summary>
@@ -698,6 +731,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private async Task OpenRndis()
         {
+            MyGM.POP("正在打开USB网络共享");
             await MyGM.Adb(@"shell svc usb setFunctions rndis");
         }
 

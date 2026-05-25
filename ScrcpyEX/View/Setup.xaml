@@ -147,7 +147,7 @@
                         <CheckBox IsChecked="{Binding Cfg.IsKeepLandscape}">
                             <StackPanel>
                                 <TextBlock Text="是否保持横屏"/>
-                                <TextBlock Text="除了手动消除黑边，其他操作不会自动消除黑边" Style="{StaticResource tbkSmall}"/>
+                                <TextBlock Text="消除黑边时始终保持横屏比例" Style="{StaticResource tbkSmall}"/>
                             </StackPanel>
                         </CheckBox>
                         <Border/>

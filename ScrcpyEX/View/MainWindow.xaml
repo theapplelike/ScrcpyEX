@@ -9,7 +9,7 @@
         xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel" 
         xmlns:mycontrol="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
-        Title="MainWindow" Width="970" Height="493" MinWidth="145" MinHeight="108"
+        Title="MainWindow" Width="970" Height="493"
         WindowStartupLocation="CenterScreen" UseLayoutRounding="True" SnapsToDevicePixels="True"
         Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged"
         StateChanged="Window_StateChanged" Activated="Window_Activated" Deactivated="Window_Deactivated"
@@ -20,7 +20,7 @@
     </Window.DataContext>
 
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False" ResizeBorderThickness="3,0,3,3"/>
+        <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False" ResizeBorderThickness="3,2,3,3"/>
     </WindowChrome.WindowChrome>
 
     <Window.Resources>

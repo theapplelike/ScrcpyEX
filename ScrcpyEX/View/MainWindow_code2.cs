@@ -51,37 +51,38 @@ namespace ScrcpyEX.View
             Regex reg = new("[0-9]+");
             MatchCollection mc = reg.Matches(texture);
 
-            _vm.Resolution = $"投屏分辨率 {mc[0].Value}*{mc[1].Value}，{GetResolutionRatio(mc)}";
+            _vm.Resolution = GetResolutionRatio(mc);
         }
 
         /// <summary>
-        /// 获得分辨率的最小比例值、宽和高的比例。
+        /// 获得分辨率和比值。
         /// </summary>
         private string GetResolutionRatio(MatchCollection mc)
         {
             int.TryParse(mc[0].Value, out int a);
             int.TryParse(mc[1].Value, out int b);
-            int max = GetGreatestCommonDivisor(a, b);
-            _horizontalRatio = a / max;
-            _verticalRatio = b / max;
+            //int max = GetGreatestCommonDivisor(a, b);
+            _verticalReso = b;
+            _horizontalReso = a;
+            _resoRatio = a > b ? a * 1.0 / b : b * 1.0 / a;
             MDC_Hook.Enable = a < b;
 
-            return $"比例 {a / max}:{b / max}";
+            return $"投屏分辨率 {a}*{b}，比值 {_resoRatio:F2}";
         }
 
         /// <summary>
         /// 获得最大公约数。
         /// </summary>
-        private int GetGreatestCommonDivisor(int a, int b)
-        {
-            if (a < b)
-            {
-                a += b;
-                b = a - b;
-                a -= b;
-            }
-            return (a % b == 0) ? b : GetGreatestCommonDivisor(a % b, b);
-        }
+        //private int GetGreatestCommonDivisor(int a, int b)
+        //{
+        //    if (a < b)
+        //    {
+        //        a += b;
+        //        b = a - b;
+        //        a -= b;
+        //    }
+        //    return (a % b == 0) ? b : GetGreatestCommonDivisor(a % b, b);
+        //}
 
         /// <summary>
         /// 设置计时器。DispatcherTimer计时器有一个特性，如果已经启动，
