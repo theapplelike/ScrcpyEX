@@ -509,7 +509,7 @@ namespace ScrcpyEX.View
                 {
                     //获得指定设备IP，awk 是一个文本处理工具，按行处理文本
                     //{print $9}表示打印每一行的第9个字段，字段默认以空格或制表符分隔
-                    string ip = (await MyGM.Adb($@"-s {dev} shell ip route | awk '{{print $9}}'")).Trim();
+                    string ip = (await MyGM.AdbAsync($@"-s {dev} shell ip route | awk '{{print $9}}'")).Trim();
                     if (ip == "")
                     {
                         popMid.Show("未获得设备IP地址，请检查是否在同一网络中。");
@@ -517,10 +517,10 @@ namespace ScrcpyEX.View
                     }
 
                     //将安卓设备上的 ADB 服务从 USB 模式切换为网络模式
-                    await MyGM.Adb($"-s {dev} tcpip 5555");
+                    await MyGM.AdbAsync($"-s {dev} tcpip 5555");
 
                     //连接指定 IP 地址和端口上的 Android 设备，须在同一局域网中
-                    await MyGM.Adb($"connect {ip}:5555");
+                    await MyGM.AdbAsync($"connect {ip}:5555");
 
                     CloseScrcpy();
                     await Task.Delay(1000);
@@ -541,7 +541,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private async Task<List<string>> GetAdbDevices()
         {
-            string output = await MyGM.Adb("devices");
+            string output = await MyGM.AdbAsync("devices");
             return [.. output
                 .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
                 .Where(line => !line.StartsWith("List of devices") && !string.IsNullOrWhiteSpace(line))
@@ -732,7 +732,16 @@ namespace ScrcpyEX.View
         private async Task OpenRndis()
         {
             MyGM.POP("正在打开USB网络共享");
-            await MyGM.Adb(@"shell svc usb setFunctions rndis");
+
+            string str = await MyGM.AdbAsync("shell svc usb setFunctions rndis", true);
+            if (string.IsNullOrWhiteSpace(str))
+            {
+                MyGM.POP("USB网络共享打开成功");
+            }
+            else
+            {
+                MyGM.ShwError($"错误流信息：\n{str}", "ADB命令执行失败");
+            }
         }
 
 

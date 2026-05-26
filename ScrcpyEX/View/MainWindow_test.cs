@@ -68,25 +68,7 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
-            //double currResoRatio = ScActualWidth > ScActualHeight ? ScActualWidth / ScActualHeight : ScActualHeight / ScActualWidth;
-            double currResoRatio = ScActualWidth / ScActualHeight;
 
-            Debug.WriteLine($"比值：{currResoRatio}--{_resoRatio}");
-            if (currResoRatio < _resoRatio)
-            {
-                Debug.WriteLine($"宽度变大");
-
-                //double ratio = _horizontalReso * 1.0 / _verticalReso;
-                Width = ScActualHeight * _resoRatio + ExtraWidth;
-                Debug.WriteLine($"调整宽度，期望：{ScActualHeight * _resoRatio + ExtraWidth}，实际：{ActualWidth}");
-            }
-            else
-            {
-                Debug.WriteLine($"宽度缩小");
-                Width = ScActualHeight * _resoRatio + ExtraWidth;
-                Debug.WriteLine($"调整宽度，期望：{ScActualHeight * _resoRatio + ExtraWidth}，实际：{ActualWidth}");
-
-            }
         }
 
         /// <summary>
@@ -128,49 +110,6 @@ namespace ScrcpyEX.View
         //    await Task.Delay(1);
         //}
 
-        //static Process _adbPrc = null;
-        //static StreamWriter sw = null;
-        /// <summary>
-        /// 启动cmd再启动adb发送命令，只有第一次会相应，之后不能响应可能是写入流第一次后就关闭了。
-        /// </summary>
-        //private async Task AdbTest2(double x, double y)
-        //{
-        //    //string adbClickCommand = $"shell input tap {x} {y}";
-        //    string adbClickCommand = $"{MV.ADB_Path} shell input tap {x} {y}";
-        //    //string command = $"{MV.ADB_Path} shell input touchscreen swipe 100 101 100 100 10";
-        //
-        //    if (_adbPrc == null)
-        //    {
-        //        // 创建一个新的进程启动信息
-        //        ProcessStartInfo processStartInfo = new()
-        //        {
-        //            FileName = "cmd.exe",         //使用命令提示符来执行ADB命令
-        //            Arguments = $"/c {adbClickCommand}",    //(/c)表示执行完命令后关闭命令行窗口
-        //            RedirectStandardOutput = true, // 重定向输出
-        //            RedirectStandardError = true,  // 重定向错误
-        //            RedirectStandardInput = true,  //重定向输入
-        //            UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
-        //            CreateNoWindow = true,          // 不创建窗口
-        //        };
-        //        _adbPrc = Process.Start(processStartInfo);
-        //
-        //        sw = _adbPrc.StandardInput;
-        //        sw.Write(adbClickCommand);
-        //        Debug.WriteLine($"创建adb,{sw.BaseStream.CanWrite}.");
-        //    }
-        //    else
-        //    {
-        //        sw = _adbPrc.StandardInput;
-        //        sw.Write(adbClickCommand);
-        //        Debug.WriteLine($"对adb发送命令,{sw.BaseStream.CanWrite}.");
-        //    }
-        //
-        //    string output = _adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
-        //    string Error = _adbPrc.StandardError.ReadToEnd();
-        //    await Task.Delay(1);
-        //    Debug.WriteLine($"输出：{output}。  错误：{Error}。{_adbPrc.HasExited}。");
-        //}
-
         /// <summary>
         /// 通过端口发送命令。
         /// </summary>
@@ -188,49 +127,23 @@ namespace ScrcpyEX.View
         //
         //    communicator.Disconnect();
         //}
-
-        /// <summary>
-        /// 据说可以降低延迟，但权限被拒绝：sendevent: /dev/input/event2: Permission denied。
-        /// </summary>
-        //private async Task AdbTest4(double x, double y)
+        
+        //private void AdbPersistent()
         //{
-        //    StringBuilder sb = new();
-        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 1 $((0x14a)) 1");
-        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x30)) $((0x15))");
-        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x39)) 0");
-        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x35)) {x}");
-        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 3 $((0x36)) {y}");
-        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 2 0");
-        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 0 0");
-        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 1 $((0x14a)) 0");
-        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 2 0");
-        //    sb.AppendLine($"{MV.ADB_Path} shell sendevent /dev/input/event2 0 0 0");
-        //
-        //    // 创建一个新的进程启动信息
-        //    ProcessStartInfo processStartInfo = new()
+        //    if (_persistentShell == null)
         //    {
-        //        FileName = "cmd.exe",         //使用命令提示符来执行ADB命令
-        //        Arguments = $"/c {sb}",    //(/c)表示执行完命令后关闭命令行窗口
-        //        RedirectStandardOutput = true, // 重定向输出
-        //        RedirectStandardError = true,  // 重定向错误
-        //        RedirectStandardInput = true,  //重定向输入
-        //        UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
-        //        CreateNoWindow = true,          // 不创建窗口
-        //    };
-        //    Process adbPrc = Process.Start(processStartInfo);
-        //    Debug.WriteLine($"创建adb.");
-        //
-        //    string output = adbPrc.StandardOutput.ReadToEnd(); // 读取标准输出（可选
-        //    string Error = adbPrc.StandardError.ReadToEnd();
-        //    await Task.Delay(1);
-        //    Debug.WriteLine($"输出：{output}。错误：{Error}。{adbPrc.HasExited}。");
+        //        InitPersistentShell();
+        //    }
+        //    CheckInputShown();
         //}
-
-        // 初始化持久化 shell
-        //private static Process _persistentShell;
+        //
+        //private static Process _persistentShell = null;
         //private static StreamWriter _shellWriter;
         //private static StreamReader _shellReader;
         //
+        ///// <summary>
+        ///// 初始化持久化 shell。
+        ///// </summary>
         //private void InitPersistentShell()
         //{
         //    _persistentShell = new Process
@@ -238,7 +151,7 @@ namespace ScrcpyEX.View
         //        StartInfo = new ProcessStartInfo
         //        {
         //            FileName = MV.ADB_Path,
-        //            Arguments = "shell",
+        //            Arguments = "shell",//让adb启动一个持久的远程shell会话
         //            UseShellExecute = false,
         //            RedirectStandardInput = true,
         //            RedirectStandardOutput = true,
@@ -251,7 +164,10 @@ namespace ScrcpyEX.View
         //    _shellReader = _persistentShell.StandardOutput;
         //}
         //
-        //// 发送命令并读取直到特定结束标记
+        ///// <summary>
+        ///// 发送命令并读取直到特定结束标记
+        ///// </summary>
+        ///// <returns></returns>
         //private bool CheckInputShown()
         //{
         //    // 发送命令，末尾加一个唯一 echo 标记来定位结束行
@@ -260,17 +176,18 @@ namespace ScrcpyEX.View
         //    _shellWriter.Flush();
         //
         //    string line;
-        //    
         //    while ((line = _shellReader.ReadLine()) != null)
         //    {
         //        if (line.Contains(marker))
+        //        {
+        //            Debug.WriteLine($"跳出循环，{line}");
         //            break;
+        //        } 
         //        if (line.Contains("mInputShown=true"))
         //        {
         //            Debug.WriteLine($"输出行：{line}");
         //            return true;
         //        }
-        //            
         //    }
         //    
         //    return false;

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using static System.Net.WebRequestMethods;
 
 namespace ScrcpyEX.MyDefinition
 {
@@ -361,11 +363,46 @@ namespace ScrcpyEX.MyDefinition
         /// </summary>
         /// <param name="adbCmd">需要执行的ADB命令。</param>
         /// <returns>执行命令后的结果。</returns>
-        public static async Task<string> Adb(string adbCmd)
+        //public static async Task<string> Adb(string adbCmd)
+        //{
+        //    return await Task.Run(() =>
+        //    {
+        //        ProcessStartInfo prcStartInfo = new()
+        //        {
+        //            FileName = MV.ADB_Path,         //adb的路径
+        //            Arguments = adbCmd,             //执行完命令后adb会直接关闭
+        //            RedirectStandardOutput = true,  //重定向输出
+        //            RedirectStandardError = true,
+        //            StandardOutputEncoding = Encoding.UTF8,
+        //            StandardErrorEncoding = Encoding.UTF8,
+        //            UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
+        //            CreateNoWindow = true,          // 不创建窗口
+        //        };
+        //        using Process adbPrc = Process.Start(prcStartInfo);
+        //        string output = adbPrc.StandardOutput.ReadToEnd();
+        //        string error = adbPrc.StandardError.ReadToEnd();
+        //
+        //        adbPrc.WaitForExit();
+        //
+        //        Debug.Write($"{adbCmd}，执行结果：\n{output}");
+        //        Debug.WriteIf(error != "", $"错误信息：{error}\n");
+        //        Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
+        //
+        //        return output;
+        //    });
+        //}
+
+        /// <summary>
+        /// 启动ADB发送命令。
+        /// </summary>
+        /// <param name="adbCmd">需要执行的ADB命令。</param>
+        /// <param name="isReturnErr">返回结果是否为错误流。</param>
+        /// <returns>执行命令后的结果。</returns>
+        public static async Task<string> AdbAsync(string adbCmd, bool isReturnErr = false)
         {
-            return await Task.Run(() =>
+            using Process adbPrc = new()
             {
-                ProcessStartInfo prcStartInfo = new()
+                StartInfo = new ProcessStartInfo
                 {
                     FileName = MV.ADB_Path,         //adb的路径
                     Arguments = adbCmd,             //执行完命令后adb会直接关闭
@@ -375,19 +412,35 @@ namespace ScrcpyEX.MyDefinition
                     StandardErrorEncoding = Encoding.UTF8,
                     UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
                     CreateNoWindow = true,          // 不创建窗口
-                };
-                using Process adbPrc = Process.Start(prcStartInfo);
-                string output = adbPrc.StandardOutput.ReadToEnd();
-                string error = adbPrc.StandardError.ReadToEnd();
+                },
+                EnableRaisingEvents = true
+            };
 
-                adbPrc.WaitForExit();
+            TaskCompletionSource<object> tcs = new();
+            adbPrc.Exited += (_, _) => tcs.TrySetResult(null);
+            adbPrc.Start();
+            await tcs.Task;// 异步等待进程退出（不阻塞线程）
 
-                Debug.Write($"{adbCmd}，执行结果：\n{output}");
-                Debug.WriteIf(error != "", $"错误信息：{error}\n");
-                Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
+            string otp = await adbPrc.StandardOutput.ReadToEndAsync();
+            string err = await adbPrc.StandardError.ReadToEndAsync();
 
-                return output;
-            });
+            Debug.WriteLineIf(otp != "", $"{adbCmd}，执行正常：\n{Fmt(otp)}");
+            Debug.WriteLineIf(err != "", $"{adbCmd}，执行错误：\n{Fmt(err)}");
+            Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
+
+            return isReturnErr ? err : otp;
+        }
+
+        /// <summary>
+        /// 格式化Adb的输出内容，去掉空字符行，剩余行前面增加4个空格的缩进。
+        /// </summary>
+        /// <param name="output">要格式化的字符串。</param>
+        /// <returns>格式化后的字符串。</returns>
+        private static string Fmt(string output)
+        {
+            return  string.Join(
+                Environment.NewLine,
+                output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries).Select(s => $"    {s}"));
         }
 
         /// <summary>

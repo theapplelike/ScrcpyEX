@@ -23,7 +23,7 @@ namespace ScrcpyEX.View
                 {
                     //设备需要线连接上才可以获得其型号信息
                     //Android 11以下版本可以不带端口号，Android 11及以上可能需要修改这段代码
-                    await MyGM.Adb($"connect {device}");
+                    await MyGM.AdbAsync($"connect {device}");
                 }
             }
 
@@ -32,7 +32,7 @@ namespace ScrcpyEX.View
                 //await MyGM.Adb($@"-s {device} shell getprop | grep -E 'net.hostname|ro.product.name|ro.product.device|ro.product.manufacturer|ro.product.brand|ro.product.model'");
                 //net.hostname有些设备没有，所以最后只保留了设备的制造商和型号
 
-                string output = await MyGM.Adb($@"-s {device} shell getprop | grep -E 'ro.product.manufacturer|ro.product.model'");
+                string output = await MyGM.AdbAsync($@"-s {device} shell getprop | grep -E 'ro.product.manufacturer|ro.product.model'");
                 _vm.Infos.Add(ParseDeviceInfo(output));
             }
         }
