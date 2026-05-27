@@ -111,7 +111,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Resize_Tick(object sender, EventArgs e)
         {
-            //Debug.WriteLine("程序大小已改变，重新定位映射pop。");
+            //Debug.WriteLine("程序大小已改变，重新生成映射pop。");
 
             _resizeTimer.Stop();
             CreateSavedPop(btnMappingAdd.IsEnabled);
@@ -122,11 +122,18 @@ namespace ScrcpyEX.View
         /// </summary>
         private void LocationChange_Tick(object sender, EventArgs e)
         {
-            //Debug.WriteLine("程序位置已改变，重新定位映射pop。");
+            //Debug.WriteLine("程序位置已改变，重新显示映射pop。");
 
             _locationChangeTimer.Stop();
-            HideKeyMapping();
-            ShowKeyMapping();
+            if (_isAdjustPop)
+            {
+                HideKeyMapping();
+                ShowKeyMapping();
+            }
+            else
+            {
+                _isAdjustPop = true;
+            }
         }
 
         /// <summary>

@@ -115,6 +115,14 @@
 
                         <CheckBox IsChecked="{Binding Cfg.ScrcpySet.DisablScreensaver}" Content="设备投屏时电脑禁用屏幕保护"/>
                         <Border/>
+
+                        <CheckBox IsChecked="{Binding Cfg.ScrcpySet.NewDisplay}">
+                            <StackPanel>
+                                <TextBlock Text="使用虚拟屏幕"/>
+                                <TextBlock Text="使用一个新的虚拟屏幕，而不是设备屏幕" Style="{StaticResource tbkSmall}"/>
+                            </StackPanel>
+                        </CheckBox>
+                        <Border/>
                     </StackPanel>
                 </Grid>
 

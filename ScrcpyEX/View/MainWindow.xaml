@@ -136,18 +136,18 @@
                 <ToolBar ToolBarTray.IsLocked="True">
 
                     <DockPanel x:Name="dcpScMain">
-                        <Button x:Name="btnWired" Click="BtnWired_Click" Content="&#xF0B9;" Style="{StaticResource thisBtn}" ToolTip="有线连接"/>
-                        <Button x:Name="btnWirel" Click="BtnWirel_Click" Content="&#xe93e;" Style="{StaticResource thisBtn}" ToolTip="无线连接"/>
-                        <Button x:Name="btnStop"  Click="BtnStop_Click"  Content="&#xECCB;" Style="{StaticResource thisBtn}" ToolTip="停止投屏"/>
+                        <Button x:Name="btnWired" Click="BtnWired_Click" Content="&#xF0B9;" Style="{StaticResource thisBtn}" ToolTip="有线连接(F1)"/>
+                        <Button x:Name="btnWirel" Click="BtnWirel_Click" Content="&#xe93e;" Style="{StaticResource thisBtn}" ToolTip="无线连接(F2)"/>
+                        <Button x:Name="btnStop"  Click="BtnStop_Click"  Content="&#xECCB;" Style="{StaticResource thisBtn}" ToolTip="停止投屏(F3)"/>
                     </DockPanel>
                     <Rectangle Style="{StaticResource sep}"/>
                     
-                    <mycontrol:IconButton x:Name="btnRecManage" Click="BtnRecManage_Click" MainIcon="&#xea40;" CornerIcon="&#xE712;" ToolTip="脚本管理"/>
-                    <mycontrol:IconButton x:Name="btnSetManage" Click="BtnSetManage_Click" MainIcon="&#xe713;" CornerIcon="&#xE712;" ToolTip="程序设置"/>
+                    <mycontrol:IconButton x:Name="btnRecManage" Click="BtnRecManage_Click" MainIcon="&#xea40;" CornerIcon="&#xE712;" ToolTip="脚本管理(F5)"/>
+                    <mycontrol:IconButton x:Name="btnSetManage" Click="BtnSetManage_Click" MainIcon="&#xe713;" CornerIcon="&#xE712;" ToolTip="程序设置(F6)"/>
                     <Rectangle Style="{StaticResource sep}"/>
 
-                    <mycontrol:IconButton x:Name="btnSizeOpt" Click="BtnSizeOpt_Click" MainIcon="&#xe78a;" CornerIcon="&#xE7bc;" ToolTip="位置与大小选项"/>
-                    <mycontrol:IconButton x:Name="btnFuncOpt" Click="BtnFuncOpt_Click" MainIcon="&#xebd2;" CornerIcon="&#xE7bc;" ToolTip="功能菜单"/>
+                    <mycontrol:IconButton x:Name="btnSizeOpt" Click="BtnSizeOpt_Click" MainIcon="&#xe78a;" CornerIcon="&#xE7bc;" ToolTip="位置与大小选项(F7)"/>
+                    <mycontrol:IconButton x:Name="btnFuncOpt" Click="BtnFuncOpt_Click" MainIcon="&#xebd2;" CornerIcon="&#xE7bc;" ToolTip="功能菜单(F8)"/>
                     <Button x:Name="btnTest" Style="{StaticResource thisBtn}" Content="&#xf133;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
                     
                     <Border x:Name="bdRec" HorizontalAlignment="Right" BorderBrush="SteelBlue" BorderThickness="4">

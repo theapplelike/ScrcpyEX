@@ -35,19 +35,14 @@ namespace ScrcpyEX.View
         /// 横屏时拦截双击体验差，能否只拦截黑色区域的双击--会有20ms左右的延迟
         /// 双击黑边SC会消失但不会关闭--目前SC消失时不能获得消息，使用双击拦截临时解决
         /// border和scrcpy相同大小，监听SDL的消息-x
-        /// 虚拟屏幕
+        /// 虚拟屏幕-y
         /// com.bilibili.azurlane
         /// 标题栏每个按钮快捷键-y
         /// adb开启USB网络-y
         /// sc突然断线要清理资源-y
-        /// 添加新的按键映射后更新到KMC_Hook的热键列表-y
-        /// F11会触发安卓的截图，可以考虑拦截-y
         /// sc有焦点时显示图标-y
-        /// 缩放在竖屏下有问题
-        /// 组图像脚本在手动比较的时候现在只传入了第一个-y
-        /// 截图时放大镜在125%缩放的电脑偏移很大-y
-        /// 图像脚本和自己组成组脚本，删除这个组脚本时会报错-y
-        /// 缩放和位置变更都会重置pop，在缩放和位置同时改变时，只执行其中一个重置
+        /// 缩放在竖屏下有问题-y
+        /// 缩放和位置变更都会重置pop，在缩放和位置同时改变时，只执行其中一个重置-y
         /// 宽度很宽但高度很小时，pop垂直方向会在界面外，原因是偏移都用宽的比例
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
@@ -68,7 +63,7 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
-
+            await MyGM.AdbAsync("shell wm density");
         }
 
         /// <summary>

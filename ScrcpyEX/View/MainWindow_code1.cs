@@ -478,8 +478,8 @@ namespace ScrcpyEX.View
             }
             else
             {
-                if (popSize.IsOpen) { popSize.IsOpen = false; }
-                if (popFunc.IsOpen) { popFunc.IsOpen = false; }
+                popSize.IsOpen = false;
+                popFunc.IsOpen = false;
             }
 
             foreach (KeyMapping mp in mappings)

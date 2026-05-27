@@ -48,5 +48,11 @@ namespace ScrcpyEX.Model
         [CommandLine("--disable-screensaver")]
         public bool DisablScreensaver { get; set; } = true;
 
+        /// <summary>
+        /// 使用虚拟屏幕。
+        /// </summary>
+        [CommandLine("--new-display")]
+        public bool NewDisplay { get; set; } = false;
+
     }
 }

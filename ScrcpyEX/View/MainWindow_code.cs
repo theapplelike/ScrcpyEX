@@ -90,10 +90,10 @@ namespace ScrcpyEX.View
             bdRec.Visibility = Visibility.Collapsed;
             dplTip.Visibility = Visibility.Collapsed;
 
-            SetControlEvent();
-            SetTimer();
             ReadCfg();
+            SetTimer();
             ScOptInit();
+            SetControlEvent();
             SetUISize(MyCfg.Cfg.IsUseLastSize);
 
             //添加消息钩子监听程序的所有消息
@@ -222,7 +222,7 @@ namespace ScrcpyEX.View
             Process[] prcs = Process.GetProcessesByName("Scrcpy");
             foreach (Process prc in prcs)
             {
-                prc.CloseMainWindow();
+                prc.Kill();
                 prc.Dispose();
             }
         }
@@ -253,6 +253,8 @@ namespace ScrcpyEX.View
         {
             double wd = SystemParameters.WorkArea.Width;
             double ht = SystemParameters.WorkArea.Height;
+            _isAdjustPop = false;
+            HideKeyMapping();
 
             if (Width >= wd && Height >= ht)
             {
@@ -263,7 +265,7 @@ namespace ScrcpyEX.View
             {
                 SaveTempSize();
                 Top = Left = 0;
-                Width = wd; 
+                Width = wd;
                 Height = ht;
                 btnMaximize.Content = "\ue923";
             }

@@ -93,6 +93,7 @@ namespace ScrcpyEX.View
         /// Scrcpy的默认初始宽高（在100%缩放下），使用比例为15：7，华为nova 4e。
         /// </summary>
         private readonly int _scWidth = 960, _scHeight = 448;
+        //private readonly int _scWidth = 1156, _scHeight = 540;
 
         /// <summary>
         /// SC投屏水平方向分辨率。
@@ -120,9 +121,9 @@ namespace ScrcpyEX.View
         private int _si = 0;
 
         /// <summary>
-        /// Scrcpy是否拥有键盘输入焦点。
+        /// 现在是否可以调整映射Popup。
         /// </summary>
-        //private bool _isScHasFouce = false;
+        private bool _isAdjustPop = true;
 
         /// <summary>
         /// 窗口除开Scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
