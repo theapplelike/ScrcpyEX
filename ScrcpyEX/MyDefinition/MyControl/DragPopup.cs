@@ -60,9 +60,14 @@ namespace ScrcpyEX.MyDefinition.MyControl
         private readonly KeyMapping _mapping;
 
         /// <summary>
-        /// Popup中控件的缩放比例。
+        /// Popup中控件的X轴缩放比例。
         /// </summary>
-        private readonly double _ratio;
+        private readonly double _rx;
+
+        /// <summary>
+        /// Popup中控件的Y轴缩放比例。
+        /// </summary>
+        private readonly double _ry;
 
         /// <summary>
         /// Popup初始是否为编辑状态。
@@ -138,13 +143,15 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// 可拖拽、可映射按键的Popup。
         /// </summary>
         /// <param name="mapping">当前Popup对应的按键信息映射类。</param>
-        /// <param name="ratio">其中控件的缩放比例。</param>
+        /// <param name="rx">其中控件的X轴缩放比例。</param>
+        /// <param name="ry">其中控件的Y轴缩放比例。</param>
         /// <param name="isInitEdit">Popup初始是否为编辑状态。</param>
         /// <param name="isLeaveParent">是否可以移出逻辑父级。</param>
-        public DragPopup(KeyMapping mapping, double ratio, bool isInitEdit, bool isLeaveParent = false)
+        public DragPopup(KeyMapping mapping, double rx, double ry, bool isInitEdit, bool isLeaveParent = false)
         {
             _mapping = mapping;
-            _ratio = ratio;
+            _rx = rx;
+            _ry = ry;
             _isInitEdit = isInitEdit;
             _isLeaveParent = isLeaveParent;
 
@@ -158,7 +165,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// </summary>
         private void Popup_Loaded(object sender, RoutedEventArgs e)
         {
-            ControlInit(_ratio, 0.3);
+            ControlInit(_rx, _ry, 0.3);
             ControlEventBinding();
             SetEditingStatus(_isInitEdit);
         }
@@ -166,9 +173,10 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// <summary>
         /// DragPopup中包含的控件进行初始化。
         /// </summary>
-        /// <param name="ratio">Popup中控件的缩放比例。</param>
+        /// <param name="rx">Popup中控件的X轴缩放比例。</param>
+        /// <param name="ry">Popup中控件的Y轴缩放比例。</param>
         /// <param name="limit">缩放比例的上下限。</param>
-        private void ControlInit(double ratio, double limit)
+        private void ControlInit(double rx, double ry, double limit)
         {
             //提供最外层边框
             _bdOuter = new()
@@ -186,8 +194,8 @@ namespace ScrcpyEX.MyDefinition.MyControl
             _txtInput = new()
             {
                 Text = _mapping.Char,
-                Width = MyGM.RatioClamp(15 , ratio, limit),
-                FontSize = MyGM.RatioClamp(16, ratio, limit),
+                Width = MyGM.RatioClamp(15 , rx, limit),
+                FontSize = MyGM.RatioClamp(16, ry, limit),
                 FontFamily = new FontFamily("Consolas"),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
@@ -207,8 +215,8 @@ namespace ScrcpyEX.MyDefinition.MyControl
             {
                 FontSize = 8,
                 Content = "X",
-                Height = MyGM.RatioClamp(14, ratio, 0.5),
-                Width = MyGM.RatioClamp(14, ratio, 0.5),
+                Width = MyGM.RatioClamp(14, rx, 0.5),
+                Height = MyGM.RatioClamp(14, ry, 0.5),
                 VerticalAlignment = VerticalAlignment.Top,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Margin = new(0, -2, -2, 0),
@@ -218,8 +226,8 @@ namespace ScrcpyEX.MyDefinition.MyControl
             //显示映射按键字符的边框
             _bdChar = new()
             {
-                Height = MyGM.RatioClamp(20, ratio, limit),
-                Width = MyGM.RatioClamp(20, ratio, limit),
+                Width = MyGM.RatioClamp(20, rx, limit),
+                Height = MyGM.RatioClamp(20, ry, limit),
                 Background = _argb50,
                 BorderBrush = Brushes.Black,
                 CornerRadius = new(20),
@@ -232,7 +240,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 FontWeight = FontWeights.Black,
-                FontSize = MyGM.RatioClamp(16, ratio, limit),
+                FontSize = MyGM.RatioClamp(16, rx, limit),
                 FontFamily = new FontFamily("Consolas"),
             };
 

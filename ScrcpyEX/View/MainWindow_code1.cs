@@ -255,19 +255,20 @@ namespace ScrcpyEX.View
         /// <param name="mapping">按键映射信息类。</param>
         /// <param name="isInitEdit">Popup初始是否为编辑状态。</param>
         /// <param name="isInitVisible">Popup初始是否可见。</param>
+        /// <param name="isNew">是否为新创建的Popup。</param>
         /// <returns>DragPopup对象。</returns>
-        private DragPopup CreatePop(KeyMapping mapping, bool isInitEdit, bool isInitVisible = true)
+        private DragPopup CreatePop(KeyMapping mapping, bool isInitEdit, bool isInitVisible, bool isNew = false)
         {
-            DragPopup pop = new(mapping, ScRatioX, isInitEdit)
+            DragPopup pop = new(mapping, ScRatioX, ScRatioY, isInitEdit)
             {
                 Placement = PlacementMode.Relative,
                 PlacementTarget = gShow,    //这里需要指明父级
                 AllowsTransparency = true,
-                Height = PopupDiameter,
-                Width = PopupDiameter,
+                Width = PopWd,
+                Height = PopHt,
                 IsOpen = isInitVisible,
-                HorizontalOffset = mapping.OffsetX * ScRatioX,
-                VerticalOffset = mapping.OffsetY * ScRatioY,
+                HorizontalOffset = mapping.OffsetX * (isNew ? 1 : ScRatioX),
+                VerticalOffset = mapping.OffsetY * (isNew ? 1 : ScRatioY),
             };
 
             gShow.Children.Add(pop);//这里的父级要和pop.PlacementTarget属性一致
@@ -320,7 +321,9 @@ namespace ScrcpyEX.View
         /// </summary>
         private void MappingAdd()
         {
-            MV.DragPopups.Add(CreatePop(new KeyMapping(ScActualWidth, ScActualHeight, PopupDiameter), true));
+            MV.DragPopups.Add(CreatePop(
+                new KeyMapping(ScActualWidth, ScActualHeight, PopWd, PopHt),
+                true, true, true));
         }
 
         /// <summary>
@@ -410,7 +413,7 @@ namespace ScrcpyEX.View
             //    PressMouse();
             //}
                 
-            DoKeyMapping(vkCode, ScRatioX, ScHandle);
+            DoKeyMapping(vkCode, ScHandle);
             //Debug.WriteLine($"映射键：{MV.St.ElapsedMilliseconds}ms");
         }
 
@@ -466,9 +469,8 @@ namespace ScrcpyEX.View
         /// 如果键入的字符在映射列表中，则映射为单击操作。
         /// </summary>
         /// <param name="vkCode">捕获的虚拟键码。</param>
-        /// <param name="ratio">Scrcpy当前宽度和默认宽度的比值。</param>
         /// <param name="scHandle">Scrcpy的句柄。</param>
-        private void DoKeyMapping(Keys vkCode, double ratio, IntPtr scHandle)
+        private void DoKeyMapping(Keys vkCode, IntPtr scHandle)
         {
             List<KeyMapping> mappings = [.. MyCfg.Cfg.KeyMappings.Where(k => k.VkCode == vkCode)];
 
@@ -484,12 +486,13 @@ namespace ScrcpyEX.View
 
             foreach (KeyMapping mp in mappings)
             {
-                //根据现在的比例计算半径
-                double radius = PopupDiameter * MV.DpiScaleX / 2;
+                //根据现在的比例计算左上角到圆心的偏移
+                double cx = PopWd * MV.DpiScaleX / 2;
+                double cy = PopHt * MV.DpiScaleY / 2;
                 
                 //获得圆心坐标
-                int centreX = (int)(mp.OffsetX * ratio * MV.DpiScaleX + radius);
-                int centreY = (int)(mp.OffsetY * ratio * MV.DpiScaleY + radius);
+                int centreX = (int)(mp.OffsetX * ScRatioX * MV.DpiScaleX + cx);
+                int centreY = (int)(mp.OffsetY * ScRatioY * MV.DpiScaleY + cy);
 
                 IntPtr lp = new((centreY << 16) + centreX);
                 DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
@@ -504,7 +507,7 @@ namespace ScrcpyEX.View
                 //}
 
                 //ADB_Click(centreX, centreY);
-                Debug.WriteLine($"圆心点:({centreX},{centreY})。");
+                //Debug.WriteLine($"圆心点:({centreX},{centreY})。");
             }
 
             //逻辑鼠标回到物理鼠标的位置

@@ -187,9 +187,14 @@ namespace ScrcpyEX.View
         private bool IsScClosed => _scHost == null || _scHost.ScHandle == IntPtr.Zero;
 
         /// <summary>
-        /// 圆形DragPopup的直径。
+        /// 圆形DragPopup的宽度。
         /// </summary>
-        private double PopupDiameter => 50 * ScRatioX;
+        private double PopWd => 50 * ScRatioX;
+
+        /// <summary>
+        /// 圆形DragPopup的高度。
+        /// </summary>
+        private double PopHt => 50 * ScRatioY;
 
         /// <summary>
         /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。

@@ -175,14 +175,17 @@ namespace ScrcpyEX.View
         {
             _vm.IsScHasFouce = false;
             KMC_Hook.IsScHasFocus = false;
-            //Debug.WriteLine($"主界面收到焦点");
+            Debug.WriteLine($"BtnFouce收到键盘输入焦点");
         }
 
         private void BtnFouce_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            _vm.IsScHasFouce = true;
-            KMC_Hook.IsScHasFocus = true;
-            //Debug.WriteLine($"主界面失去焦点，可能焦点给到SC");
+            if (ScHandle != IntPtr.Zero && DLL.GetFocus() == ScHandle)
+            {
+                _vm.IsScHasFouce = true;
+                KMC_Hook.IsScHasFocus = true;
+                Debug.WriteLine($"BtnFouce失去键盘输入焦点，焦点给到SC");
+            }
         }
         #endregion
 

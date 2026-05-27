@@ -3,6 +3,7 @@ using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.MyClass;
 using ScrcpyEX.MyDefinition.MyControl;
+using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -43,7 +44,7 @@ namespace ScrcpyEX.View
         /// sc有焦点时显示图标-y
         /// 缩放在竖屏下有问题-y
         /// 缩放和位置变更都会重置pop，在缩放和位置同时改变时，只执行其中一个重置-y
-        /// 宽度很宽但高度很小时，pop垂直方向会在界面外，原因是偏移都用宽的比例
+        /// 宽度很宽但高度很小时，pop垂直方向会在界面外，原因是偏移都用宽的比例-y
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -63,7 +64,7 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
-            await MyGM.AdbAsync("shell wm density");
+            //await MyGM.AdbAsync("shell wm density");
         }
 
         /// <summary>

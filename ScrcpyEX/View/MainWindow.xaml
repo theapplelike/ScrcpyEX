@@ -31,6 +31,7 @@
         <Style x:Key="ItemBtn" TargetType="Button">
             <Setter Property="Margin" Value="1"/>
             <Setter Property="Height" Value="30"/>
+            <Setter Property="Focusable" Value="False"/>
         </Style>
         <Style TargetType="RadioButton">
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -75,10 +76,10 @@
                     <TextBlock Text="{Binding Resolution}" Background="White" Padding="5"/>
                     <TextBlock Text="{Binding Scaling}" Background="White" Padding="5"/>
                     <UniformGrid Rows="2" Columns="2" Margin="0,3" Background="lavender">
-                        <RadioButton x:Name="rdoLoc1" Content="↖左上" Margin="0,5,0,2"/>
-                        <RadioButton x:Name="rdoLoc2" Content="↗右上" Margin="0,5,0,2"/>
-                        <RadioButton x:Name="rdoLoc3" Content="↙左下" Margin="0,2,0,5"/>
-                        <RadioButton x:Name="rdoLoc4" Content="↘右下" Margin="0,2,0,5"/>
+                        <RadioButton x:Name="rdoLoc1" Content="↖左上" Margin="0,5,0,2" Focusable="False"/>
+                        <RadioButton x:Name="rdoLoc2" Content="↗右上" Margin="0,5,0,2" Focusable="False"/>
+                        <RadioButton x:Name="rdoLoc3" Content="↙左下" Margin="0,2,0,5" Focusable="False"/>
+                        <RadioButton x:Name="rdoLoc4" Content="↘右下" Margin="0,2,0,5" Focusable="False"/>
                     </UniformGrid>
 
                     <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并定位"/>

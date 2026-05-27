@@ -592,10 +592,13 @@ namespace ScrcpyEX.View
                 _resizeTimer.Start();
             }
 
-            //计算菜单栏右侧按钮是否需要放入溢出菜单
+            //计算菜单栏右侧按钮是否需要放入移出溢出菜单
             if (e.NewSize.Width >= 329)
             {
-                MoveOutSysMenu();
+                while (stpRightMenu.Children.Count < 3)
+                {
+                    MoveOutSysMenu();
+                }
             }
             else if (e.NewSize.Width < 329 && e.NewSize.Width >= 223)
             {
@@ -610,7 +613,7 @@ namespace ScrcpyEX.View
             }
             else if (e.NewSize.Width < 223)
             {
-                if (stpRightMenu.Children.Count > 1)
+                while (stpRightMenu.Children.Count > 1)
                 {
                     MoveInSysMenu(true);
                 }

@@ -41,11 +41,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         /// <param name="ScActualWidth">Scrcpy的实际宽度。</param>
         /// <param name="ScActualHeight">Scrcpy的实际高度。</param>
-        /// <param name="popDiameter">Popup的直径。</param>
-        public KeyMapping(double ScActualWidth, double ScActualHeight, double popDiameter)
+        /// <param name="PopWd">Popup的宽度。</param>
+        /// <param name="PopHt">Popup的高度。</param>
+        public KeyMapping(double ScActualWidth, double ScActualHeight, double PopWd, double PopHt)
         {
-            OffsetX = (ScActualWidth - popDiameter) / 2;
-            OffsetY = (ScActualHeight - popDiameter) / 2;
+            OffsetX = (ScActualWidth - PopWd) / 2;
+            OffsetY = (ScActualHeight - PopHt) / 2;
         }
 
         /// <summary>
