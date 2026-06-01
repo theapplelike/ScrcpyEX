@@ -38,37 +38,39 @@ namespace ScrcpyEX.View
         /// <returns>消息处理结果，大多数情况下返回 IntPtr.Zero（表示使用默认处理）。</returns>
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            //wParam高字节为0X20，低字节为1时，说明窗口被激活，但处于最小化
-            //if (msg == 0x0006 && (int)wParam == 0X200001)
-            //{
-            //    handled = true;
-            //    Debug.WriteLine($"拦截消息：{msg:X4}，{(int)wParam:X4}，{(int)lParam:X4}，说明窗口被激活，但处于最小化");
-            //}
-            //窗口的非客户区域激活状态改变，wParam为0时窗口失活，为1时窗口激活，
-            //当窗口Z序在后面，但处于激活状态时，Z序到最前面是不会触发Activated事件的，此时强制显示映射按钮
-            //else if (msg == 0x0086 && (int)wParam == 0X0001)
-            //{
-            //    //ShowKeyMapping();
-            //    //Debug.WriteLine($"拦截消息：{msg:X4}，{(int)wParam:X4}，{(int)lParam:X4}，" +
-            //    //    $"未触发Activated事件，强制显示映射按钮");
-            //}
-            //else
-            //    Debug.WriteLine($"MEG：{msg:X4}，{(long)wParam:X4}，{(long)lParam:X4}");
-
             switch (msg)
             {
                 case WM.ACTIVATE:
-                    //wParam高字节为0X20，低字节为1时，说明窗口被激活，但处于最小化
+                    #region wParam高字节为0X20，低字节为1时，说明窗口被激活，但处于最小化
                     if ((int)wParam == 0X200001)
                     {
                         handled = true;
                         Debug.WriteLine($"拦截消息：{msg:X4}，{(int)wParam:X4}，{(int)lParam:X4}，窗口被激活，但处于最小化");
                     }
+                    #endregion
                     break;
                 case WM.DPICHANGED:
+                    #region DPI 改变时重新获取
                     MV.DpiScaleX = VisualTreeHelper.GetDpi(this).DpiScaleX;
                     MV.DpiScaleY = VisualTreeHelper.GetDpi(this).DpiScaleY;
                     Debug.WriteLine($"DPI 改变了，重新获取当前窗口的 DPI");
+                    #endregion
+                    break;
+                case WM.SYSKEYDOWN:
+                    #region 转发SC的快捷键
+                    if (wParam.ToInt32() == VK_O && (lParam.ToInt64() & (1L << 29)) != 0)
+                    {
+                        if ((DLL.GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0)//Shift是否按下
+                        {
+                            PostShortcutsThree(VK_O);
+                        }
+                        else
+                        {
+                            PostShortcutsTwo(VK_O);
+                        }
+                        handled = true;
+                    }
+                    #endregion
                     break;
                 default:
                     //Debug.WriteLine($"MEG：{msg:X4}，{(long)wParam:X4}，{(long)lParam:X4}");

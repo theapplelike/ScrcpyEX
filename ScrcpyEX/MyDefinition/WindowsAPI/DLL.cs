@@ -244,6 +244,21 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <returns>最高位(bit 15)：1 = 按下，0 = 抬起；最低位(bit 0)用于切换键：1 = 开启（如 Caps Lock 开启），0 = 关闭。</returns>
         public static short GetKeyState(uint nVirtKey) => GetKeyState((int)nVirtKey);
 
+        /// <summary>
+        /// 获取指定虚拟键在当前消息产生时刻的状态（硬件中断的实时状态）。
+        /// </summary>
+        /// <param name="vKey">虚拟键码。</param>
+        /// <returns>最高位(bit 15)：1 = 按下，0 = 抬起；最低位(bit 0)指示自从上次调用 GetAsyncKeyState 以来，该键是否被按下过，但并不可靠。</returns>
+        [DllImport("user32.dll")]
+        public static extern short GetAsyncKeyState(int vKey);
+
+        /// <summary>
+        /// 获取指定虚拟键在当前消息产生时刻的状态（硬件中断的实时状态）。
+        /// </summary>
+        /// <param name="vKey">虚拟键码。</param>
+        /// <returns>最高位(bit 15)：1 = 按下，0 = 抬起；最低位(bit 0)指示自从上次调用 GetAsyncKeyState 以来，该键是否被按下过，但并不可靠。</returns>
+        public static short GetAsyncKeyState(uint vKey) => GetAsyncKeyState((int)vKey);
+
         //[DllImport("user32.dll")]
         //public static extern IntPtr GetDesktopWindow();
 

@@ -27,6 +27,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DPoint = System.Drawing.Point;  //Windows Forms的Point
 using WPoint = System.Windows.Point;  //WPF的Point
+using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
 
 namespace ScrcpyEX.View
 {
@@ -45,6 +46,9 @@ namespace ScrcpyEX.View
         /// 缩放在竖屏下有问题-y
         /// 缩放和位置变更都会重置pop，在缩放和位置同时改变时，只执行其中一个重置-y
         /// 宽度很宽但高度很小时，pop垂直方向会在界面外，原因是偏移都用宽的比例-y
+        /// 实现模拟器一样的方向控制
+        /// 按钮实现Alt+O快捷键-y
+        /// 虚拟屏幕能否呈现为宽屏-京东等应用不支持分屏，在虚拟屏幕上运行会强制回到主屏幕
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -64,7 +68,7 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
-            //await MyGM.AdbAsync("shell wm density");
+            await MyGM.AdbAsync("shell wm density");
         }
 
         /// <summary>
@@ -130,7 +134,10 @@ namespace ScrcpyEX.View
         //    {
         //        InitPersistentShell();
         //    }
+        //
+        //    MV.St = Stopwatch.StartNew();
         //    CheckInputShown();
+        //    Debug.WriteLine($"持久化：{MV.St.ElapsedMilliseconds}ms");
         //}
         //
         //private static Process _persistentShell = null;

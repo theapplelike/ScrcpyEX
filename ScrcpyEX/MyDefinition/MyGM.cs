@@ -428,6 +428,8 @@ namespace ScrcpyEX.MyDefinition
             Debug.WriteLineIf(err != "", $"{adbCmd}，执行错误：\n{Fmt(err)}");
             Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
 
+            if (adbPrc.ExitCode == 0) err = "";
+
             return isReturnErr ? err : otp;
         }
 

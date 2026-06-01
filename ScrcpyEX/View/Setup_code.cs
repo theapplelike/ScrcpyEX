@@ -52,6 +52,7 @@ namespace ScrcpyEX.View
         /// 菜单显示状态转换，使用动画过度效果。
         /// </summary>
         /// <param name="stp">要进行状态转换的菜单。</param>
+        /// <param name="i">菜单的位置索引，从0开始。</param>
         private void MenuStateTransition(StackPanel stp, int i)
         {
             // 停止可能正在进行的动画，避免冲突

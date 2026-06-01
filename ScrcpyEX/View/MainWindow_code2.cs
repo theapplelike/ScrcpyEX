@@ -26,6 +26,7 @@ using DPoint = System.Drawing.Point;  //Windows Forms的Point
 using WPoint = System.Windows.Point;  //WPF的Point
 using DRectangle = System.Drawing.Rectangle;
 using WRectangle = System.Windows.Shapes.Rectangle;
+using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
 
 namespace ScrcpyEX.View
 {
@@ -330,12 +331,6 @@ namespace ScrcpyEX.View
         /// <param name="infos">当前执行的脚本。</param>
         private async void ImgCompare(List<ScriptInfo> infos)
         {
-            //if (infos[0].ImgName == "")
-            //{
-            //    popMid.Show("不是图像脚本，不能进行比对。");
-            //    return;
-            //}
-            
             try
             {
                 List<BitmapSource> bmps = [];
@@ -353,21 +348,39 @@ namespace ScrcpyEX.View
 
                 ShowImg showImg = new(infos, bmps);
                 showImg.ShowDialog();
-
-                //CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, info.CropRect);
-                //if (scWindow == null)
-                //{
-                //    popMid.Show("获取Scrcpy截图失败。");
-                //    return;
-                //}
-
-                //ShowImg showImg = new(info, scWindow);
-                //showImg.ShowDialog();
             }
             catch (Exception ex)
             {
                 MyGM.ShwError($"尝试对比图像时异常：{ex}");
             }
+        }
+
+        /// <summary>
+        /// 转发SC相关的快捷键，Alt+键。Alt按下及之后的键都应该是系统键，除了最后的Alt抬起。
+        /// </summary>
+        /// <param name="key">键值。</param>
+        private void PostShortcutsTwo(uint key)
+        {
+            if (ScHandle == IntPtr.Zero) return;
+            DLL.PostMessage(ScHandle, WM.SYSKEYDOWN, (IntPtr)VK_LMENU, IntPtr.Zero);
+            DLL.PostMessage(ScHandle, WM.SYSKEYDOWN, (IntPtr)key, IntPtr.Zero);
+            DLL.PostMessage(ScHandle, WM.SYSKEYUP, (IntPtr)key, IntPtr.Zero);
+            DLL.PostMessage(ScHandle, WM.KEYUP, (IntPtr)VK_LMENU, IntPtr.Zero);
+        }
+
+        /// <summary>
+        /// 转发SC相关的快捷键，Alt+Shift+键。
+        /// </summary>
+        /// <param name="key">键值。</param>
+        private void PostShortcutsThree(uint key)
+        {
+            if (ScHandle == IntPtr.Zero) return;
+            DLL.PostMessage(ScHandle, WM.SYSKEYDOWN, (IntPtr)VK_LMENU, IntPtr.Zero);
+            DLL.PostMessage(ScHandle, WM.SYSKEYDOWN, (IntPtr)VK_SHIFT, IntPtr.Zero);
+            DLL.PostMessage(ScHandle, WM.SYSKEYDOWN, (IntPtr)key, IntPtr.Zero);
+            DLL.PostMessage(ScHandle, WM.SYSKEYUP, (IntPtr)key, IntPtr.Zero);
+            DLL.PostMessage(ScHandle, WM.SYSKEYUP, (IntPtr)VK_SHIFT, IntPtr.Zero);
+            DLL.PostMessage(ScHandle, WM.KEYUP, (IntPtr)VK_LMENU, IntPtr.Zero);
         }
 
         /// <summary>
