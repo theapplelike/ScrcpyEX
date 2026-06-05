@@ -259,6 +259,36 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <returns>最高位(bit 15)：1 = 按下，0 = 抬起；最低位(bit 0)指示自从上次调用 GetAsyncKeyState 以来，该键是否被按下过，但并不可靠。</returns>
         public static short GetAsyncKeyState(uint vKey) => GetAsyncKeyState((int)vKey);
 
+        /// <summary>
+        /// 获取指定设备上下文（DC）上某个坐标点的像素颜色。
+        /// </summary>
+        /// <param name="hdc">设备上下文句柄。</param>
+        /// <param name="nXPos">要读取的点的逻辑坐标X。</param>
+        /// <param name="nYPos">要读取的点的逻辑坐标Y。</param>
+        /// <returns>一个 COLORREF 值，格式为 0x00BBGGRR，即低8位是红色，次8位是绿色，高8位是蓝色。如果坐标超出裁剪区域，返回 CLR_INVALID(0xFFFFFFFF)。</returns>
+        [DllImport("gdi32.dll")]
+        public static extern uint GetPixel(IntPtr hdc, int nXPos, int nYPos);
+
+        /// <summary>
+        /// 获取设备上下文句柄（Device Context）。
+        /// </summary>
+        /// <param name="hWnd">
+        /// <para>如果传递具体窗口的句柄，返回的 DC 就只对应该窗口的客户区，绘图操作会被自动裁剪到窗口边界内。</para>
+        /// <para>如果传递 IntPtr.Zero（NULL），则返回整个屏幕的 DC，可以在屏幕任意位置绘制，常用于截屏、取色等全局操作。</para>
+        /// </param>
+        /// <returns>指向设备上下文的句柄（HDC）。如果失败，返回 IntPtr.Zero。</returns>
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetDC(IntPtr hWnd);
+
+        /// <summary>
+        /// 释放由 GetDC 或 GetWindowDC 获取的设备上下文（DC），将资源归还给系统。
+        /// </summary>
+        /// <param name="hWnd">窗口句柄，必须与当初调用 GetDC 时传入的句柄完全一致（如果是获取屏幕 DC，这里就是 IntPtr.Zero）。</param>
+        /// <param name="hDC">要释放的设备上下文句柄，来自 GetDC 的返回值。</param>
+        /// <returns>1--释放成功；0--释放失败。</returns>
+        [DllImport("user32.dll")]
+        public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
         //[DllImport("user32.dll")]
         //public static extern IntPtr GetDesktopWindow();
 

@@ -14,7 +14,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <summary>
         /// Shift 键，只能判断Shift按下，无法判断是左右Shift。
         /// </summary>
-        public const int VK_SHIFT = 0x10;
+        public const uint VK_SHIFT = 0x10;
 
         /// <summary>
         /// Alt 键，只能判断Alt按下，无法判断是左右Alt。

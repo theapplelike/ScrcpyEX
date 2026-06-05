@@ -97,6 +97,7 @@
     <Compile Include="MyDefinition\MyClass\ADBSocketCommunicator.cs" />
     <Compile Include="MyDefinition\MyClass\InputModeSwitcher.cs" />
     <Compile Include="MyDefinition\MyClass\KeyMapping.cs" />
+    <Compile Include="MyDefinition\MyClass\MiniTouchService.cs" />
     <Compile Include="MyDefinition\MyClass\OpenCv.cs" />
     <Compile Include="MyDefinition\MyClass\ScrcpyHost.cs" />
     <Compile Include="MyDefinition\MyControl\DragPopup.cs" />

@@ -419,16 +419,21 @@ namespace ScrcpyEX.MyDefinition
             TaskCompletionSource<object> tcs = new();
             adbPrc.Exited += (_, _) => tcs.TrySetResult(null);
             adbPrc.Start();
+
+            // 立刻启动异步读取，让管道数据被消费
+            Task<string> otpTask = adbPrc.StandardOutput.ReadToEndAsync();
+            Task<string> errTask = adbPrc.StandardError.ReadToEndAsync();
             await tcs.Task;// 异步等待进程退出（不阻塞线程）
 
-            string otp = await adbPrc.StandardOutput.ReadToEndAsync();
-            string err = await adbPrc.StandardError.ReadToEndAsync();
+            string otp = await otpTask;
+            string err = await errTask;
 
+            Debug.WriteLineIf(otp == "" && err == "", $"【{adbCmd}】");
             Debug.WriteLineIf(otp != "", $"{adbCmd}，执行正常：\n{Fmt(otp)}");
-            Debug.WriteLineIf(err != "", $"{adbCmd}，执行错误：\n{Fmt(err)}");
+            Debug.WriteLineIf(err != "", $"{adbCmd}，执行错误({adbPrc.ExitCode})：\n{Fmt(err)}");
             Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
 
-            if (adbPrc.ExitCode == 0) err = "";
+            //if (adbPrc.ExitCode == 0) err = "";
 
             return isReturnErr ? err : otp;
         }
@@ -440,7 +445,7 @@ namespace ScrcpyEX.MyDefinition
         /// <returns>格式化后的字符串。</returns>
         private static string Fmt(string output)
         {
-            return  string.Join(
+            return string.Join(
                 Environment.NewLine,
                 output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries).Select(s => $"    {s}"));
         }
