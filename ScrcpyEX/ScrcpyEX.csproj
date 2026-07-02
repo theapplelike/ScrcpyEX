@@ -87,24 +87,41 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\BreadcrumbItem.cs" />
+    <Compile Include="Model\FileItem.cs" />
     <Compile Include="Model\FormSize.cs" />
     <Compile Include="Model\PointInfo.cs" />
     <Compile Include="Model\ScriptGroup.cs" />
     <Compile Include="Model\ScriptInfo.cs" />
     <Compile Include="Model\ScrcpySet.cs" />
     <Compile Include="Model\ScriptItem.cs" />
+    <Compile Include="MyDefinition\Interface\IDirectoryService.cs" />
     <Compile Include="MyDefinition\MyClass\AdbDeviceScanner.cs" />
-    <Compile Include="MyDefinition\MyClass\ADBSocketCommunicator.cs" />
+    <Compile Include="MyDefinition\MyClass\AdbDirectoryService.cs" />
     <Compile Include="MyDefinition\MyClass\InputModeSwitcher.cs" />
     <Compile Include="MyDefinition\MyClass\KeyMapping.cs" />
+    <Compile Include="MyDefinition\MyClass\LocalDirectoryService.cs" />
     <Compile Include="MyDefinition\MyClass\MiniTouchService.cs" />
     <Compile Include="MyDefinition\MyClass\OpenCv.cs" />
+    <Compile Include="MyDefinition\MyClass\RangeOC.cs" />
     <Compile Include="MyDefinition\MyClass\ScrcpyHost.cs" />
     <Compile Include="MyDefinition\MyControl\DragPopup.cs" />
+    <Compile Include="MyDefinition\MyControl\FileExplorer.xaml.cs">
+      <DependentUpon>FileExplorer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MyDefinition\MyControl\FileExplorer_code.cs">
+      <DependentUpon>FileExplorer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MyDefinition\MyControl\FileExplorer_var.cs">
+      <DependentUpon>FileExplorer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MyDefinition\MyControl\HoverPopup.cs" />
     <Compile Include="MyDefinition\MyControl\IconButton.cs" />
     <Compile Include="MyDefinition\MyControl\TimePopup.cs" />
+    <Compile Include="MyDefinition\MyConverter\FileToIconConverter.cs" />
+    <Compile Include="MyDefinition\MyConverter\FileSizeConverter.cs" />
     <Compile Include="MyDefinition\MyConverter\IsScriptGroupConverter.cs" />
+    <Compile Include="MyDefinition\MyConverter\SortArrowConverter.cs" />
     <Compile Include="MyDefinition\WindowsAPI\DLL.cs" />
     <Compile Include="MyDefinition\MV.cs" />
     <Compile Include="MyDefinition\MyAttribute\ArgumentsAttribute.cs" />
@@ -121,11 +138,15 @@
     <Compile Include="MyDefinition\WindowsAPI\SW.cs" />
     <Compile Include="MyDefinition\WindowsAPI\VK.cs" />
     <Compile Include="MyDefinition\WindowsAPI\WM.cs" />
+    <Compile Include="ViewModel\DataSyncVM.cs" />
     <Compile Include="ViewModel\MainWindowVM.cs" />
     <Compile Include="ViewModel\RecManageVM.cs" />
     <Compile Include="ViewModel\ScreenshotVM.cs" />
     <Compile Include="ViewModel\SelectDeviceVM.cs" />
     <Compile Include="ViewModel\SetupVM.cs" />
+    <Compile Include="View\DataSync.xaml.cs">
+      <DependentUpon>DataSync.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\MainWindow_code.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -186,6 +207,10 @@
     <Compile Include="View\ShowImg.xaml.cs">
       <DependentUpon>ShowImg.xaml</DependentUpon>
     </Compile>
+    <Page Include="MyDefinition\MyControl\FileExplorer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resource\Style\IconButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -195,6 +220,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resource\Style\MyStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DataSync.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

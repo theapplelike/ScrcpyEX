@@ -133,5 +133,94 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
+    <!--导航栏的控制按钮样式-->
+    <Style x:Key="NaviBtn" TargetType="Button">
+        <Setter Property="Width" Value="30"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="FontFamily" Value="/ScrcpyEX;component/Resource/IconFont/SegoeFluentIcons.ttf#Segoe Fluent Icons"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Focusable" Value="False"/>
+
+        <!--重写按钮的模板-->
+        <Setter Property="Template">
+            <Setter.Value>
+                <!--使用按钮原来的样式，不做更改-->
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="15">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <!--鼠标悬停时修改背景颜色，这里不需要设置BorderBrush为Transparent，因为已经移除了焦点视觉样式-->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="LightBlue"/>
+                        </Trigger>
+                        <!--鼠标按下时的样式-->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="SkyBlue"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+                        <!--鼠标禁用时的样式-->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <!--<Setter Property="Background" Value="#EEEEEE"/>-->
+                            <Setter Property="Foreground" Value="#AAAAAA"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--导航栏的项按钮样式-->
+    <Style x:Key="NaviItemBtn" TargetType="Button">
+        <Setter Property="Margin" Value="0,4"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="FontFamily" Value="幼圆"/>
+        <Setter Property="Foreground" Value="#0078D4"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        
+        <!--重写按钮的模板-->
+        <Setter Property="Template">
+            <Setter.Value>
+                <!--使用按钮原来的样式，不做更改-->
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="2"
+                            Padding="4,0">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <!--鼠标悬停时修改背景颜色-->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="#005A9E"/>
+                            <Setter Property="Background" Value="#BEE6FD"/>
+                        </Trigger>
+                        <!--鼠标按下时的样式-->
+                        <!--<Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="SkyBlue"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>-->
+                        <!--鼠标禁用时的样式-->
+                        <!--<Trigger Property="IsEnabled" Value="False">
+                            --><!--<Setter Property="Background" Value="#EEEEEE"/>--><!--
+                            <Setter Property="Foreground" Value="#AAAAAA"/>
+                        </Trigger>-->
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

@@ -739,17 +739,7 @@ namespace ScrcpyEX.View
         private async Task OpenRndis()
         {
             MyGM.POP("正在打开USB网络共享");
-
             await MyGM.AdbAsync("shell svc usb setFunctions rndis");
-            string str = await MyGM.AdbAsync("shell getprop sys.usb.config");
-            if (str.Contains("rndis"))
-            {
-                MyGM.POP("USB网络共享打开成功");
-            }
-            else
-            {
-                MyGM.ShwError($"输出信息：\n{str}", "ADB命令执行失败");
-            }
         }
 
 

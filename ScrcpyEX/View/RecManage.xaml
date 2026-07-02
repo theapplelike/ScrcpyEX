@@ -18,7 +18,7 @@
 
     <Window.Resources>
         <SolidColorBrush x:Key="Scb1" Color="#5B9DF0" Opacity="0.25"/>
-        <converter:IsScriptGroupConverter x:Key="ScriptTypeConverter"/>
+        <converter:IsScriptGroupConverter x:Key="IsScriptTypeConverter"/>
         
         <Style x:Key="LstBtn" TargetType="Button" BasedOn="{StaticResource MenuBtn}">
             <Setter Property="Height" Value="30"/>
@@ -111,7 +111,7 @@
                                 </Grid>
                             </Border>
                             <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Path=., Converter={StaticResource ScriptTypeConverter}}" Value="True">
+                                <DataTrigger Binding="{Binding Path=., Converter={StaticResource IsScriptTypeConverter}}" Value="True">
                                     <Setter TargetName="borderRoot" Property="Background" Value="{StaticResource StripeBrush}"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>

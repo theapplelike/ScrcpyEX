@@ -12,6 +12,8 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.Xml;
@@ -25,9 +27,9 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
 using DPoint = System.Drawing.Point;  //Windows Forms的Point
 using WPoint = System.Windows.Point;  //WPF的Point
-using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
 
 namespace ScrcpyEX.View
 {
@@ -66,71 +68,55 @@ namespace ScrcpyEX.View
         {
             //MyGM.POP("yesclick");
         }
-        //MiniTouchService mt = null;
+
         //测试用的小屏无黑边尺寸205,136
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
 
-            //string localPath = "./Resource/File/minitouch-arm64-v8a";
-            //string PushPath  = "/data/local/tmp/minitouch";
-            //await MyGM.AdbAsync($"push {localPath} {PushPath}");
+            //await MyGM.AdbAsync("devices");
 
-            //await MyGM.AdbAsync($"shell [ -f {PushPath} ] && echo Y || echo N");
+            //var client = new TcpClient();
+            //await client.ConnectAsync("127.0.0.1", 27183);
+            //var stream = client.GetStream();
+            //
+            //long touchId = 19;
+            ////int screenW = 1080, screenH = 1920; // 从服务端获取的实际尺寸
+            //
+            //// 按下
+            //byte[] downMsg = BuildTouchMsg(0, touchId, 100, 390);
+            //await stream.WriteAsync(downMsg, 0, downMsg.Length);
+            //
+            //// 移动到新位置
+            ////byte[] moveMsg = BuildTouchMsg(2, touchId, x2, y2, screenW, screenH);
+            ////await stream.WriteAsync(moveMsg, 0, moveMsg.Length);
+            //
+            //// 抬起
+            //byte[] upMsg = BuildTouchMsg(1, touchId, 100, 390);
+            //await stream.WriteAsync(upMsg, 0, upMsg.Length);
 
-            //await MyGM.AdbAsync($"shell rm {PushPath}");
-
-            //await MyGM.AdbAsync($"shell chmod 755 {PushPath}");
-            //await MyGM.AdbAsync($"shell {PushPath} > /dev/null 2>&1 &");
-
-            //卸载STFService
-            await MyGM.AdbAsync($"uninstall jp.co.cyberagent.stf");
-
-            //安装STFService
-            //await MyGM.AdbAsync($"install D:/Download/STF.apk");
-
-            //验证STFService是否安装
-            //await MyGM.AdbAsync("shell pm list packages jp.co.cyberagent.stf");
-
-            //赋予STFService应用INJECT_EVENTS权限
-            //await MyGM.AdbAsync("shell pm grant jp.co.cyberagent.stf android.permission.INJECT_EVENTS");
-            //await MyGM.AdbAsync("shell am startservice -n jp.co.cyberagent.stf/.Service --es action minitouch --es socketName minitouch");
-
-            //await MyGM.AdbAsync("forward --list");
-            //await MyGM.AdbAsync("shell dumpsys activity services jp.co.cyberagent.stf");
-            //await MyGM.AdbAsync("shell am stopservice jp.co.cyberagent.stf/.Service");
-            //if (mt == null)
-            //{
-            //    mt = new();
-            //    await mt.StartAsync();
-            //}
-            //else
-            //{
-            //    mt.Down(99, 376);
-            //    mt.Move(500, 600);
-            //    mt.Up(500, 500);
-            //}
-            //mt = null;
+            DataSync fm = new();
+            fm.ShowDialog();
         }
 
-        /// <summary>
-        /// 通过端口发送命令。
-        /// </summary>
-        //private async Task AdbTest3(double x, double y)
-        //{
-        //    string adbClickCommand = $"shell input tap {x} {y}";
-        //
-        //    ADBSocketCommunicator communicator = new();
-        //    await communicator.ConnectAsync();
-        //
-        //    // 发送"help"命令以获取支持的ADB命令列表
-        //    string helpResponse = await communicator.SendCommandAsync(adbClickCommand);
-        //    Debug.WriteLine("重定向输出:");
-        //    Debug.WriteLine(helpResponse);
-        //
-        //    communicator.Disconnect();
-        //}
-        
+        private byte[] BuildTouchMsg(byte action, long touchId, int x, int y)
+        {
+            using var ms = new MemoryStream();
+            using var writer = new BinaryWriter(ms);
+
+            writer.Write((byte)0x02);               // 消息类型：注入触摸
+            writer.Write(action);                   // 0=DOWN, 1=UP, 2=MOVE
+            writer.Write(IPAddress.HostToNetworkOrder(touchId)); // 大端序 8 字节
+            writer.Write(IPAddress.HostToNetworkOrder((short)x)); // 大端序 2 字节
+            writer.Write(IPAddress.HostToNetworkOrder((short)y));
+            writer.Write(IPAddress.HostToNetworkOrder((short)_horizontalReso));
+            writer.Write(IPAddress.HostToNetworkOrder((short)_verticalReso));
+            writer.Write(IPAddress.HostToNetworkOrder(unchecked((short)65535))); // 压力
+            writer.Write(0x00000001);               // 动作按钮（大端序 4 字节）
+
+            return ms.ToArray();
+        }
+
         //private void AdbPersistent()
         //{
         //    if (_persistentShell == null)

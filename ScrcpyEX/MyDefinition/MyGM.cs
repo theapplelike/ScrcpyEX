@@ -309,7 +309,6 @@ namespace ScrcpyEX.MyDefinition
         public static DLL.LpRect GetHandleRect(IntPtr handle)
         {
             DLL.GetWindowRect(handle, out DLL.LpRect rc);
-            //Console.WriteLine($"句柄窗口尺寸：{rc.Left},{rc.Top},{rc.Right},{rc.Bottom},{rc.Width},{rc.Height}");
             return rc;
         }
 
@@ -362,40 +361,6 @@ namespace ScrcpyEX.MyDefinition
         /// 启动ADB发送命令。
         /// </summary>
         /// <param name="adbCmd">需要执行的ADB命令。</param>
-        /// <returns>执行命令后的结果。</returns>
-        //public static async Task<string> Adb(string adbCmd)
-        //{
-        //    return await Task.Run(() =>
-        //    {
-        //        ProcessStartInfo prcStartInfo = new()
-        //        {
-        //            FileName = MV.ADB_Path,         //adb的路径
-        //            Arguments = adbCmd,             //执行完命令后adb会直接关闭
-        //            RedirectStandardOutput = true,  //重定向输出
-        //            RedirectStandardError = true,
-        //            StandardOutputEncoding = Encoding.UTF8,
-        //            StandardErrorEncoding = Encoding.UTF8,
-        //            UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
-        //            CreateNoWindow = true,          // 不创建窗口
-        //        };
-        //        using Process adbPrc = Process.Start(prcStartInfo);
-        //        string output = adbPrc.StandardOutput.ReadToEnd();
-        //        string error = adbPrc.StandardError.ReadToEnd();
-        //
-        //        adbPrc.WaitForExit();
-        //
-        //        Debug.Write($"{adbCmd}，执行结果：\n{output}");
-        //        Debug.WriteIf(error != "", $"错误信息：{error}\n");
-        //        Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
-        //
-        //        return output;
-        //    });
-        //}
-
-        /// <summary>
-        /// 启动ADB发送命令。
-        /// </summary>
-        /// <param name="adbCmd">需要执行的ADB命令。</param>
         /// <param name="isReturnErr">返回结果是否为错误流。</param>
         /// <returns>执行命令后的结果。</returns>
         public static async Task<string> AdbAsync(string adbCmd, bool isReturnErr = false)
@@ -433,8 +398,6 @@ namespace ScrcpyEX.MyDefinition
             Debug.WriteLineIf(err != "", $"{adbCmd}，执行错误({adbPrc.ExitCode})：\n{Fmt(err)}");
             Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
 
-            //if (adbPrc.ExitCode == 0) err = "";
-
             return isReturnErr ? err : otp;
         }
 
@@ -447,22 +410,22 @@ namespace ScrcpyEX.MyDefinition
         {
             return string.Join(
                 Environment.NewLine,
-                output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries).Select(s => $"    {s}"));
+                output.SplitReal(Environment.NewLine).Select(s => $"    {s}"));
         }
 
         /// <summary>
         /// 记录普通日志。
         /// </summary>
         /// <param name="text">日志内容。</param>
-        public static void Log(string text)
-        {
-            StringBuilder sb = new();
-            sb.AppendLine($"【{DateTime.Now}】：{text}");
-            Directory.CreateDirectory(@".\main\Local\Log");
-
-            using StreamWriter sw = new(@".\main\Local\Log\Log.txt", true, Encoding.UTF8);
-            sw.WriteLine(sb);
-        }
+        //public static void Log(string text)
+        //{
+        //    StringBuilder sb = new();
+        //    sb.AppendLine($"【{DateTime.Now}】：{text}");
+        //    Directory.CreateDirectory(@".\main\Local\Log");
+        //
+        //    using StreamWriter sw = new(@".\main\Local\Log\Log.txt", true, Encoding.UTF8);
+        //    sw.WriteLine(sb);
+        //}
 
 
     }

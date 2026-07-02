@@ -10,8 +10,14 @@ using System.Windows.Data;
 
 namespace ScrcpyEX.MyDefinition.MyConverter
 {
+    /// <summary>
+    /// 当前对象是否为组脚本。
+    /// </summary>
     public class IsScriptGroupConverter : IValueConverter
     {
+        /// <summary>
+        /// 当前对象是否可以转化为组脚本。
+        /// </summary>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return value is ScriptGroup;
