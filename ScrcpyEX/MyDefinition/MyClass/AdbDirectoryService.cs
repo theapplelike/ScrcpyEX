@@ -34,9 +34,19 @@ namespace ScrcpyEX.MyDefinition.MyClass
             return parent;
         }
 
+        /// <summary>
+        /// 获取指定路径下的文件和子目录列表。
+        /// </summary>
+        /// <param name="tgtPath">指定的路径。</param>
+        /// <returns>返回文件和子目录列表，如果ADB执行失败则返回null。</returns>
         public async Task<IEnumerable<FileItem>> GetDirContentAsync(string tgtPath)
         {
-            string otp = await MyGM.AdbAsync($"shell ls -la {tgtPath}");
+            (string otp, string Err, int ExitCode) = await MyGM.AdbMoreAsync($"shell ls -la {tgtPath}");
+
+            if (Err != "" && ExitCode != 0)
+            {
+                throw new Exception($"终止值：{ExitCode}\nADB 执行错误: {Err}");
+            }
             return ParseDir(otp, tgtPath.TrimEnd('/'));
         }
 

@@ -60,7 +60,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
 
         private async void BtnGoUp_Click(object sender, RoutedEventArgs e)
         {
-            await NavigateTo(DirService.GetParentPath(_curPath), true);
+            await NavigateTo(DirService.GetParentPath(CurPath), true);
         }
 
         private async void BtnNavi_Click(object sender, RoutedEventArgs e)
@@ -70,6 +70,11 @@ namespace ScrcpyEX.MyDefinition.MyControl
             {
                 await NavigateTo(bi.FullPath, true);
             }
+        }
+
+        private async void BtnRoot_Click(object sender, RoutedEventArgs e)
+        {
+            await NavigateTo(DirService.Root, true);
         }
 
         /// <summary>
@@ -87,6 +92,11 @@ namespace ScrcpyEX.MyDefinition.MyControl
             }
         }
 
+        private void TbkErr_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            tbkErr.Visibility = Visibility.Collapsed;
+        }
 
+        
     }
 }

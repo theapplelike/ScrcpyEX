@@ -101,7 +101,6 @@
     <Compile Include="MyDefinition\MyClass\InputModeSwitcher.cs" />
     <Compile Include="MyDefinition\MyClass\KeyMapping.cs" />
     <Compile Include="MyDefinition\MyClass\LocalDirectoryService.cs" />
-    <Compile Include="MyDefinition\MyClass\MiniTouchService.cs" />
     <Compile Include="MyDefinition\MyClass\OpenCv.cs" />
     <Compile Include="MyDefinition\MyClass\RangeOC.cs" />
     <Compile Include="MyDefinition\MyClass\ScrcpyHost.cs" />
@@ -145,6 +144,12 @@
     <Compile Include="ViewModel\SelectDeviceVM.cs" />
     <Compile Include="ViewModel\SetupVM.cs" />
     <Compile Include="View\DataSync.xaml.cs">
+      <DependentUpon>DataSync.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DataSync_code.cs">
+      <DependentUpon>DataSync.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DataSync_var.cs">
       <DependentUpon>DataSync.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow_code.cs">

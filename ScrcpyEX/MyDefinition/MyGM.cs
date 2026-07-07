@@ -402,6 +402,49 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
+        /// 启动ADB发送命令，将返回更多信息。
+        /// </summary>
+        /// <param name="adbCmd">需要执行的ADB命令。</param>
+        /// <returns>返回 输出流、错误流、终止值。</returns>
+        public static async Task<(string, string, int)> AdbMoreAsync(string adbCmd)
+        {
+            using Process adbPrc = new()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = MV.ADB_Path,         //adb的路径
+                    Arguments = adbCmd,             //执行完命令后adb会直接关闭
+                    RedirectStandardOutput = true,  //重定向输出
+                    RedirectStandardError = true,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8,
+                    UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
+                    CreateNoWindow = true,          // 不创建窗口
+                },
+                EnableRaisingEvents = true
+            };
+
+            TaskCompletionSource<object> tcs = new();
+            adbPrc.Exited += (_, _) => tcs.TrySetResult(null);
+            adbPrc.Start();
+
+            // 立刻启动异步读取，让管道数据被消费
+            Task<string> otpTask = adbPrc.StandardOutput.ReadToEndAsync();
+            Task<string> errTask = adbPrc.StandardError.ReadToEndAsync();
+            await tcs.Task;// 异步等待进程退出（不阻塞线程）
+
+            string otp = await otpTask;
+            string err = await errTask;
+
+            Debug.WriteLineIf(otp == "" && err == "", $"【{adbCmd}】");
+            Debug.WriteLineIf(otp != "", $"{adbCmd}，执行正常：\n{Fmt(otp)}");
+            Debug.WriteLineIf(err != "", $"{adbCmd}，执行错误({adbPrc.ExitCode})：\n{Fmt(err)}");
+            Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
+
+            return (otp, err, adbPrc.ExitCode);
+        }
+
+        /// <summary>
         /// 格式化Adb的输出内容，去掉空字符行，剩余行前面增加4个空格的缩进。
         /// </summary>
         /// <param name="output">要格式化的字符串。</param>

@@ -11,8 +11,14 @@ namespace ScrcpyEX.ViewModel
 {
     internal class DataSyncVM : NotificationObject
     {
+        /// <summary>
+        /// ADB目录服务。
+        /// </summary>
         public IDirectoryService AdbService { get; } = new AdbDirectoryService();
 
+        /// <summary>
+        /// 本地目录的服务。
+        /// </summary>
         public IDirectoryService LclService { get; } = new LocalDirectoryService();
 
 

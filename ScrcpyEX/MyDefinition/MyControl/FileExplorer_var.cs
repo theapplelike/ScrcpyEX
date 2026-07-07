@@ -23,11 +23,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
         private readonly List<string> _history = [];
 
         /// <summary>
-        /// 当前的路径。
-        /// </summary>
-        private string _curPath;
-
-        /// <summary>
         /// 当前的历史记录索引。
         /// </summary>
         private int _curIndex = -1;
@@ -36,6 +31,16 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// 目录的集合。
         /// </summary>
         private readonly RangeOC<FileItem> _dir = [];
+
+        /// <summary>
+        /// 当前的路径。
+        /// </summary>
+        public string CurPath { get; set; }
+
+        /// <summary>
+        /// 是否可以发送文件。
+        /// </summary>
+        public bool IsCanSend { get; set; }
 
         /// <summary>
         /// 排序命令。
@@ -92,6 +97,20 @@ namespace ScrcpyEX.MyDefinition.MyControl
         }
         public static readonly DependencyProperty DirServiceProperty = RegProp<IDirectoryService>(nameof(DirService));
 
-        
+        /// <summary>
+        /// 是否显示导航到根目录按钮。
+        /// </summary>
+        public Visibility ShowGoRoot
+        {
+            get => (Visibility)GetValue(ShowGoRootProperty);
+            set
+            {
+                SetValue(ShowGoRootProperty, value);
+                scv.Margin = value == Visibility.Visible ? new() : new(0, 0, 15, 0);
+            }
+        }
+        public static readonly DependencyProperty ShowGoRootProperty = RegProp<Visibility>(nameof(ShowGoRoot));
+
+
     }
 }

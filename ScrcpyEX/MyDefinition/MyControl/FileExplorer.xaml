@@ -10,10 +10,9 @@
              d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded">
 
     <UserControl.Resources>
-        <converter:FileToIconConverter x:Key="FileToIconConverter"/>
         <converter:FileSizeConverter x:Key="FileSizeConverter"/>
         <converter:SortArrowConverter x:Key="SortArrowConverter"/>
-        <SolidColorBrush x:Key="Scb1" Color="red" Opacity="0.1"/>
+        <converter:FileToIconConverter x:Key="FileToIconConverter"/>
 
         <!--ListView的内容控件的列头样式-->
         <Style TargetType="{x:Type GridViewColumnHeader}">
@@ -22,7 +21,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
-                        <Border x:Name="border" BorderThickness="0,0,1,0" BorderBrush="Black" Margin="-0,0,0,0">
+                        <Border x:Name="border" BorderThickness="0,0,1,0" BorderBrush="Black" Margin="0,0,0,0">
                             <Grid SnapsToDevicePixels="True" Background="Transparent">
                                 <Grid.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
@@ -43,10 +42,6 @@
                                                   RecognizesAccessKey="True"
                                                   SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
 
-                                <!--<TextBlock Text="&#xe70d;" 
-                                       Margin="0,0,4,0"
-                                       Grid.Column="1" 
-                                       Style="{StaticResource txtIcon}"/>-->
                                 <!--指示升降序的箭头-->
                                 <Path x:Name="SortArrow"
                                       Grid.Column="1"
@@ -112,11 +107,12 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Margin="0,0,0,5" BorderThickness="1" BorderBrush="Black" CornerRadius="16" Padding="5,0,0,0">
+        <Border Margin="0,0,0,5" BorderThickness="1" BorderBrush="Black" CornerRadius="16" Padding="5,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
@@ -133,9 +129,9 @@
                     <Border Width="2" Background="LightGray" Margin="2,0,4,0"/>
                 </StackPanel>
 
-                <ScrollViewer Grid.Column="1" 
-                              x:Name="scv"
-                              Margin="0,0,15,0"
+                <ScrollViewer x:Name="scv" 
+                              Grid.Column="1" 
+                              Margin="0,0,0,0"
                               Focusable="False"
                               CanContentScroll="True"
                               HorizontalScrollBarVisibility="Hidden" 
@@ -161,6 +157,11 @@
                     </ItemsControl>
                 </ScrollViewer>
 
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Visibility="{Binding ShowGoRoot, ElementName=root}">
+                    <Border Width="2" Background="LightGray" Margin="4,0,2,0"/>
+                    <Button x:Name="btnRoot" Click="BtnRoot_Click" Content="&#xea8a;" Style="{StaticResource NaviBtn}" IsEnabled="True"/>
+                </StackPanel>
+                
             </Grid>
         </Border>
 
@@ -168,10 +169,6 @@
                   ItemsSource="{Binding DirView, ElementName=root}" 
                   Grid.Row="1"
                   d:ItemsSource="{d:SampleData ItemCount=5}">
-
-            <ListView.Resources>
-                <!--<Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource CleanColumnHeaderStyle}" />-->
-            </ListView.Resources>
 
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
@@ -221,7 +218,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn x:Name="gvcSize">
+                    <GridViewColumn x:Name="gvcSize" Width="60">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Tag="Size">大小</GridViewColumnHeader>
                         </GridViewColumn.Header>
@@ -246,6 +243,8 @@
                 </GridView>
             </ListView.View>
         </ListView>
+
+        <TextBlock x:Name="tbkErr" MouseUp="TbkErr_MouseUp" Grid.Row="1" Background="DarkKhaki" Foreground="GhostWhite" Visibility="Collapsed" Padding="5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
     </Grid>
 </UserControl>

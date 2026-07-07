@@ -27,6 +27,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
 using DPoint = System.Drawing.Point;  //Windows Forms的Point
 using WPoint = System.Windows.Point;  //WPF的Point
@@ -73,48 +74,13 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
-
             //await MyGM.AdbAsync("devices");
-
-            //var client = new TcpClient();
-            //await client.ConnectAsync("127.0.0.1", 27183);
-            //var stream = client.GetStream();
-            //
-            //long touchId = 19;
-            ////int screenW = 1080, screenH = 1920; // 从服务端获取的实际尺寸
-            //
-            //// 按下
-            //byte[] downMsg = BuildTouchMsg(0, touchId, 100, 390);
-            //await stream.WriteAsync(downMsg, 0, downMsg.Length);
-            //
-            //// 移动到新位置
-            ////byte[] moveMsg = BuildTouchMsg(2, touchId, x2, y2, screenW, screenH);
-            ////await stream.WriteAsync(moveMsg, 0, moveMsg.Length);
-            //
-            //// 抬起
-            //byte[] upMsg = BuildTouchMsg(1, touchId, 100, 390);
-            //await stream.WriteAsync(upMsg, 0, upMsg.Length);
 
             DataSync fm = new();
             fm.ShowDialog();
-        }
 
-        private byte[] BuildTouchMsg(byte action, long touchId, int x, int y)
-        {
-            using var ms = new MemoryStream();
-            using var writer = new BinaryWriter(ms);
-
-            writer.Write((byte)0x02);               // 消息类型：注入触摸
-            writer.Write(action);                   // 0=DOWN, 1=UP, 2=MOVE
-            writer.Write(IPAddress.HostToNetworkOrder(touchId)); // 大端序 8 字节
-            writer.Write(IPAddress.HostToNetworkOrder((short)x)); // 大端序 2 字节
-            writer.Write(IPAddress.HostToNetworkOrder((short)y));
-            writer.Write(IPAddress.HostToNetworkOrder((short)_horizontalReso));
-            writer.Write(IPAddress.HostToNetworkOrder((short)_verticalReso));
-            writer.Write(IPAddress.HostToNetworkOrder(unchecked((short)65535))); // 压力
-            writer.Write(0x00000001);               // 动作按钮（大端序 4 字节）
-
-            return ms.ToArray();
+            string a = System.IO.Path.GetPathRoot(@"C:\");
+            string b = System.IO.Path.GetPathRoot(@"C:\inetpub");
         }
 
         //private void AdbPersistent()

@@ -109,6 +109,17 @@ namespace ScrcpyEX.MyDefinition
             return org.Split([separator], StringSplitOptions.RemoveEmptyEntries);
         }
 
+        /// <summary>
+        /// 根据分隔符拆分原始字符串，不会包含空数组元素。
+        /// </summary>
+        /// <param name="org">原始字符串。</param>
+        /// <param name="separators">分隔符数组。</param>
+        /// <returns>分隔后的字符串数组，不会包含空数组元素。</returns>
+        public static string[] SplitReal(this string org, char[] separators)
+        {
+            return org.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+        }
+
 
     }
 }

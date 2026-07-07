@@ -23,5 +23,25 @@ namespace ScrcpyEX.View
         {
             InitializeComponent();
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            MyInit();
+        }
+
+        private async void BtnToAdb_Click(object sender, RoutedEventArgs e)
+        {
+            await SendFile(true, "推送");
+        }
+
+        private async void BtnToLcl_Click(object sender, RoutedEventArgs e)
+        {
+            await SendFile(false, "拉取");
+        }
+
+        private async void BtnSync_Click(object sender, RoutedEventArgs e)
+        {
+            await SyncFile();
+        }
     }
 }
