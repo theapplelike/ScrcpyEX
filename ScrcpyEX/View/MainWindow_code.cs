@@ -121,6 +121,8 @@ namespace ScrcpyEX.View
             KMC_Hook.CancelHook();
             MRS_Hook.CancelHook();
             MDC_Hook.CancelHook();
+
+            if (!Debugger.IsAttached) MyGM.StopAdbServer();
         }
 
         /// <summary>

@@ -187,6 +187,11 @@ namespace ScrcpyEX.View
                 Debug.WriteLine($"BtnFouce失去键盘输入焦点，焦点给到SC");
             }
         }
+
+        private void BtnDataSync_Click(object sender, RoutedEventArgs e)
+        {
+            new DataSync().ShowDialog();
+        }
         #endregion
 
         #region 位置和大小的菜单
@@ -275,7 +280,6 @@ namespace ScrcpyEX.View
         {
             MappingCancel();
         }
-
         #endregion
 
         

@@ -142,6 +142,7 @@
                     
                     <mycontrol:IconButton x:Name="btnRecManage" Click="BtnRecManage_Click" MainIcon="&#xea40;" CornerIcon="&#xE712;" ToolTip="脚本管理(F5)"/>
                     <mycontrol:IconButton x:Name="btnSetManage" Click="BtnSetManage_Click" MainIcon="&#xe713;" CornerIcon="&#xE712;" ToolTip="程序设置(F6)"/>
+                    <mycontrol:IconButton x:Name="btnDataSync"  Click="BtnDataSync_Click"  MainIcon="&#xe8f7;" CornerIcon="&#xE712;" ToolTip="数据传输窗口"/>
                     <Rectangle Style="{StaticResource sep}"/>
 
                     <mycontrol:IconButton x:Name="btnSizeOpt" Click="BtnSizeOpt_Click" MainIcon="&#xe78a;" CornerIcon="&#xE7bc;" ToolTip="位置与大小选项(F7)"/>

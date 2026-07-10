@@ -24,8 +24,10 @@ namespace ScrcpyEX.MyDefinition.MyControl
         {
             if (DesignerProperties.GetIsInDesignMode(this)) return;
 
+            prgLoad.Visibility = Visibility.Visible;
             DirView = CollectionViewSource.GetDefaultView(_dir);
             await NavigateTo(DirService.Root);
+            prgLoad.Visibility = Visibility.Collapsed;
         }
 
         /// <summary>
@@ -177,6 +179,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 tbkErr.Visibility = Visibility.Visible;
                 return IsCanSend = false;
             }
+
             return IsCanSend = true;
         }
 

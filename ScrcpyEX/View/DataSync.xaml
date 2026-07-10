@@ -47,5 +47,9 @@
             <Button x:Name="btnSync" Click="BtnSync_Click" Content="&#xe8ab;" Style="{StaticResource thisBtn}" ToolTip="同步双方目录数据"/>
         </StackPanel>
 
+        <Grid x:Name="gMask" Grid.ColumnSpan="3" IsHitTestVisible="True" Background="#80FFFFFF" Visibility="Collapsed">
+            <ctrl:ProgressRing RingType="3" Desc="传输中..."/>
+        </Grid>
+
     </Grid>
 </Window>

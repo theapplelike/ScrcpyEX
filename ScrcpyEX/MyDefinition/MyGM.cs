@@ -361,44 +361,11 @@ namespace ScrcpyEX.MyDefinition
         /// 启动ADB发送命令。
         /// </summary>
         /// <param name="adbCmd">需要执行的ADB命令。</param>
-        /// <param name="isReturnErr">返回结果是否为错误流。</param>
         /// <returns>执行命令后的结果。</returns>
-        public static async Task<string> AdbAsync(string adbCmd, bool isReturnErr = false)
+        public static async Task<string> AdbAsync(string adbCmd)
         {
-            using Process adbPrc = new()
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = MV.ADB_Path,         //adb的路径
-                    Arguments = adbCmd,             //执行完命令后adb会直接关闭
-                    RedirectStandardOutput = true,  //重定向输出
-                    RedirectStandardError = true,
-                    StandardOutputEncoding = Encoding.UTF8,
-                    StandardErrorEncoding = Encoding.UTF8,
-                    UseShellExecute = false,        // 必须设置为false以允许设置Arguments属性
-                    CreateNoWindow = true,          // 不创建窗口
-                },
-                EnableRaisingEvents = true
-            };
-
-            TaskCompletionSource<object> tcs = new();
-            adbPrc.Exited += (_, _) => tcs.TrySetResult(null);
-            adbPrc.Start();
-
-            // 立刻启动异步读取，让管道数据被消费
-            Task<string> otpTask = adbPrc.StandardOutput.ReadToEndAsync();
-            Task<string> errTask = adbPrc.StandardError.ReadToEndAsync();
-            await tcs.Task;// 异步等待进程退出（不阻塞线程）
-
-            string otp = await otpTask;
-            string err = await errTask;
-
-            Debug.WriteLineIf(otp == "" && err == "", $"【{adbCmd}】");
-            Debug.WriteLineIf(otp != "", $"{adbCmd}，执行正常：\n{Fmt(otp)}");
-            Debug.WriteLineIf(err != "", $"{adbCmd}，执行错误({adbPrc.ExitCode})：\n{Fmt(err)}");
-            Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
-
-            return isReturnErr ? err : otp;
+            (string otp, _, _) = await AdbMoreAsync(adbCmd);
+            return otp;
         }
 
         /// <summary>
@@ -454,6 +421,22 @@ namespace ScrcpyEX.MyDefinition
             return string.Join(
                 Environment.NewLine,
                 output.SplitReal(Environment.NewLine).Select(s => $"    {s}"));
+        }
+
+        /// <summary>
+        /// 停止ADB服务。
+        /// </summary>
+        public static void StopAdbServer()
+        {
+            ProcessStartInfo psi = new()
+            {
+                FileName = MV.ADB_Path,
+                Arguments = "kill-server",
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+
+            Process.Start(psi);
         }
 
         /// <summary>

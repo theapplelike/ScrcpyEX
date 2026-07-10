@@ -116,6 +116,9 @@
     </Compile>
     <Compile Include="MyDefinition\MyControl\HoverPopup.cs" />
     <Compile Include="MyDefinition\MyControl\IconButton.cs" />
+    <Compile Include="MyDefinition\MyControl\ProgressRing.xaml.cs">
+      <DependentUpon>ProgressRing.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MyDefinition\MyControl\TimePopup.cs" />
     <Compile Include="MyDefinition\MyConverter\FileToIconConverter.cs" />
     <Compile Include="MyDefinition\MyConverter\FileSizeConverter.cs" />
@@ -213,6 +216,10 @@
       <DependentUpon>ShowImg.xaml</DependentUpon>
     </Compile>
     <Page Include="MyDefinition\MyControl\FileExplorer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MyDefinition\MyControl\ProgressRing.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

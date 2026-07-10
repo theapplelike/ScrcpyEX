@@ -70,17 +70,16 @@ namespace ScrcpyEX.View
             //MyGM.POP("yesclick");
         }
 
-        //测试用的小屏无黑边尺寸205,136
+        /// <summary>
+        /// 测试用的小屏无黑边尺寸205,136
+        /// await MyGM.AdbAsync("devices");
+        /// </summary>
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
-            //await MyGM.AdbAsync("devices");
 
-            DataSync fm = new();
-            fm.ShowDialog();
-
-            string a = System.IO.Path.GetPathRoot(@"C:\");
-            string b = System.IO.Path.GetPathRoot(@"C:\inetpub");
+            //DataSync fm = new();
+            //fm.ShowDialog();
         }
 
         //private void AdbPersistent()

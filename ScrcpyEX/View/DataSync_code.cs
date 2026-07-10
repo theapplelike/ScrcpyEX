@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -144,12 +145,14 @@ namespace ScrcpyEX.View
         /// <param name="isPush">是否为推送模式（本地->安卓）。</param>
         private async Task TransmitFile(List<string> fileNames, bool isPush)
         {
+            gMask.Visibility = Visibility.Visible;
             foreach (string name in fileNames)
             {
                 string lclPath = Path.Combine(fleLcl.CurPath, name);
                 string adbPath = $@"{fleAdb.CurPath}/{name}";
                 await MyGM.AdbAsync(GetCmd(lclPath, adbPath, isPush));
             }
+            gMask.Visibility = Visibility.Collapsed;
         }
 
 
