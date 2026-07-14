@@ -1,6 +1,7 @@
 ﻿using OpenCvSharp.ML;
 using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition.MyEvent;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Threading;
 
@@ -109,18 +111,18 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// </summary>
         private void SetColWidth()
         {
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
+            Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
             {
                 //gvcTime.Width = double.NaN;
                 //gvcSize.Width = double.NaN;
-                double nameWd = lstAndroid.ActualWidth -
+                double nameWd = lstDir.ActualWidth -
                     SystemParameters.VerticalScrollBarWidth -
                     gvcSize.ActualWidth -
                     gvcTime.ActualWidth - 10;
 
                 gvcName.Width = nameWd > 0 ? nameWd : double.NaN;
                 //Debug.WriteLine($"info:" +
-                //    $"{lstAndroid.ActualWidth}--" +
+                //    $"{lstDir.ActualWidth}--" +
                 //    $"{gvcName.ActualWidth}--{gvcSize.ActualWidth}--{gvcTime.ActualWidth}");
             }));
         }
@@ -181,6 +183,77 @@ namespace ScrcpyEX.MyDefinition.MyControl
             }
 
             return IsCanSend = true;
+        }
+
+        /// <summary>
+        /// 创建右键菜单。
+        /// </summary>
+        /// <param name="clickedFile">右键点击的那一项。</param>
+        /// <param name="selectedFiles">所有选中的文件项。</param>
+        /// <returns>ContextMenu控件。</returns>
+        private ContextMenu CreateMenu(FileItem clickedFile, IList<FileItem> selectedFiles)
+        {
+            ContextMenu menu = new();
+            MenuItem xferItem = new() { Header = "传输文件" };
+            MenuItem coverItem = new() { Header = "传输文件（覆盖）" };
+            MenuItem deleItem = new() { Header = "删除文件" };
+            selectedFiles = [.. selectedFiles.Where(f => !f.IsDirectory)];
+
+            xferItem.Click += (s, e) =>
+            {
+                // 构造事件参数并引发路由事件
+                XferFileEventArgs args = new()
+                {
+                    ClickedItem = clickedFile,
+                    SelectedItems = selectedFiles,
+                    RoutedEvent = XferFileRequestedEvent,
+                };
+                RaiseEvent(args);
+            };
+            coverItem.Click += (s, e) =>
+            {
+                XferFileEventArgs args = new()
+                {
+                    IsCover = true,
+                    ClickedItem = clickedFile,
+                    SelectedItems = selectedFiles,
+                    RoutedEvent = XferFileRequestedEvent,
+                };
+                RaiseEvent(args);
+            };
+            deleItem.Click += async (s, e) =>
+            {
+                prgLoad.Visibility = Visibility.Visible;
+                await DirService.DeleteFilesAsync(selectedFiles);
+                Reload();
+                prgLoad.Visibility = Visibility.Collapsed;
+            };
+
+            GenTitle(menu, selectedFiles);
+            menu.Items.Add(xferItem);
+            menu.Items.Add(coverItem);
+            menu.Items.Add(new Separator());
+            menu.Items.Add(deleItem);
+
+            return menu;
+        }
+
+        /// <summary>
+        /// 生成菜单的标题。
+        /// </summary>
+        /// <param name="menu">菜单控件。</param>
+        /// <param name="selectedFiles">所有选中的项。</param>
+        private void GenTitle(ContextMenu menu, IList<FileItem> selectedFiles)
+        {
+            MenuItem headerItem = new()
+            {
+                Header = selectedFiles.Count == 1
+                     ? $"文件: {selectedFiles[0].Name}"
+                     : $"已选中 {selectedFiles.Count} 个文件",
+                Style = (Style)FindResource("ContextMenuHeaderStyle")
+            };
+            menu.Items.Add(headerItem);
+            menu.Items.Add(new Separator());
         }
 
         /// <summary>

@@ -289,6 +289,9 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         [DllImport("user32.dll")]
         public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
+        [DllImport("winmm.dll")]
+        public static extern int waveOutGetNumDevs();
+
         //[DllImport("user32.dll")]
         //public static extern IntPtr GetDesktopWindow();
 

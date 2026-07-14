@@ -1,6 +1,7 @@
 ﻿using OpenCvSharp.ML;
 using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition.Interface;
+using ScrcpyEX.MyDefinition.MyEvent;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -35,15 +36,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             MyInit();
-        }
-
-        private async void ChildGrid_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            Grid grid = sender as Grid;
-            if (grid.DataContext is FileItem fi && fi.IsDirectory)
-            {
-                await NavigateTo(fi.FullPath, true);
-            }
         }
 
         private async void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -97,6 +89,41 @@ namespace ScrcpyEX.MyDefinition.MyControl
             tbkErr.Visibility = Visibility.Collapsed;
         }
 
-        
+        private async void ChildGrid_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Grid grid = sender as Grid;
+            if (grid.DataContext is FileItem fi && fi.IsDirectory)
+            {
+                await NavigateTo(fi.FullPath, true);
+            }
+        }
+
+        /// <summary>
+        /// ListView显示右键菜单。
+        /// </summary>
+        private void LstDir_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (sender is ListView lst)
+            {
+                if (lst.ContainerFromElement((DependencyObject)e.OriginalSource) is ListViewItem item)
+                {
+                    if (item.DataContext is FileItem fi)
+                    {
+                        e.Handled = true;
+
+                        //目录菜单待定
+                        if (fi.IsDirectory)
+                        {
+                            return;
+                        }
+
+                        item.ContextMenu = CreateMenu(fi, [.. lst.SelectedItems.Cast<FileItem>()]);
+                        item.ContextMenu.IsOpen = true;
+                    }
+                }
+            }
+        }
+
+
     }
 }

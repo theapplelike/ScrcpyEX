@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition.MyEvent;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,17 +33,33 @@ namespace ScrcpyEX.View
 
         private async void BtnToAdb_Click(object sender, RoutedEventArgs e)
         {
-            await SendFile(true, "推送");
+            await SendFile(true);
         }
 
         private async void BtnToLcl_Click(object sender, RoutedEventArgs e)
         {
-            await SendFile(false, "拉取");
+            await SendFile(false);
         }
 
         private async void BtnSync_Click(object sender, RoutedEventArgs e)
         {
             await SyncFile();
+        }
+
+        private async void FleLcl_XferFileRequested(object sender, RoutedEventArgs e)
+        {
+            if (e is XferFileEventArgs args)
+            {
+                await SendFile(true, args.IsCover, [.. args.SelectedItems]);
+            }
+        }
+
+        private async void FleAdb_XferFileRequested(object sender, RoutedEventArgs e)
+        {
+            if (e is XferFileEventArgs args)
+            {
+                await SendFile(false, args.IsCover, [.. args.SelectedItems]);
+            }
         }
     }
 }

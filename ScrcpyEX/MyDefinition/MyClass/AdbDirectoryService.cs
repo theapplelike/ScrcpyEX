@@ -50,6 +50,19 @@ namespace ScrcpyEX.MyDefinition.MyClass
             return ParseDir(otp, tgtPath.TrimEnd('/'));
         }
 
+        public async Task<int> DeleteFilesAsync(IEnumerable<FileItem> items)
+        {
+            if (items == null) return 0;
+            int deleted = 0;
+            foreach (FileItem item in items)
+            {
+                if (item.IsDirectory) continue;
+                string output = await MyGM.AdbAsync($"shell rm -f \"{item.FullPath}\"");
+                deleted++;
+            }
+            return deleted;
+        }
+
         /// <summary>
         /// <para>
         /// ADB获得的文件列表格式：-rw-rw---- 1 root sdcard_rw 301 2026-04-04 19:25 shumei.txt

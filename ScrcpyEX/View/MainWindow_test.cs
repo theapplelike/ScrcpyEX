@@ -78,8 +78,7 @@ namespace ScrcpyEX.View
         {
             await Task.Delay(1);
 
-            //DataSync fm = new();
-            //fm.ShowDialog();
+            new DataSync().ShowDialog();
         }
 
         //private void AdbPersistent()

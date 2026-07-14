@@ -18,7 +18,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using static System.Net.WebRequestMethods;
 
 namespace ScrcpyEX.MyDefinition
 {
@@ -27,6 +26,11 @@ namespace ScrcpyEX.MyDefinition
     /// </summary>
     internal class MyGM
     {
+        /// <summary>
+        /// 错误日志路径。
+        /// </summary>
+        private static readonly string _errPath = @".\main\Local\ErrorLog";
+
         /// <summary>
         /// 在鼠标位置显示Popup提示，重复执行时可以显示到最新位置。
         /// </summary>
@@ -402,10 +406,12 @@ namespace ScrcpyEX.MyDefinition
 
             string otp = await otpTask;
             string err = await errTask;
+            int exc = adbPrc.ExitCode;
 
-            Debug.WriteLineIf(otp == "" && err == "", $"【{adbCmd}】");
+            Debug.WriteLineIf(otp == "" && err == "", $"【{adbCmd}】，终止值：{exc}");
             Debug.WriteLineIf(otp != "", $"{adbCmd}，执行正常：\n{Fmt(otp)}");
-            Debug.WriteLineIf(err != "", $"{adbCmd}，执行错误({adbPrc.ExitCode})：\n{Fmt(err)}");
+            Debug.WriteLineIf(err != "" && exc == 0, $"{adbCmd}，执行正常({adbPrc.ExitCode})：\n{Fmt(err)}");
+            Debug.WriteLineIf(err != "" && exc != 0, $"{adbCmd}，执行错误({adbPrc.ExitCode})：\n{Fmt(err)}");
             Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
 
             return (otp, err, adbPrc.ExitCode);
@@ -437,6 +443,38 @@ namespace ScrcpyEX.MyDefinition
             };
 
             Process.Start(psi);
+        }
+
+        /// <summary>
+        /// 记录异常信息。
+        /// </summary>
+        /// <param name="ex">异常对象。</param>
+        /// <param name="processEvent">处理异常的事件名称。</param>
+        /// <param name="isShwBox">是否需要显示错误弹窗。</param>
+        public static void RecordException(Exception ex, string processEvent, bool isShwBox = true)
+        {
+            StringBuilder sb = new();
+            sb.AppendLine("****************************异常文本****************************");
+            sb.AppendLine("【出现时间】：" + DateTime.Now.ToString());
+            sb.AppendLine("【处理事件】：" + processEvent);
+            if (ex != null)
+            {
+                sb.AppendLine("【异常类型】：" + ex.GetType().Name);
+                sb.AppendLine("【异常信息】：" + ex.Message);
+                sb.AppendLine("【堆栈调用】：" + ex.StackTrace);
+            }
+            else
+            {
+                sb.AppendLine("【未处理异常】：" + ex.ToString());
+            }
+            sb.AppendLine("****************************--------****************************");
+            Directory.CreateDirectory(_errPath);
+
+            //文件存在则追加，不存在则新建文件。
+            using StreamWriter sw = new($@"{_errPath}\ErrorLog.txt", true, Encoding.UTF8);
+            sw.WriteLine(sb);
+
+            if (isShwBox) ShwError($"{processEvent}：{ex}");
         }
 
         /// <summary>

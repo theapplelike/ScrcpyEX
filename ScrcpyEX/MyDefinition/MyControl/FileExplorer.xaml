@@ -15,6 +15,24 @@
         <converter:SortArrowConverter x:Key="SortArrowConverter"/>
         <converter:FileToIconConverter x:Key="FileToIconConverter"/>
 
+        <!-- MenuItem项的标题样式：看起来像静态文本，无交互 -->
+        <Style x:Key="ContextMenuHeaderStyle" TargetType="MenuItem">
+            <Setter Property="IsEnabled" Value="False"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border Background="WhiteSmoke" Padding="8,4">
+                            <TextBlock Text="{TemplateBinding Header}" 
+                                       FontWeight="SemiBold" 
+                                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+                                       FontSize="12"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!--ListView的内容控件的列头样式-->
         <Style TargetType="{x:Type GridViewColumnHeader}">
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -106,6 +124,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <Border Margin="0,0,0,5" BorderThickness="1" BorderBrush="Black" CornerRadius="16" Padding="5,0">
@@ -166,9 +185,10 @@
             </Grid>
         </Border>
 
-        <ListView x:Name="lstAndroid" 
-                  ItemsSource="{Binding DirView, ElementName=root}" 
+        <ListView x:Name="lstDir" 
                   Grid.Row="1"
+                  ItemsSource="{Binding DirView, ElementName=root}" 
+                  ContextMenuOpening="LstDir_ContextMenuOpening"
                   d:ItemsSource="{d:SampleData ItemCount=5}">
 
             <ListView.ItemContainerStyle>
@@ -185,7 +205,7 @@
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Grid PreviewMouseUp="ChildGrid_PreviewMouseUp">
+                                <Grid ToolTipService.BetweenShowDelay="0" PreviewMouseLeftButtonUp="ChildGrid_PreviewMouseLeftButtonUp">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto"/>
                                         <ColumnDefinition Width="*"/>
@@ -211,9 +231,31 @@
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
+                                    
                                     <Grid.ToolTip>
-                                        <TextBlock Text="{Binding Name}" />
+                                        <ToolTip>
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock>
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Text" Value="文件："/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsDirectory}" Value="True">
+                                                                        <Setter Property="Text" Value="目录："/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                    <TextBlock Text="{Binding Name}"/>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding Size, Converter={StaticResource FileSizeConverter}, StringFormat='大小：{0}'}"/>
+                                                <TextBlock Text="{Binding Time, StringFormat='修改时间：{0:yyyy-MM-dd HH:mm}'}"/>
+                                            </StackPanel>
+                                        </ToolTip>
                                     </Grid.ToolTip>
+                                    
                                 </Grid>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -230,7 +272,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn x:Name="gvcTime">
+                    <GridViewColumn x:Name="gvcTime" Width="114">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Tag="Time">修改时间</GridViewColumnHeader>
                         </GridViewColumn.Header>
@@ -246,7 +288,16 @@
         </ListView>
 
         <ctrl:ProgressRing x:Name="prgLoad" Grid.Row="1" RingType="2" Visibility="Collapsed"/>
-        <TextBlock x:Name="tbkErr" MouseUp="TbkErr_MouseUp" Grid.Row="1" Background="DarkKhaki" Foreground="GhostWhite" Visibility="Collapsed" Padding="5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBlock x:Name="tbkErr" MouseUp="TbkErr_MouseUp" Grid.Row="1" 
+                   Background="DarkKhaki" Foreground="GhostWhite" Visibility="Collapsed" 
+                   Padding="5" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                   TextWrapping="Wrap" MaxWidth="400"/>
+
+        <StatusBar Grid.Row="2" Margin="10,0,0,0" Background="Transparent">
+            <StatusBarItem>
+                <TextBlock Text="{Binding DirView.Count, ElementName=root, StringFormat='共 {0} 项'}"/>
+            </StatusBarItem>
+        </StatusBar>
 
     </Grid>
 </UserControl>

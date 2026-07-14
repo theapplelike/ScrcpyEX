@@ -43,6 +43,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -124,6 +125,8 @@
     <Compile Include="MyDefinition\MyConverter\FileSizeConverter.cs" />
     <Compile Include="MyDefinition\MyConverter\IsScriptGroupConverter.cs" />
     <Compile Include="MyDefinition\MyConverter\SortArrowConverter.cs" />
+    <Compile Include="MyDefinition\MyEvent\XferFileEventArgs.cs" />
+    <Compile Include="MyDefinition\WindowsAPI\AudioDeviceDetector.cs" />
     <Compile Include="MyDefinition\WindowsAPI\DLL.cs" />
     <Compile Include="MyDefinition\MV.cs" />
     <Compile Include="MyDefinition\MyAttribute\ArgumentsAttribute.cs" />

@@ -1,7 +1,9 @@
-﻿using ScrcpyEX.Model;
+﻿using Microsoft.VisualBasic.FileIO;
+using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition.Interface;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,6 +47,32 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 return GetDirContent(path);
             }
         });
+
+        public async Task<int> DeleteFilesAsync(IEnumerable<FileItem> items)
+        {
+            if (items == null) return 0;
+            int deleted = 0;
+            await Task.Run(() =>
+            {
+                foreach (FileItem item in items)
+                {
+                    if (item.IsDirectory) continue; // 跳过目录
+                    try
+                    {
+                        if (File.Exists(item.FullPath))
+                        {
+                            FileSystem.DeleteFile(item.FullPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                            deleted++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MyGM.RecordException(ex, $"{item.FullPath} 删除失败");
+                    }
+                }
+            });
+            return deleted;
+        }
 
         /// <summary>
         /// 获得驱动器信息。

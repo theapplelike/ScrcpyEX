@@ -150,6 +150,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             sb.Append($"--keyboard=uhid ");
             sb.Append($"--window-x 0 --window-y {SystemParameters.PrimaryScreenHeight * MV.DpiScaleY} --window-width=800 ");
 
+            if (!AudioDeviceDetector.HasActiveRenderDevice()) sb.Append($"--no-audio ");
             if (_isWired)
             {
                 sb.Append("--select-usb");
@@ -285,6 +286,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
                 // 设置父子关系
                 DLL.SetParent(_scHandle, hwndParent.Handle);
+                DLL.ShowWindow(_scHandle, SW.SW_SHOWNOACTIVATE);
 
                 return new HandleRef(this, _scHandle);
             }

@@ -28,7 +28,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         public const int SW_SHOWMINIMIZED = 2;
 
         /// <summary>
-        /// 激活窗口并显示最大化的窗口。SW_MAXIMIZE 和此值一致
+        /// 激活窗口并显示最大化的窗口。SW_MAXIMIZE 和此值一致。
         /// </summary>
         public const int SW_SHOWMAXIMIZED = 3;
 
@@ -48,12 +48,12 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         public const int SW_MINIMIZE = 6;
 
         /// <summary>
-        /// 将窗口显示为最小化窗口。 此值类似于 SW_SHOWMINIMIZED 但窗口未激活。
+        /// 将窗口显示为最小化窗口。此值类似于 SW_SHOWMINIMIZED 但窗口未激活。
         /// </summary>
         public const int SW_SHOWMINNOACTIVE = 7;
 
         /// <summary>
-        /// 以当前大小和位置显示窗口。 此值类似于 SW_SHOW，只是窗口未激活。
+        /// 以当前大小和位置显示窗口。此值类似于 SW_SHOW，只是窗口未激活。
         /// </summary>
         public const int SW_SHOWNA = 8;
 

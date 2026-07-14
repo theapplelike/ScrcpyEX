@@ -1,4 +1,5 @@
-﻿using ScrcpyEX.MyDefinition;
+﻿using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -37,16 +38,24 @@ namespace ScrcpyEX.View
         /// 在指定的本地目录和ADB设备目录中发送文件。
         /// </summary>
         /// <param name="isPush">是否为推送模式（本地->安卓）。</param>
-        /// <param name="desc">说明文字。</param>
-        private async Task SendFile(bool isPush, string desc)
+        /// <param name="isCover">如果已存在文件，是否覆盖。</param>
+        /// <param name="fileItems">指定要发送的文件列表。</param>
+        private async Task SendFile(bool isPush, bool isCover = false, List<FileItem> fileItems = null)
         {
+            string desc = isPush ? "推送" : "拉取";
             if (!IsCanSend())
             {
                 MyGM.POP($"设备未正确连接，不能{desc}文件。");
                 return;
             }
 
-            List<string> files = await GetFiles(isPush);
+            List<string> files = (isCover, fileItems) switch
+            {
+                (false, null) => await GetFiles(isPush),
+                (false, not null) => await GetFiles(isPush, fileItems),
+                (true, not null) => [.. fileItems.Select(f => f.Name)],
+                _ => []
+            };
             if (files.Count == 0)
             {
                 MyGM.POP($"所有文件已存在，无需{desc}。");
@@ -127,6 +136,30 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
+        /// 获取要推送/拉取的文件列表。
+        /// </summary>
+        /// <param name="isPush">是否为推送模式（本地->安卓）。</param>
+        /// <param name="fileItems">指定要发送的文件列表。</param>
+        /// <returns>要推送/拉取的文件列表。</returns>
+        private async Task<List<string>> GetFiles(bool isPush, List<FileItem> fileItems)
+        {
+            if (isPush)
+            {
+                HashSet<string> adb = ParseFile(await MyGM.AdbAsync($"shell ls -l {fleAdb.CurPath}"));
+                HashSet<string> lcl = [.. fileItems.Select(f => f.Name)];
+
+                return [.. lcl.Except(adb)];
+            }
+            else
+            {
+                HashSet<string> adb = [.. fileItems.Select(f => f.Name)];
+                HashSet<string> lcl = [.. Directory.GetFiles(fleLcl.CurPath).Select(Path.GetFileName)];
+
+                return [.. adb.Except(lcl)];
+            }
+        }
+
+        /// <summary>
         /// 组合推送/拉取的ADB命令。
         /// </summary>
         /// <param name="lclPath">本地目录。</param>
@@ -150,7 +183,11 @@ namespace ScrcpyEX.View
             {
                 string lclPath = Path.Combine(fleLcl.CurPath, name);
                 string adbPath = $@"{fleAdb.CurPath}/{name}";
-                await MyGM.AdbAsync(GetCmd(lclPath, adbPath, isPush));
+                (_, string Err, int ExitCode) = await MyGM.AdbMoreAsync(GetCmd(lclPath, adbPath, isPush));
+                if (Err != "" && ExitCode != 0)
+                {
+                    MyGM.ShwError($"终止值：{ExitCode}\nADB 执行错误: {Err}");
+                }
             }
             gMask.Visibility = Visibility.Collapsed;
         }

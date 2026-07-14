@@ -1,6 +1,7 @@
 ﻿using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition.Interface;
 using ScrcpyEX.MyDefinition.MyClass;
+using ScrcpyEX.MyDefinition.MyEvent;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -103,13 +104,39 @@ namespace ScrcpyEX.MyDefinition.MyControl
         public Visibility ShowGoRoot
         {
             get => (Visibility)GetValue(ShowGoRootProperty);
-            set
-            {
-                SetValue(ShowGoRootProperty, value);
-                scv.Margin = value == Visibility.Visible ? new() : new(0, 0, 15, 0);
-            }
+            set => SetValue(ShowGoRootProperty, value);
         }
-        public static readonly DependencyProperty ShowGoRootProperty = RegProp<Visibility>(nameof(ShowGoRoot));
+        public static readonly DependencyProperty ShowGoRootProperty = DependencyProperty.Register(
+            nameof(ShowGoRoot),
+            typeof(Visibility),
+            typeof(FileExplorer),
+            new PropertyMetadata(Visibility.Visible, (d, e) =>
+            {
+                FileExplorer control = (FileExplorer)d;
+                Visibility val = (Visibility)e.NewValue;
+
+                control.scv.Margin = val == Visibility.Visible ? new() : new(0, 0, 15, 0);
+            }
+        ));
+
+        /// <summary>
+        /// 注册 传输文件请求 冒泡路由事件。
+        /// </summary>
+        public static readonly RoutedEvent XferFileRequestedEvent = EventManager.RegisterRoutedEvent(
+            "XferFileRequested",          // 事件名称
+            RoutingStrategy.Bubble,           // 冒泡策略
+            typeof(RoutedEventHandler),       // 处理器类型（可改为更具体的委托）
+            typeof(FileExplorer)
+        );            
+
+        /// <summary>
+        /// CLR 事件包装器（方便外部 += 订阅）。
+        /// </summary>
+        public event RoutedEventHandler XferFileRequested
+        {
+            add => AddHandler(XferFileRequestedEvent, value);
+            remove => RemoveHandler(XferFileRequestedEvent, value);
+        }
 
 
     }

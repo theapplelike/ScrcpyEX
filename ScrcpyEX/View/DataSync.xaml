@@ -7,7 +7,7 @@
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
         xmlns:ctrl="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
         mc:Ignorable="d"
-        Title="数据同步" Height="500" Width="1000" WindowStartupLocation="CenterScreen"
+        Title="数据同步" Height="600" Width="1100" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded">
 
     <Window.DataContext>
@@ -29,22 +29,22 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <ctrl:FileExplorer x:Name="fleLcl" Grid.Column="0" DirService="{Binding LclService}"/>
-        <ctrl:FileExplorer x:Name="fleAdb" Grid.Column="2" DirService="{Binding AdbService}" ShowGoRoot="Collapsed"/>
+        <ctrl:FileExplorer x:Name="fleLcl" Grid.Column="0" DirService="{Binding LclService}" XferFileRequested="FleLcl_XferFileRequested"/>
+        <ctrl:FileExplorer x:Name="fleAdb" Grid.Column="2" DirService="{Binding AdbService}" XferFileRequested="FleAdb_XferFileRequested" ShowGoRoot="Collapsed"/>
 
         <StackPanel Grid.Column="1" Margin="0" VerticalAlignment="Center">
-            <Button x:Name="btnToAdb" Click="BtnToAdb_Click" Content="&#xE8B6;" Style="{StaticResource thisBtn}" ToolTip="将本地文件推送到安卓设备"/>
+            <Button x:Name="btnToAdb" Click="BtnToAdb_Click" Content="&#xE8B6;" Style="{StaticResource thisBtn}" ToolTip="将本地目录下所有文件推送到安卓设备"/>
             <Button x:Name="btnToLcl" Click="BtnToLcl_Click"
                     Content="&#xE8B6;"
                     Style="{StaticResource thisBtn}"
                     RenderTransformOrigin="0.5,0.5"
                     Margin="0,5"
-                    ToolTip="将安卓文件推送到本地目录">
+                    ToolTip="将安卓目录下所有文件推送到本地目录">
                 <Button.RenderTransform>
                     <RotateTransform Angle="180"/>
                 </Button.RenderTransform>
             </Button>
-            <Button x:Name="btnSync" Click="BtnSync_Click" Content="&#xe8ab;" Style="{StaticResource thisBtn}" ToolTip="同步双方目录数据"/>
+            <Button x:Name="btnSync" Click="BtnSync_Click" Content="&#xe8ab;" Style="{StaticResource thisBtn}" ToolTip="同步双方目录下所有文件"/>
         </StackPanel>
 
         <Grid x:Name="gMask" Grid.ColumnSpan="3" IsHitTestVisible="True" Background="#80FFFFFF" Visibility="Collapsed">
