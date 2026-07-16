@@ -410,7 +410,7 @@ namespace ScrcpyEX.MyDefinition
 
             Debug.WriteLineIf(otp == "" && err == "", $"【{adbCmd}】，终止值：{exc}");
             Debug.WriteLineIf(otp != "", $"{adbCmd}，执行正常：\n{Fmt(otp)}");
-            Debug.WriteLineIf(err != "" && exc == 0, $"{adbCmd}，执行正常({adbPrc.ExitCode})：\n{Fmt(err)}");
+            Debug.WriteLineIf(err != "" && exc == 0, $"{adbCmd}，正常的错误流({adbPrc.ExitCode})：\n{Fmt(err)}");
             Debug.WriteLineIf(err != "" && exc != 0, $"{adbCmd}，执行错误({adbPrc.ExitCode})：\n{Fmt(err)}");
             Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
 

@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -29,9 +30,20 @@ namespace ScrcpyEX.View
         /// 检查本地和ADB间是否可以发送文件。
         /// </summary>
         /// <returns>true--可以发送文件；false--不能发送文件。</returns>
-        private bool IsCanSend()
+        private bool IsCanSend(string desc)
         {
-            return fleLcl.IsCanSend && fleAdb.IsCanSend;
+            if (!fleLcl.IsCanXfer() || !fleAdb.IsCanXfer())
+            {
+                MyGM.POP($"当前存在逻辑目录，不能{desc}文件。");
+                return false;
+            }
+            if(!fleLcl.IsLoadSuccess || !fleAdb.IsLoadSuccess)
+            {
+                MyGM.POP($"目录未正确加载，不能{desc}文件。");
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -43,9 +55,8 @@ namespace ScrcpyEX.View
         private async Task SendFile(bool isPush, bool isCover = false, List<FileItem> fileItems = null)
         {
             string desc = isPush ? "推送" : "拉取";
-            if (!IsCanSend())
+            if (!IsCanSend(desc))
             {
-                MyGM.POP($"设备未正确连接，不能{desc}文件。");
                 return;
             }
 
@@ -79,9 +90,8 @@ namespace ScrcpyEX.View
         /// </summary>
         private async Task SyncFile()
         {
-            if (!IsCanSend())
+            if (!IsCanSend("同步"))
             {
-                MyGM.POP("设备未正确连接，不能同步文件。");
                 return;
             }
 
@@ -178,18 +188,57 @@ namespace ScrcpyEX.View
         /// <param name="isPush">是否为推送模式（本地->安卓）。</param>
         private async Task TransmitFile(List<string> fileNames, bool isPush)
         {
-            gMask.Visibility = Visibility.Visible;
+            int total = fileNames.Count, i = 0;
+
+            ShowRing(total);
             foreach (string name in fileNames)
             {
                 string lclPath = Path.Combine(fleLcl.CurPath, name);
                 string adbPath = $@"{fleAdb.CurPath}/{name}";
-                (_, string Err, int ExitCode) = await MyGM.AdbMoreAsync(GetCmd(lclPath, adbPath, isPush));
-                if (Err != "" && ExitCode != 0)
+                (_, string err, int exitCode) = await MyGM.AdbMoreAsync(GetCmd(lclPath, adbPath, isPush));
+
+                if (err != "" && exitCode != 0)
                 {
-                    MyGM.ShwError($"终止值：{ExitCode}\nADB 执行错误: {Err}");
+                    MyGM.ShwError($"终止值：{exitCode}\nADB 执行错误: {err}");
+                    continue;
                 }
+
+                ring.Desc = $"传输中【{++i}/{total}】...";
+                ring.AddMsg($"【{name}】传输成功，{ParseOutput(err)}");
             }
-            gMask.Visibility = Visibility.Collapsed;
+            //gMask.Visibility = Visibility.Collapsed;
+            ring.Desc = $"传输完毕【{i}/{total}】...";
+            ring.StopSpin();
+            _isXferComplete = true;
+        }
+
+        /// <summary>
+        /// 显示进度环并初始化。
+        /// </summary>
+        private void ShowRing(int total)
+        {
+            ring.Init($"传输中【0/{total}】...");
+            gMask.Visibility = Visibility.Visible;
+            _isXferComplete = false;
+        }
+
+        /// <summary>
+        /// 解析输出中的传输速度。
+        /// </summary>
+        /// <param name="otp">ADB的输出。</param>
+        /// <returns>说明速度和大小的字符串，格式：36.7 MB/s(11.389秒内传输438,006,392字节）。</returns>
+        private string ParseOutput(string otp)
+        {
+            Match match = Regex.Match(otp, @"(\d+\.?\d*\s*MB/s)\s*\((\d+)\s*bytes in\s*([\d.]+)s\)");
+            if (match.Success)
+            {
+                string speed = match.Groups[1].Value;
+                string bytes = long.Parse(match.Groups[2].Value).ToString("#,##0");
+                string seconds = match.Groups[3].Value;
+
+                return $"{speed}（{seconds}秒内传输{bytes}字节）";
+            }
+            return "速度解析失败";
         }
 
 

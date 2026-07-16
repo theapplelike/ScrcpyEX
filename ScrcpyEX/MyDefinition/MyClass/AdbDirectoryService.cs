@@ -23,6 +23,11 @@ namespace ScrcpyEX.MyDefinition.MyClass
             return path == Root;
         }
 
+        public bool IsCanXfer(string path)
+        {
+            return true;
+        }
+
         public string GetParentPath(string curPath)
         {
             string parent = Path.GetDirectoryName(curPath).Replace('\\', '/');

@@ -166,7 +166,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// 加载目标路径下的所有子目录和文件到集合中。
         /// </summary>
         /// <param name="tgtPath">目标目录。</param>
-        /// <returns>true加载成功；false加载失败，并在界面上显示错误信息。</returns>
+        /// <returns>true--加载成功；false--加载失败，并在界面上显示错误信息。</returns>
         private async Task<bool> LoadDirFile(string tgtPath)
         {
             try
@@ -179,10 +179,10 @@ namespace ScrcpyEX.MyDefinition.MyControl
             {
                 tbkErr.Text = ex.Message;
                 tbkErr.Visibility = Visibility.Visible;
-                return IsCanSend = false;
+                return IsLoadSuccess = false;
             }
 
-            return IsCanSend = true;
+            return IsLoadSuccess = true;
         }
 
         /// <summary>
@@ -270,6 +270,15 @@ namespace ScrcpyEX.MyDefinition.MyControl
         public async void Reload()
         {
             await NavigateTo(CurPath);
+        }
+
+        /// <summary>
+        /// 当前目录是否可以执行传输任务。
+        /// </summary>
+        /// <returns>true--实际目录，可以传输；false--逻辑目录，不可以传输。</returns>
+        public bool IsCanXfer()
+        {
+            return DirService.IsCanXfer(CurPath);
         }
 
 

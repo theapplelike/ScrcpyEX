@@ -25,6 +25,11 @@ namespace ScrcpyEX.MyDefinition.MyClass
             return path == Root || path.TrimEnd(Sep) == Root;
         }
 
+        public bool IsCanXfer(string path)
+        {
+            return !IsRoot(path);
+        }
+
         /// <summary>
         /// 获取父目录路径。
         /// </summary>

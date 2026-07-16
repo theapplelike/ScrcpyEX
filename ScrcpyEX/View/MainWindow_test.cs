@@ -77,7 +77,9 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
-
+            //await MyGM.AdbMoreAsync($"shell sm list-volumes public");
+            //await MyGM.AdbMoreAsync($"shell ls /storage/");
+            //await MyGM.AdbMoreAsync($"shell echo $SECONDARY_STORAGE");
             new DataSync().ShowDialog();
         }
 

@@ -5,7 +5,20 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
              mc:Ignorable="d" 
-             d:DesignHeight="80" d:DesignWidth="80">
+             d:DesignHeight="150" d:DesignWidth="500" 
+             Loaded="UserControl_Loaded" IsVisibleChanged="UserControl_IsVisibleChanged">
+
+    <UserControl.Resources>
+        <Style x:Key="tbkStyle" TargetType="TextBlock" >
+            <Setter Property="Foreground" Value="DodgerBlue"/>
+            <Setter Property="FontFamily" Value="幼圆"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,5,0,0"/>
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
             
@@ -20,6 +33,7 @@
                 <Ellipse.RenderTransform>
                     <RotateTransform />
                 </Ellipse.RenderTransform>
+                <!--
                 <Ellipse.Style>
                     <Style TargetType="Ellipse">
                         <Style.Triggers>
@@ -35,9 +49,20 @@
                             </Trigger>
                         </Style.Triggers>
                     </Style>
-                </Ellipse.Style>
+                </Ellipse.Style>-->
+                
+                <Ellipse.Resources>
+                    <Storyboard x:Key="RotateAnim" RepeatBehavior="Forever">
+                        <DoubleAnimation Storyboard.TargetProperty="StrokeDashOffset" From="0" To="-30" Duration="0:0:1.5"/>
+                    </Storyboard>
+                </Ellipse.Resources>
             </Ellipse>
-            <TextBlock x:Name="tbkDesc" Text="加载中..." Foreground="DodgerBlue" FontFamily="幼圆" FontWeight="ExtraBold" Margin="0,10,0,0" FontSize="14"/>
+            
+            <TextBlock x:Name="tbkDesc" Text="加载中..." Style="{StaticResource tbkStyle}"  Margin="0,10,0,0"/>
+            <TextBlock x:Name="tbkTxt1" Style="{StaticResource tbkStyle}"/>
+            <TextBlock x:Name="tbkTxt2" Style="{StaticResource tbkStyle}"/>
+            <TextBlock x:Name="tbkTxt3" Style="{StaticResource tbkStyle}"/>
+
         </StackPanel>
     </Grid>
 </UserControl>

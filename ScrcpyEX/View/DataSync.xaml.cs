@@ -61,5 +61,13 @@ namespace ScrcpyEX.View
                 await SendFile(false, args.IsCover, [.. args.SelectedItems]);
             }
         }
+
+        private void GMask_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (_isXferComplete)
+            {
+                gMask.Visibility = Visibility.Collapsed;
+            }
+        }
     }
 }

@@ -39,9 +39,9 @@ namespace ScrcpyEX.MyDefinition.MyControl
         public string CurPath { get; set; }
 
         /// <summary>
-        /// 是否可以发送文件。
+        /// 目录是否加载成功。
         /// </summary>
-        public bool IsCanSend { get; set; }
+        public bool IsLoadSuccess { get; set; }
 
         /// <summary>
         /// 排序命令。

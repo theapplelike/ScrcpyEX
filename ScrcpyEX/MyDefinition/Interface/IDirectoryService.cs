@@ -28,6 +28,12 @@ namespace ScrcpyEX.MyDefinition.Interface
         bool IsRoot(string path);
 
         /// <summary>
+        /// 当前目录是否可以执行传输任务。
+        /// </summary>
+        /// <returns>true--可以；false--不可以。</returns>
+        bool IsCanXfer(string path);
+
+        /// <summary>
         /// 获取父目录路径。
         /// </summary>
         string GetParentPath(string path);
