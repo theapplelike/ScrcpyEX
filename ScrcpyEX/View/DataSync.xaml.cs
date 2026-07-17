@@ -69,5 +69,7 @@ namespace ScrcpyEX.View
                 gMask.Visibility = Visibility.Collapsed;
             }
         }
+
+
     }
 }

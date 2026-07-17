@@ -33,9 +33,14 @@ namespace ScrcpyEX.MyDefinition.MyControl
             InitializeComponent();
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        private void Root_Loaded(object sender, RoutedEventArgs e)
         {
             MyInit();
+        }
+
+        private void Root_Unloaded(object sender, RoutedEventArgs e)
+        {
+            MyClose();
         }
 
         private async void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -124,6 +129,42 @@ namespace ScrcpyEX.MyDefinition.MyControl
             }
         }
 
+        private void ItemsControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            SetAddrBarVisib(true);
+        }
 
+        private async void TxtAddr_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                await NavigateTo(txtAddr.Text, true);
+                SetAddrBarVisib(false);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Escape)
+            {
+                SetAddrBarVisib(false);
+                e.Handled = true;
+            }
+        }
+
+        private void TxtAddr_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (_isEditingPath) SetAddrBarVisib(false);
+        }
+
+        private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!_isEditingPath) return;
+
+            // 点击地址栏内部，不退出
+            if (e.OriginalSource is DependencyObject source && IsChildOf(txtAddr, source)) return; 
+
+            // 否则退出编辑模式
+            SetAddrBarVisib(false);
+        }
+
+        
     }
 }

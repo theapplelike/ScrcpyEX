@@ -7,13 +7,14 @@
              xmlns:local="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
              xmlns:converter="clr-namespace:ScrcpyEX.MyDefinition.MyConverter"
              mc:Ignorable="d" 
-             x:Name="root"
-             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded">
+             x:Name="root" d:DesignHeight="450" d:DesignWidth="800" 
+             Loaded="Root_Loaded" Unloaded="Root_Unloaded">
 
     <UserControl.Resources>
         <converter:FileSizeConverter x:Key="FileSizeConverter"/>
         <converter:SortArrowConverter x:Key="SortArrowConverter"/>
         <converter:FileToIconConverter x:Key="FileToIconConverter"/>
+        <SolidColorBrush x:Key="Scb1" Color="White" Opacity="0.01"/>
 
         <!-- MenuItem项的标题样式：看起来像静态文本，无交互 -->
         <Style x:Key="ContextMenuHeaderStyle" TargetType="MenuItem">
@@ -157,24 +158,39 @@
                               HorizontalScrollBarVisibility="Hidden" 
                               VerticalScrollBarVisibility="Disabled"
                               PreviewMouseWheel="Scv_PreviewMouseWheel">
-                    <ItemsControl ItemsSource="{Binding Bis, ElementName=root}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Cursor="Hand">
-                                    <Button x:Name="btnNavi" 
-                                            Content="{Binding Name}" 
-                                            Click="BtnNavi_Click"
-                                            Style="{StaticResource NaviItemBtn}"/>
-                                    <TextBlock Text=" / " Visibility="{Binding IsLast}" Foreground="Gray" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <Grid>
+                        <ItemsControl ItemsSource="{Binding Bis, ElementName=root}" 
+                                      Background="{StaticResource Scb1}"
+                                      MouseLeftButtonUp="ItemsControl_MouseLeftButtonUp">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Cursor="Hand">
+                                        <Button x:Name="btnNavi" 
+                                                Content="{Binding Name}" 
+                                                Click="BtnNavi_Click"
+                                                Style="{StaticResource NaviItemBtn}"/>
+                                        <TextBlock Text=" / " Visibility="{Binding IsLast}" Foreground="Gray" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- 地址栏输入框 -->
+                        <TextBox x:Name="txtAddr"
+                                 Visibility="Collapsed"
+                                 Background="White"
+                                 BorderThickness="0"
+                                 FontSize="14"
+                                 FontFamily="幼圆"
+                                 VerticalContentAlignment="Center"
+                                 KeyDown="TxtAddr_KeyDown"
+                                 LostFocus="TxtAddr_LostFocus"/>
+                    </Grid>
                 </ScrollViewer>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Visibility="{Binding ShowGoRoot, ElementName=root}">

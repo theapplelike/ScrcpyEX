@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace ScrcpyEX.MyDefinition.MyControl
@@ -26,10 +28,29 @@ namespace ScrcpyEX.MyDefinition.MyControl
         {
             if (DesignerProperties.GetIsInDesignMode(this)) return;
 
+            _parentWindow = Window.GetWindow(this);
+            if (_parentWindow != null && !_isRegEvent)
+            {
+                _parentWindow.AddHandler(PreviewMouseDownEvent, new MouseButtonEventHandler(OnPreviewMouseDown), true);
+                _isRegEvent = true;
+            }
+
             prgLoad.Visibility = Visibility.Visible;
             DirView = CollectionViewSource.GetDefaultView(_dir);
             await NavigateTo(DirService.Root);
             prgLoad.Visibility = Visibility.Collapsed;
+        }
+
+        /// <summary>
+        /// 自定义清理。
+        /// </summary>
+        private void MyClose()
+        {
+            if (_parentWindow != null && _isRegEvent)
+            {
+                _parentWindow.RemoveHandler(PreviewMouseDownEvent, new MouseButtonEventHandler(OnPreviewMouseDown));
+                _isRegEvent = false;
+            }
         }
 
         /// <summary>
@@ -279,6 +300,40 @@ namespace ScrcpyEX.MyDefinition.MyControl
         public bool IsCanXfer()
         {
             return DirService.IsCanXfer(CurPath);
+        }
+
+        /// <summary>
+        /// 显示或隐藏文本地址栏。
+        /// </summary>
+        /// <param name="isShow">是否显示文本地址栏。</param>
+        private void SetAddrBarVisib(bool isShow)
+        {
+            _isEditingPath = isShow;
+            txtAddr.Visibility = isShow ? Visibility.Visible : Visibility.Collapsed;
+
+            if (isShow)
+            {
+                txtAddr.Text = CurPath;
+                txtAddr.Focus();
+                txtAddr.SelectAll();
+            }
+        }
+
+        /// <summary>
+        /// 说明指定元素是否为指定父级的子元素。
+        /// </summary>
+        /// <param name="parent">父级元素。</param>
+        /// <param name="child">子元素。</param>
+        /// <returns>true--子元素属于父元素；false--子元素不属于此父元素。</returns>
+        private bool IsChildOf(DependencyObject parent, DependencyObject child)
+        {
+            while (child != null)
+            {
+                //Debug.WriteLine($"while循环，IsChildOf：{child.GetType()}");
+                if (child == parent) return true;
+                child = VisualTreeHelper.GetParent(child);
+            }
+            return false;
         }
 
 

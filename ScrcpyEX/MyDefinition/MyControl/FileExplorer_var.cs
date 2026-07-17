@@ -34,6 +34,21 @@ namespace ScrcpyEX.MyDefinition.MyControl
         private readonly RangeOC<FileItem> _dir = [];
 
         /// <summary>
+        /// 是否在使用文本地址框编辑路径。
+        /// </summary>
+        private bool _isEditingPath = false;
+
+        /// <summary>
+        /// 父级窗口的引用。
+        /// </summary>
+        private Window _parentWindow;
+
+        /// <summary>
+        /// 是否在父窗口注册了点击检测事件，事件用于在鼠标点击任何区域时隐藏文本地址框。
+        /// </summary>
+        private bool _isRegEvent;
+
+        /// <summary>
         /// 当前的路径。
         /// </summary>
         public string CurPath { get; set; }
