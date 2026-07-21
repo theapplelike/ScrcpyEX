@@ -64,10 +64,15 @@ namespace ScrcpyEX.View
 
         private void GMask_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (_isXferComplete)
+            if (!_isXfering)
             {
                 gMask.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void BtnStop_Click(object sender, RoutedEventArgs e)
+        {
+            _cts?.Cancel();
         }
 
 

@@ -36,14 +36,6 @@ namespace ScrcpyEX.MyDefinition.MyEvent
             
         }
 
-        /// <summary>
-        /// 构造传输文件事件的原始信息。
-        /// </summary>
-        /// <param name="routedEvent">路由事件。</param>
-        /// <param name="item">当前选择目录/文件的信息。</param>
-        //public XferFileEventArgs(RoutedEvent routedEvent, FileItem item) : base(routedEvent)
-        //{
-        //    SelectedItem = item;
-        //}
+
     }
 }

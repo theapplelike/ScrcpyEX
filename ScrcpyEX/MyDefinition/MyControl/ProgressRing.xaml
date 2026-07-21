@@ -33,24 +33,7 @@
                 <Ellipse.RenderTransform>
                     <RotateTransform />
                 </Ellipse.RenderTransform>
-                <!--
-                <Ellipse.Style>
-                    <Style TargetType="Ellipse">
-                        <Style.Triggers>
-                            <Trigger Property="Visibility" Value="Visible">
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard HandoffBehavior="Compose">
-                                        <Storyboard RepeatBehavior="Forever">
-                                            <DoubleAnimation Storyboard.TargetProperty="StrokeDashOffset"
-                                                             From="0" To="-30" Duration="0:0:1.5"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Ellipse.Style>-->
-                
+
                 <Ellipse.Resources>
                     <Storyboard x:Key="RotateAnim" RepeatBehavior="Forever">
                         <DoubleAnimation Storyboard.TargetProperty="StrokeDashOffset" From="0" To="-30" Duration="0:0:1.5"/>

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -82,7 +83,7 @@ namespace ScrcpyEX.View
             {
                 fleLcl.Reload();
             }
-            MyGM.POP($"文件{desc}完成。");
+            if (_isXferComplete) MyGM.POP($"文件{desc}完成。");
         }
 
         /// <summary>
@@ -108,7 +109,7 @@ namespace ScrcpyEX.View
                 await TransmitFile(toPull, false);
                 fleLcl.Reload();
             }
-            MyGM.POP("双方目录中的文件同步完成。");
+            if (_isXferComplete) MyGM.POP("双方目录中的文件同步完成。");
         }
 
         /// <summary>
@@ -190,36 +191,54 @@ namespace ScrcpyEX.View
         {
             int total = fileNames.Count, i = 0;
 
-            ShowRing(total);
-            foreach (string name in fileNames)
+            InitXfer(total);
+            try
             {
-                string lclPath = Path.Combine(fleLcl.CurPath, name);
-                string adbPath = $@"{fleAdb.CurPath}/{name}";
-                (_, string err, int exitCode) = await MyGM.AdbMoreAsync(GetCmd(lclPath, adbPath, isPush));
-
-                if (err != "" && exitCode != 0)
+                foreach (string name in fileNames)
                 {
-                    MyGM.ShwError($"终止值：{exitCode}\nADB 执行错误: {err}");
-                    continue;
-                }
+                    _cts.Token.ThrowIfCancellationRequested();
 
-                ring.Desc = $"传输中【{++i}/{total}】...";
-                ring.AddMsg($"【{name}】传输成功，{ParseOutput(err)}");
+                    string lclPath = Path.Combine(fleLcl.CurPath, name);
+                    string adbPath = $@"{fleAdb.CurPath}/{name}";
+                    (_, string err, int exitCode) = await MyGM.AdbMoreAsync(GetCmd(lclPath, adbPath, isPush));
+
+                    if (err != "" && exitCode != 0)
+                    {
+                        MyGM.ShwError($"终止值：{exitCode}\nADB 执行错误: {err}");
+                        continue;
+                    }
+
+                    ring.Desc = $"传输中【{++i}/{total}】...";
+                    ring.AddMsg($"【{name}】传输成功，{ParseOutput(err)}");
+                }
+                _isXferComplete = true;
+                ring.Desc = $"传输完毕【{i}/{total}】...";
             }
-            //gMask.Visibility = Visibility.Collapsed;
-            ring.Desc = $"传输完毕【{i}/{total}】...";
-            ring.StopSpin();
-            _isXferComplete = true;
+            catch (OperationCanceledException)
+            {
+                ring.Desc = $"停止传输【{i}/{total}】...";
+            }
+            catch (Exception ex)
+            {
+                MyGM.ShwError($"传输时发生异常：{ex}");
+            }
+            finally
+            {
+                ring.StopSpin();
+                _isXfering = false;
+            }
         }
 
         /// <summary>
-        /// 显示进度环并初始化。
+        /// 初始化传输操作，显示进度环。
         /// </summary>
-        private void ShowRing(int total)
+        private void InitXfer(int total)
         {
             ring.Init($"传输中【0/{total}】...");
             gMask.Visibility = Visibility.Visible;
+            _isXfering = true;
             _isXferComplete = false;
+            _cts = new CancellationTokenSource();
         }
 
         /// <summary>

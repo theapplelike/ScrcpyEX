@@ -20,6 +20,14 @@
             <Setter Property="Height" Value="35"/>
             <Setter Property="Background" Value="LightSteelBlue"/>
         </Style>
+        <Style x:Key="Btn" TargetType="{x:Type Button}" BasedOn="{StaticResource MenuBtn}">
+            <Setter Property="FontFamily" Value="幼圆"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="LightSteelBlue"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -48,7 +56,10 @@
         </StackPanel>
 
         <Grid x:Name="gMask" Grid.ColumnSpan="3" IsHitTestVisible="True" Background="#CCFFFFFF" Visibility="Collapsed" MouseDown="GMask_MouseDown">
-            <ctrl:ProgressRing x:Name="ring" RingType="3" Desc="传输中..."/>
+            <StackPanel VerticalAlignment="Center">
+                <ctrl:ProgressRing x:Name="ring" RingType="3" Desc="传输中..." VerticalAlignment="Center"/>
+                <Button x:Name="btnStop" Click="BtnStop_Click" Content="停止传输" Style="{StaticResource Btn}"/>
+            </StackPanel>
         </Grid>
 
     </Grid>
