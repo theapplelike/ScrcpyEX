@@ -104,31 +104,6 @@ namespace ScrcpyEX.View
         //}
 
         /// <summary>
-        /// 将System.Drawing.Bitmap转换为System.Windows.Media.Imaging.BitmapImage。
-        /// BitmapImage专用于WPF。
-        /// </summary>
-        /// <param name="bmp">System.Drawing.Bitmap对象。</param>
-        /// <returns>System.Windows.Media.Imaging.BitmapImage对象。</returns>
-        //private BitmapImage BitmapConvert(Bitmap bmp)
-        //{
-        //    BitmapImage bitmapImage;
-        //
-        //    using (MemoryStream stream = new())
-        //    {
-        //        bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-        //        stream.Position = 0;
-        //
-        //        bitmapImage = new BitmapImage();
-        //        bitmapImage.BeginInit();
-        //        bitmapImage.StreamSource = stream;
-        //        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-        //        bitmapImage.EndInit();
-        //    }
-        //
-        //    return bitmapImage;
-        //}
-
-        /// <summary>
         /// 重新进行截图。
         /// </summary>
         private void Recapture()
@@ -148,8 +123,6 @@ namespace ScrcpyEX.View
         /// </summary>
         private void CaptureComplete()
         {
-            //Console.WriteLine($"开始点：{_startPoint.X}，{_startPoint.Y}，结束点：{_endPoint.X}，{_endPoint.Y}。");
-
             Rect cropRect = new(
                 Math.Min(_startPoint.X, _endPoint.X) * DpiScaleX,
                 Math.Min(_startPoint.Y, _endPoint.Y) * DpiScaleY,

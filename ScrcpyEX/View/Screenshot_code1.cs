@@ -30,7 +30,6 @@ namespace ScrcpyEX.View
             rctMask.Visibility = Visibility.Visible;
 
             popTool.IsOpen = false;
-            //Console.WriteLine($"开始的位置:{_startPoint.X},{_startPoint.Y}。");
         }
 
         /// <summary>
@@ -68,7 +67,6 @@ namespace ScrcpyEX.View
             tbk.Text = $"{wd}×{ht}";
 
             UpdateMask();
-            //Console.WriteLine("截图中...");
         }
 
         /// <summary>
@@ -180,27 +178,6 @@ namespace ScrcpyEX.View
                 // 写入放大镜位图的有效部分（周围已为黑色透明）
                 _magnifierBitmap.WritePixels(destRect, srcPixels, stride, 0);
             }
-
-            // 边界检查
-            //sourceX = MyGM.Clamp(sourceX, 0, _sourceBitmap.PixelWidth - _d);
-            //sourceY = MyGM.Clamp(sourceY, 0, _sourceBitmap.PixelHeight - _d);
-            //try
-            //{
-            //    _magnifierBitmap.Lock();
-            //
-            //    // 将源背景图的指定像素直接复制给放大镜位图
-            //    _sourceBitmap.CopyPixels(
-            //        new Int32Rect(sourceX, sourceY, _d, _d),
-            //        _magnifierBitmap.BackBuffer,
-            //        _magnifierBitmap.BackBufferStride * _d,
-            //        _magnifierBitmap.BackBufferStride);
-            //
-            //    _magnifierBitmap.AddDirtyRect(new Int32Rect(0, 0, _d, _d));
-            //}
-            //finally
-            //{
-            //    _magnifierBitmap.Unlock();
-            //}
 
             //Popup控件的偏移和DPI相关，所以给出的原始值要与DPI无关
             (double left, double top) = GetLocation(PointToScreen(curPoint), 15);

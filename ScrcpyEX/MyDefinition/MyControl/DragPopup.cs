@@ -100,11 +100,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
         private bool _isEdit = false;
 
         /// <summary>
-        /// 记录位置信息的句柄，用于PostMessage函数。
-        /// </summary>
-        //private IntPtr _lp = IntPtr.Zero;
-
-        /// <summary>
         /// 50%透明度的白色。
         /// </summary>
         private readonly Brush _argb50 = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255));
@@ -288,15 +283,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 //记录当前坐标为上一次的坐标
                 _lastPoint = MyGM.GetPosnW();
             }
-            //else
-            //{
-            //    (double originX, double originY) = MV.MainWin.GetPointRelativeToScrcpy();
-            //    _lp = new(((int)originY << 16) + (int)originX);
-            //    Debug.WriteLine($"句柄：{_lp}");
-            //    //发送鼠标按下消息
-            //    DLL.PostMessage(MV.MainWin.ScHandle, WM.MOUSEMOVE, IntPtr.Zero, _lp);
-            //    DLL.PostMessage(MV.MainWin.ScHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, _lp);
-            //}
 
             //double radius = 50 * MV.MainWin.ScRatioX / 2;
             //double radius = 50 / 2;//根据现在的比例计算半径，还需要乘以Scrcpy当前宽度和默认宽度的比值，这里默认这个比值为1，这个值仅用于输出调试内容，所以没有传入
@@ -314,14 +300,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 Mouse.Capture(null);
                 _isDragging = false;
             }
-            //else
-            //{
-            //    if (_lp != IntPtr.Zero)
-            //    {
-            //        //发送鼠标抬起消息
-            //        DLL.PostMessage(MV.MainWin.ScHandle, WM.LBUTTONUP, IntPtr.Zero, _lp);
-            //    }
-            //}
         }
 
         /// <summary>
@@ -340,12 +318,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 {
                     LimitToParent(ref newX, ref newY);
                 }
-
-                //Debug.WriteLine(
-                //    $"上次坐标：（{_lastPoint.X}，{_lastPoint.Y}），" +
-                //    $"当前坐标：（{_nowPoint.X}，{_nowPoint.Y}），" +
-                //    $"旧位置：（{newX}，{newY}），" +
-                //    $"新位置：（{HorizontalOffset}，{VerticalOffset}），");
 
                 HorizontalOffset = newX;
                 VerticalOffset = newY;
@@ -366,7 +338,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
                     {
                         VkCode = CharToVirtualKey(e.Text[0]);
                         _tbkDisplayChar.Text = e.Text;
-                        //Console.WriteLine($"长度>=1：{CharToVirtualKey(e.Text[0])}");
                     }
                     else
                     {
@@ -379,7 +350,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
                     {
                         VkCode = CharToVirtualKey(e.Text[0]);
                         _tbkDisplayChar.Text = e.Text.ToUpper();
-                        //Console.WriteLine($"长度<1：{CharToVirtualKey(e.Text[0])}");
                     }
                     else
                     {
@@ -471,7 +441,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         }
 
         /// <summary>
-        /// 提示控件显示指定时间后消失。
+        /// Popup定时检测鼠标位置，不和鼠标重合则显示。
         /// </summary>
         private void Pop_Tick(object sender, EventArgs e)
         {
@@ -588,5 +558,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         }
 
         ~DragPopup() => Dispose(false);
+
+
     }
 }

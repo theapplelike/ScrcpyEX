@@ -98,7 +98,6 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
 
                 if ((isSysKey || isUserKey) && GetForegroundWindow() == _mainHandle)
                 {
-                    //if (isUserKey && (int)wParam == WM.KEYDOWN && MV.MainWin.ScHandle != IntPtr.Zero)
                     if (isUserKey)
                     {
                         if ((int)wParam == WM.KEYDOWN && !IsScHasFocus)
@@ -138,6 +137,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         {
             UserHotkeys.Clear();
         }
+
 
     }
 }

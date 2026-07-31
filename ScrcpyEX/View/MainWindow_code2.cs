@@ -225,8 +225,7 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 执行点击操作，PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是y轴，低16位是x轴。
-        /// 点击的实际位置会根据ScRatioX/ScRatioY进行调整，但有黑边时仍会偏移。
+        /// 执行点击操作，点击的实际位置会根据ScRatioX/ScRatioY进行调整，但有黑边时仍会偏移。
         /// </summary>
         /// <param name="info">当前要执行的脚本。</param>
         /// <param name="scHandle">Scrcpy的句柄。</param>
@@ -247,9 +246,10 @@ namespace ScrcpyEX.View
                 //Debug.WriteLine($"比例:({ScRatioX},{ScRatioY})，实际点击:({x},{y})。");
 
                 IntPtr lp = new((y << 16) + x);
-                DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
-                DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
-                DLL.PostMessage(scHandle, WM.LBUTTONUP, IntPtr.Zero, lp);
+                SendClick(scHandle, lp);
+                //DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
+                //DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
+                //DLL.PostMessage(scHandle, WM.LBUTTONUP, IntPtr.Zero, lp);
             }
 
             //如果为有限次循环，检查是否到循环次数

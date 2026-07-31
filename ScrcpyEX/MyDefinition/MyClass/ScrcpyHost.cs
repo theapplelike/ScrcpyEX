@@ -88,7 +88,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         private async Task StartScrcpy()
         {
-            ProcessStartInfo info = new(MV.ScrcpyPath)
+            ProcessStartInfo info = new(MV.ScPath)
             {
                 Arguments = GetCommandLine(),
                 CreateNoWindow = true,

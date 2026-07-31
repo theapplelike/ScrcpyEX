@@ -304,26 +304,28 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Locate()
         {
+            System.Drawing.Rectangle workArea = MyGM.GetCurScreenRect(_mainHandle);
+
             if ((bool)rdoLoc1.IsChecked)
             {
+                Top = workArea.Top;
+                Left = workArea.Left;
                 //Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
-                Top = 0;
-                Left = 0;
             }
             else if ((bool)rdoLoc2.IsChecked)
             {
-                Top = 0;
-                Left = SystemParameters.WorkArea.Width - Width - 3;//完全贴合右边会导致截图脚本有偏移
+                Top = workArea.Top;
+                Left = workArea.Right - Width - 3;//完全贴合右边会导致截图脚本有偏移
             }
             else if ((bool)rdoLoc3.IsChecked)
             {
-                Top = SystemParameters.WorkArea.Height - Height;
+                Top = workArea.Bottom - Height;
                 Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
             }
             else if ((bool)rdoLoc4.IsChecked)
             {
-                Top = SystemParameters.WorkArea.Height - Height;
-                Left = SystemParameters.WorkArea.Width - Width;
+                Top = workArea.Bottom - Height;
+                Left = workArea.Right - Width;
             }
         }
 

@@ -28,17 +28,17 @@ namespace ScrcpyEX.ExtensionMethod
         /// <summary>
         /// Scrcpy的版本号。
         /// </summary>
-        public static string ScrcpyVersion = "v4.0";
+        public static string ScVersion = "v4.0";
 
         /// <summary>
         /// Scrcpy的路径。
         /// </summary>
-        public static string ScrcpyPath { get; set; } = @$".\scrcpy-win64-{ScrcpyVersion}\scrcpy.exe";
+        public static string ScPath { get; set; } = @$".\scrcpy-win64-{ScVersion}\scrcpy.exe";
 
         /// <summary>
         /// adb的路径。
         /// </summary>
-        public static string ADB_Path { get; set; } = @$".\scrcpy-win64-{ScrcpyVersion}\adb.exe";
+        public static string ADB_Path { get; set; } = @$".\scrcpy-win64-{ScVersion}\adb.exe";
 
         /// <summary>
         /// 脚本图片的保存路径。
@@ -49,11 +49,6 @@ namespace ScrcpyEX.ExtensionMethod
         /// 主窗体的引用。
         /// </summary>
         public static MainWindow MainWin { get; set; }
-
-        /// <summary>
-        /// 测量时间。
-        /// </summary>
-        public static Stopwatch St { get; set; }
 
         /// <summary>
         /// 按键映射Popup列表。
@@ -69,5 +64,7 @@ namespace ScrcpyEX.ExtensionMethod
         /// 屏幕Y轴上的DPI比例。
         /// </summary>
         public static double DpiScaleY { get; set; }
+
+
     }
 }

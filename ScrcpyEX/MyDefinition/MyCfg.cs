@@ -45,7 +45,7 @@ namespace ScrcpyEX.ExtensionMethod
             using StreamReader reader = File.OpenText(_cfgPath);
             JsonSerializerSettings set = new()
             {
-                TypeNameHandling = TypeNameHandling.All
+                TypeNameHandling = TypeNameHandling.Auto,
             };
 
             return JsonConvert.DeserializeObject<MyCfg>(reader.ReadToEnd(), set);

@@ -31,9 +31,9 @@ namespace ScrcpyEX.View
         {
             InitializeComponent();
 
+            Background = Brushes.Transparent;
             WindowStyle = WindowStyle.None;
             AllowsTransparency = true;
-            Background = Brushes.Transparent;
             ShowInTaskbar = false;
             Topmost = true;
 

@@ -452,13 +452,11 @@ namespace ScrcpyEX.View
         //        //{
         //        //    _isPressMouse = false;
         //        //    //DLL.mouse_event(0x04, 0, 0, 0, 0);//鼠标抬起
-        //        //    //DLL.PostMessage(_scHandle, WM.WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero);
         //        //}
         //        //else
         //        //{
         //        //    _isPressMouse = true;
         //        //    //DLL.mouse_event(0x02, 0, 0, 0, 0);//鼠标按下
-        //        //    //DLL.PostMessage(_scHandle, WM.WM_LBUTTONDOWN, (IntPtr)WM.MK_LBUTTON, IntPtr.Zero);
         //        //}
         //        DLL.mouse_event(0x02, 0, 0, 0, 0);//鼠标按下
         //    }
@@ -495,9 +493,11 @@ namespace ScrcpyEX.View
                 int centreY = (int)(mp.OffsetY * ScRatioY * MV.DpiScaleY + cy);
 
                 IntPtr lp = new((centreY << 16) + centreX);
-                DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
-                DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
-                DLL.PostMessage(scHandle, WM.LBUTTONUP, IntPtr.Zero, lp);
+                SendClick(scHandle, lp);
+
+                //DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
+                //DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
+                //DLL.PostMessage(scHandle, WM.LBUTTONUP, IntPtr.Zero, lp);
 
                 //如果标志位为true，则让鼠标左键处于按下状态
                 //if (_isPressMouse)
@@ -514,6 +514,19 @@ namespace ScrcpyEX.View
             (double originX, double originY) = GetPointRelativeToScrcpy();
             IntPtr lp1 = new(((int)originY << 16) + (int)originX);
             DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp1);
+        }
+
+        /// <summary>
+        /// 向目标句柄窗口发送一次鼠标点击操作。
+        /// PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是Y轴，低16位是X轴。
+        /// </summary>
+        /// <param name="scHandle">目标句柄窗口。</param>
+        /// <param name="lp">32位的整数，低16位存X坐标，高16位存Y坐标。</param>
+        private void SendClick(IntPtr scHandle, IntPtr lp)
+        {
+            DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
+            DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
+            DLL.PostMessage(scHandle, WM.LBUTTONUP, IntPtr.Zero, lp);
         }
 
         /// <summary>

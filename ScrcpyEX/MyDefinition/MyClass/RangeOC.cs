@@ -29,7 +29,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         }
 
         /// <summary>
-        /// 将指定的集合元素添加 <see cref="RangeOC{T}"/> 末尾。
+        /// 将指定的集合元素添加 <see cref="RangeOC{T}"/> 末尾，仅在完成后刷新一次UI。
         /// </summary>
         /// <param name="items">指定的集合。</param>
         /// <exception cref="ArgumentNullException">传入的集合为null。</exception>

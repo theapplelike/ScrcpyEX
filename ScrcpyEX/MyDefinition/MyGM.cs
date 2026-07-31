@@ -478,6 +478,16 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
+        /// 获取指定句柄所在屏幕的工作区。
+        /// </summary>
+        /// <param name="handle">程序句柄。</param>
+        /// <returns>一个System.Drawing.Rectangle，表示所在屏幕的工作区。</returns>
+        public static System.Drawing.Rectangle GetCurScreenRect(IntPtr handle)
+        {
+            return System.Windows.Forms.Screen.FromHandle(handle).WorkingArea;
+        }
+
+        /// <summary>
         /// 记录普通日志。
         /// </summary>
         /// <param name="text">日志内容。</param>
