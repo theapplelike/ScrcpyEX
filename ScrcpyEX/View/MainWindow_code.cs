@@ -308,26 +308,32 @@ namespace ScrcpyEX.View
 
             if ((bool)rdoLoc1.IsChecked)
             {
-                Top = workArea.Top;
-                Left = workArea.Left;
-                //Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
+                Top = LostDpi(workArea.Top);
+                Left = LostDpi(workArea.Left);
             }
             else if ((bool)rdoLoc2.IsChecked)
             {
-                Top = workArea.Top;
-                Left = workArea.Right - Width - 3;//完全贴合右边会导致截图脚本有偏移
+                Top = LostDpi(workArea.Top);
+                Left = LostDpi(workArea.Right) - Width;
             }
             else if ((bool)rdoLoc3.IsChecked)
             {
-                Top = workArea.Bottom - Height;
-                Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
+                Top = LostDpi(workArea.Bottom) - Height;
+                Left = LostDpi(workArea.Left);
             }
             else if ((bool)rdoLoc4.IsChecked)
             {
-                Top = workArea.Bottom - Height;
-                Left = workArea.Right - Width;
+                Top = LostDpi(workArea.Bottom) - Height;
+                Left = LostDpi(workArea.Right) - Width;
             }
         }
+
+        /// <summary>
+        /// 将值除以DPI比例，变成与DPI无关的值。
+        /// </summary>
+        /// <param name="x">和DPI相关的值。</param>
+        /// <returns>与DPI无关的值。</returns>
+        private double LostDpi(double x) => x * 1.0 / MV.DpiScaleX;
 
         /// <summary>
         /// 窗体宽度修改为屏幕的四分之一并移动定位，高度根据短比调整。
