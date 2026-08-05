@@ -40,6 +40,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
         public string ToFriendly(string path)
         {
+            //从长目录开始比对
             foreach (KeyValuePair<string, string> kvp in _friendly.OrderByDescending(k => k.Key.Length))
             {
                 if (path.StartsWith(kvp.Key, StringComparison.Ordinal))
@@ -136,6 +137,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <para>按空格分隔分别是：</para>
         /// <para>parts[0] 权限, parts[1] 链接数, parts[2] 所有者, parts[3] 组,</para>
         /// <para>parts[4] 大小, parts[5] 日期值, parts[6] 时间值, parts[7] 名称。</para>
+        /// <para>最后的名称可能带有空格，会被截断，需要组合索引7及之后的所有字符串。</para>
         /// </summary>
         /// <param name="otp">ADB获得的文件列表。</param>
         /// <param name="tgtPath">目标目录。</param>
@@ -145,7 +147,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             foreach (string di in dirs)
             {
                 string[] parts = di.SplitReal(' ');
-                string name = parts[7];
+                string name = string.Join(" ", parts, 7, parts.Length - 7);
                 if (name == "." || name == "..") continue;
                 bool isDir = parts[0][0] == 'd';//权限的第一个字符为d说明为目录
 

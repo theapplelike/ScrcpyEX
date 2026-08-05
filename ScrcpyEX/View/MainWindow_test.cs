@@ -78,7 +78,7 @@ namespace ScrcpyEX.View
         {
             await Task.Delay(1);
             //await MyGM.AdbMoreAsync($"shell sm list-volumes public");
-            //await MyGM.AdbMoreAsync($"shell ls -l /storage/self/primary/");
+            //await MyGM.AdbMoreAsync($"shell ls -l /sdcard/");
             //await MyGM.AdbMoreAsync($"shell ls -la /sdcard/");
             //await MyGM.AdbMoreAsync($"shell echo $SECONDARY_STORAGE");
             //await MyGM.AdbMoreAsync($"shell ls -la storage/A409-11E9/");
