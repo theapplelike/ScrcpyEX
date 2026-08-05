@@ -410,11 +410,12 @@ namespace ScrcpyEX.MyDefinition
 
             Debug.WriteLineIf(otp == "" && err == "", $"【{adbCmd}】，无输出流({exc})");
             Debug.WriteLineIf(otp != "" && exc == 0, $"{adbCmd}，执行正常：\n{Fmt(otp)}");
-            Debug.WriteLineIf(err != "" && exc == 0, $"{adbCmd}，正常的错误流({exc})：\n{Fmt(err)}");
+            Debug.WriteLineIf(otp != "" && exc != 0, $"{adbCmd}，正常输出({exc})：\n{Fmt(otp)}");
+            Debug.WriteLineIf(err != "" && exc == 0, $"{adbCmd}，日志信息({exc})：\n{Fmt(err)}");
             Debug.WriteLineIf(err != "" && exc != 0, $"{adbCmd}，执行错误({exc})：\n{Fmt(err)}");
             Debug.WriteLine("- - - - - - - - - -分隔符- - - - - - - - - -");
 
-            return (otp, err, adbPrc.ExitCode);
+            return (otp, err, exc);
         }
 
         /// <summary>

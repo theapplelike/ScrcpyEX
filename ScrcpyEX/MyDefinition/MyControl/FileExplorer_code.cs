@@ -1,6 +1,7 @@
 ﻿using OpenCvSharp.ML;
 using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition.MyClass;
 using ScrcpyEX.MyDefinition.MyEvent;
 using System;
 using System.Collections.Generic;
@@ -164,23 +165,33 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// <param name="path">完整的路径。</param>
         private void UpdateBis(string path)
         {
-            string[] segs = path.SplitReal(DirService.Sep);
-            StringBuilder cum = new();
+            string[] segs = DirService.ToFriendly(path).SplitReal(DirService.Sep);
+            StringBuilder add = new();
             List<BreadcrumbItem> bis = [];
         
             for (int i = 0; i < segs.Length; i++)
             {
-                cum.Append($"{(i == 0 ? "" : DirService.Sep)}{segs[i]}");
+                add.Append($"{(i == 0 ? "" : DirService.Sep)}{segs[i]}");
                 bis.Add(new BreadcrumbItem
                 {
                     Name = segs[i],
-                    FullPath = i == 0 ? $"{cum}{DirService.Sep}" : cum.ToString(),//根目录的完整路径后需要携带路径分隔符
+                    FullPath = i == 0 ? GetRootPath(add) : add.ToString(),
                     IsLast = i < segs.Length - 1 ? Visibility.Visible : Visibility.Collapsed
                 });
-                //Debug.WriteLine($"++++++完整路径：{bis[i].FullPath}");
+                //Debug.WriteLine($"++++++面包屑累加路径：{bis[i].FullPath}");
             }
         
             Bis = new(bis);
+        }
+
+        /// <summary>
+        /// 获得根目录的完整路径，末尾会携带路径分隔符。
+        /// </summary>
+        /// <param name="add">各分段路径的累加。</param>
+        /// <returns>根目录的完整路径。</returns>
+        private string GetRootPath(StringBuilder add)
+        {
+            return $"{add}{DirService.Sep}";
         }
 
         /// <summary>
@@ -192,7 +203,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         {
             try
             {
-                var items = await DirService.GetDirContentAsync(tgtPath);
+                IEnumerable<FileItem> items = await DirService.GetDirContentAsync(tgtPath);
                 _dir.Clear();
                 _dir.AddRange(items);
             }

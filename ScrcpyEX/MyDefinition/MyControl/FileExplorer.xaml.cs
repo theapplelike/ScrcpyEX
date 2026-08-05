@@ -65,7 +65,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
             Button btn = sender as Button;
             if (btn.DataContext is BreadcrumbItem bi)
             {
-                await NavigateTo(bi.FullPath, true);
+                await NavigateTo(DirService.ToReal(bi.FullPath), true);
             }
         }
 

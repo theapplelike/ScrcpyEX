@@ -30,6 +30,10 @@ namespace ScrcpyEX.MyDefinition.MyClass
             return !IsRoot(path);
         }
 
+        public string ToFriendly(string path) => path;
+
+        public string ToReal(string path) => path;
+
         /// <summary>
         /// 获取父目录路径。
         /// </summary>
@@ -90,12 +94,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
             foreach (DriveInfo di in drives)
             {
-                items.Add(new FileItem
-                {
-                    Name = di.Name,
-                    FullPath = di.Name,
-                    IsDirectory = true,
-                });
+                items.Add(new FileItem(di.Name, di.Name));
             }
             return items;
         }

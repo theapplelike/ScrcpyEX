@@ -38,7 +38,7 @@
         </Grid.ColumnDefinitions>
 
         <ctrl:FileExplorer x:Name="fleLcl" Grid.Column="0" DirService="{Binding LclService}" XferFileRequested="FleLcl_XferFileRequested"/>
-        <ctrl:FileExplorer x:Name="fleAdb" Grid.Column="2" DirService="{Binding AdbService}" XferFileRequested="FleAdb_XferFileRequested" ShowGoRoot="Collapsed"/>
+        <ctrl:FileExplorer x:Name="fleAdb" Grid.Column="2" DirService="{Binding AdbService}" XferFileRequested="FleAdb_XferFileRequested"/>
 
         <StackPanel Grid.Column="1" Margin="0" VerticalAlignment="Center">
             <Button x:Name="btnToAdb" Click="BtnToAdb_Click" Content="&#xE8B6;" Style="{StaticResource thisBtn}" ToolTip="将本地目录下所有文件推送到安卓设备"/>

@@ -52,6 +52,19 @@ namespace ScrcpyEX.MyDefinition.Interface
         /// <returns>删除成功的数量。</returns>
         Task<int> DeleteFilesAsync(IEnumerable<FileItem> items);
 
+        /// <summary>
+        /// 将实际路径转换为友好路径。
+        /// </summary>
+        /// <param name="path">要转化的路径。</param>
+        /// <returns>转化后的路径。</returns>
+        string ToFriendly(string path);
+
+        /// <summary>
+        /// 将友好路径转换为实际路径。
+        /// </summary>
+        /// <param name="path">要转化的路径。</param>
+        /// <returns>转化后的路径。</returns>
+        string ToReal(string path);
 
     }
 }

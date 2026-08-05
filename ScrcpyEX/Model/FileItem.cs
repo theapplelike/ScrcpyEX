@@ -43,6 +43,21 @@ namespace ScrcpyEX.Model
         /// </summary>
         public string Extension { get; set; } = "";
 
+        public FileItem() { }
+
+        /// <summary>
+        /// 使用文件名称、完整路径、是否目录初始化类。
+        /// </summary>
+        /// <param name="name">文件名称。</param>
+        /// <param name="fullPath">完整的文件路径。</param>
+        /// <param name="isDir">是否为目录。</param>
+        public FileItem(string name, string fullPath, bool isDir = true)
+        {
+            Name = name;
+            FullPath = fullPath;
+            IsDirectory = isDir;
+        }
+
 
     }
 }
