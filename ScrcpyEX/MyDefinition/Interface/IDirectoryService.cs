@@ -46,11 +46,18 @@ namespace ScrcpyEX.MyDefinition.Interface
         Task<IEnumerable<FileItem>> GetDirContentAsync(string path);
 
         /// <summary>
-        /// 删除列表中的所有文件。
+        /// 删除列表中的所有文件，非文件不会删除。
         /// </summary>
         /// <param name="items">文件列表。</param>
         /// <returns>删除成功的数量。</returns>
         Task<int> DeleteFilesAsync(IEnumerable<FileItem> items);
+
+        /// <summary>
+        /// 删除列表中的所有的目录，非目录不会删除。
+        /// </summary>
+        /// <param name="items">目录列表。</param>
+        /// <returns>删除成功的数量。</returns>
+        Task<int> DeleteDirsAsync(IEnumerable<FileItem> items);
 
         /// <summary>
         /// 将实际路径转换为友好路径。

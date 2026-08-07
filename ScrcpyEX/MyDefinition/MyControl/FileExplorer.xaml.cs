@@ -46,13 +46,19 @@ namespace ScrcpyEX.MyDefinition.MyControl
         private async void BtnBack_Click(object sender, RoutedEventArgs e)
         {
             _curIndex--;
-            await NavigateTo(_curIndex < 0 ? DirService.Root : _history[_curIndex]);
+            if (!await NavigateTo(_curIndex < 0 ? DirService.Root : _history[_curIndex]))
+            {
+                _curIndex++;//导航失败回退索引
+            }
         }
 
         private async void BtnFwrd_Click(object sender, RoutedEventArgs e)
         {
             _curIndex++;
-            await NavigateTo(_history[_curIndex]);
+            if (!await NavigateTo(_history[_curIndex]))
+            {
+                _curIndex--;//导航失败回退索引
+            }
         }
 
         private async void BtnGoUp_Click(object sender, RoutedEventArgs e)
@@ -110,22 +116,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         {
             if (sender is ListView lst)
             {
-                if (lst.ContainerFromElement((DependencyObject)e.OriginalSource) is ListViewItem item)
-                {
-                    if (item.DataContext is FileItem fi)
-                    {
-                        e.Handled = true;
-
-                        //目录菜单待定
-                        if (fi.IsDirectory)
-                        {
-                            return;
-                        }
-
-                        item.ContextMenu = CreateMenu(fi, [.. lst.SelectedItems.Cast<FileItem>()]);
-                        item.ContextMenu.IsOpen = true;
-                    }
-                }
+                OpenContextMenu(lst, e);
             }
         }
 

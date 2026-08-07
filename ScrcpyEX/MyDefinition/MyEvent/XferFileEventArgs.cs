@@ -14,7 +14,7 @@ namespace ScrcpyEX.MyDefinition.MyEvent
     internal class XferFileEventArgs : RoutedEventArgs
     {
         /// <summary>
-        /// 如果已存在文件，是否覆盖。
+        /// 如果已存在文件，是否覆盖，默认为false。
         /// </summary>
         public bool IsCover { get; set; } = false;
 

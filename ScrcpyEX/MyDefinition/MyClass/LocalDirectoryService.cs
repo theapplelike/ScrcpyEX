@@ -59,28 +59,24 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
         public async Task<int> DeleteFilesAsync(IEnumerable<FileItem> items)
         {
-            if (items == null) return 0;
-            int deleted = 0;
-            await Task.Run(() =>
+            return await DeleteItemsAsync(items.Where(i => !i.IsDirectory), i =>
             {
-                foreach (FileItem item in items)
+                if (File.Exists(i.FullPath))
                 {
-                    if (item.IsDirectory) continue; // 跳过目录
-                    try
-                    {
-                        if (File.Exists(item.FullPath))
-                        {
-                            FileSystem.DeleteFile(item.FullPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-                            deleted++;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MyGM.RecordException(ex, $"{item.FullPath} 删除失败");
-                    }
+                    FileSystem.DeleteFile(i.FullPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
                 }
             });
-            return deleted;
+        }
+
+        public async Task<int> DeleteDirsAsync(IEnumerable<FileItem> items)
+        {
+            return await DeleteItemsAsync(items.Where(i => i.IsDirectory), i =>
+            {
+                if (Directory.Exists(i.FullPath))
+                {
+                    FileSystem.DeleteDirectory(i.FullPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                }
+            });
         }
 
         /// <summary>
@@ -132,6 +128,33 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 });
             }
             return items;
+        }
+
+        /// <summary>
+        /// 通用的删除方法，处理异常和计数。
+        /// </summary>
+        /// <param name="items">要删除的文件项或目录项列表。</param>
+        /// <param name="deleteAction">包含具体删除逻辑的委托。</param>
+        /// <returns>删除成功的数量。</returns>
+        private async Task<int> DeleteItemsAsync(IEnumerable<FileItem> items, Action<FileItem> deleteAction)
+        {
+            int deleted = 0;
+            await Task.Run(() =>
+            {
+                foreach (FileItem item in items)
+                {
+                    try
+                    {
+                        deleteAction(item);//执行具体的删除逻辑
+                        deleted++;
+                    }
+                    catch (Exception ex)
+                    {
+                        MyGM.RecordException(ex, $"{item.FullPath} 删除失败");
+                    }
+                }
+            });
+            return deleted;
         }
 
 

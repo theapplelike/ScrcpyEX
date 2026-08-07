@@ -99,15 +99,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
         public async Task<int> DeleteFilesAsync(IEnumerable<FileItem> items)
         {
-            if (items == null) return 0;
-            int deleted = 0;
-            foreach (FileItem item in items)
-            {
-                if (item.IsDirectory) continue;
-                string output = await MyGM.AdbAsync($"shell rm -f \"{item.FullPath}\"");
-                deleted++;
-            }
-            return deleted;
+            return await DeleteItemsAsync(items.Where(i => !i.IsDirectory), false);
+        }
+
+        public async Task<int> DeleteDirsAsync(IEnumerable<FileItem> items)
+        {
+            return await DeleteItemsAsync(items.Where(i => i.IsDirectory), true);
         }
 
         /// <summary>
@@ -123,9 +120,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
             {
                 return ParseDir(otp, path.TrimEnd('/'));
             }
-            if (Err != "" && exc != 0)
+            if (exc != 0 && Err != "")
             {
-                throw new Exception($"终止值：{exc}\nADB 执行错误: {Err}");
+                throw new Exception($"终止值：【{exc}】\nADB 执行错误: {Err}");
             }
             return [];
         }
@@ -203,7 +200,29 @@ namespace ScrcpyEX.MyDefinition.MyClass
             return string.Empty;
         }
 
-        
+        /// <summary>
+        /// 通用的删除方法，处理异常和计数。
+        /// </summary>
+        /// <param name="items">要删除的文件项或目录项列表。</param>
+        /// <param name="isDelDir">true--删除目录；false--删除文件。</param>
+        /// <returns>删除成功的数量。</returns>
+        private async Task<int> DeleteItemsAsync(IEnumerable<FileItem> items, bool isDelDir)
+        {
+            int deleted = 0;
+            foreach (FileItem item in items)
+            {
+                if (isDelDir)
+                {
+                    await MyGM.AdbAsync($"shell rm -r \"{item.FullPath}\"");
+                }
+                else
+                {
+                    await MyGM.AdbAsync($"shell rm \"{item.FullPath}\"");
+                }
+                deleted++;
+            }
+            return deleted;
+        }
 
 
     }

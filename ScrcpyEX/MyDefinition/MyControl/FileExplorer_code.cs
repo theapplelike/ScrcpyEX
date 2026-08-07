@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -109,11 +110,12 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// </summary>
         /// <param name="tgtPath">目标目录。</param>
         /// <param name="isRecord">是否将此目录添加到历史记录。</param>
-        private async Task NavigateTo(string tgtPath, bool isRecord = false)
+        /// <returns>导航是否成功。</returns>
+        private async Task<bool> NavigateTo(string tgtPath, bool isRecord = false)
         {
             CurPath = tgtPath;
 
-            if (!await LoadDirFile(tgtPath)) return;
+            if (!await LoadDirFile(tgtPath)) return false;
             UpdateBis(tgtPath);
 
             if (isRecord) AddHistory(tgtPath);
@@ -126,6 +128,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
             {
                 Debug.WriteLine($"{st}");
             }
+            return true;
         }
 
         /// <summary>
@@ -218,18 +221,72 @@ namespace ScrcpyEX.MyDefinition.MyControl
         }
 
         /// <summary>
-        /// 创建右键菜单。
+        /// 打开控件附带的内容菜单。
+        /// </summary>
+        /// <param name="lst">ListView类型的控件。</param>
+        /// <param name="e">上下文菜单事件提供数据。</param>
+        private void OpenContextMenu(ListView lst, ContextMenuEventArgs e)
+        {
+            if (lst.ContainerFromElement((DependencyObject)e.OriginalSource) is not ListViewItem item)
+            {
+                return;
+            }
+            if (item.DataContext is not FileItem fi)
+            {
+                return;
+            }
+            e.Handled = true;
+
+            if (fi.IsDirectory)
+            {
+                Debug.WriteLine($"右击目录++");
+                item.ContextMenu = CreateDirMenu([.. lst.SelectedItems.Cast<FileItem>().Where(f => f.IsDirectory)]);
+                item.ContextMenu.IsOpen = true;
+            }
+            else
+            {
+                Debug.WriteLine($"右击文件--");
+                item.ContextMenu = CreateFileMenu(fi, [.. lst.SelectedItems.Cast<FileItem>().Where(f => !f.IsDirectory)]);
+                item.ContextMenu.IsOpen = true;
+            }
+        }
+
+        /// <summary>
+        /// 创建控制目录的右键菜单。
+        /// </summary>
+        /// <param name="selectedDirs">选中的目录项列表。</param>
+        /// <returns>ContextMenu控件。</returns>
+        private ContextMenu CreateDirMenu(IList<FileItem> selectedDirs)
+        {
+            ContextMenu menu = new();
+            MenuItem deleItem = new() { Header = "删除目录" };
+
+            deleItem.Click += async (s, e) =>
+            {
+                prgLoad.Visibility = Visibility.Visible;
+                await DirService.DeleteDirsAsync(selectedDirs);
+                Reload();
+                prgLoad.Visibility = Visibility.Collapsed;
+            };
+
+            GenTitle(menu, selectedDirs, "目录");
+            menu.Items.Add(deleItem);
+
+            return menu;
+        }
+
+        /// <summary>
+        /// 创建控制文件的右键菜单。
         /// </summary>
         /// <param name="clickedFile">右键点击的那一项。</param>
-        /// <param name="selectedFiles">所有选中的文件项。</param>
+        /// <param name="selectedFiles">选中的文件项列表。</param>
         /// <returns>ContextMenu控件。</returns>
-        private ContextMenu CreateMenu(FileItem clickedFile, IList<FileItem> selectedFiles)
+        private ContextMenu CreateFileMenu(FileItem clickedFile, IList<FileItem> selectedFiles)
         {
             ContextMenu menu = new();
             MenuItem xferItem = new() { Header = "传输文件" };
             MenuItem coverItem = new() { Header = "传输文件（覆盖）" };
             MenuItem deleItem = new() { Header = "删除文件" };
-            selectedFiles = [.. selectedFiles.Where(f => !f.IsDirectory)];
 
             xferItem.Click += (s, e) =>
             {
@@ -274,14 +331,14 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// 生成菜单的标题。
         /// </summary>
         /// <param name="menu">菜单控件。</param>
-        /// <param name="selectedFiles">所有选中的项。</param>
-        private void GenTitle(ContextMenu menu, IList<FileItem> selectedFiles)
+        /// <param name="selecteds">所有选中的项。</param>
+        private void GenTitle(ContextMenu menu, IList<FileItem> selecteds, string desc = "文件")
         {
             MenuItem headerItem = new()
             {
-                Header = selectedFiles.Count == 1
-                     ? $"文件: {selectedFiles[0].Name}"
-                     : $"已选中 {selectedFiles.Count} 个文件",
+                Header = selecteds.Count == 1
+                     ? $"{desc}: {selecteds[0].Name}"
+                     : $"已选中 {selecteds.Count} 个{desc}",
                 Style = (Style)FindResource("ContextMenuHeaderStyle")
             };
             menu.Items.Add(headerItem);
