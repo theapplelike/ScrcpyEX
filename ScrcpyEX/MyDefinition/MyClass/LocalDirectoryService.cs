@@ -59,6 +59,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
         public async Task<int> DeleteFilesAsync(IEnumerable<FileItem> items)
         {
+            if (items.Count() <= 0) return 0;
             return await DeleteItemsAsync(items.Where(i => !i.IsDirectory), i =>
             {
                 if (File.Exists(i.FullPath))
@@ -70,6 +71,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
         public async Task<int> DeleteDirsAsync(IEnumerable<FileItem> items)
         {
+            if (items.Count() <= 0) return 0;
             return await DeleteItemsAsync(items.Where(i => i.IsDirectory), i =>
             {
                 if (Directory.Exists(i.FullPath))

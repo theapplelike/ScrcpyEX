@@ -8,7 +8,7 @@
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel" 
-        xmlns:mycontrol="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
+        xmlns:ctrl="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
         Title="MainWindow" Width="970" Height="493"
         WindowStartupLocation="CenterScreen" UseLayoutRounding="True" SnapsToDevicePixels="True"
         Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged"
@@ -53,18 +53,18 @@
         </Grid.RowDefinitions>
 
         <!--程序通用的鼠标提示-->
-        <mycontrol:TimePopup x:Name="pop" PopupAnimation="Fade" Placement="Mouse">
+        <ctrl:TimePopup x:Name="pop" PopupAnimation="Fade" Placement="Mouse">
             <Border MinHeight="10" MinWidth="20" CornerRadius="5" BorderThickness="2" BorderBrush="{StaticResource Scb2}" Background="{StaticResource Scb1}" Margin="5">
                 <TextBlock Text="提示文本" Padding="10"/>
             </Border>
-        </mycontrol:TimePopup>
+        </ctrl:TimePopup>
 
         <!--主界面使用的居中提示-->
-        <mycontrol:TimePopup x:Name="popMid" PopupAnimation="Slide" Placement="Center" PlacementTarget="{Binding ElementName=gMenu}">
+        <ctrl:TimePopup x:Name="popMid" PopupAnimation="Slide" Placement="Center" PlacementTarget="{Binding ElementName=gMenu}">
             <Border MinHeight="10" MinWidth="20" CornerRadius="10" BorderThickness="3" BorderBrush="{StaticResource Scb2}" Background="{StaticResource Scb1}" Margin="2">
                 <TextBlock FontSize="20" Padding="6" Foreground="#3F6897"/>
             </Border>
-        </mycontrol:TimePopup>
+        </ctrl:TimePopup>
 
         <!--位置和大小的菜单-->
         <Popup x:Name="popSize" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnSizeOpt}">
@@ -116,12 +116,12 @@
         </Popup>
 
         <!--放置右侧按钮的悬停菜单-->
-        <mycontrol:HoverPopup x:Name="popSysOpt" PlacementTarget="{Binding ElementName=btnClosePrg}">
-        </mycontrol:HoverPopup>
+        <ctrl:HoverPopup x:Name="popSysOpt" PlacementTarget="{Binding ElementName=btnClosePrg}">
+        </ctrl:HoverPopup>
 
         <!--Scrcpy功能选项悬停菜单-->
-        <mycontrol:HoverPopup x:Name="popScOpt">
-        </mycontrol:HoverPopup>
+        <ctrl:HoverPopup x:Name="popScOpt">
+        </ctrl:HoverPopup>
 
         <!--自定义菜单栏-->
         <Grid x:Name="gMenu" Background="AliceBlue" MouseLeftButtonDown="GMenu_MouseLeftButtonDown">
@@ -140,13 +140,13 @@
                     </DockPanel>
                     <Rectangle Style="{StaticResource sep}"/>
                     
-                    <mycontrol:IconButton x:Name="btnRecManage" Click="BtnRecManage_Click" MainIcon="&#xea40;" CornerIcon="&#xE712;" ToolTip="脚本管理(F5)"/>
-                    <mycontrol:IconButton x:Name="btnSetManage" Click="BtnSetManage_Click" MainIcon="&#xe713;" CornerIcon="&#xE712;" ToolTip="程序设置(F6)"/>
-                    <mycontrol:IconButton x:Name="btnDataSync"  Click="BtnDataSync_Click"  MainIcon="&#xe8f7;" CornerIcon="&#xE712;" ToolTip="数据传输窗口"/>
+                    <ctrl:IconButton x:Name="btnRecManage" Click="BtnRecManage_Click" MainIcon="&#xea40;" CornerIcon="&#xE712;" ToolTip="脚本管理(F5)"/>
+                    <ctrl:IconButton x:Name="btnSetManage" Click="BtnSetManage_Click" MainIcon="&#xe713;" CornerIcon="&#xE712;" ToolTip="程序设置(F6)"/>
+                    <ctrl:IconButton x:Name="btnDataSync"  Click="BtnDataSync_Click"  MainIcon="&#xe8f7;" CornerIcon="&#xE712;" ToolTip="数据同步(F10)"/>
                     <Rectangle Style="{StaticResource sep}"/>
 
-                    <mycontrol:IconButton x:Name="btnSizeOpt" Click="BtnSizeOpt_Click" MainIcon="&#xe78a;" CornerIcon="&#xE7bc;" ToolTip="位置与大小选项(F7)"/>
-                    <mycontrol:IconButton x:Name="btnFuncOpt" Click="BtnFuncOpt_Click" MainIcon="&#xebd2;" CornerIcon="&#xE7bc;" ToolTip="功能菜单(F8)"/>
+                    <ctrl:IconButton x:Name="btnSizeOpt" Click="BtnSizeOpt_Click" MainIcon="&#xe78a;" CornerIcon="&#xE7bc;" ToolTip="位置与大小选项(F7)"/>
+                    <ctrl:IconButton x:Name="btnFuncOpt" Click="BtnFuncOpt_Click" MainIcon="&#xebd2;" CornerIcon="&#xE7bc;" ToolTip="功能菜单(F8)"/>
                     <Button x:Name="btnTest" Style="{StaticResource thisBtn}" Content="&#xf133;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
                     
                     <Border x:Name="bdRec" HorizontalAlignment="Right" BorderBrush="SteelBlue" BorderThickness="4">

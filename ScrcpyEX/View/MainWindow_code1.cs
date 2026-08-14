@@ -434,6 +434,7 @@ namespace ScrcpyEX.View
                 case Keys.F7: OpenMenu(btnSizeOpt, popSize); break;
                 case Keys.F8: OpenMenu(btnFuncOpt, popFunc); break;
                 case Keys.F9: await OpenRndis(); break;
+                case Keys.F10: new DataSync().ShowDialog(); break;
                 case Keys.F11: ScFocusSwitch(); break;
                 case Keys.F12: BtnTest_Click(null, null); break;
             }
@@ -506,7 +507,6 @@ namespace ScrcpyEX.View
                 //    //Console.WriteLine("继续让鼠标左键处于按下状态。");
                 //}
 
-                //ADB_Click(centreX, centreY);
                 //Debug.WriteLine($"圆心点:({centreX},{centreY})。");
             }
 

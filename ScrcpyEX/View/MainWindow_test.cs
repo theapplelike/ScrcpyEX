@@ -1,4 +1,5 @@
-﻿using ScrcpyEX.ExtensionMethod;
+﻿using OpenCvSharp;
+using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.MyClass;
@@ -77,13 +78,13 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
-            //await MyGM.AdbMoreAsync($"shell sm list-volumes public");
+            //await MyGM.AdbMoreAsync($"devices -l");
             //await MyGM.AdbMoreAsync($"shell ls -l /sdcard/");
             //await MyGM.AdbMoreAsync($"shell ls -la /sdcard/");
             //await MyGM.AdbMoreAsync($"shell echo $SECONDARY_STORAGE");
             //await MyGM.AdbMoreAsync($"shell ls -la storage/A409-11E9/");
             //await MyGM.AdbMoreAsync($"shell ls -la $SECONDARY_STORAGE/");
-            new DataSync().ShowDialog();
+            //new DataSync().ShowDialog();
         }
 
         //private void AdbPersistent()

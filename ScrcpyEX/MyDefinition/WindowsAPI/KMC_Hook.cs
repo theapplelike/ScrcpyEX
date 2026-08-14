@@ -14,7 +14,9 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
     /// </summary>
     internal class KMC_Hook
     {
-        //安装监视低级别键盘输入事件的hook过程，获得的消息更全面
+        /// <summary>
+        /// 安装监视低级别键盘输入事件的hook过程，获得的消息更全面。
+        /// </summary>
         private const int WH_KEYBOARD_LL = 13;  
 
         /// <summary>
@@ -46,6 +48,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
             (int)Keys.F7,
             (int)Keys.F8,
             (int)Keys.F9,
+            (int)Keys.F10,
             (int)Keys.F11,
             (int)Keys.F12
         ];

@@ -26,7 +26,7 @@ namespace ScrcpyEX.MyDefinition.MyEvent
         /// <summary>
         /// 所有选中的文件项。
         /// </summary>
-        public IList<FileItem> SelectedItems { get; set; }
+        public IEnumerable<FileItem> SelectedItems { get; set; }
 
         /// <summary>
         /// 构造传输文件事件的原始信息。

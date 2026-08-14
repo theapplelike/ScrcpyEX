@@ -190,6 +190,7 @@ namespace ScrcpyEX.View
         private async Task TransmitFile(List<string> fileNames, bool isPush)
         {
             int total = fileNames.Count, i = 0;
+            Stopwatch st = Stopwatch.StartNew();
 
             InitXfer(total);
             try
@@ -208,15 +209,15 @@ namespace ScrcpyEX.View
                         continue;
                     }
 
-                    ring.Desc = $"传输中【{++i}/{total}】...";
-                    ring.AddMsg($"【{name}】传输成功，{ParseOutput(err)}");
+                    prgLoad.Text = $"传输中【{++i}/{total}】...";
+                    prgLoad.AddMsg($"【{name}】传输成功，{ParseOutput(err)}");
                 }
                 _isXferComplete = true;
-                ring.Desc = $"传输完毕【{i}/{total}】...";
+                prgLoad.Text = $"传输完毕【{i}/{total}】...";
             }
             catch (OperationCanceledException)
             {
-                ring.Desc = $"停止传输【{i}/{total}】...";
+                prgLoad.Text = $"停止传输【{i}/{total}】...";
             }
             catch (Exception ex)
             {
@@ -224,8 +225,19 @@ namespace ScrcpyEX.View
             }
             finally
             {
-                ring.StopSpin();
+                st.Stop();
+                prgLoad.StopSpin();
                 _isXfering = false;
+
+                //传输成功时，传输时长小于3秒时隐藏说明遮罩
+                if (_isXferComplete && st.Elapsed.TotalSeconds < 3)
+                {
+                    gMask.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    btnStop.Visibility = Visibility.Hidden;
+                }
             }
         }
 
@@ -234,8 +246,9 @@ namespace ScrcpyEX.View
         /// </summary>
         private void InitXfer(int total)
         {
-            ring.Init($"传输中【0/{total}】...");
+            prgLoad.Init($"传输中【0/{total}】...");
             gMask.Visibility = Visibility.Visible;
+            btnStop.Visibility = Visibility.Visible;
             _isXfering = true;
             _isXferComplete = false;
             _cts = new CancellationTokenSource();

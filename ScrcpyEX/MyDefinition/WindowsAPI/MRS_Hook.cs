@@ -14,7 +14,9 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
     /// </summary>
     internal class MRS_Hook
     {
-        // 安装监视低级别鼠标输入事件的hook过程，获得的消息更全面
+        /// <summary>
+        /// 安装监视低级别鼠标输入事件的hook过程，获得的消息更全面。
+        /// </summary>
         private const int WH_MOUSE_LL = 14;
 
         /// <summary>
@@ -61,14 +63,9 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <returns>CallNextHookEx函数的处理值。</returns>
         private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (nCode >= 0)
+            if (nCode >= 0 && (uint)wParam == WM.LBUTTONDOWN)
             {
-                // 检查鼠标事件类型
-                switch ((uint)wParam)
-                {
-                    case WM.LBUTTONDOWN: RecordPosition(); break;
-                    //case MP.WM_LBUTTONUP: break;
-                }
+                RecordPosition();
             }
             return CallNextHookEx(HookID, nCode, wParam, lParam);
         }

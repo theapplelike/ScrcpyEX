@@ -99,11 +99,13 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
         public async Task<int> DeleteFilesAsync(IEnumerable<FileItem> items)
         {
+            if (items.Count() <= 0) return 0;
             return await DeleteItemsAsync(items.Where(i => !i.IsDirectory), false);
         }
 
         public async Task<int> DeleteDirsAsync(IEnumerable<FileItem> items)
         {
+            if (items.Count() <= 0) return 0;
             return await DeleteItemsAsync(items.Where(i => i.IsDirectory), true);
         }
 
@@ -189,9 +191,13 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <returns>不存在SD卡时返回空。</returns>
         private async Task<string> GetSdCard()
         {
-            (string otp, _, _) = await MyGM.AdbMoreAsync("shell ls /storage/");
+            (string otp, string Err, int exc) = await MyGM.AdbMoreAsync("shell ls /storage/");
             string[] entries = otp.SplitReal(['\r', '\n']);
 
+            if (exc != 0 && Err != "")
+            {
+                throw new Exception($"终止值：【{exc}】\nADB 执行错误: {Err}");
+            }
             foreach (string entry in entries)
             {
                 if (_sysDir.Contains(entry)) continue;
@@ -211,17 +217,25 @@ namespace ScrcpyEX.MyDefinition.MyClass
             int deleted = 0;
             foreach (FileItem item in items)
             {
-                if (isDelDir)
-                {
-                    await MyGM.AdbAsync($"shell rm -r \"{item.FullPath}\"");
-                }
-                else
-                {
-                    await MyGM.AdbAsync($"shell rm \"{item.FullPath}\"");
-                }
+                string dir = isDelDir ? "-r" : "";
+                string cmd = $"shell rm {dir} \"{EscapeAdbPath(item.FullPath)}\"";
+
+                await MyGM.AdbAsync(cmd);
                 deleted++;
             }
             return deleted;
+        }
+
+        /// <summary>
+        /// 转义ADB路径中的空格、双引号、单引号等，防止被截断。
+        /// </summary>
+        /// <param name="path">ADB路径。</param>
+        /// <returns>特殊字符被转义后的路径。</returns>
+        private string EscapeAdbPath(string path)
+        {
+            return path.Replace(" ", "\\ ")
+                       .Replace("'", "\\'")
+                       .Replace("\"", "\\\"");
         }
 
 

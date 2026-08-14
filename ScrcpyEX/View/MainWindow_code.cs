@@ -201,7 +201,7 @@ namespace ScrcpyEX.View
                 if (isWired)
                 {
                     popScOpt.ExchangeMainBtn(btnWired);
-                    await ScrcpyInit(true);
+                    await PrepareWired();
                 }
                 else
                 {
@@ -232,13 +232,66 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
+        /// 准备进行有线连接，如果有多个设备，会让用户选择。
+        /// </summary>
+        private async Task PrepareWired()
+        {
+            List<string> devices = await GetAdbDevices();
+
+            if (devices.Count == 0)
+            {
+                popMid.Show("没有任何设备可以连接。");
+            }
+            else if (devices.Count == 1)
+            {
+                await ScrcpyInit(true);
+            }
+            else
+            {
+                SelectDevice select = new(devices, true);
+                if (select.ShowDialog() == true)
+                {
+                    await ScrcpyInit(true, devices[select.Index]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 准备进行无线连接，连接前会查询网络中所有IP和端口开放的设备，如有多个设备则会让用户选择。
+        /// </summary>
+        private async Task PrepareWireless()
+        {
+            AdbDeviceScanner scanner = new();
+            List<string> devices = await scanner.ScanNetworkForAdbDevicesAsync();
+
+            if (devices.Count <= 0)
+            {
+                popMid.Show("局域网中没有可以连接的设备。");
+            }
+            else if (devices.Count == 1)
+            {
+                await ScrcpyInit(false, devices[0]);
+            }
+            else
+            {
+                SelectDevice select = new(devices, false);
+                if (select.ShowDialog() == true)
+                {
+                    await ScrcpyInit(false, devices[select.Index]);
+                }
+            }
+        }
+
+        /// <summary>
         /// Scrcpy启动完成后，初始化Scrcpy相关的所有功能。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
-        private async Task ScrcpyInit(bool isWired, string ip = "", string port = "5555")
+        /// <param name="sign">有线形式--【设备序列号】，无线模式--【设备IP地址】。</param>
+        /// <param name="port">无线形式启动启动时的端口号。</param>
+        private async Task ScrcpyInit(bool isWired, string sign = "", string port = "5555")
         {
             _scHost = new ScrcpyHost();
-            bdShow.Child = await _scHost.StartScrcpyAsync(isWired, ip, port);
+            bdShow.Child = await _scHost.StartScrcpyAsync(isWired, sign, port);
 
             if (bdShow.Child != null)
             {
@@ -248,6 +301,79 @@ namespace ScrcpyEX.View
 
                 Debug.WriteLine($"-*-激活:{IsActive}，主:{_mainHandle}，SC:{ScHandle}");
             }
+        }
+
+        /// <summary>
+        /// 关闭Scrcpy，同时回收焦点。
+        /// </summary>
+        private void CloseScrcpy()
+        {
+            if (!IsScClosed)
+            {
+                _scHost.DisposeScrcpy();
+                btnFouce.Focus();
+                bdShow.Child = null;
+                StopScriptAndRecord();
+                Debug.WriteLine($"用户结束Scrcpy程序。");
+            }
+        }
+
+        /// <summary>
+        /// 打开设备的无线调试功能，开启后可以无线连接，需要在同一个网络中。
+        /// 通过ADB将USB连接的设备打开无线调试，然后重启Scrcpy，打开无线调试的设备可以被Tcpclient访问。
+        /// </summary>
+        /// <returns>设备无线调试是否打开成功。</returns>
+        private async Task<bool> WirelessDebug()
+        {
+            popMid.Show("请保持USB连接稳定。");
+            List<string> devices = await GetAdbDevices();
+
+            foreach (string dev in devices)
+            {
+                //判断是序列号还是IP，序列号代表是USB连接
+                if (!dev.Contains(":") || !IPAddress.TryParse(dev.Split(':')[0], out _))
+                {
+                    //获得指定设备IP，awk 是一个文本处理工具，按行处理文本
+                    //{print $9}表示打印每一行的第9个字段，字段默认以空格或制表符分隔
+                    string ip = (await MyGM.AdbAsync($@"-s {dev} shell ip route | awk '{{print $9}}'")).Trim();
+                    if (ip == "")
+                    {
+                        popMid.Show("未获得设备IP地址，请检查是否在同一网络中。");
+                        return false; ;
+                    }
+
+                    //将安卓设备上的 ADB 服务从 USB 模式切换为网络模式
+                    await MyGM.AdbAsync($"-s {dev} tcpip 5555");
+
+                    //连接指定 IP 地址和端口上的 Android 设备，须在同一局域网中
+                    await MyGM.AdbAsync($"connect {ip}:5555");
+
+                    CloseScrcpy();
+                    await Task.Delay(1000);
+                    StartScrcpy(false);
+
+                    popMid.Show("匹配完成，正在启动Scrcpy。");
+                    return true;
+                }
+            }
+
+            popMid.Show("没有设备或未打开USB调试。");
+            return false;
+        }
+
+        /// <summary>
+        /// 所有当前连接到电脑的 Android 设备或模拟器。
+        /// USB连接的物理设备，是其序列号；网络连接的设备，格式为 IP地址:端口号；模拟器是 emulator-端口号。
+        /// </summary>
+        private async Task<List<string>> GetAdbDevices()
+        {
+            string output = await MyGM.AdbAsync("devices");
+            return [.. output
+                .SplitReal(['\r', '\n'])
+                .Where(line => !line.StartsWith("List of devices") && !string.IsNullOrWhiteSpace(line))
+                .Select(line => line.SplitReal(['\t', ' ']))
+                .Where(parts => parts.Length >= 2 && parts[1] == "device")
+                .Select(parts => parts[0].Trim())];
         }
 
         /// <summary>
@@ -353,21 +479,6 @@ namespace ScrcpyEX.View
             Width = SystemParameters.WorkArea.Width / 2;
             Height = (Width - ExtraWidth) * ratio + ExtraHeight;
             Locate();
-        }
-
-        /// <summary>
-        /// 关闭Scrcpy，同时回收焦点。
-        /// </summary>
-        private void CloseScrcpy()
-        {
-            if (!IsScClosed)
-            {
-                _scHost.DisposeScrcpy();
-                btnFouce.Focus();
-                bdShow.Child = null;
-                StopScriptAndRecord();
-                Debug.WriteLine($"用户结束Scrcpy程序。");
-            }
         }
 
         /// <summary>
@@ -498,96 +609,6 @@ namespace ScrcpyEX.View
 
             Locate();
             RemoveScBlack();
-        }
-
-        /// <summary>
-        /// 打开设备的无线调试功能，开启后可以无线连接，需要在同一个网络中。
-        /// </summary>
-        private async void WirelessDebug()
-        {
-            popMid.Show("请保持USB连接稳定。");
-            await OpenWirelessDebug();
-        }
-
-        /// <summary>
-        /// 通过ADB将USB连接的设备打开无线调试，然后重启Scrcpy，打开无线调试的设备可以被Tcpclient访问。
-        /// </summary>
-        /// <returns>设备无线调试是否打开成功。</returns>
-        private async Task<bool> OpenWirelessDebug()
-        {
-            List<string> devices = await GetAdbDevices();
-            foreach (string dev in devices)
-            {
-                //判断是序列号还是IP，序列号代表是USB连接
-                if (!dev.Contains(":") || !IPAddress.TryParse(dev.Split(':')[0], out _))
-                {
-                    //获得指定设备IP，awk 是一个文本处理工具，按行处理文本
-                    //{print $9}表示打印每一行的第9个字段，字段默认以空格或制表符分隔
-                    string ip = (await MyGM.AdbAsync($@"-s {dev} shell ip route | awk '{{print $9}}'")).Trim();
-                    if (ip == "")
-                    {
-                        popMid.Show("未获得设备IP地址，请检查是否在同一网络中。");
-                        return false; ;
-                    }
-
-                    //将安卓设备上的 ADB 服务从 USB 模式切换为网络模式
-                    await MyGM.AdbAsync($"-s {dev} tcpip 5555");
-
-                    //连接指定 IP 地址和端口上的 Android 设备，须在同一局域网中
-                    await MyGM.AdbAsync($"connect {ip}:5555");
-
-                    CloseScrcpy();
-                    await Task.Delay(1000);
-                    StartScrcpy(false);
-
-                    popMid.Show("匹配完成，正在启动Scrcpy。");
-                    return true;
-                }
-            }
-
-            popMid.Show("没有设备或未打开USB调试。");
-            return false;
-        }
-
-        /// <summary>
-        /// 所有当前连接到电脑的 Android 设备或模拟器。
-        /// USB连接的物理设备，是其序列号；网络连接的设备，格式为 IP地址:端口号；模拟器是 emulator-端口号。
-        /// </summary>
-        private async Task<List<string>> GetAdbDevices()
-        {
-            string output = await MyGM.AdbAsync("devices");
-            return [.. output
-                .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
-                .Where(line => !line.StartsWith("List of devices") && !string.IsNullOrWhiteSpace(line))
-                .Select(line => line.Split(['\t', ' '], StringSplitOptions.RemoveEmptyEntries))
-                .Where(parts => parts.Length >= 2 && parts[1] == "device")
-                .Select(parts => parts[0].Trim())];
-        }
-
-        /// <summary>
-        /// 准备进行无线连接，连接前会查询网络中所有IP和端口开放的设备，如有多个设备则会让用户选择。
-        /// </summary>
-        private async Task PrepareWireless()
-        {
-            AdbDeviceScanner scanner = new();
-            List<string> devices = await scanner.ScanNetworkForAdbDevicesAsync();
-
-            if (devices.Count <= 0)
-            {
-                popMid.Show("局域网中没有可以连接的设备。");
-            }
-            else if (devices.Count == 1)
-            {
-                await ScrcpyInit(false, devices[0]);
-            }
-            else
-            {
-                SelectDevice select = new(devices);
-                if (select.ShowDialog() == true)
-                {
-                    await ScrcpyInit(false, devices[select.Index]);
-                }
-            }
         }
 
         /// <summary>

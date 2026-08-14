@@ -246,9 +246,9 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 打开无线调试。
         /// </summary>
-        private void BtnOpenWireless_Click(object sender, RoutedEventArgs e)
+        private async void BtnOpenWireless_Click(object sender, RoutedEventArgs e)
         {
-            WirelessDebug();
+            await WirelessDebug();
         }
 
         private void BtnRemoveBlack_Click(object sender, RoutedEventArgs e)

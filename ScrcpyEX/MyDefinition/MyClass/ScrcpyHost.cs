@@ -35,12 +35,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private bool _isWired;
 
         /// <summary>
-        /// 有线形式启动时的IP地址。
+        /// 默认为空，如果有值：有线形式--【设备序列号】，无线模式--【设备IP地址】。
         /// </summary>
-        private string _ip;
+        private string _sign;
 
         /// <summary>
-        /// 有线形式启动启动时的端口号。
+        /// 无线形式启动时的端口号。
         /// </summary>
         private string _port;
 
@@ -58,13 +58,13 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// 异步启动Scrcpy。
         /// </summary>
         /// <param name="isWired">是否使用有线形式启动。</param>
-        /// <param name="ip">有线形式启动时的IP地址。</param>
-        /// <param name="port">有线形式启动启动时的端口号。</param>
+        /// <param name="sign">有线形式--【设备序列号】，无线模式--【设备IP地址】。</param>
+        /// <param name="port">无线形式启动启动时的端口号。</param>
         /// <returns>承载Scrcpy的HwndHost。</returns>
-        public async Task<HwndHost> StartScrcpyAsync(bool isWired, string ip, string port)
+        public async Task<HwndHost> StartScrcpyAsync(bool isWired, string sign, string port)
         {
             _isWired = isWired;
-            _ip = ip;
+            _sign = sign;
             _port = port;
 
             await StartScrcpy();
@@ -153,11 +153,18 @@ namespace ScrcpyEX.MyDefinition.MyClass
             if (!AudioDeviceDetector.HasActiveRenderDevice()) sb.Append($"--no-audio ");
             if (_isWired)
             {
-                sb.Append("--select-usb");
+                if (_sign == "")
+                {
+                    sb.Append("--select-usb");
+                }
+                else
+                {
+                    sb.Append($"--serial={_sign}");
+                }
             }
             else
             {
-                sb.Append($"--tcpip={_ip}:{_port}");
+                sb.Append($"--tcpip={_sign}:{_port}");
             }
 
             Debug.WriteLine($"ScHost命令行：{sb}。");

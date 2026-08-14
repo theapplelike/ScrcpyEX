@@ -25,6 +25,20 @@ namespace ScrcpyEX.ViewModel
         }
         private ObservableCollection<string> infos = ["1", "2"];
 
+        /// <summary>
+        /// 按钮显示的图标。
+        /// </summary>
+        public string BtnChar
+        {
+            get { return btnChar; }
+            set
+            {
+                btnChar = value;
+                RaisePropertyChanged();
+            }
+        }
+        private string btnChar = "\uecf0";
+
 
     }
 }

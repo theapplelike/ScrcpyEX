@@ -14,6 +14,11 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
     internal class MDC_Hook
     {
         /// <summary>
+        /// 安装监视低级别鼠标输入事件的hook过程，获得的消息更全面。
+        /// </summary>
+        private const int WH_MOUSE_LL = 14;
+
+        /// <summary>
         /// 钩子句柄。
         /// </summary>
         private static IntPtr _hookId;
@@ -28,18 +33,15 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// </summary>
         private static HookProc _hookProc;
 
-        // 用于双击检测的状态
+        /// <summary>
+        /// 记录最后一次点击的时间。
+        /// </summary>
         private static uint _lastClickTime = 0;
 
         /// <summary>
         /// 双击的最大时间间隔。
         /// </summary>
         private static readonly uint _dblClickTime = GetDoubleClickTime();
-
-        /// <summary>
-        /// 安装监视低级别鼠标输入事件的hook过程，获得的消息更全面。
-        /// </summary>
-        private const int WH_MOUSE_LL = 14;
 
         /// <summary>
         /// 整个屏幕的设备上下文句柄（Device Context）。

@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:ScrcpyEX.View"
         mc:Ignorable="d"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
+        x:Name="root"
         Title="选择连接设备" Height="450" Width="600" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded">
 
@@ -22,28 +23,31 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="请选择要无线连接的设备" FontSize="30" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <TextBlock Text="请选择要连接的设备" FontFamily="幼圆" FontSize="35" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         <ListBox x:Name="lst" ItemsSource="{Binding Infos}" SelectionChanged="Lst_SelectionChanged" Grid.Row="1" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Center" VerticalAlignment="Top">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Border BorderBrush="LightSteelBlue" BorderThickness="2" CornerRadius="10">
-                        <Grid>
+                        <Grid Margin="0,0,10,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="300" />
                                 <ColumnDefinition Width="40" />
                             </Grid.ColumnDefinitions>
                             <TextBlock x:Name="tbkEdit" Text="{Binding}" TextTrimming="CharacterEllipsis" Margin="10,0" VerticalAlignment="Center"/>
-                            <Button x:Name="btnEdit" Click="BtnEdit_Click" Grid.Column="1" Content="&#xe8ac;" Style="{StaticResource LstBtn}"/>
+                            <Button x:Name="btnEdit" 
+                                    Click="BtnEdit_Click" 
+                                    Grid.Column="1" 
+                                    Content="{Binding DataContext.BtnChar, ElementName=root}" 
+                                    Style="{StaticResource LstBtn}"/>
                         </Grid>
                     </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-
 
     </Grid>
 </Window>

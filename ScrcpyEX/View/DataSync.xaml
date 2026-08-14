@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ScrcpyEX.View"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
+        xmlns:mcl="clr-namespace:MyControlLibrary.Controls;assembly=MyControlLibrary"
         xmlns:ctrl="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
         mc:Ignorable="d"
         Title="数据同步" Height="600" Width="1100" WindowStartupLocation="CenterScreen"
@@ -57,7 +58,7 @@
 
         <Grid x:Name="gMask" Grid.ColumnSpan="3" IsHitTestVisible="True" Background="#CCFFFFFF" Visibility="Collapsed" MouseDown="GMask_MouseDown">
             <StackPanel VerticalAlignment="Center">
-                <ctrl:ProgressRing x:Name="ring" RingType="3" Desc="传输中..." VerticalAlignment="Center"/>
+                <mcl:ProgressRing x:Name="prgLoad" RingType="3" Text="传输中..." VerticalAlignment="Center"/>
                 <Button x:Name="btnStop" Click="BtnStop_Click" Content="停止传输" Style="{StaticResource Btn}"/>
             </StackPanel>
         </Grid>

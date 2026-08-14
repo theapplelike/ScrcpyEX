@@ -458,20 +458,13 @@ namespace ScrcpyEX.MyDefinition
             sb.AppendLine("****************************异常文本****************************");
             sb.AppendLine("【出现时间】：" + DateTime.Now.ToString());
             sb.AppendLine("【处理事件】：" + processEvent);
-            if (ex != null)
-            {
-                sb.AppendLine("【异常类型】：" + ex.GetType().Name);
-                sb.AppendLine("【异常信息】：" + ex.Message);
-                sb.AppendLine("【堆栈调用】：" + ex.StackTrace);
-            }
-            else
-            {
-                sb.AppendLine("【未处理异常】：" + ex.ToString());
-            }
+            sb.AppendLine("【异常类型】：" + ex.GetType().Name);
+            sb.AppendLine("【异常信息】：" + ex.Message);
+            sb.AppendLine("【堆栈调用】：" + ex.StackTrace);
             sb.AppendLine("****************************--------****************************");
             Directory.CreateDirectory(_errPath);
 
-            //文件存在则追加，不存在则新建文件。
+            //文件存在则追加，不存在则新建文件
             using StreamWriter sw = new($@"{_errPath}\ErrorLog.txt", true, Encoding.UTF8);
             sw.WriteLine(sb);
 

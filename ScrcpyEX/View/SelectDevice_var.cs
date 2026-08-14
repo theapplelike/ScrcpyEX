@@ -10,14 +10,19 @@ namespace ScrcpyEX.View
     public partial class SelectDevice//var
     {
         /// <summary>
+        /// 窗体对应的ViewModel。
+        /// </summary>
+        private readonly SelectDeviceVM _vm;
+
+        /// <summary>
         /// 设备列表，可能是设备的序列号，也可能是设备的IP。
         /// </summary>
         private readonly List<string> _devices;
 
         /// <summary>
-        /// 窗体对应的ViewModel。
+        /// 是否有线连接。
         /// </summary>
-        private readonly SelectDeviceVM _vm;
+        private readonly bool _isWired;
 
         /// <summary>
         /// 选中的设备的索引。

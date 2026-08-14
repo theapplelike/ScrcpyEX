@@ -4,6 +4,7 @@ using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition.MyClass;
 using ScrcpyEX.MyDefinition.MyEvent;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -239,14 +240,14 @@ namespace ScrcpyEX.MyDefinition.MyControl
 
             if (fi.IsDirectory)
             {
-                Debug.WriteLine($"右击目录++");
-                item.ContextMenu = CreateDirMenu([.. lst.SelectedItems.Cast<FileItem>().Where(f => f.IsDirectory)]);
+                //item.ContextMenu = CreateDirMenu([.. lst.SelectedItems.Cast<FileItem>().Where(f => f.IsDirectory)]);
+                item.ContextMenu = CreateDirMenu(lst.SelectedItems.Cast<FileItem>());
                 item.ContextMenu.IsOpen = true;
             }
             else
             {
-                Debug.WriteLine($"右击文件--");
-                item.ContextMenu = CreateFileMenu(fi, [.. lst.SelectedItems.Cast<FileItem>().Where(f => !f.IsDirectory)]);
+                //item.ContextMenu = CreateFileMenu(fi, [.. lst.SelectedItems.Cast<FileItem>().Where(f => !f.IsDirectory)]);
+                item.ContextMenu = CreateFileMenu(fi, lst.SelectedItems.Cast<FileItem>());
                 item.ContextMenu.IsOpen = true;
             }
         }
@@ -254,22 +255,24 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// <summary>
         /// 创建控制目录的右键菜单。
         /// </summary>
-        /// <param name="selectedDirs">选中的目录项列表。</param>
+        /// <param name="selectedItems">选中的目录项列表。</param>
         /// <returns>ContextMenu控件。</returns>
-        private ContextMenu CreateDirMenu(IList<FileItem> selectedDirs)
+        private ContextMenu CreateDirMenu(IEnumerable<FileItem> selectedItems)
         {
             ContextMenu menu = new();
-            MenuItem deleItem = new() { Header = "删除目录" };
+            MenuItem deleItem = new() { Header = "删除" };
+            List<FileItem> items = [.. selectedItems];
 
             deleItem.Click += async (s, e) =>
             {
                 prgLoad.Visibility = Visibility.Visible;
-                await DirService.DeleteDirsAsync(selectedDirs);
+                await DirService.DeleteDirsAsync(items);
+                await DirService.DeleteFilesAsync(items);
                 Reload();
                 prgLoad.Visibility = Visibility.Collapsed;
             };
 
-            GenTitle(menu, selectedDirs, "目录");
+            GenTitle(menu, selectedItems);
             menu.Items.Add(deleItem);
 
             return menu;
@@ -279,14 +282,16 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// 创建控制文件的右键菜单。
         /// </summary>
         /// <param name="clickedFile">右键点击的那一项。</param>
-        /// <param name="selectedFiles">选中的文件项列表。</param>
+        /// <param name="selectedItems">选中的文件项列表。</param>
         /// <returns>ContextMenu控件。</returns>
-        private ContextMenu CreateFileMenu(FileItem clickedFile, IList<FileItem> selectedFiles)
+        private ContextMenu CreateFileMenu(FileItem clickedFile, IEnumerable<FileItem> selectedItems)
         {
             ContextMenu menu = new();
             MenuItem xferItem = new() { Header = "传输文件" };
             MenuItem coverItem = new() { Header = "传输文件（覆盖）" };
-            MenuItem deleItem = new() { Header = "删除文件" };
+            MenuItem deleItem = new() { Header = "删除" };
+            IEnumerable<FileItem> dirs = selectedItems.Where(f => f.IsDirectory);
+            IEnumerable<FileItem> files = selectedItems.Where(f => !f.IsDirectory);
 
             xferItem.Click += (s, e) =>
             {
@@ -294,7 +299,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 XferFileEventArgs args = new()
                 {
                     ClickedItem = clickedFile,
-                    SelectedItems = selectedFiles,
+                    SelectedItems = files,
                     RoutedEvent = XferFileRequestedEvent,
                 };
                 RaiseEvent(args);
@@ -305,7 +310,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 {
                     IsCover = true,
                     ClickedItem = clickedFile,
-                    SelectedItems = selectedFiles,
+                    SelectedItems = files,
                     RoutedEvent = XferFileRequestedEvent,
                 };
                 RaiseEvent(args);
@@ -313,12 +318,13 @@ namespace ScrcpyEX.MyDefinition.MyControl
             deleItem.Click += async (s, e) =>
             {
                 prgLoad.Visibility = Visibility.Visible;
-                await DirService.DeleteFilesAsync(selectedFiles);
+                await DirService.DeleteDirsAsync(dirs);
+                await DirService.DeleteFilesAsync(files);
                 Reload();
                 prgLoad.Visibility = Visibility.Collapsed;
             };
 
-            GenTitle(menu, selectedFiles);
+            GenTitle(menu, selectedItems);
             menu.Items.Add(xferItem);
             menu.Items.Add(coverItem);
             menu.Items.Add(new Separator());
@@ -332,13 +338,36 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// </summary>
         /// <param name="menu">菜单控件。</param>
         /// <param name="selecteds">所有选中的项。</param>
-        private void GenTitle(ContextMenu menu, IList<FileItem> selecteds, string desc = "文件")
+        private void GenTitle(ContextMenu menu, IEnumerable<FileItem> selecteds)
         {
+            int dirCount = 0, fileCount = 0, total = 0;
+            string firstName = null, header;
+
+            foreach (FileItem item in selecteds)
+            {
+                total++;
+                if (item.IsDirectory)
+                    dirCount++;
+                else
+                    fileCount++;
+
+                firstName ??= item.Name;
+            }
+
+            if (total == 0)
+                header = "未选中任何项";
+            else if (total == 1)
+                header = $"{(dirCount > 0 ? "目录" : "文件")}：{firstName}";
+            else if (fileCount > 0 && dirCount > 0)
+                header = $"已选中 {fileCount} 个文件，{dirCount} 个目录";
+            else if (fileCount > 0)
+                header = $"已选中 {fileCount} 个文件";
+            else
+                header = $"已选中 {dirCount} 个目录";
+
             MenuItem headerItem = new()
             {
-                Header = selecteds.Count == 1
-                     ? $"{desc}: {selecteds[0].Name}"
-                     : $"已选中 {selecteds.Count} 个{desc}",
+                Header = header,
                 Style = (Style)FindResource("ContextMenuHeaderStyle")
             };
             menu.Items.Add(headerItem);

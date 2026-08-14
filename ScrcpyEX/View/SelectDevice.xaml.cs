@@ -23,23 +23,29 @@ namespace ScrcpyEX.View
     /// </summary>
     public partial class SelectDevice : Window
     {
-        public SelectDevice(List<string> devices)
+        /// <summary>
+        /// 有多个设备时选择启动设备的界面。
+        /// </summary>
+        /// <param name="devices">通过ADB获得的设备 序列号 或 IP地址。</param>
+        /// <param name="isWired">是否有线连接。</param>
+        public SelectDevice(List<string> devices, bool isWired)
         {
             InitializeComponent();
-            _devices = devices;
             _vm = (SelectDeviceVM)DataContext;
+            _devices = devices;
+            _isWired = isWired;
+            _vm.BtnChar = isWired ? "\uecf0" : "\uee77";
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            GetDeviceInfo();
+            await LoadDeviceInfo();
         }
 
         private void Lst_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (lst.SelectedItem != null)
             {
-                //Console.WriteLine($"选中了: {lst.SelectedItem},{lst.SelectedIndex}");
                 Index = lst.SelectedIndex;
                 DialogResult = true;
             }
