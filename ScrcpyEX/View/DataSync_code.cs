@@ -113,28 +113,30 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// <para>
-        /// ADB获得的文件列表格式：-rw-rw---- 1 root sdcard_rw 301 2026-04-04 19:25 shumei.txt
-        /// </para>
-        /// <para>按空格分隔分别是：</para>
-        /// <para>parts[0] 权限, parts[1] 链接数, parts[2] 所有者, parts[3] 组,</para>
-        /// <para>parts[4] 大小, parts[5] 日期值, parts[6] 时间值, parts[7] 名称。</para>
+        /// 解析时不能简单用空格分隔，因为最后一个文件名可能包含多个空格。
         /// </summary>
-        /// <param name="otp">ADB获得的文件列表。</param>
-        /// <returns>字符串中解析出来的所有文件名的集合。</returns>
+        /// <param name="otp">ADB的ls -l命令获得的文件列表。</param>
+        /// <returns>文件名的集合，使用正则表达式保证获取原始的文件名。</returns>
         private HashSet<string> ParseFile(string otp)
         {
-            return [.. otp
-                    .SplitReal(Environment.NewLine)
-                    .Skip(1) //跳过 total 行
-                    .Select(line => line.SplitReal(' '))
-                    .Where(parts => parts.Length >= 8 && parts[0][0] == '-')//只保留普通文件(权限首字符为'-')
-                    .Select(parts => parts[7])
-                    .Where(name => name != "." && name != "..")];
+            HashSet<string> result = [];
+            string[] lines = [.. otp.SplitReal(['\r', '\n']).Skip(1)];
+
+            foreach (string line in lines)
+            {
+                Match match = MyGM.LsLineRegex.Match(line);
+                if (match.Success)
+                {
+                    string name = match.Groups["name"].Value;//包含所有空格
+                    result.Add(name);
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
-        /// 获取要推送/拉取的文件列表。
+        /// 获取要推送/拉取的文件列表，-l不显示以 . 开头的隐藏文件（也不显示 . 和 ..）。
         /// </summary>
         /// <param name="isPush">是否为推送模式（本地->安卓）。</param>
         /// <returns>要推送/拉取的文件列表。</returns>
@@ -147,7 +149,7 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 获取要推送/拉取的文件列表。
+        /// 获取要推送/拉取的文件列表，-l不显示以 . 开头的隐藏文件（也不显示 . 和 ..）。
         /// </summary>
         /// <param name="isPush">是否为推送模式（本地->安卓）。</param>
         /// <param name="fileItems">指定要发送的文件列表。</param>

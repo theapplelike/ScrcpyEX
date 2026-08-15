@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace ScrcpyEX.MyDefinition
 {
@@ -30,6 +31,26 @@ namespace ScrcpyEX.MyDefinition
         /// 错误日志路径。
         /// </summary>
         private static readonly string _errPath = @".\main\Local\ErrorLog";
+
+        /// <summary>
+        /// <para>ADB的ls命令结果：-rw-rw---- 1 root sdcard_rw 301 2026-04-04 19:25 shumei.txt</para>
+        /// <para>按空格分隔分别是：</para>
+        /// <para>parts[0] 权限, parts[1] 链接数, parts[2] 所有者, parts[3] 组,</para>
+        /// <para>parts[4] 大小, parts[5] 日期值, parts[6] 时间值, parts[7] 名称。</para>
+        /// <para>最后的名称可能带有空格，会被截断，且可能有多个空格，所以使用正则表达式匹配最后的文件名保证空格完整。</para>
+        /// <para>此正则表达式的结果依次是：</para>
+        /// <para>Groups[0]，原始字符串。</para>
+        /// <para>Groups[1]，文件类型：-, d, l 等。</para>
+        /// <para>Groups[2]，权限位（9个字符）：rw-rw----。</para>
+        /// <para>Groups[3]，文件大小：301。</para>
+        /// <para>Groups[4]，日期：2026-04-04。</para>
+        /// <para>Groups[5]，时间：19:25。</para>
+        /// <para>Groups[6]，完整文件名（含所有空格）。</para>
+        /// </summary>
+        public static readonly Regex LsLineRegex = new(
+            @"^(?<type>[\-dlspbcD])(?<perm>[\-rwx]{9})\s+\d+\s+\S+\s+\S+\s+(?<size>\d+)\s+(?<date>\d{4}-\d{2}-\d{2})\s+(?<time>\d{2}:\d{2})\s+(?<name>.+)$",
+            RegexOptions.Compiled
+        );
 
         /// <summary>
         /// 在鼠标位置显示Popup提示，重复执行时可以显示到最新位置。

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ScrcpyEX.MyDefinition.MyClass
@@ -110,7 +111,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         }
 
         /// <summary>
-        /// 获得路径下的子目录和文件。
+        /// 获得路径下的子目录和文件，-la会读取隐藏文件。
         /// </summary>
         /// <param name="path">指定的路径。</param>
         /// <returns>路径下子目录和文件的集合。</returns>
@@ -130,34 +131,38 @@ namespace ScrcpyEX.MyDefinition.MyClass
         }
 
         /// <summary>
-        /// <para>
-        /// ADB获得的文件列表格式：-rw-rw---- 1 root sdcard_rw 301 2026-04-04 19:25 shumei.txt
-        /// </para>
-        /// <para>按空格分隔分别是：</para>
-        /// <para>parts[0] 权限, parts[1] 链接数, parts[2] 所有者, parts[3] 组,</para>
-        /// <para>parts[4] 大小, parts[5] 日期值, parts[6] 时间值, parts[7] 名称。</para>
-        /// <para>最后的名称可能带有空格，会被截断，需要组合索引7及之后的所有字符串。</para>
+        /// 解析时不能简单用空格分隔，因为最后一个文件名可能包含多个空格。
         /// </summary>
-        /// <param name="otp">ADB获得的文件列表。</param>
+        /// <param name="otp">ADB的ls -la命令获得的文件列表。</param>
         /// <param name="tgtPath">目标目录。</param>
+        /// <returns>FileItem的集合，使用正则表达式保证获取原始的文件名。</returns>
         private IEnumerable<FileItem> ParseDir(string otp, string tgtPath)
         {
-            string[] dirs = [.. otp.SplitReal(Environment.NewLine).Skip(1)];
-            foreach (string di in dirs)
+            string[] lines = otp.SplitReal(['\r', '\n']);
+            foreach (string line in lines)
             {
-                string[] parts = di.SplitReal(' ');
-                string name = string.Join(" ", parts, 7, parts.Length - 7);
-                if (name == "." || name == "..") continue;
-                bool isDir = parts[0][0] == 'd';//权限的第一个字符为d说明为目录
+                if (line.TrimStart().StartsWith("total")) continue;
 
+                Match match = MyGM.LsLineRegex.Match(line);
+                if (!match.Success) continue;
+
+                string typeChar = match.Groups[1].Value;
+                string sizeStr = match.Groups[3].Value;
+                string date = match.Groups[4].Value;
+                string time = match.Groups[5].Value;
+                string name = match.Groups[6].Value;
+
+                if (name == "." || name == "..") continue;
+
+                bool isDir = typeChar == "d";
                 yield return new FileItem
                 {
                     Name = name,
-                    Size = isDir ? null : long.Parse(parts[4]),
-                    Time = DateTime.Parse($"{parts[5]} {parts[6]}"),
+                    Size = isDir ? null : long.Parse(sizeStr),
+                    Time = DateTime.Parse($"{date} {time}"),
                     FullPath = $"{tgtPath}/{name}",
                     IsDirectory = isDir,
-                    Extension = Path.GetExtension(name),
+                    Extension = Path.GetExtension(name)
                 };
             }
         }
