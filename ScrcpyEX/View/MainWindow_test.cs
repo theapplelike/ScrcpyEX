@@ -19,6 +19,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.Xml;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,6 +31,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 using DPoint = System.Drawing.Point;  //Windows Forms的Point
 using WPoint = System.Windows.Point;  //WPF的Point
 
@@ -73,7 +75,7 @@ namespace ScrcpyEX.View
 
         /// <summary>
         /// 测试用的小屏无黑边尺寸205,136
-        /// await MyGM.AdbAsync("devices");
+        /// await MyGM.AdbAsync("devices -l");
         /// </summary>
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
@@ -83,8 +85,10 @@ namespace ScrcpyEX.View
             //await MyGM.AdbMoreAsync($"shell ls -la /sdcard/");
             //await MyGM.AdbMoreAsync($"shell echo $SECONDARY_STORAGE");
             //await MyGM.AdbMoreAsync($"shell ls -la storage/A409-11E9/");
-            //await MyGM.AdbMoreAsync($"shell ls -la $SECONDARY_STORAGE/");
+            //await MyGM.AdbMoreAsync($"disconnect 192.168.10.244:5555");
+            //await MyGM.AdbMoreAsync($"devices -l");
             //new DataSync().ShowDialog();
+
         }
 
         //private void AdbPersistent()

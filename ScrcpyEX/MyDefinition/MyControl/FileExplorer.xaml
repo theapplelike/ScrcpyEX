@@ -196,7 +196,8 @@
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Visibility="{Binding ShowGoRoot, ElementName=root}">
                     <Border Width="2" Background="LightGray" Margin="4,0,2,0"/>
-                    <Button x:Name="btnRoot" Click="BtnRoot_Click" Content="&#xea8a;" Style="{StaticResource NaviBtn}" IsEnabled="True"/>
+                    <Button x:Name="btnRfsh" Click="BtnRfsh_Click" Content="&#xE72c;" Style="{StaticResource NaviBtn}" IsEnabled="True"/>
+                    <Button x:Name="btnRoot" Click="BtnRoot_Click" Content="&#xEa8a;" Style="{StaticResource NaviBtn}" IsEnabled="True"/>
                 </StackPanel>
                 
             </Grid>

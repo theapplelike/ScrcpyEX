@@ -36,7 +36,7 @@ namespace ScrcpyEX.ExtensionMethod
         public static string ScPath { get; set; } = @$".\scrcpy-win64-{ScVersion}\scrcpy.exe";
 
         /// <summary>
-        /// adb的路径。
+        /// ADB的路径。
         /// </summary>
         public static string ADB_Path { get; set; } = @$".\scrcpy-win64-{ScVersion}\adb.exe";
 

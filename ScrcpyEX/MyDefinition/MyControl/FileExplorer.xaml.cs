@@ -75,6 +75,11 @@ namespace ScrcpyEX.MyDefinition.MyControl
             }
         }
 
+        private async void BtnRfsh_Click(object sender, RoutedEventArgs e)
+        {
+            await NavigateTo(CurPath, true);
+        }
+
         private async void BtnRoot_Click(object sender, RoutedEventArgs e)
         {
             await NavigateTo(DirService.Root, true);

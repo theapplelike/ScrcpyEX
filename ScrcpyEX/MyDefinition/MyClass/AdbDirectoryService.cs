@@ -31,7 +31,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
         public bool IsRoot(string path)
         {
-            return path == Root;
+            return path == Root || path.TrimEnd(Sep) == Root;
         }
 
         public bool IsCanXfer(string path)

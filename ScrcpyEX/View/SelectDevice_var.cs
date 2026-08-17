@@ -28,5 +28,7 @@ namespace ScrcpyEX.View
         /// 选中的设备的索引。
         /// </summary>
         public int Index {  get; set; }
+
+
     }
 }

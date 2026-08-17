@@ -7,6 +7,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -37,10 +38,10 @@ namespace ScrcpyEX.MyDefinition
         /// <para>按空格分隔分别是：</para>
         /// <para>parts[0] 权限, parts[1] 链接数, parts[2] 所有者, parts[3] 组,</para>
         /// <para>parts[4] 大小, parts[5] 日期值, parts[6] 时间值, parts[7] 名称。</para>
-        /// <para>最后的名称可能带有空格，会被截断，且可能有多个空格，所以使用正则表达式匹配最后的文件名保证空格完整。</para>
+        /// <para>最后的名称可能带有空格，且可能有连续空格，所以使用正则表达式匹配最后的文件名保证空格完整。</para>
         /// <para>此正则表达式的结果依次是：</para>
         /// <para>Groups[0]，原始字符串。</para>
-        /// <para>Groups[1]，文件类型：-, d, l 等。</para>
+        /// <para>Groups[1]，文件类型：-,d,l 等。</para>
         /// <para>Groups[2]，权限位（9个字符）：rw-rw----。</para>
         /// <para>Groups[3]，文件大小：301。</para>
         /// <para>Groups[4]，日期：2026-04-04。</para>
@@ -500,6 +501,46 @@ namespace ScrcpyEX.MyDefinition
         public static System.Drawing.Rectangle GetCurScreenRect(IntPtr handle)
         {
             return System.Windows.Forms.Screen.FromHandle(handle).WorkingArea;
+        }
+
+        /// <summary>
+        /// 从可能包含端口的字符串中提取 IP 地址。
+        /// <para>支持格式：192.168.1.1:8080、[::1]:5555、192.168.1.1（无端口）、::1（无端口）。</para>
+        /// </summary>
+        /// <param name="input">要解析的字符串。</param>
+        /// <returns>返回有效的 IP，若无法提取有效的 IP，返回空字符串。</returns>
+        public static string ExtractIpAddress(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return "";
+            if (IPAddress.TryParse(input, out _)) return input;
+
+            // 处理 IPv6 带端口格式：[IPv6]:port
+            if (input.StartsWith("[") && input.Contains("]:"))
+            {
+                int start = input.IndexOf('[');
+                int end = input.IndexOf(']');
+                if (start >= 0 && end > start)
+                {
+                    string ipv6Candidate = input.Substring(start + 1, end - start - 1);
+                    if (IPAddress.TryParse(ipv6Candidate, out _))
+                    {
+                        return ipv6Candidate;
+                    }
+                }
+            }
+
+            // 处理 IPv4 带端口或 IPv6 不带方括号
+            int lastColon = input.LastIndexOf(':');
+            if (lastColon > 0)
+            {
+                string candidate = input.Substring(0, lastColon);
+                if (IPAddress.TryParse(candidate, out _))
+                {
+                    return candidate;
+                }
+            }
+
+            return "";
         }
 
         /// <summary>

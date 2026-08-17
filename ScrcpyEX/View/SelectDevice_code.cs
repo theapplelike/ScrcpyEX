@@ -1,4 +1,5 @@
-﻿using ScrcpyEX.MyDefinition;
+﻿using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,7 +17,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private async Task LoadDeviceInfo()
         {
-            _vm.Infos.Clear();
+            _vm.DeviceInfos.Clear();
             if (_isWired)
             {
                 await LoadWired();
@@ -35,7 +36,14 @@ namespace ScrcpyEX.View
             foreach (string dev in _devices)
             {
                 string output = await MyGM.AdbAsync($@"-s {dev} shell getprop | grep -E 'ro.product.manufacturer|ro.product.model'");
-                _vm.Infos.Add(ParseDeviceInfo(output));
+                List<string> result = ParseDeviceInfo(output);
+
+                _vm.DeviceInfos.Add(new AdbDeviceInfo()
+                {
+                    Manufacturer = result[0],
+                    Model = result[1],
+                    Sign = dev,
+                });
             }
         }
 
@@ -55,7 +63,14 @@ namespace ScrcpyEX.View
                     //net.hostname有些设备没有，所以最后只保留了设备的制造商和型号
 
                     string output = await MyGM.AdbAsync($@"-s {dev} shell getprop | grep -E 'ro.product.manufacturer|ro.product.model'");
-                    _vm.Infos.Add(ParseDeviceInfo(output));
+                    List<string> result = ParseDeviceInfo(output);
+
+                    _vm.DeviceInfos.Add(new AdbDeviceInfo()
+                    {
+                        Manufacturer = result[0],
+                        Model = result[1],
+                        Sign = dev,
+                    });
                 }
             }
         }
@@ -65,7 +80,7 @@ namespace ScrcpyEX.View
         /// </summary>
         /// <param name="output">从adb获得的返回内容。</param>
         /// <returns>以特定格式返回设备型号信息。</returns>
-        private string ParseDeviceInfo(string output)
+        private List<string> ParseDeviceInfo(string output)
         {
             List<string> infos = [];
             foreach (string str in output.SplitReal(['\r', '\n']))
@@ -78,7 +93,7 @@ namespace ScrcpyEX.View
             }
 
             Debug.WriteLine($"格式化：" + string.Join("，", infos));
-            return string.Join(" ", infos);
+            return infos;
         }
 
 

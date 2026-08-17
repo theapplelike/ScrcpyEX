@@ -21,6 +21,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using static ScrcpyEX.MyDefinition.MyEnum;
 using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
 
 namespace ScrcpyEX.View
@@ -236,7 +237,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private async Task PrepareWired()
         {
-            List<string> devices = await GetAdbDevices();
+            List<string> devices = await GetSpecifiedAdbDevices(AdbDeviceType.Usb);
 
             if (devices.Count == 0)
             {
@@ -257,12 +258,23 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 准备进行无线连接，连接前会查询网络中所有IP和端口开放的设备，如有多个设备则会让用户选择。
+        /// 准备进行无线连接，连接前会查询局域网中所有IP和端口开放和ADB可以识别的设备，如有多个设备则会让用户选择。
         /// </summary>
         private async Task PrepareWireless()
         {
             AdbDeviceScanner scanner = new();
             List<string> devices = await scanner.ScanNetworkForAdbDevicesAsync();
+            List<string> socketAddr = await GetSpecifiedAdbDevices(AdbDeviceType.Tcp);
+
+            //添加ADB可以识别的设备
+            foreach (string addr in socketAddr)
+            {
+                string ip = MyGM.ExtractIpAddress(addr);
+                if (ip != "" && !devices.Contains(ip))
+                {
+                    devices.Add(ip);
+                }
+            }
 
             if (devices.Count <= 0)
             {
@@ -326,12 +338,12 @@ namespace ScrcpyEX.View
         private async Task<bool> WirelessDebug()
         {
             popMid.Show("请保持USB连接稳定。");
-            List<string> devices = await GetAdbDevices();
+            List<string> devices = await GetSpecifiedAdbDevices(AdbDeviceType.Usb);
 
             foreach (string dev in devices)
             {
                 //判断是序列号还是IP，序列号代表是USB连接
-                if (!dev.Contains(":") || !IPAddress.TryParse(dev.Split(':')[0], out _))
+                //if (!dev.Contains(":") || !IPAddress.TryParse(dev.Split(':')[0], out _))
                 {
                     //获得指定设备IP，awk 是一个文本处理工具，按行处理文本
                     //{print $9}表示打印每一行的第9个字段，字段默认以空格或制表符分隔
@@ -350,9 +362,9 @@ namespace ScrcpyEX.View
 
                     CloseScrcpy();
                     await Task.Delay(1000);
-                    StartScrcpy(false);
-
                     popMid.Show("匹配完成，正在启动Scrcpy。");
+
+                    StartScrcpy(false);
                     return true;
                 }
             }
@@ -362,10 +374,46 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 所有当前连接到电脑的 Android 设备或模拟器。
-        /// USB连接的物理设备，是其序列号；网络连接的设备，格式为 IP地址:端口号；模拟器是 emulator-端口号。
+        /// 获取指定类型的 ADB 设备序列号列表。
         /// </summary>
-        private async Task<List<string>> GetAdbDevices()
+        /// <param name="type">指定 ADB 设备类型。</param>
+        /// <returns>USB连接的物理设备，是其序列号；网络连接的设备，格式为 IP地址:端口号；模拟器是 emulator-端口号。</returns>
+        private async Task<List<string>> GetSpecifiedAdbDevices(AdbDeviceType type)
+        {
+            List<string> allDevices = await GetAllAdbDevices();
+            List<string> result = [];
+
+            foreach (string serial in allDevices)
+            {
+                bool isEmulator = serial.StartsWith("emulator-");
+                bool isTcp = serial.Contains(":");
+                bool isUsb = !isEmulator && !isTcp;
+
+                switch (type)
+                {
+                    case AdbDeviceType.All:
+                        result.Add(serial);
+                        break;
+                    case AdbDeviceType.Usb:
+                        if (isUsb) result.Add(serial);
+                        break;
+                    case AdbDeviceType.Tcp:
+                        if (isTcp) result.Add(serial);
+                        break;
+                    case AdbDeviceType.Emulator:
+                        if (isEmulator) result.Add(serial);
+                        break;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 所有当前连接到电脑的 Android 设备或模拟器。
+        /// </summary>
+        /// <returns>USB连接的物理设备，是其序列号；网络连接的设备，格式为 IP地址:端口号；模拟器是 emulator-端口号。</returns>
+        private async Task<List<string>> GetAllAdbDevices()
         {
             string output = await MyGM.AdbAsync("devices");
             return [.. output

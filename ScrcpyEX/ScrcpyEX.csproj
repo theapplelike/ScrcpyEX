@@ -92,6 +92,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\AdbDeviceInfo.cs" />
     <Compile Include="Model\BreadcrumbItem.cs" />
     <Compile Include="Model\FileItem.cs" />
     <Compile Include="Model\FormSize.cs" />
@@ -122,10 +123,12 @@
     <Compile Include="MyDefinition\MyControl\HoverPopup.cs" />
     <Compile Include="MyDefinition\MyControl\IconButton.cs" />
     <Compile Include="MyDefinition\MyControl\TimePopup.cs" />
+    <Compile Include="MyDefinition\MyConverter\ConnectIconConverter.cs" />
     <Compile Include="MyDefinition\MyConverter\FileToIconConverter.cs" />
     <Compile Include="MyDefinition\MyConverter\FileSizeConverter.cs" />
     <Compile Include="MyDefinition\MyConverter\IsScriptGroupConverter.cs" />
     <Compile Include="MyDefinition\MyConverter\SortArrowConverter.cs" />
+    <Compile Include="MyDefinition\MyEnum.cs" />
     <Compile Include="MyDefinition\MyEvent\XferFileEventArgs.cs" />
     <Compile Include="MyDefinition\WindowsAPI\AudioDeviceDetector.cs" />
     <Compile Include="MyDefinition\WindowsAPI\DLL.cs" />

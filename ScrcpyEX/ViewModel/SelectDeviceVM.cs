@@ -14,30 +14,16 @@ namespace ScrcpyEX.ViewModel
         /// <summary>
         /// 说明设备信息的集合。
         /// </summary>
-        public ObservableCollection<string> Infos
+        public ObservableCollection<AdbDeviceInfo> DeviceInfos
         {
-            get { return infos; }
+            get { return deviceInfos; }
             set
             {
-                infos = value;
+                deviceInfos = value;
                 RaisePropertyChanged();
             }
         }
-        private ObservableCollection<string> infos = ["1", "2"];
-
-        /// <summary>
-        /// 按钮显示的图标。
-        /// </summary>
-        public string BtnChar
-        {
-            get { return btnChar; }
-            set
-            {
-                btnChar = value;
-                RaisePropertyChanged();
-            }
-        }
-        private string btnChar = "\uecf0";
+        private ObservableCollection<AdbDeviceInfo> deviceInfos = [];
 
 
     }

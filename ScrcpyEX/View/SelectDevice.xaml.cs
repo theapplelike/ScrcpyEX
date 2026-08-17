@@ -34,7 +34,6 @@ namespace ScrcpyEX.View
             _vm = (SelectDeviceVM)DataContext;
             _devices = devices;
             _isWired = isWired;
-            _vm.BtnChar = isWired ? "\uecf0" : "\uee77";
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)

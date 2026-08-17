@@ -182,7 +182,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
                     FullPath = i == 0 ? GetRootPath(add) : add.ToString(),
                     IsLast = i < segs.Length - 1 ? Visibility.Visible : Visibility.Collapsed
                 });
-                //Debug.WriteLine($"++++++面包屑累加路径：{bis[i].FullPath}");
+                Debug.WriteLine($"++++++面包屑累加路径：{bis[i].FullPath}");
             }
         
             Bis = new(bis);

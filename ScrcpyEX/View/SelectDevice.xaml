@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ScrcpyEX.View"
+        xmlns:converter="clr-namespace:ScrcpyEX.MyDefinition.MyConverter"
         mc:Ignorable="d"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
         x:Name="root"
@@ -15,9 +16,15 @@
     </Window.DataContext>
 
     <Window.Resources>
+        <converter:ConnectIconConverter x:Key="ConnectIconConv"/>
+        
         <Style x:Key="LstBtn" TargetType="Button" BasedOn="{StaticResource MenuBtn}">
             <Setter Property="Height" Value="30"/>
             <Setter Property="Width" Value="40"/>
+        </Style>
+        <Style x:Key="tbk" TargetType="TextBlock">
+            <Setter Property="Margin" Value="10,0,0,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
     </Window.Resources>
 
@@ -28,20 +35,24 @@
         </Grid.RowDefinitions>
 
         <TextBlock Text="请选择要连接的设备" FontFamily="幼圆" FontSize="35" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <ListBox x:Name="lst" ItemsSource="{Binding Infos}" SelectionChanged="Lst_SelectionChanged" Grid.Row="1" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Center" VerticalAlignment="Top">
+        <ListBox x:Name="lst" ItemsSource="{Binding DeviceInfos}" SelectionChanged="Lst_SelectionChanged" Grid.Row="1" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Center" VerticalAlignment="Top">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Border BorderBrush="LightSteelBlue" BorderThickness="2" CornerRadius="10">
                         <Grid Margin="0,0,10,0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="300" />
-                                <ColumnDefinition Width="40" />
+                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="40"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock x:Name="tbkEdit" Text="{Binding}" TextTrimming="CharacterEllipsis" Margin="10,0" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource tbk}" Text="{Binding Manufacturer}"/>
+                                <TextBlock Style="{StaticResource tbk}" Text="{Binding Model}"/>
+                                <TextBlock Style="{StaticResource tbk}" Text="{Binding Sign}"/>
+                            </StackPanel>
                             <Button x:Name="btnEdit" 
                                     Click="BtnEdit_Click" 
                                     Grid.Column="1" 
-                                    Content="{Binding DataContext.BtnChar, ElementName=root}" 
+                                    Content="{Binding Sign, Converter={StaticResource ConnectIconConv}}" 
                                     Style="{StaticResource LstBtn}"/>
                         </Grid>
                     </Border>
