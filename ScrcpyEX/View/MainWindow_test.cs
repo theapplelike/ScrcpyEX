@@ -1,4 +1,6 @@
 ﻿using OpenCvSharp;
+using OpenCvSharp.Features2D;
+using OpenCvSharp.Quality;
 using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition;
@@ -29,7 +31,6 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 using DPoint = System.Drawing.Point;  //Windows Forms的Point
@@ -49,14 +50,7 @@ namespace ScrcpyEX.View
         /// border和scrcpy相同大小，监听SDL的消息-x
         /// 虚拟屏幕-y
         /// com.bilibili.azurlane
-        /// 标题栏每个按钮快捷键-y
         /// adb开启USB网络-y
-        /// sc突然断线要清理资源-y
-        /// sc有焦点时显示图标-y
-        /// 缩放在竖屏下有问题-y
-        /// 缩放和位置变更都会重置pop，在缩放和位置同时改变时，只执行其中一个重置-y
-        /// 宽度很宽但高度很小时，pop垂直方向会在界面外，原因是偏移都用宽的比例-y
-        /// 按钮实现Alt+O快捷键-y
         /// 虚拟屏幕能否呈现为宽屏-京东等应用不支持分屏，在虚拟屏幕上运行会强制回到主屏幕
         /// </summary>
         private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
@@ -89,6 +83,73 @@ namespace ScrcpyEX.View
             //await MyGM.AdbMoreAsync($"devices -l");
             //new DataSync().ShowDialog();
 
+            //PicTest(@"F:\new\Pic\测试");
+            //PicTest(@"F:\new\Pic\截图");
+            PicTest(@"F:\new\Pic\fox");
+            //PicTest(@"F:\new\Pic\拍照");
+        }
+
+        private void PicTest(string root)
+        {
+            string[] files = Directory.GetFiles(root);
+            int i = 0;
+
+            foreach (string file in files)
+            {
+                string ext = Path.GetExtension(file);
+                string name = Path.GetFileName(file);
+                Debug.WriteLine($"- - - - -{name}");
+
+                //OpenCv.CompareSSIM(@$"{root}\原始{ext}", file);
+                //OpenCv.CalculateSSIM(@$"{root}\原始{ext}", file);
+                //OpenCv.CalculatePSNR(@$"{root}\原始{ext}", file);
+                //OpenCv.CalculateRgbHist(@$"{root}\原始{ext}", file);
+                //OpenCv.CalculateHsvHist(@$"{root}\原始{ext}", file);
+                //OpenCv.CalculateHuMoment(@$"{root}\原始{ext}", file);
+                //OpenCv.CalculateSIFT(@$"{root}\原始{ext}", file);
+                //OpenCv.CalculateORB(@$"{root}\原始{ext}", file);
+
+                MatchUITemplate(@$"{root}\原始{ext}", file, @$"{root}\result{++i}-{name}");
+            }
+        }
+
+        public double MatchUITemplate(string targetPath, string templatePath, string savePath)
+        {
+            if (targetPath == templatePath) return 1;
+
+            using Mat target = Cv2.ImRead(targetPath, ImreadModes.Grayscale);
+            using Mat template = Cv2.ImRead(templatePath, ImreadModes.Grayscale);
+
+            // 如果截图（目标）比模板还小，绝对匹配不到（直接返回0）
+            if (target.Width < template.Width || target.Height < template.Height)
+            {
+                Debug.WriteLine("目标图像太小，无法包含完整的模板图标。");
+                return 0.0;
+            }
+
+            using Mat result = new();
+
+            // 模板匹配算法：使用归一化相关系数匹配法 (0~1)，最适合UI识别
+            Cv2.MatchTemplate(target, template, result, TemplateMatchModes.CCoeffNormed);
+            Cv2.MinMaxLoc(result, out double minVal, out double maxVal, out OpenCvSharp.Point minLoc, out OpenCvSharp.Point maxLoc);
+
+            // 截取匹配的框坐标
+            OpenCvSharp.Rect matchRect = new(maxLoc.X, maxLoc.Y, template.Width, template.Height);
+
+            if (maxVal > 0.85)
+            {
+                // 把识别出来的框画在图上
+                using Mat colorTarget = Cv2.ImRead(targetPath, ImreadModes.Color);
+                Cv2.Rectangle(colorTarget, matchRect, Scalar.Red, 2);
+                Cv2.ImWrite(savePath, colorTarget);
+                Debug.WriteLine($"模板匹配相似度: {maxVal:F4}，匹配位置: {maxLoc}");
+            }
+            else
+            {
+                Debug.WriteLine($"匹配失败: {maxVal:F4}，匹配位置: {maxLoc}");
+            }
+
+            return maxVal;
         }
 
         //private void AdbPersistent()
