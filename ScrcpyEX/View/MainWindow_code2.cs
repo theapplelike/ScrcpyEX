@@ -1,4 +1,5 @@
-﻿using ScrcpyEX.ExtensionMethod;
+﻿using OpenCvSharp.ML;
+using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.MyClass;
@@ -20,13 +21,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using DBrushes = System.Drawing.Brushes;
-using WBrushes = System.Windows.Media.Brushes;
-using DPoint = System.Drawing.Point;  //Windows Forms的Point
-using WPoint = System.Windows.Point;  //WPF的Point
-using DRectangle = System.Drawing.Rectangle;
-using WRectangle = System.Windows.Shapes.Rectangle;
 using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
+using DBrushes = System.Drawing.Brushes;
+using DPoint = System.Drawing.Point;  //Windows Forms的Point
+using DRectangle = System.Drawing.Rectangle;
+using WBrushes = System.Windows.Media.Brushes;
+using WPoint = System.Windows.Point;  //WPF的Point
+using WRectangle = System.Windows.Shapes.Rectangle;
 
 namespace ScrcpyEX.View
 {
@@ -149,7 +150,7 @@ namespace ScrcpyEX.View
         {
             //Debug.WriteLine($"Timed进入新一轮，已产生的间隔：{_vm.Running}。");
             _vm.CycleNum++;
-            _stopwatch = Stopwatch.StartNew();
+            _stopwatch.Restart();
 
             for (int i = 0; i < infos.Count; i++)
             {
@@ -172,12 +173,14 @@ namespace ScrcpyEX.View
             try
             {
                 //Debug.WriteLine($"Image进入新一轮，已产生的间隔：{_vm.Running}。");
-                _vm.ScriptInterval = 5000;
+                //_vm.ScriptInterval = 5000;
                 await ImageCompare(infos[_si++ % infos.Count]);
             }
             catch (Exception ex)
             {
-                MyGM.ShwError($"执行图像脚本时异常：{ex}。");
+                _vm.ScriptInterval = 5000;
+                MyGM.RecordException(ex, "执行图像脚本时异常");
+                //MyGM.ShwError($"执行图像脚本时异常：{ex}。");
             }
             finally
             {
@@ -203,8 +206,21 @@ namespace ScrcpyEX.View
             double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
             if (ssim >= info.Similarity / 100)
             {
-                await NextImageScript(info);
-                Debug.WriteLine($"单次对比通过，相似度：{ssim:F8}");
+                if (info.IsAdaptive)
+                {
+                    _vm.ScriptInterval = _vm.Running * 1000 * 0.9;//每次将上一次间隔的90%作为自适应间隔
+                }
+
+                _vm.CycleNum++;
+                _stopwatch.Restart();
+                await ExecuteClickScript(info, ScHandle);
+                Debug.WriteLine($"单次对比通过，相似度：{ssim:P2}");
+            }
+            else
+            {
+                //每次未匹配上增加间隔时间，间隔达到12秒以上时重新从5秒间隔开始
+                double interval = _vm.ScriptInterval * 1.5;
+                _vm.ScriptInterval = interval > 12000 ? 5000 : interval;
             }
         }
 
@@ -212,17 +228,17 @@ namespace ScrcpyEX.View
         /// 图像比对通过，进行脚本下一轮循环。
         /// </summary>
         /// <param name="info">脚本信息。</param>
-        private async Task NextImageScript(ScriptInfo info)
-        {
-            if (info.IsAdaptive)
-            {
-                _vm.ScriptInterval = _vm.Running * 1000 * 0.9;//每次将上一次间隔的90%作为自适应间隔
-            }
-
-            _vm.CycleNum++;
-            _stopwatch = Stopwatch.StartNew();
-            await ExecuteClickScript(info, ScHandle);
-        }
+        //private async Task NextImageScript(ScriptInfo info)
+        //{
+        //    if (info.IsAdaptive)
+        //    {
+        //        _vm.ScriptInterval = _vm.Running * 1000 * 0.9;//每次将上一次间隔的90%作为自适应间隔
+        //    }
+        //
+        //    _vm.CycleNum++;
+        //    _stopwatch.Restart();
+        //    await ExecuteClickScript(info, ScHandle);
+        //}
 
         /// <summary>
         /// 执行点击操作，点击的实际位置会根据ScRatioX/ScRatioY进行调整，但有黑边时仍会偏移。
@@ -243,10 +259,9 @@ namespace ScrcpyEX.View
                 //保存的坐标数据都是以默认尺寸为准，使用时需要乘以当前尺寸和默认尺寸的比例
                 int x = (int)(pi.Pt.X * ScRatioX);
                 int y = (int)(pi.Pt.Y * ScRatioY);
-                //Debug.WriteLine($"比例:({ScRatioX},{ScRatioY})，实际点击:({x},{y})。");
 
-                IntPtr lp = new((y << 16) + x);
-                SendClick(scHandle, lp);
+                SendClick(scHandle, x, y);
+                //Debug.WriteLine($"比例:({ScRatioX},{ScRatioY})，实际点击:({x},{y})。");
                 //DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
                 //DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
                 //DLL.PostMessage(scHandle, WM.LBUTTONUP, IntPtr.Zero, lp);

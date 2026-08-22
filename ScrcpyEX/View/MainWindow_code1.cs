@@ -242,10 +242,9 @@ namespace ScrcpyEX.View
         {
             _si = 0;
             _scriptTimer.Elapsed += _imageHandler;
-            _scriptTimer.Interval = 10;//第一次执行的间隔
+            _scriptTimer.Interval = 100;//第一次执行的间隔
             _scriptTimer.Start();
             _countTimer.Start();
-            //ImageScript_Tick(_recInfo);//立刻执行一次脚本
         }
 
         /// <summary>
@@ -493,8 +492,7 @@ namespace ScrcpyEX.View
                 int centreX = (int)(mp.OffsetX * ScRatioX * MV.DpiScaleX + cx);
                 int centreY = (int)(mp.OffsetY * ScRatioY * MV.DpiScaleY + cy);
 
-                IntPtr lp = new((centreY << 16) + centreX);
-                SendClick(scHandle, lp);
+                SendClick(scHandle, centreX, centreY);
 
                 //DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
                 //DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
@@ -517,13 +515,15 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 向目标句柄窗口发送一次鼠标点击操作。
+        /// 向目标句柄窗口发送一次完整的鼠标点击操作，按下和抬起。
         /// PostMessage发送鼠标消息时，通过第四个参数指定鼠标在窗口中的位置，高16位是Y轴，低16位是X轴。
         /// </summary>
         /// <param name="scHandle">目标句柄窗口。</param>
-        /// <param name="lp">32位的整数，低16位存X坐标，高16位存Y坐标。</param>
-        private void SendClick(IntPtr scHandle, IntPtr lp)
+        /// <param name="x">相对于目标窗口的X轴坐标。</param>
+        /// <param name="y">相对于目标窗口的Y轴坐标。</param>
+        private void SendClick(IntPtr scHandle, int x, int y)
         {
+            IntPtr lp = new((y << 16) + x);
             DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
             DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
             DLL.PostMessage(scHandle, WM.LBUTTONUP, IntPtr.Zero, lp);

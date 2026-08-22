@@ -47,7 +47,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 准确的测量运行时间。
         /// </summary>
-        private Stopwatch _stopwatch;
+        private Stopwatch _stopwatch = new();
 
         /// <summary>
         /// 调整窗口大小改变时触发的计时器。
@@ -116,7 +116,7 @@ namespace ScrcpyEX.View
         private List<ScriptInfo> _scriptInfos = null;
 
         /// <summary>
-        /// ScriptInfo，执行图像组脚本时计数的变量。
+        /// ScriptInfo，执行图像组脚本时指向组列表下标的变量。
         /// </summary>
         private int _si = 0;
 

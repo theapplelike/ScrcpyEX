@@ -84,15 +84,15 @@ namespace ScrcpyEX.View
             //new DataSync().ShowDialog();
 
             //PicTest(@"F:\new\Pic\测试");
-            //PicTest(@"F:\new\Pic\截图");
-            PicTest(@"F:\new\Pic\fox");
+            //PicTest(@"F:\new\Pic\截图4");
+            //PicTest(@"F:\new\Pic\fox");
             //PicTest(@"F:\new\Pic\拍照");
         }
 
         private void PicTest(string root)
         {
             string[] files = Directory.GetFiles(root);
-            int i = 0;
+            //int i = 0;
 
             foreach (string file in files)
             {
@@ -100,16 +100,14 @@ namespace ScrcpyEX.View
                 string name = Path.GetFileName(file);
                 Debug.WriteLine($"- - - - -{name}");
 
-                //OpenCv.CompareSSIM(@$"{root}\原始{ext}", file);
-                //OpenCv.CalculateSSIM(@$"{root}\原始{ext}", file);
-                //OpenCv.CalculatePSNR(@$"{root}\原始{ext}", file);
-                //OpenCv.CalculateRgbHist(@$"{root}\原始{ext}", file);
-                //OpenCv.CalculateHsvHist(@$"{root}\原始{ext}", file);
-                //OpenCv.CalculateHuMoment(@$"{root}\原始{ext}", file);
-                //OpenCv.CalculateSIFT(@$"{root}\原始{ext}", file);
-                //OpenCv.CalculateORB(@$"{root}\原始{ext}", file);
+                OpenCv.CompareSSIM(@$"{root}\原始{ext}", file);
+                OpenCv.CalculateRgbHist(@$"{root}\原始{ext}", file);
+                OpenCv.CalculateHsvHist(@$"{root}\原始{ext}", file);
+                OpenCv.CalculateHuMoment(@$"{root}\原始{ext}", file);
+                OpenCv.CalculateSIFT(@$"{root}\原始{ext}", file);
+                OpenCv.CalculateORB(@$"{root}\原始{ext}", file);
 
-                MatchUITemplate(@$"{root}\原始{ext}", file, @$"{root}\result{++i}-{name}");
+                //MatchUITemplate(@$"{root}\原始{ext}", file, @$"{root}\result{++i}-{name}");
             }
         }
 
