@@ -398,40 +398,6 @@ namespace ScrcpyEX.View
             DLL.PostMessage(ScHandle, WM.KEYUP, (IntPtr)VK_LMENU, IntPtr.Zero);
         }
 
-        /// <summary>
-        /// 矩形比对/九宫格比对，获得原始点及周围1像素总共9张图片，用于图像质量不一致时的比较。
-        /// </summary>
-        /// <param name="recInfo">脚本信息。</param>
-        /// <returns>其中任意一张图片的像素度在指定阈值以上时，返回true，否则返回false。</returns>
-        //private async Task<bool> MatrixComparison(ScriptInfo recInfo)
-        //{
-        //    List<double> matrixs = [];
-        //    string imgName = recInfo.ImgName;
-        //
-        //    for (int i = -1; i <= 1; i++)
-        //    {
-        //        for (int j = -1; j <= 1; j++)
-        //        {
-        //            Rect rect = recInfo.CropRect;
-        //            rect.X += i;
-        //            rect.Y += j;
-        //
-        //            CroppedBitmap scBitmap = await GetScriptImg(ScHandle, _mainHandle, rect);
-        //            if (scBitmap == null)
-        //            {
-        //                matrixs.Add(0);
-        //                continue;
-        //            }
-        //
-        //            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{imgName}", scBitmap);
-        //            matrixs.Add(ssim);
-        //        }
-        //    }
-        //
-        //    Debug.WriteLine($"多次比对：{string.Join(", ", matrixs.Select(n => $"{n:F2}"))}");
-        //    return matrixs.Max() >= 0.7;
-        //}
-
 
     }
 }

@@ -6,6 +6,7 @@ using ScrcpyEX.MyDefinition.MyClass;
 using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -197,7 +198,7 @@ namespace ScrcpyEX.View
             if (IsScClosed)
             {
                 btnWired.IsEnabled = btnWirel.IsEnabled = false;
-                CheckScrcpy();
+                //CheckScrcpy();
 
                 if (isWired)
                 {
@@ -222,15 +223,15 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 检查Scrcpy是否已经运行，如果运行则停止。
         /// </summary>
-        private void CheckScrcpy()
-        {
-            Process[] prcs = Process.GetProcessesByName("Scrcpy");
-            foreach (Process prc in prcs)
-            {
-                prc.Kill();
-                prc.Dispose();
-            }
-        }
+        //private void CheckScrcpy()
+        //{
+        //    Process[] prcs = Process.GetProcessesByName("Scrcpy");
+        //    foreach (Process prc in prcs)
+        //    {
+        //        prc.Kill();
+        //        prc.Dispose();
+        //    }
+        //}
 
         /// <summary>
         /// 准备进行有线连接，如果有多个设备，会让用户选择。
@@ -313,6 +314,10 @@ namespace ScrcpyEX.View
 
                 Debug.WriteLine($"-*-激活:{IsActive}，主:{_mainHandle}，SC:{ScHandle}");
             }
+            else
+            {
+                MyGM.ShwError("bdShow.Child为null，SC添加失败");
+            }
         }
 
         /// <summary>
@@ -342,31 +347,27 @@ namespace ScrcpyEX.View
 
             foreach (string dev in devices)
             {
-                //判断是序列号还是IP，序列号代表是USB连接
-                //if (!dev.Contains(":") || !IPAddress.TryParse(dev.Split(':')[0], out _))
+                //获得指定设备IP，awk 是一个文本处理工具，按行处理文本
+                //{print $9}表示打印每一行的第9个字段，字段默认以空格或制表符分隔
+                string ip = (await MyGM.AdbAsync($@"-s {dev} shell ip route | awk '{{print $9}}'")).Trim();
+                if (ip == "")
                 {
-                    //获得指定设备IP，awk 是一个文本处理工具，按行处理文本
-                    //{print $9}表示打印每一行的第9个字段，字段默认以空格或制表符分隔
-                    string ip = (await MyGM.AdbAsync($@"-s {dev} shell ip route | awk '{{print $9}}'")).Trim();
-                    if (ip == "")
-                    {
-                        popMid.Show("未获得设备IP地址，请检查是否在同一网络中。");
-                        return false; ;
-                    }
-
-                    //将安卓设备上的 ADB 服务从 USB 模式切换为网络模式
-                    await MyGM.AdbAsync($"-s {dev} tcpip 5555");
-
-                    //连接指定 IP 地址和端口上的 Android 设备，须在同一局域网中
-                    await MyGM.AdbAsync($"connect {ip}:5555");
-
-                    CloseScrcpy();
-                    await Task.Delay(1000);
-                    popMid.Show("匹配完成，正在启动Scrcpy。");
-
-                    StartScrcpy(false);
-                    return true;
+                    popMid.Show("未获得设备IP地址，请检查是否在同一网络中。");
+                    return false; ;
                 }
+
+                //将安卓设备上的 ADB 服务从 USB 模式切换为网络模式
+                await MyGM.AdbAsync($"-s {dev} tcpip 5555");
+
+                //连接指定 IP 地址和端口上的 Android 设备，须在同一局域网中
+                await MyGM.AdbAsync($"connect {ip}:5555");
+
+                CloseScrcpy();
+                await Task.Delay(1000);
+                popMid.Show("匹配完成，正在启动Scrcpy。");
+
+                StartScrcpy(false);
+                return true;
             }
 
             popMid.Show("没有设备或未打开USB调试。");
@@ -818,7 +819,15 @@ namespace ScrcpyEX.View
         private async Task OpenRndis()
         {
             MyGM.POP("正在打开USB网络共享");
-            await MyGM.AdbAsync("shell svc usb setFunctions rndis");
+            (string otp, string err, int exc) = await MyGM.AdbMoreAsync("shell svc usb setFunctions rndis");
+            if (exc == 255)
+            {
+                MyGM.POP($"{otp}\nUSB网络共享打开成功");
+            }
+            else
+            {
+                MyGM.POP($"{err}\nUSB网络共享打开失败，请检查设备连接");
+            }
         }
 
 

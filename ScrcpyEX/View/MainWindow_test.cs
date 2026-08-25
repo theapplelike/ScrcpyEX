@@ -9,6 +9,7 @@ using ScrcpyEX.MyDefinition.MyControl;
 using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -87,6 +88,7 @@ namespace ScrcpyEX.View
             //PicTest(@"F:\new\Pic\截图4");
             //PicTest(@"F:\new\Pic\fox");
             //PicTest(@"F:\new\Pic\拍照");
+
         }
 
         private void PicTest(string root)

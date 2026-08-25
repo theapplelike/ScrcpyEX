@@ -45,6 +45,11 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private string _port;
 
         /// <summary>
+        /// 管理Scrcpy生命周期的作业对象。
+        /// </summary>
+        private ScrcpyJob _job = null;
+
+        /// <summary>
         /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。
         /// </summary>
         public IntPtr ScHandle { get; set; } = IntPtr.Zero;
@@ -114,6 +119,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
                         if (_prc.MainWindowHandle != IntPtr.Zero)
                         {
                             ScHandle = _prc.MainWindowHandle;
+                            _job?.Dispose();
+                            _job = new ScrcpyJob();
+                            _job.AddProcess(_prc.Id);
                             return;
                         }
                         Debug.WriteLine($">>>>>>>>>>>>>>{++i}：尝试启动Scrcpy。");
@@ -195,6 +203,8 @@ namespace ScrcpyEX.MyDefinition.MyClass
             _prc.Exited -= Prc_Exited;
             _prc.CancelOutputRead();
             _prc.CancelErrorRead();
+            _job?.Dispose();
+            _job = null;
             ScHandle = IntPtr.Zero;
             KMC_Hook.ClearUserHotkeys();
             MDC_Hook.CancelHook();

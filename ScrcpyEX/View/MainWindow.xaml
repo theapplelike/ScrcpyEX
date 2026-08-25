@@ -43,7 +43,8 @@
             <Setter Property="Margin" Value="2,0"/>
         </Style>
         <SolidColorBrush x:Key="Scb1" Color="#D5EBFB" Opacity="0.6"/>
-        <SolidColorBrush x:Key="Scb2" Color="#5B9DF0" Opacity="0.5"/>
+        <SolidColorBrush x:Key="Scb2" Color="#D5EBFB" Opacity="0.9"/>
+        <SolidColorBrush x:Key="Scb3" Color="#5B9DF0" Opacity="0.5"/>
     </Window.Resources>
 
     <Grid x:Name="gMain" Background="LightSteelBlue">
@@ -54,14 +55,14 @@
 
         <!--程序通用的鼠标提示-->
         <ctrl:TimePopup x:Name="pop" PopupAnimation="Fade" Placement="Mouse">
-            <Border MinHeight="10" MinWidth="20" CornerRadius="5" BorderThickness="2" BorderBrush="{StaticResource Scb2}" Background="{StaticResource Scb1}" Margin="5">
-                <TextBlock Text="提示文本" Padding="10"/>
+            <Border MinHeight="10" MinWidth="20" CornerRadius="5" BorderThickness="2" BorderBrush="{StaticResource Scb3}" Background="{StaticResource Scb2}" Margin="3">
+                <TextBlock Padding="16" FontWeight="Bold" LineHeight="12" LineStackingStrategy="BlockLineHeight"/>
             </Border>
         </ctrl:TimePopup>
 
         <!--主界面使用的居中提示-->
         <ctrl:TimePopup x:Name="popMid" PopupAnimation="Slide" Placement="Center" PlacementTarget="{Binding ElementName=gMenu}">
-            <Border MinHeight="10" MinWidth="20" CornerRadius="10" BorderThickness="3" BorderBrush="{StaticResource Scb2}" Background="{StaticResource Scb1}" Margin="2">
+            <Border MinHeight="10" MinWidth="20" CornerRadius="6" BorderThickness="3" BorderBrush="{StaticResource Scb3}" Background="{StaticResource Scb1}" Margin="2">
                 <TextBlock FontSize="20" Padding="6" Foreground="#3F6897"/>
             </Border>
         </ctrl:TimePopup>

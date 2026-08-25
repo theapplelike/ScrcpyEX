@@ -105,6 +105,7 @@
     <Compile Include="MyDefinition\MyClass\AdbDeviceScanner.cs" />
     <Compile Include="MyDefinition\MyClass\AdbDirectoryService.cs" />
     <Compile Include="MyDefinition\MyClass\InputModeSwitcher.cs" />
+    <Compile Include="MyDefinition\MyClass\ScrcpyJob.cs" />
     <Compile Include="MyDefinition\MyClass\KeyMapping.cs" />
     <Compile Include="MyDefinition\MyClass\LocalDirectoryService.cs" />
     <Compile Include="MyDefinition\MyClass\OpenCv.cs" />

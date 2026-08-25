@@ -117,15 +117,15 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <returns>路径下子目录和文件的集合。</returns>
         private async Task<IEnumerable<FileItem>> GetDirContent(string path)
         {
-            (string otp, string Err, int exc) = await MyGM.AdbMoreAsync($"shell ls -la {path}");
+            (string otp, string err, int exc) = await MyGM.AdbMoreAsync($"shell ls -la {path}");
 
             if (otp != "")
             {
                 return ParseDir(otp, path.TrimEnd('/'));
             }
-            if (exc != 0 && Err != "")
+            if (exc != 0 && err != "")
             {
-                throw new Exception($"终止值：【{exc}】\nADB 执行错误: {Err}");
+                throw new Exception($"终止值：【{exc}】\nADB 执行错误: {err}");
             }
             return [];
         }
@@ -196,12 +196,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <returns>不存在SD卡时返回空。</returns>
         private async Task<string> GetSdCard()
         {
-            (string otp, string Err, int exc) = await MyGM.AdbMoreAsync("shell ls /storage/");
+            (string otp, string err, int exc) = await MyGM.AdbMoreAsync("shell ls /storage/");
             string[] entries = otp.SplitReal(['\r', '\n']);
 
-            if (exc != 0 && Err != "")
+            if (exc != 0 && err != "")
             {
-                throw new Exception($"终止值：【{exc}】\nADB 执行错误: {Err}");
+                throw new Exception($"终止值：【{exc}】\nADB 执行错误: {err}");
             }
             foreach (string entry in entries)
             {
