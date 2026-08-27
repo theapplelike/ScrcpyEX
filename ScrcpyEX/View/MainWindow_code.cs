@@ -822,11 +822,13 @@ namespace ScrcpyEX.View
             (string otp, string err, int exc) = await MyGM.AdbMoreAsync("shell svc usb setFunctions rndis");
             if (exc == 255)
             {
-                MyGM.POP($"{otp}\nUSB网络共享打开成功");
+                string lb = otp == "" ? "" : "\n";
+                MyGM.POP($"{otp}{lb}USB网络共享打开成功");
             }
             else
             {
-                MyGM.POP($"{err}\nUSB网络共享打开失败，请检查设备连接");
+                string lb = err == "" ? "" : "\n";
+                MyGM.POP($"{err}{lb}USB网络共享打开失败，请检查设备连接");
             }
         }
 
