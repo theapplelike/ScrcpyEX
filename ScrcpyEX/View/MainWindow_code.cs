@@ -93,6 +93,7 @@ namespace ScrcpyEX.View
 
             bdRec.Visibility = Visibility.Collapsed;
             dplTip.Visibility = Visibility.Collapsed;
+            btnTest.Visibility = Visibility.Collapsed;
 
             ReadCfg();
             SetTimer();
@@ -666,7 +667,7 @@ namespace ScrcpyEX.View
         /// <param name="e">SizeChanged事件相关的数据。</param>
         private void WindowSizeChanged(SizeChangedEventArgs e)
         {
-            //Debug.WriteLine($"现在的宽度：{e.NewSize.Width}");
+            Debug.WriteLine($"现在的宽度：{e.NewSize.Width}");
 
             _vm.Scaling = $"缩放比例 {ScRatioX:P}:{ScRatioY:P}";
             if (!IsScClosed)
@@ -682,7 +683,7 @@ namespace ScrcpyEX.View
                     MoveOutSysMenu();
                 }
             }
-            else if (e.NewSize.Width < 329 && e.NewSize.Width >= 223)
+            else if (e.NewSize.Width < 329 && e.NewSize.Width >= 229)
             {
                 if (stpRightMenu.Children.Count > 2)
                 {
@@ -693,7 +694,7 @@ namespace ScrcpyEX.View
                     MoveOutSysMenu();
                 }
             }
-            else if (e.NewSize.Width < 223)
+            else if (e.NewSize.Width < 229)
             {
                 while (stpRightMenu.Children.Count > 1)
                 {

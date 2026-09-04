@@ -27,22 +27,22 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <summary>
         /// 真正的HwndHost。
         /// </summary>
-        private InternalHwndHost _hwndHost;
+        private InternalHwndHost _hwndHost = null;
 
         /// <summary>
         /// 是否使用有线形式启动。
         /// </summary>
-        private bool _isWired;
+        private bool _isWired = true;
 
         /// <summary>
-        /// 默认为空，如果有值：有线形式--【设备序列号】，无线模式--【设备IP地址】。
+        /// 默认为空字符串，如果有值：有线形式--【设备序列号】，无线模式--【设备IP地址】。
         /// </summary>
-        private string _sign;
+        private string _sign = "";
 
         /// <summary>
         /// 无线形式启动时的端口号。
         /// </summary>
-        private string _port;
+        private string _port = "";
 
         /// <summary>
         /// 管理Scrcpy生命周期的作业对象。

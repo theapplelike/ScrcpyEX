@@ -170,7 +170,7 @@
 
             <!---->
             <Button x:Name="btnFouce" Grid.Column="1" Width="1" Height="1" InputMethod.IsInputMethodEnabled="False" PreviewGotKeyboardFocus="BtnFouce_PreviewGotKeyboardFocus" LostKeyboardFocus="BtnFouce_LostKeyboardFocus"/>
-            <StackPanel x:Name="stpRightMenu" Grid.Column="1" Orientation="Horizontal" FlowDirection="RightToLeft">
+            <StackPanel x:Name="stpRightMenu" Grid.Column="1" Orientation="Horizontal" FlowDirection="RightToLeft" Margin="9,0,0,0">
                 <Button x:Name="btnClosePrg" Click="BtnClosePrg_Click" Style="{StaticResource thisBtn}" Content="&#xe711;"/>
                 <Button x:Name="btnMaximize" Click="BtnMaximize_Click" Style="{StaticResource thisBtn}" Content="&#xe922;"/>
                 <Button x:Name="btnMinimize" Click="BtnMinimize_Click" Style="{StaticResource thisBtn}" Content="&#xe73c;"/>

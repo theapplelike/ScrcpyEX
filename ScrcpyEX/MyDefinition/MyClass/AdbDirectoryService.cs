@@ -201,7 +201,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
             if (exc != 0 && err != "")
             {
-                throw new Exception($"终止值：【{exc}】\nADB 执行错误: {err}");
+                throw new Exception($"终止值：【{exc}】，ADB 执行错误:\n {err}");
             }
             foreach (string entry in entries)
             {
