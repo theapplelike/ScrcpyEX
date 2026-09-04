@@ -50,12 +50,6 @@ namespace ScrcpyEX.View
             WindowSizeChanged(e);
         }
 
-        private void Window_StateChanged(object sender, EventArgs e)
-        {
-            //Debug.WriteLine($"-------------窗口状态改变：{WindowState}");
-            //RefreshScrcpy();
-        }
-
         private void Window_Activated(object sender, EventArgs e)
         {
             //Debug.WriteLine($"++++++++++窗口激活,{IsActive},{DLL.GetForegroundWindow()}");
@@ -66,11 +60,11 @@ namespace ScrcpyEX.View
                 if (DLL.GetForegroundWindow() == _mainHandle)
                 {
                     ShowKeyMapping();
-                    //Debug.WriteLine($"窗口是Z轴最顶端窗口，top yes。");
                 }
                 else
                 {
-                    WindowState = WindowState.Minimized;
+                    popMid.Show($"进程非Z轴最顶端窗口，不显示映射按钮");
+                    //WindowState = WindowState.Minimized;
                     //Debug.WriteLine($"窗口非Z轴最顶端窗口，top no。");
                 }
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
@@ -83,12 +77,12 @@ namespace ScrcpyEX.View
 
             if ((DLL.GetKeyState(VK_LMENU) & 0x8000) != 0)
             {
-                Debug.WriteLine($"左 Alt 卡住");
+                //Debug.WriteLine($"左 Alt 卡住");
                 SendAltKeyUp(ScHandle, false);
             }
             else if ((DLL.GetKeyState(VK_RMENU) & 0x8000) != 0)
             {
-                Debug.WriteLine($"右 Alt 卡住");
+                //Debug.WriteLine($"右 Alt 卡住");
                 SendAltKeyUp(ScHandle, true);
             }
         }
@@ -195,11 +189,6 @@ namespace ScrcpyEX.View
         #endregion
 
         #region 位置和大小的菜单
-        //private void Pop_Closed(object sender, EventArgs e)
-        //{
-        //    MyGM.SetSameColor(gMenu, Brushes.Transparent, ((Popup)sender).Tag);
-        //}
-
         private void BtnQuarterLoc_Click(object sender, RoutedEventArgs e)
         {
             QuarterMove();

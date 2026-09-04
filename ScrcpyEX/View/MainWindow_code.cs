@@ -667,7 +667,7 @@ namespace ScrcpyEX.View
         /// <param name="e">SizeChanged事件相关的数据。</param>
         private void WindowSizeChanged(SizeChangedEventArgs e)
         {
-            Debug.WriteLine($"现在的宽度：{e.NewSize.Width}");
+            //Debug.WriteLine($"现在的宽度：{e.NewSize.Width}");
 
             _vm.Scaling = $"缩放比例 {ScRatioX:P}:{ScRatioY:P}";
             if (!IsScClosed)

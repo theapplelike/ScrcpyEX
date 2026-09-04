@@ -5,6 +5,7 @@
     <Style TargetType="local:IconButton" BasedOn="{StaticResource MenuBtn}">
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="Height" Value="30"/>
 
         <!--如果重写Template，继承的父控件所有Template的内容会被覆盖，需要把父控件的Template复制过来，在其中添加需要的内容-->
         <Setter Property="Template">
