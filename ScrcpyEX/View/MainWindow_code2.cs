@@ -21,6 +21,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using static ScrcpyEX.MyDefinition.MyEnum;
 using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
 using DBrushes = System.Drawing.Brushes;
 using DPoint = System.Drawing.Point;  //Windows Forms的Point
@@ -63,7 +64,7 @@ namespace ScrcpyEX.View
         {
             int.TryParse(mc[0].Value, out int a);
             int.TryParse(mc[1].Value, out int b);
-            //int max = GetGreatestCommonDivisor(a, b);
+
             _verticalReso = b;
             _horizontalReso = a;
             _resoRatio = a > b ? a * 1.0 / b : b * 1.0 / a;
@@ -71,20 +72,6 @@ namespace ScrcpyEX.View
 
             return $"投屏分辨率 {a}*{b}，比值 {_resoRatio:F2}";
         }
-
-        /// <summary>
-        /// 获得最大公约数。
-        /// </summary>
-        //private int GetGreatestCommonDivisor(int a, int b)
-        //{
-        //    if (a < b)
-        //    {
-        //        a += b;
-        //        b = a - b;
-        //        a -= b;
-        //    }
-        //    return (a % b == 0) ? b : GetGreatestCommonDivisor(a % b, b);
-        //}
 
         /// <summary>
         /// 设置计时器。DispatcherTimer计时器有一个特性，如果已经启动，
@@ -172,15 +159,31 @@ namespace ScrcpyEX.View
 
             try
             {
-                //Debug.WriteLine($"Image进入新一轮，已产生的间隔：{_vm.Running}。");
-                //_vm.ScriptInterval = 5000;
-                await ImageCompare(infos[_si++ % infos.Count]);
+                if (_scriptItem is ScriptGroup sg)
+                {
+                    if (sg.LinkMode == LinkMode.InTurn)
+                    {
+                        await ImageCompare(infos[_siOrder++ % infos.Count]);
+                    }
+                    else
+                    {
+                        bool isOk = await ImageCompare(infos[_siSuccess % infos.Count]);
+                        if (isOk)
+                        {
+                            _vm.ScriptInterval = 5000;
+                            _siSuccess++;
+                        }
+                    }
+                }
+                else
+                {
+                    await ImageCompare(infos[0]);
+                }  
             }
             catch (Exception ex)
             {
                 _vm.ScriptInterval = 5000;
                 MyGM.RecordException(ex, "执行图像脚本时异常");
-                //MyGM.ShwError($"执行图像脚本时异常：{ex}。");
             }
             finally
             {
@@ -191,16 +194,17 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 使用脚本图像和当前Scrcpy的截图进行比对。
+        /// 使用脚本中的图像和当前Scrcpy的截图进行比对。
         /// </summary>
         /// <param name="info">脚本信息类实例。</param>
-        private async Task ImageCompare(ScriptInfo info)
+        /// <returns>图形对比是否通过。</returns>
+        private async Task<bool> ImageCompare(ScriptInfo info)
         {
             CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, info.CropRect);
             if (scWindow == null)
             {
                 popMid.Show("获取Scrcpy脚本截图失败。");
-                return;
+                return false;
             }
 
             double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
@@ -215,12 +219,14 @@ namespace ScrcpyEX.View
                 _stopwatch.Restart();
                 await ExecuteClickScript(info, ScHandle);
                 Debug.WriteLine($"单次对比通过，相似度：{ssim:P2}");
+                return true;
             }
             else
             {
                 //每次未匹配上增加间隔时间，间隔达到12秒以上时重新从5秒间隔开始
                 double interval = _vm.ScriptInterval * 1.5;
                 _vm.ScriptInterval = interval > 12000 ? 5000 : interval;
+                return false;
             }
         }
 
@@ -254,7 +260,6 @@ namespace ScrcpyEX.View
                 {
                     await Task.Delay(TimeSpan.FromSeconds(pi.LastTime));
                 }
-                //Debug.WriteLine($"点击：{pi.LastTime}-{pi.Pt.X},{pi.Pt.Y}");
 
                 //保存的坐标数据都是以默认尺寸为准，使用时需要乘以当前尺寸和默认尺寸的比例
                 int x = (int)(pi.Pt.X * ScRatioX);
@@ -262,9 +267,6 @@ namespace ScrcpyEX.View
 
                 SendClick(scHandle, x, y);
                 //Debug.WriteLine($"比例:({ScRatioX},{ScRatioY})，实际点击:({x},{y})。");
-                //DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
-                //DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
-                //DLL.PostMessage(scHandle, WM.LBUTTONUP, IntPtr.Zero, lp);
             }
 
             //如果为有限次循环，检查是否到循环次数

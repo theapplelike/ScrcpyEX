@@ -240,13 +240,11 @@ namespace ScrcpyEX.MyDefinition.MyControl
 
             if (fi.IsDirectory)
             {
-                //item.ContextMenu = CreateDirMenu([.. lst.SelectedItems.Cast<FileItem>().Where(f => f.IsDirectory)]);
                 item.ContextMenu = CreateDirMenu(lst.SelectedItems.Cast<FileItem>());
                 item.ContextMenu.IsOpen = true;
             }
             else
             {
-                //item.ContextMenu = CreateFileMenu(fi, [.. lst.SelectedItems.Cast<FileItem>().Where(f => !f.IsDirectory)]);
                 item.ContextMenu = CreateFileMenu(fi, lst.SelectedItems.Cast<FileItem>());
                 item.ContextMenu.IsOpen = true;
             }

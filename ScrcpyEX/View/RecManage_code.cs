@@ -24,6 +24,7 @@ namespace ScrcpyEX.View
         {
             _vm.ScriptItems = new(MyCfg.Cfg.Scripts);
             gSuboption.Visibility = Visibility.Hidden;
+            stpExeMode.Visibility = Visibility.Collapsed;
             cmbMultipleScript.Visibility = Visibility.Hidden;
 
             _pointDt.Columns.Add("LastTime", typeof(double));
@@ -40,20 +41,29 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 获得当前选中的脚本列表。
+        /// 获得当前选中的脚本列表，无论单/组脚本都会转化成 List&lt;ScriptInfo&gt;。
         /// </summary>
         /// <returns>脚本信息列表。</returns>
-        public List<ScriptInfo> GetSelectScript()
+        //public List<ScriptInfo> GetSelectScript()
+        //{
+        //    if (_currScript is ScriptInfo info)
+        //    {
+        //        return [info];
+        //    }
+        //    else if (_currScript is ScriptGroup group)
+        //    {
+        //        return [.. group.Scripts];
+        //    }
+        //    return [];
+        //}
+
+        /// <summary>
+        /// 获得当前选中的脚本。
+        /// </summary>
+        /// <returns>单/组脚本的基类ScriptItem。</returns>
+        public ScriptItem GetSelectScript()
         {
-            if (_currScript is ScriptInfo info)
-            {
-                return [info];
-            }
-            else if (_currScript is ScriptGroup group)
-            {
-                return [.. group.Scripts];
-            }
-            return [];
+            return _currScript;
         }
 
         /// <summary>

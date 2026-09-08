@@ -1,4 +1,5 @@
 ﻿using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace ScrcpyEX.MyDefinition
     /// <summary>
     /// 自定义通用方法（Generic Method）类。
     /// </summary>
-    internal class MyGM
+    internal static class MyGM
     {
         /// <summary>
         /// 错误日志路径。
@@ -541,6 +542,24 @@ namespace ScrcpyEX.MyDefinition
             }
 
             return "";
+        }
+
+        /// <summary>
+        /// 根据传入的ScriptItem基类获得脚本信息列表，无论单/组脚本都会转化成 List&lt;ScriptInfo&gt;。
+        /// </summary>
+        /// <param name="scriptItem">传入的ScriptItem基类。</param>
+        /// <returns>脚本信息列表。</returns>
+        public static List<ScriptInfo> GetScriptList(ScriptItem scriptItem)
+        {
+            if (scriptItem is ScriptInfo info)
+            {
+                return [info];
+            }
+            else if (scriptItem is ScriptGroup group)
+            {
+                return [.. group.Scripts];
+            }
+            return [];
         }
 
         /// <summary>

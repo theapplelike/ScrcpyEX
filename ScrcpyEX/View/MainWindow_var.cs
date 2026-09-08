@@ -111,14 +111,24 @@ namespace ScrcpyEX.View
         private double _resoRatio = 0;
 
         /// <summary>
-        /// 保存已选中的脚本。
+        /// 保存已选中的原始脚本。
+        /// </summary>
+        private ScriptItem _scriptItem = null;
+
+        /// <summary>
+        /// 保存已选中的脚本列表。
         /// </summary>
         private List<ScriptInfo> _scriptInfos = null;
 
         /// <summary>
-        /// ScriptInfo，执行图像组脚本时指向组列表下标的变量。
+        /// ScriptInfo，执行图像组脚本时顺序模式下，指向组列表下标的变量。
         /// </summary>
-        private int _si = 0;
+        private int _siOrder = 0;
+
+        /// <summary>
+        /// ScriptInfo，执行图像组脚本时成功继续模式下，指向组列表下标的变量。
+        /// </summary>
+        private int _siSuccess = 0;
 
         /// <summary>
         /// 现在是否可以调整映射Popup。

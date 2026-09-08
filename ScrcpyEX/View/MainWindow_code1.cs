@@ -172,17 +172,20 @@ namespace ScrcpyEX.View
                 return;
             }
 
-            List<ScriptInfo> infos = manage.GetSelectScript();
+            //List<ScriptInfo> infos = manage.GetSelectScript();
+            ScriptItem item = manage.GetSelectScript();
+            List<ScriptInfo> infos = MyGM.GetScriptList(item);
+
             if (infos[0].IsTime)
             {
-                ScriptBefore(infos);
+                ScriptBefore(item, infos);
                 TimedScript();
             }
             else
             {
                 if (infos[0].ImgName != "")
                 {
-                    ScriptBefore(infos);
+                    ScriptBefore(item, infos);
                     ImageScript();
                 }
                 else
@@ -196,7 +199,7 @@ namespace ScrcpyEX.View
         /// 脚本执行前要执行的操作。
         /// </summary>
         /// <param name="infos">要执行的脚本信息。</param>
-        private void ScriptBefore(List<ScriptInfo> infos)
+        private void ScriptBefore(ScriptItem item, List<ScriptInfo> infos)
         {
             //消除黑边，有黑边时会有偏移
             RemoveScBlack();
@@ -204,6 +207,7 @@ namespace ScrcpyEX.View
             //UI和变量初始化
             _vm.Running = 0;
             _vm.CycleNum = 0;
+            _scriptItem = item;
             _scriptInfos = infos;
             _stopwatch = Stopwatch.StartNew();
             bdRec.Visibility = Visibility.Visible;
@@ -240,7 +244,8 @@ namespace ScrcpyEX.View
         /// </summary>
         private void ImageScript()
         {
-            _si = 0;
+            _siOrder = 0;
+            _siSuccess = 0;
             _scriptTimer.Elapsed += _imageHandler;
             _scriptTimer.Interval = 100;//第一次执行的间隔
             _scriptTimer.Start();
@@ -269,9 +274,7 @@ namespace ScrcpyEX.View
                 HorizontalOffset = mapping.OffsetX * (isNew ? 1 : ScRatioX),
                 VerticalOffset = mapping.OffsetY * (isNew ? 1 : ScRatioY),
             };
-
             gShow.Children.Add(pop);//这里的父级要和pop.PlacementTarget属性一致
-            //Debug.WriteLine($"映射Popup原始左上:({mapping.OffsetX},{mapping.OffsetY}),比例:({ScRatioX},{ScRatioY}),最终左上:({pop.HorizontalOffset},{pop.VerticalOffset})。");
             
             return pop;
         }
@@ -413,7 +416,6 @@ namespace ScrcpyEX.View
             //}
                 
             DoKeyMapping(vkCode, ScHandle);
-            //Debug.WriteLine($"映射键：{MV.St.ElapsedMilliseconds}ms");
         }
 
         /// <summary>
@@ -494,18 +496,12 @@ namespace ScrcpyEX.View
 
                 SendClick(scHandle, centreX, centreY);
 
-                //DLL.PostMessage(scHandle, WM.MOUSEMOVE, IntPtr.Zero, lp);
-                //DLL.PostMessage(scHandle, WM.LBUTTONDOWN, (IntPtr)MK.LBUTTON, lp);
-                //DLL.PostMessage(scHandle, WM.LBUTTONUP, IntPtr.Zero, lp);
-
                 //如果标志位为true，则让鼠标左键处于按下状态
                 //if (_isPressMouse)
                 //{
                 //    DLL.mouse_event(0x02, 0, 0, 0, 0);//按下
                 //    //Console.WriteLine("继续让鼠标左键处于按下状态。");
                 //}
-
-                //Debug.WriteLine($"圆心点:({centreX},{centreY})。");
             }
 
             //逻辑鼠标回到物理鼠标的位置
@@ -536,7 +532,6 @@ namespace ScrcpyEX.View
         private void ScFocusSwitch()
         {
             if (ScHandle == IntPtr.Zero) return;
-            //if (DLL.GetFocus() == ScHandle)
             if (_vm.IsScHasFouce)
             {
                 bool isOk = btnFouce.Focus();

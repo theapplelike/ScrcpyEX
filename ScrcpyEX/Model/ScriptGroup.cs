@@ -6,6 +6,7 @@ using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using static ScrcpyEX.MyDefinition.MyEnum;
 
 namespace ScrcpyEX.Model
 {
@@ -18,6 +19,11 @@ namespace ScrcpyEX.Model
         /// 脚本信息列表。
         /// </summary>
         public ObservableCollection<ScriptInfo> Scripts { get; set; }
+
+        /// <summary>
+        /// 组脚本执行时的衔接模式。
+        /// </summary>
+        public LinkMode LinkMode { get; set; } = LinkMode.InTurn;
 
         /// <summary>
         /// 组脚本的默认构造函数。

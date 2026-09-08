@@ -16,6 +16,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using static ScrcpyEX.MyDefinition.MyEnum;
 
 namespace ScrcpyEX.View
 {
@@ -91,6 +92,7 @@ namespace ScrcpyEX.View
             if (obj is ScriptInfo info)
             {
                 _currScript = info;
+                stpExeMode.Visibility = Visibility.Collapsed;
                 cmbMultipleScript.Visibility = Visibility.Hidden;
                 cmbMultipleScript.ItemsSource = null;
 
@@ -100,6 +102,10 @@ namespace ScrcpyEX.View
             else if (obj is ScriptGroup group)
             {
                 _currScript = group;
+                stpExeMode.Visibility = Visibility.Visible;
+                if (group.LinkMode == LinkMode.InTurn) rdoInTurn.IsChecked = true;
+                if (group.LinkMode == LinkMode.KeepOn) rdoKeepOn.IsChecked = true;
+
                 cmbMultipleScript.Visibility = Visibility.Visible;
                 cmbMultipleScript.ItemsSource = group.Scripts;
                 cmbMultipleScript.DisplayMemberPath = "Name";
@@ -204,6 +210,8 @@ namespace ScrcpyEX.View
         /// <param name="group">组脚本实例。</param>
         private void SaveScriptGroup(ScriptGroup group)
         {
+            group.LinkMode = (bool)rdoInTurn.IsChecked ? LinkMode.InTurn : LinkMode.KeepOn;
+
             foreach (ScriptInfo si in group.Scripts)
             {
                 if (si == cmbMultipleScript.SelectedItem)

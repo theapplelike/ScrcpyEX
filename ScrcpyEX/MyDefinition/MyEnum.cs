@@ -37,6 +37,22 @@ namespace ScrcpyEX.MyDefinition
             Emulator
         }
 
+        /// <summary>
+        /// 组脚本执行时，各个脚本间衔接的模式。
+        /// </summary>
+        public enum LinkMode
+        {
+            /// <summary>
+            /// A-B-A-B，顺序交替轮流执行。
+            /// </summary>
+            InTurn,
+
+            /// <summary>
+            /// [A-A...]成功->[B-B...]成功，当前脚本执行成功后继续下一个脚本。
+            /// </summary>
+            KeepOn
+        }
+
 
     }
 }

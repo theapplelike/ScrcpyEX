@@ -122,20 +122,27 @@
 
             <Grid Grid.Column="1" Margin="10">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
-                    <TextBlock Text="详细信息：" />
-                    <!--显示组脚本中的脚本列表-->
-                    <ComboBox x:Name="cmbMultipleScript" SelectionChanged="CmbMultipleScript_SelectionChanged" Margin="5,2" Width="140"/>
+                <StackPanel x:Name="stpExeMode" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                    <TextBlock Text="执行模式"/>
+                    <RadioButton x:Name="rdoInTurn" Content="顺序轮流" GroupName="mode" Margin="5,0"/>
+                    <RadioButton x:Name="rdoKeepOn" Content="成功继续" GroupName="mode" Margin="0,0,5,0"/>
                     <Button x:Name="btnHelp" Click="BtnHelp_Click" Content="&#xe9ce;" Style="{StaticResource MenuBtn}" Width="32"/>
                 </StackPanel>
 
-                <DataGrid x:Name="dgPoint" Grid.Row="1" AutoGenerateColumns="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
+                <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                    <TextBlock Text="详细信息" />
+                    <!--显示组脚本中的脚本列表-->
+                    <ComboBox x:Name="cmbMultipleScript" SelectionChanged="CmbMultipleScript_SelectionChanged" Margin="5,2" Width="140"/>
+                </StackPanel>
+
+                <DataGrid x:Name="dgPoint" Grid.Row="2" AutoGenerateColumns="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="延时（秒）" Binding="{Binding LastTime}" Width="*"/>
                         <DataGridTextColumn Header="坐标点X" Binding="{Binding XAxis}" Width="*"/>
@@ -143,7 +150,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <Grid Grid.Row="2" Margin="0,5">
+                <Grid Grid.Row="3" Margin="0,5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20"/>
                         <RowDefinition Height="20"/>
@@ -199,7 +206,7 @@
                     </Grid>
                 </Grid>
             
-                <Grid Grid.Row="3">
+                <Grid Grid.Row="4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>

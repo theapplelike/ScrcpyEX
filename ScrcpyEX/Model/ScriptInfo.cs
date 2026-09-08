@@ -8,7 +8,7 @@ using System.Windows;
 namespace ScrcpyEX.Model
 {
     /// <summary>
-    /// 脚本信息类，保存脚本相关信息。
+    /// 单脚本信息类，保存脚本相关信息。
     /// </summary>
     public class ScriptInfo : ScriptItem, ICloneable
     {
