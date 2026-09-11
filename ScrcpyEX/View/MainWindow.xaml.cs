@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -57,15 +58,14 @@ namespace ScrcpyEX.View
             // 延迟检查，确保窗口已经完全激活
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                if (DLL.GetForegroundWindow() == _mainHandle)
+                IntPtr topHwnd = DLL.GetForegroundWindow();
+                if (topHwnd == _mainHandle)
                 {
                     ShowKeyMapping();
                 }
                 else
                 {
-                    popMid.Show($"进程非Z轴最顶端窗口，不显示映射按钮");
-                    //WindowState = WindowState.Minimized;
-                    //Debug.WriteLine($"窗口非Z轴最顶端窗口，top no。");
+                    BringWindowToFront(topHwnd);
                 }
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }

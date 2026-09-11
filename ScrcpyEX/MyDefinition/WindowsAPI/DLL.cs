@@ -289,14 +289,35 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         [DllImport("user32.dll")]
         public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
-        [DllImport("winmm.dll")]
-        public static extern int waveOutGetNumDevs();
+        /// <summary>
+        /// 根据窗口句柄获取创建该窗口的线程 ID 和（可选的）进程 ID。
+        /// </summary>
+        /// <param name="hWnd">要查询的窗口句柄。可以是顶层窗口，也可以是子窗口。</param>
+        /// <param name="ProcessId">获得进程的 ID，窗口＜线程＜进程。</param>
+        /// <returns>创建指定窗口的线程 ID，如果 hWnd 无效或函数失败，返回 0。</returns>
+        [DllImport("user32.dll")]
+        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
+        /// <summary>
+        /// 附加或分离两个线程的输入处理机制，附加后两个线程会共享输入处理状态：例如键盘状态、鼠标捕获、焦点、活动窗口等。
+        /// </summary>
+        /// <param name="idAttach">要被附加的线程 ID。通常传入你自己的 UI 线程 ID</param>
+        /// <param name="idAttachTo">目标线程 ID，即 idAttach 要附加到的线程。附加后，idAttach 就加入了 idAttachTo 的输入队列。</param>
+        /// <param name="fAttach">true--附加；false--分离。分离时，必须使用与附加时相同的 idAttach 和 idAttachTo，否则可能无法正确分离。</param>
+        /// <returns>true--操作成功；false--操作失败。</returns>
+        [DllImport("user32.dll")]
+        public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+        /// <summary>
+        /// 将指定窗口带到前台并激活，并通常被置于 Z 序的顶部。
+        /// </summary>
+        /// <param name="hWnd">要激活并置于前台的窗口句柄。</param>
+        /// <returns>true--只表示调用被系统接受，并不保证窗口一定成为前台窗口；false--失败，可通过 GetLastError() 获取错误码。</returns>
+        [DllImport("user32.dll")]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         //[DllImport("user32.dll")]
         //public static extern IntPtr GetDesktopWindow();
-
-        //[DllImport("user32.dll")]
-        //public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         //[DllImport("user32.dll", CharSet = CharSet.Auto)]
         //public static extern bool PostThreadMessage(uint idThread, uint Msg, IntPtr wParam, IntPtr lParam);

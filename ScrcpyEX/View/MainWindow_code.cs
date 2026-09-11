@@ -24,6 +24,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using static ScrcpyEX.MyDefinition.MyEnum;
 using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
+using static ScrcpyEX.MyDefinition.WindowsAPI.DLL;
 
 namespace ScrcpyEX.View
 {
@@ -62,7 +63,7 @@ namespace ScrcpyEX.View
                     #region 转发SC的快捷键
                     if (wParam.ToInt32() == VK_O && (lParam.ToInt64() & (1L << 29)) != 0)
                     {
-                        if ((DLL.GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0)//Shift是否按下
+                        if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0)//Shift是否按下
                         {
                             PostShortcutsThree(VK_O);
                         }
@@ -310,7 +311,7 @@ namespace ScrcpyEX.View
             if (bdShow.Child != null)
             {
                 Activate();
-                CreateSavedPop(false, DLL.GetForegroundWindow() == _mainHandle);
+                CreateSavedPop(false, GetForegroundWindow() == _mainHandle);
                 InputModeSwitcher.SwitchToEnglishMode(ScHandle);
 
                 Debug.WriteLine($"-*-激活:{IsActive}，主:{_mainHandle}，SC:{ScHandle}");
@@ -786,11 +787,11 @@ namespace ScrcpyEX.View
         public void SendAltKeyUp(IntPtr hWnd, bool isRightAlt)
         {
             uint vk = isRightAlt ? VK_RMENU : VK_LMENU;
-            uint scanCode = DLL.MapVirtualKey(vk, 0);
+            uint scanCode = MapVirtualKey(vk, 0);
             uint extended = isRightAlt ? 1u : 0u;
 
             IntPtr lParamUp = BuildLParam(1, scanCode, extended, 0, 1, 1);
-            DLL.PostMessage(hWnd, WM.SYSKEYUP, (IntPtr)vk, lParamUp);
+            PostMessage(hWnd, WM.SYSKEYUP, (IntPtr)vk, lParamUp);
         }
 
         /// <summary>
@@ -830,6 +831,28 @@ namespace ScrcpyEX.View
             {
                 string lb = err == "" ? "" : "\n";
                 MyGM.POP($"{err}{lb}USB网络共享打开失败，请检查设备连接");
+            }
+        }
+
+        /// <summary>
+        /// 将指定句柄的窗口置于前台。
+        /// </summary>
+        /// <param name="topHwnd">要置于前台的窗口句柄。</param>
+        private void BringWindowToFront(IntPtr topHwnd)
+        {
+            uint topThreadId = GetWindowThreadProcessId(topHwnd, out _);
+            uint thisThreadId = GetWindowThreadProcessId(_mainHandle, out _);
+
+            if (topThreadId != thisThreadId)
+            {
+                // 设置前台进程需要自己是前台进程，如果自己不是则应该附加到前台进程再操作
+                AttachThreadInput(thisThreadId, topThreadId, true);
+                SetForegroundWindow(topHwnd);
+                AttachThreadInput(thisThreadId, topThreadId, false);
+            }
+            else
+            {
+                SetForegroundWindow(topHwnd);
             }
         }
 
