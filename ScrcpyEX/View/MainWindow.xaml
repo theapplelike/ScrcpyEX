@@ -62,8 +62,8 @@
 
         <!--主界面使用的居中提示-->
         <ctrl:TimePopup x:Name="popMid" PopupAnimation="Slide" Placement="Center" PlacementTarget="{Binding ElementName=gMenu}">
-            <Border MinHeight="10" MinWidth="20" CornerRadius="6" BorderThickness="3" BorderBrush="{StaticResource Scb3}" Background="{StaticResource Scb1}" Margin="2">
-                <TextBlock FontSize="20" Padding="6" Foreground="#3F6897"/>
+            <Border MinHeight="10" MinWidth="20" CornerRadius="6" BorderThickness="4" BorderBrush="{StaticResource Scb3}" Background="{StaticResource Scb1}" Margin="2">
+                <TextBlock FontSize="20" Padding="10" Foreground="#3F6897"/>
             </Border>
         </ctrl:TimePopup>
 

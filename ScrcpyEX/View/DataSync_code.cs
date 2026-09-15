@@ -52,7 +52,7 @@ namespace ScrcpyEX.View
         /// </summary>
         /// <param name="isPush">是否为推送模式（本地->安卓）。</param>
         /// <param name="isCover">如果已存在文件，是否覆盖。</param>
-        /// <param name="fileItems">指定要发送的文件列表。</param>
+        /// <param name="fileItems">指定要发送的文件列表，为null时会根据推送模式检索所有文件。</param>
         private async Task SendFile(bool isPush, bool isCover = false, List<FileItem> fileItems = null)
         {
             string desc = isPush ? "推送" : "拉取";
