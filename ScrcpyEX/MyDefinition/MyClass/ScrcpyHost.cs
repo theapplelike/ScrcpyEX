@@ -80,7 +80,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
             }
 
             // 创建真正的HwndHost
-            _hwndHost = new InternalHwndHost(ScHandle, _prc);
+            _hwndHost = new InternalHwndHost(ScHandle);
+            _hwndHost.WindowDestroyed += DisposeScrcpy;
+
             HashSet<int> hs = [.. MyCfg.Cfg.KeyMappings.Select(k => (int)k.VkCode)];
             KMC_Hook.InitUserHotkeys(hs);
             MDC_Hook.RegisterHook(ScHandle);
@@ -200,11 +202,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         private void Prc_Exited(object sender, EventArgs e)
         {
-            _prc.Exited -= Prc_Exited;
+            //_prc.Exited -= Prc_Exited;
             _prc.CancelOutputRead();
             _prc.CancelErrorRead();
             _job?.Dispose();
             _job = null;
+
             ScHandle = IntPtr.Zero;
             KMC_Hook.ClearUserHotkeys();
             MDC_Hook.CancelHook();
@@ -216,10 +219,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         private void Prc_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (e.Data == null)
-            {
-                return;
-            }
+            if (e.Data == null) return;
             Debug.WriteLine($"[E]{e.Data}");
         
             if (e.Data.Contains("A popup should open on the device to request authorization."))
@@ -237,10 +237,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         private void Prc_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (e.Data == null)
-            {
-                return;
-            }
+            if (e.Data == null) return;
             Debug.WriteLine($"[I]{e.Data}");
         
             //获得当前分辨率，第一个参数是宽，第二个参数是高
@@ -261,26 +258,22 @@ namespace ScrcpyEX.MyDefinition.MyClass
         }
 
         /// <summary>
-        /// 释放Scrcpy的资源，用于用户关闭。
+        /// 关闭Scrcpy并释放其使用的资源。
         /// </summary>
         public void DisposeScrcpy()
         {
-            _prc.CloseMainWindow();
-            _prc.WaitForExit();
+            _prc.CloseMainWindow(); //进程退出后会调用Exited事件，前提是EnableRaisingEvents属性要设置为true
+            _prc.WaitForExit();     //进程退出后要一直等待，防止Exited事件未执行完就执行Dispose()
             _prc.Dispose();
             _hwndHost.Dispose();
+            Debug.WriteLine($"ScHost：所有资源清理完毕。");
         }
 
         /// <summary>
         /// HwndHost中不支持异步，所以外部启动Scrcpy，内部封装Scrcpy。
         /// </summary>
-        private class InternalHwndHost(IntPtr scHandle, Process prc) : HwndHost
+        private class InternalHwndHost(IntPtr scHandle) : HwndHost
         {
-            /// <summary>
-            /// 对第三方程序的引用。
-            /// </summary>
-            private readonly Process _prc = prc;
-
             /// <summary>
             /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。
             /// </summary>
@@ -290,6 +283,11 @@ namespace ScrcpyEX.MyDefinition.MyClass
             /// Scrcpy上一次的Rect。
             /// </summary>
             internal Rect _lastRect = new();
+
+            /// <summary>
+            /// 底层窗口被销毁时触发，用于通知宿主做进程关闭和资源释放。
+            /// </summary>
+            public Action WindowDestroyed = null;
 
             /// <summary>
             /// 当 HwndHost 被添加到可视化树时自动调用，创建并返回要嵌入的 Win32 窗口句柄。
@@ -314,16 +312,8 @@ namespace ScrcpyEX.MyDefinition.MyClass
             /// <param name="hwnd">包含窗口句柄的结构。</param>
             protected override void DestroyWindowCore(HandleRef hwnd)
             {
-                //Debug.WriteLine($"执行资源清理：{hwnd}，Scrcpy句柄：{_scHandle}");
-                if (_scHandle != IntPtr.Zero)
-                {
-                    _prc.CloseMainWindow(); //进程退出后会调用Exited事件，前提是EnableRaisingEvents属性要设置为true
-                    _prc.WaitForExit();     //进程退出后要一直等待，防止Exited事件未执行完就执行Dispose()
-                    Debug.WriteLine("InternalHwndHost：Scrcpy未关闭，程序执行关闭操作。");
-                }
-
-                _prc.Dispose();
-                Debug.WriteLine("InternalHwndHost：Scrcpy已清理完毕，退出整个程序。");
+                Debug.WriteLine("InternalHwndHost：Scrcpy窗口从父级移除。");
+                WindowDestroyed?.Invoke();
             }
 
             /// <summary>
@@ -340,8 +330,6 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 _lastRect = rcBoundingBox;
                 DLL.MoveWindow(_scHandle, 0, 0, (int)rcBoundingBox.Width, (int)rcBoundingBox.Height, true);
                 base.OnWindowPositionChanged(rcBoundingBox);
-
-                //Debug.WriteLine("InternalHwndHost：Scrcpy尺寸修改");
             }
 
             /// <summary>
@@ -367,7 +355,6 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 base.OnWindowPositionChanged(_lastRect);
 
                 DLL.SendMessage(_scHandle, WM.SETREDRAW, (IntPtr)1, IntPtr.Zero);
-                //Debug.WriteLine("刷新Scrcpy窗口");
             }
         }
 
