@@ -18,7 +18,7 @@
     <Window.DataContext>
         <ViewModel:MainWindowVM/>
     </Window.DataContext>
-
+    
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False" ResizeBorderThickness="3,2,3,3"/>
     </WindowChrome.WindowChrome>

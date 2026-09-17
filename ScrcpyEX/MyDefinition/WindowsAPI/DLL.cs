@@ -135,7 +135,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// </summary>
         /// <param name="hwnd">要复制的窗口的句柄。</param>
         /// <param name="hdcBlt">设备上下文的句柄。</param>
-        /// <param name="nFlags">绘图选项。0x1，捕获窗口的客户区，即窗口内部内容，排除标题栏、边框等非客户区。0x2，捕获窗口的完整内容，包括非客户区（标题栏、边框等）。</param>
+        /// <param name="nFlags">绘图选项。0x1--捕获窗口的客户区，即窗口内部内容，排除标题栏、边框等非客户区。0x2--捕获窗口的完整内容，包括非客户区（标题栏、边框等）。</param>
         /// <returns>true--函数成功；false--函数失败。</returns>
         [DllImport("user32.dll")]
         public static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);

@@ -77,11 +77,11 @@ namespace ScrcpyEX.View
             await TransmitFile(files, isPush);
             if (isPush)
             {
-                fleAdb.Reload();
+                await fleAdb.Reload();
             }
             else
             {
-                fleLcl.Reload();
+                await fleLcl.Reload();
             }
             if (_isXferComplete) MyGM.POP($"文件{desc}完成。");
         }
@@ -102,12 +102,12 @@ namespace ScrcpyEX.View
             if (toPush.Count > 0)
             {
                 await TransmitFile(toPush, true);
-                fleAdb.Reload();
+                await fleAdb.Reload();
             }
             if (toPull.Count > 0)
             {
                 await TransmitFile(toPull, false);
-                fleLcl.Reload();
+                await fleLcl.Reload();
             }
             if (_isXferComplete) MyGM.POP("双方目录中的文件同步完成。");
         }
@@ -193,8 +193,9 @@ namespace ScrcpyEX.View
         {
             int total = fileNames.Count, i = 0;
             Stopwatch st = Stopwatch.StartNew();
+            string desc = isPush ? "推送" : "拉取";
 
-            InitXfer(total);
+            InitXfer(total, desc);
             try
             {
                 foreach (string name in fileNames)
@@ -211,7 +212,7 @@ namespace ScrcpyEX.View
                         continue;
                     }
 
-                    prgLoad.Text = $"传输中【{++i}/{total}】...";
+                    prgLoad.Text = $"{desc}中【{++i}/{total}】...";
                     prgLoad.AddMsg($"【{name}】传输成功，{ParseOutput(err)}");
                 }
                 _isXferComplete = true;
@@ -246,9 +247,10 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 初始化传输操作，显示进度环。
         /// </summary>
-        private void InitXfer(int total)
+        /// <param name="isPush">是否为推送模式（本地->安卓）。</param>
+        private void InitXfer(int total, string desc)
         {
-            prgLoad.Init($"传输中【0/{total}】...");
+            prgLoad.Init($"{desc}中【0/{total}】...");
             gMask.Visibility = Visibility.Visible;
             btnStop.Visibility = Visibility.Visible;
             _isXfering = true;
@@ -273,6 +275,11 @@ namespace ScrcpyEX.View
                 return $"{speed}（{seconds}秒内传输{bytes}字节）";
             }
             return "速度解析失败";
+        }
+
+        private void ShowDifferentSize()
+        {
+
         }
 
 

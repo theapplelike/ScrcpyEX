@@ -137,15 +137,9 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// </summary>
         private void SetColWidth()
         {
-            Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
             {
-                //gvcTime.Width = double.NaN;
-                //gvcSize.Width = double.NaN;
-                double nameWd = lstDir.ActualWidth -
-                    SystemParameters.VerticalScrollBarWidth -
-                    gvcSize.ActualWidth -
-                    gvcTime.ActualWidth - 10;
-
+                double nameWd = lstDir.ActualWidth - gvcSize.ActualWidth - gvcTime.ActualWidth - 18;
                 gvcName.Width = nameWd > 0 ? nameWd : double.NaN;
                 //Debug.WriteLine($"info:" +
                 //    $"{lstDir.ActualWidth}--" +
@@ -266,7 +260,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 prgLoad.Visibility = Visibility.Visible;
                 await DirService.DeleteDirsAsync(items);
                 await DirService.DeleteFilesAsync(items);
-                Reload();
+                await Reload();
                 prgLoad.Visibility = Visibility.Collapsed;
             };
 
@@ -318,7 +312,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 prgLoad.Visibility = Visibility.Visible;
                 await DirService.DeleteDirsAsync(dirs);
                 await DirService.DeleteFilesAsync(files);
-                Reload();
+                await Reload();
                 prgLoad.Visibility = Visibility.Collapsed;
             };
 
@@ -381,23 +375,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
         }
 
         /// <summary>
-        /// 重新加载当前的目录。
-        /// </summary>
-        public async void Reload()
-        {
-            await NavigateTo(CurPath);
-        }
-
-        /// <summary>
-        /// 当前目录是否可以执行传输任务。
-        /// </summary>
-        /// <returns>true--实际目录，可以传输；false--逻辑目录，不可以传输。</returns>
-        public bool IsCanXfer()
-        {
-            return DirService.IsCanXfer(CurPath);
-        }
-
-        /// <summary>
         /// 显示或隐藏文本地址栏。
         /// </summary>
         /// <param name="isShow">是否显示文本地址栏。</param>
@@ -429,6 +406,23 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 child = VisualTreeHelper.GetParent(child);
             }
             return false;
+        }
+
+        /// <summary>
+        /// 重新加载当前的目录。
+        /// </summary>
+        public async Task Reload()
+        {
+            await NavigateTo(CurPath);
+        }
+
+        /// <summary>
+        /// 当前目录是否可以执行传输任务。
+        /// </summary>
+        /// <returns>true--实际目录，可以传输；false--逻辑目录，不可以传输。</returns>
+        public bool IsCanXfer()
+        {
+            return DirService.IsCanXfer(CurPath);
         }
 
 

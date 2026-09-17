@@ -26,6 +26,7 @@
             <Setter Property="FontSize" Value="15"/>
             <Setter Property="Width" Value="100"/>
             <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="0,10,0,0"/>
             <Setter Property="Background" Value="LightSteelBlue"/>
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
@@ -42,13 +43,13 @@
         <ctrl:FileExplorer x:Name="fleAdb" Grid.Column="2" DirService="{Binding AdbService}" XferFileRequested="FleAdb_XferFileRequested"/>
 
         <StackPanel Grid.Column="1" Margin="0" VerticalAlignment="Center">
-            <Button x:Name="btnToAdb" Click="BtnToAdb_Click" Content="&#xE8B6;" Style="{StaticResource thisBtn}" ToolTip="将本地目录下所有文件推送到安卓设备"/>
+            <Button x:Name="btnToAdb" Click="BtnToAdb_Click" Content="&#xE8B6;" Style="{StaticResource thisBtn}" ToolTip="将本地目录下所有文件推送到安卓设备，已存在的文件不会再次推送"/>
             <Button x:Name="btnToLcl" Click="BtnToLcl_Click"
                     Content="&#xE8B6;"
                     Style="{StaticResource thisBtn}"
                     RenderTransformOrigin="0.5,0.5"
                     Margin="0,5"
-                    ToolTip="将安卓目录下所有文件推送到本地目录">
+                    ToolTip="将安卓目录下所有文件拉取到本地目录，已存在的文件不会再次拉取">
                 <Button.RenderTransform>
                     <RotateTransform Angle="180"/>
                 </Button.RenderTransform>

@@ -42,7 +42,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
-                        <Border x:Name="border" BorderThickness="0,0,1,0" BorderBrush="Black" Margin="0,0,0,0">
+                        <Border x:Name="border" BorderThickness="0,0,1,0" BorderBrush="Black">
                             <Grid SnapsToDevicePixels="True" Background="Transparent">
                                 <Grid.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
@@ -57,7 +57,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <ContentPresenter x:Name="HeaderContent"
-                                                  Margin="4,4"
+                                                  Margin="6,4"
                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                   RecognizesAccessKey="True"
@@ -68,7 +68,7 @@
                                       Grid.Column="1"
                                       Width="8" 
                                       Height="6"
-                                      Margin="4,0,4,0"
+                                      Margin="0,0,6,0"
                                       Stretch="Fill"
                                       Fill="Gray">
                                     <Path.Data>
@@ -107,12 +107,13 @@
                         </Border>
 
                         <ControlTemplate.Triggers>
-                            <!-- 触发器：当角色是 Padding 或 Floating 时，隐藏右边框 -->
+                            <!-- 触发器：当角色是 Padding 时，隐藏右边框 -->
                             <Trigger Property="Role" Value="Padding">
                                 <Setter TargetName="border" Property="Visibility" Value="Collapsed"/>
                             </Trigger>
-                            <Trigger Property="Role" Value="Floating">
-                                <Setter TargetName="border" Property="Visibility" Value="Collapsed"/>
+                            <!-- 最后一列不显示右边框 -->
+                            <Trigger Property="Tag" Value="Time">
+                                <Setter TargetName="border" Property="BorderThickness" Value="0"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
 
@@ -120,6 +121,92 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="ThinScrollBar" TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+
+            <!-- 默认：垂直 -->
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="MinWidth" Value="8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent">
+                            <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border x:Name="Bd" Background="#889E9E9E" CornerRadius="4" Margin="1,0"/>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Bd" Property="Background" Value="#666666"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsDragging" Value="True">
+                                                        <Setter TargetName="Bd" Property="Background" Value="#444444"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="False"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <!-- 水平：换模板、换高宽、换命令方向 -->
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Width" Value="Auto"/>
+                    <Setter Property="MinWidth" Value="0"/>
+                    <Setter Property="Height" Value="8"/>
+                    <Setter Property="MinHeight" Value="8"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ScrollBar">
+                                <Grid Background="Transparent">
+                                    <!-- 水平方向 IsDirectionReversed 必须为 False -->
+                                    <Track x:Name="PART_Track" IsDirectionReversed="False">
+                                        <Track.DecreaseRepeatButton>
+                                            <RepeatButton Command="ScrollBar.PageLeftCommand" Opacity="0" Focusable="False"/>
+                                        </Track.DecreaseRepeatButton>
+                                        <Track.Thumb>
+                                            <Thumb>
+                                                <Thumb.Template>
+                                                    <ControlTemplate TargetType="Thumb">
+                                                        <Border x:Name="Bd" Background="#889E9E9E" CornerRadius="4" Margin="0,1"/>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="Bd" Property="Background" Value="#666666"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsDragging" Value="True">
+                                                                <Setter TargetName="Bd" Property="Background" Value="#444444"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Thumb.Template>
+                                            </Thumb>
+                                        </Track.Thumb>
+                                        <Track.IncreaseRepeatButton>
+                                            <RepeatButton Command="ScrollBar.PageRightCommand" Opacity="0" Focusable="False"/>
+                                        </Track.IncreaseRepeatButton>
+                                    </Track>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
     </UserControl.Resources>
 
     <Grid Margin="5">
@@ -209,6 +296,10 @@
                   ContextMenuOpening="LstDir_ContextMenuOpening"
                   d:ItemsSource="{d:SampleData ItemCount=5}">
 
+            <ListView.Resources>
+                <Style TargetType="ScrollBar" BasedOn="{StaticResource ThinScrollBar}"/>
+            </ListView.Resources>
+
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -279,7 +370,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn x:Name="gvcSize" Width="60">
+                    <GridViewColumn x:Name="gvcSize" Width="72">
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Tag="Size">大小</GridViewColumnHeader>
                         </GridViewColumn.Header>

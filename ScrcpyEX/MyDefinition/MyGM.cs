@@ -49,8 +49,8 @@ namespace ScrcpyEX.MyDefinition
         /// <para>Groups[5]，时间：19:25。</para>
         /// <para>Groups[6]，完整文件名（含所有空格）。</para>
         /// </summary>
-        public static readonly Regex LsLineRegex = new(
-            @"^(?<type>[\-dlspbcD])(?<perm>[\-rwx]{9})\s+\d+\s+\S+\s+\S+\s+(?<size>\d+)\s+(?<date>\d{4}-\d{2}-\d{2})\s+(?<time>\d{2}:\d{2})\s+(?<name>.+)$",
+        public static Regex LsLineRegex { get; } = new(
+            @"^(?<type>[\-dlspbcD])(?<perm>[\-rwxsStT]{9})\s+\d+\s+\S+\s+\S+\s+(?<size>\d+)\s+(?<date>\d{4}-\d{2}-\d{2})\s+(?<time>\d{2}:\d{2})\s+(?<name>.+)$",
             RegexOptions.Compiled
         );
 
