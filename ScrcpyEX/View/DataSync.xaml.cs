@@ -75,6 +75,9 @@ namespace ScrcpyEX.View
             _cts?.Cancel();
         }
 
-
+        private void BtnCompare_Click(object sender, RoutedEventArgs e)
+        {
+            CompareSize();
+        }
     }
 }

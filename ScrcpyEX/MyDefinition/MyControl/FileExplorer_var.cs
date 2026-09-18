@@ -29,11 +29,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
         private int _curIndex = -1;
 
         /// <summary>
-        /// 目录的集合。
-        /// </summary>
-        private readonly RangeOC<FileItem> _dir = [];
-
-        /// <summary>
         /// 是否在使用文本地址框编辑路径。
         /// </summary>
         private bool _isEditingPath = false;
@@ -47,6 +42,16 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// 是否在父窗口注册了点击检测事件，事件用于在鼠标点击任何区域时隐藏文本地址框。
         /// </summary>
         private bool _isRegEvent;
+
+        /// <summary>
+        /// 目录中文件项的集合。
+        /// </summary>
+        private readonly RangeOC<FileItem> _dir = [];
+
+        /// <summary>
+        /// 当前目录中文件项的集合。
+        /// </summary>
+        public List<FileItem> CurDirs => [.. _dir];
 
         /// <summary>
         /// 当前的路径。
@@ -94,7 +99,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         public static readonly DependencyProperty BisProperty = RegProp<ObservableCollection<BreadcrumbItem>>(nameof(Bis));
 
         /// <summary>
-        /// 目录的视图，用于UI排序。
+        /// 目录中文件项的视图，用于UI排序。
         /// </summary>
         public ICollectionView DirView
         {

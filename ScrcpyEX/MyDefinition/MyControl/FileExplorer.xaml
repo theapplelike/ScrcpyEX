@@ -294,6 +294,7 @@
                   Grid.Row="1"
                   ItemsSource="{Binding DirView, ElementName=root}" 
                   ContextMenuOpening="LstDir_ContextMenuOpening"
+                  SelectionChanged="LstDir_SelectionChanged"
                   d:ItemsSource="{d:SampleData ItemCount=5}">
 
             <ListView.Resources>
@@ -376,7 +377,17 @@
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Size, Converter={StaticResource FileSizeConverter}}"/>
+                                <Grid>
+                                    <TextBlock Text="{Binding Size, Converter={StaticResource FileSizeConverter}, ConverterParameter=emptyDir}"/>
+                                    <Grid.ToolTip>
+                                        <ToolTip>
+                                            <TextBlock Text="{Binding Size, 
+                                                             Converter={StaticResource FileSizeConverter},
+                                                             ConverterParameter=full,
+                                                             StringFormat='大小：{0}'}"/>
+                                        </ToolTip>
+                                    </Grid.ToolTip>
+                                </Grid>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -403,8 +414,17 @@
                    TextWrapping="Wrap" MaxWidth="400"/>
 
         <StatusBar Grid.Row="2" Margin="10,0,0,0" Background="Transparent">
+            <StatusBar.ItemContainerStyle>
+                <Style TargetType="StatusBarItem">
+                    <Setter Property="Margin" Value="0,0,4,0"/>
+                </Style>
+            </StatusBar.ItemContainerStyle>
+
             <StatusBarItem>
                 <TextBlock Text="{Binding DirView.Count, ElementName=root, StringFormat='共 {0} 项'}"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock x:Name="tbkSelect"/>
             </StatusBarItem>
         </StatusBar>
 

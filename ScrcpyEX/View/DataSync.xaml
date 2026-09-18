@@ -42,7 +42,7 @@
         <ctrl:FileExplorer x:Name="fleLcl" Grid.Column="0" DirService="{Binding LclService}" XferFileRequested="FleLcl_XferFileRequested"/>
         <ctrl:FileExplorer x:Name="fleAdb" Grid.Column="2" DirService="{Binding AdbService}" XferFileRequested="FleAdb_XferFileRequested"/>
 
-        <StackPanel Grid.Column="1" Margin="0" VerticalAlignment="Center">
+        <StackPanel x:Name="stpOper" Grid.Column="1" Margin="0" VerticalAlignment="Center">
             <Button x:Name="btnToAdb" Click="BtnToAdb_Click" Content="&#xE8B6;" Style="{StaticResource thisBtn}" ToolTip="将本地目录下所有文件推送到安卓设备，已存在的文件不会再次推送"/>
             <Button x:Name="btnToLcl" Click="BtnToLcl_Click"
                     Content="&#xE8B6;"
@@ -54,9 +54,18 @@
                     <RotateTransform Angle="180"/>
                 </Button.RenderTransform>
             </Button>
-            <Button x:Name="btnSync" Click="BtnSync_Click" Content="&#xe8ab;" Style="{StaticResource thisBtn}" ToolTip="同步双方目录下所有文件"/>
+            <Button x:Name="btnSync" Click="BtnSync_Click" Content="&#xedab;" Style="{StaticResource thisBtn}" ToolTip="同步双方目录下所有文件，已存在的文件不会覆盖"/>
         </StackPanel>
 
+        <Button x:Name="btnCompare"
+                Click="BtnCompare_Click"
+                Grid.Column="1" 
+                Content="&#xe735;"
+                Margin="0,0,0,30" 
+                VerticalAlignment="Bottom"
+                Style="{StaticResource CoinFlipBtn}" 
+                ToolTip="筛选双方目录下名称相同但大小不同的文件"/>
+        
         <Grid x:Name="gMask" Grid.ColumnSpan="3" IsHitTestVisible="True" Background="#CCFFFFFF" Visibility="Collapsed" MouseDown="GMask_MouseDown">
             <StackPanel VerticalAlignment="Center">
                 <mcl:ProgressRing x:Name="prgLoad" RingType="3" Text="传输中..." VerticalAlignment="Center"/>

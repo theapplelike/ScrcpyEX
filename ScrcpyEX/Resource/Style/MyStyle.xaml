@@ -224,4 +224,68 @@
         </Setter>
     </Style>
 
+    <!--点击时触发硬币翻转效果的按钮-->
+    <Style x:Key="CoinFlipBtn" TargetType="Button">
+        <Setter Property="Width" Value="40"/>
+        <Setter Property="Height" Value="35"/>
+        <Setter Property="FontFamily" Value="/ScrcpyEX;component/Resource/IconFont/SegoeFluentIcons.ttf#Segoe Fluent Icons"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="Background" Value="LightSteelBlue"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Focusable" Value="False"/>
+        
+        <!--重写按钮的模板-->
+        <Setter Property="Template">
+            <Setter.Value>
+                <!--使用按钮原来的样式，不做更改-->
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4" 
+                            RenderTransformOrigin="0.5,0.5">
+                        <Border.RenderTransform>
+                            <ScaleTransform x:Name="flip" ScaleX="1"/>
+                        </Border.RenderTransform>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <!--鼠标悬停时修改背景颜色-->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="LightBlue"/>
+                        </Trigger>
+                        <!--鼠标按下时的样式-->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="SkyBlue"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+                        <!--鼠标禁用时的样式-->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="#EEEEEE"/>
+                            <Setter Property="Foreground" Value="#AAAAAA"/>
+                        </Trigger>
+                        <EventTrigger RoutedEvent="Button.Click">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <!-- 折起来：1 → 0，AutoReverse=True时会自动反向播回起点-->
+                                    <DoubleAnimation Storyboard.TargetName="flip"
+                                                     Storyboard.TargetProperty="ScaleX"
+                                                     To="0" Duration="0:0:0.12"
+                                                     AutoReverse="True"/>
+                                    <!--同时增加高度表现翻转效果-->
+                                    <DoubleAnimation Storyboard.TargetName="flip"
+                                                     Storyboard.TargetProperty="ScaleY"
+                                                     To="1.5" Duration="0:0:0.12"
+                                                     AutoReverse="True"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

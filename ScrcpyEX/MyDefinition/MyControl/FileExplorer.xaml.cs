@@ -125,6 +125,12 @@ namespace ScrcpyEX.MyDefinition.MyControl
             }
         }
 
+        private void LstDir_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int n = lstDir.SelectedItems.Count;
+            tbkSelect.Text = n == 0 ? "" : $"已选中 {n} 项";
+        }
+
         private void ItemsControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             SetAddrBarVisib(true);

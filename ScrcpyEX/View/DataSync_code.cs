@@ -1,4 +1,5 @@
-﻿using ScrcpyEX.Model;
+﻿using OpenCvSharp.Aruco;
+using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition;
 using System;
 using System.Collections.Generic;
@@ -277,9 +278,39 @@ namespace ScrcpyEX.View
             return "速度解析失败";
         }
 
-        private void ShowDifferentSize()
+        /// <summary>
+        /// 显示名称相同、但大小不同的文件进行比较，再次调用取消比较。
+        /// </summary>
+        private void CompareSize()
         {
+            if (stpOper.IsEnabled)
+            {
+                List<string> diffSize = GetDiffSizeLists();
+                fleLcl.FilterDiffSize(diffSize);
+                fleAdb.FilterDiffSize(diffSize);
+                btnCompare.Content = "\uf0e7";
+            }
+            else
+            {
+                fleLcl.CancelFilter();
+                fleAdb.CancelFilter();
+                btnCompare.Content = "\ue735";
+            }
+            stpOper.IsEnabled = !stpOper.IsEnabled;
+        }
 
+        /// <summary>
+        /// 找出两侧目录中名称相同、但大小不同的所有文件名。
+        /// </summary>
+        private List<string> GetDiffSizeLists()
+        {
+            Dictionary<string, FileItem> adbMap = fleAdb.CurDirs
+                .GroupBy(x => x.Name)
+                .ToDictionary(g => g.Key, g => g.First());
+
+            return [.. fleLcl.CurDirs
+                    .Where(l => adbMap.TryGetValue(l.Name, out FileItem a) && l.Size != a.Size)
+                    .Select(l => l.Name)];
         }
 
 

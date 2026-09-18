@@ -425,6 +425,24 @@ namespace ScrcpyEX.MyDefinition.MyControl
             return DirService.IsCanXfer(CurPath);
         }
 
+        /// <summary>
+        /// 仅显示同名但不同大小的文件。
+        /// </summary>
+        /// <param name="diffSize">同名但不同大小的文件列表。</param>
+        public void FilterDiffSize(List<string> diffSize)
+        {
+            HashSet<string> set = new(diffSize, StringComparer.Ordinal);
+            DirView.Filter = o => set.Contains(((FileItem)o).Name);
+        }
+
+        /// <summary>
+        /// 取消筛选同名但不同大小的文件。
+        /// </summary>
+        public void CancelFilter()
+        {
+            DirView.Filter = null;
+        }
+
 
     }
 }
