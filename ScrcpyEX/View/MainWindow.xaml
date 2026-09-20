@@ -28,6 +28,11 @@
             <Setter Property="Height" Value="30"/>
             <Setter Property="Background" Value="AliceBlue"/>
         </Style>
+        <Style x:Key="ScriptBtn" TargetType="Button" BasedOn="{StaticResource MenuBtn}">
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Foreground" Value="SteelBlue"/>
+            <Setter Property="Background" Value="AliceBlue"/>
+        </Style>
         <Style x:Key="ItemBtn" TargetType="Button">
             <Setter Property="Margin" Value="1"/>
             <Setter Property="Height" Value="30"/>
@@ -152,7 +157,7 @@
                     
                     <Border x:Name="bdRec" HorizontalAlignment="Right" BorderBrush="SteelBlue" BorderThickness="4">
                         <DockPanel>
-                            <Button x:Name="btnImgCompare" Click="BtnImgCompare_Click" Style="{StaticResource thisBtn}" Content="&#xf58c;" Foreground="SteelBlue" Height="22" ToolTip="查看脚本比对图像"/>
+                            <Button x:Name="btnImgCompare" Click="BtnImgCompare_Click" Style="{StaticResource ScriptBtn}" Content="&#xf58c;" ToolTip="查看脚本比对图像"/>
                             <DockPanel x:Name="dplTip" Height="22">
                                 <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
                                 <TextBlock Text="{Binding CycleNum}" VerticalAlignment="Center" FontSize="16" Margin="2,0,0,0"/>
@@ -161,7 +166,9 @@
                                 <TextBlock Text="秒" VerticalAlignment="Center" FontSize="16" Margin="0,0,2,0"/>
                                 <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
                             </DockPanel>
-                            <Button x:Name="btnRecStop" Click="BtnRecStop_Click" Style="{StaticResource thisBtn}" Content="&#xe769;" Foreground="SteelBlue" Height="22" ToolTip="停止脚本/录制"/>
+                            <Button x:Name="btnRecStop" Click="BtnRecStop_Click" Style="{StaticResource ScriptBtn}" Content="&#xe769;" ToolTip="停止脚本/录制"/>
+                            <TextBlock FontSize="20" Width="4" Height="22" Background="SteelBlue"/>
+                            <Button x:Name="btnImgShot" Click="BtnImgShot_Click" Style="{StaticResource ScriptBtn}" Content="&#xf7ed;" ToolTip="截取脚本图像"/>
                         </DockPanel>
                     </Border>
 

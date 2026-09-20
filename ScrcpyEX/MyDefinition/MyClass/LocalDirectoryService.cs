@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic.FileIO;
+using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition.Interface;
 using System;
@@ -19,6 +20,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
         public char Sep => Path.DirectorySeparatorChar;
 
         public string Root { get; } = @"PC";
+
+        public string LastDir
+        {
+            get => MyCfg.Cfg.FeData.LastLclDir;
+            set => MyCfg.Cfg.FeData.LastLclDir = value;
+        }
 
         public bool IsRoot(string path)
         {

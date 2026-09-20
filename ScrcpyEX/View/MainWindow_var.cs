@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace ScrcpyEX.View
@@ -134,6 +135,16 @@ namespace ScrcpyEX.View
         /// 现在是否可以调整映射Popup。
         /// </summary>
         private bool _isAdjustPop = true;
+
+        /// <summary>
+        /// 保存录制脚本时截取的临时图像。
+        /// </summary>
+        private CroppedBitmap _cropImg = null;
+
+        /// <summary>
+        /// 说明截图结果位置大小的矩形。
+        /// </summary>
+        private System.Windows.Rect _cropRect = new();
 
         /// <summary>
         /// 窗口除开Scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。

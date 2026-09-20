@@ -104,6 +104,19 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
+        /// 进行截图。
+        /// </summary>
+        private void DoScreenshot()
+        {
+            Screenshot screen = new(ScHandle);
+            if (screen.ShowDialog() == true)
+            {
+                _cropImg = screen.Crop;
+                _cropRect = screen.CropRect;
+            }
+        }
+
+        /// <summary>
         /// 注册鼠标钩子进行录制脚本操作，如果已注册鼠标钩子，则注销鼠标钩子并保存录制的脚本。
         /// </summary>
         private void ScriptRecordSwitch()
@@ -126,6 +139,7 @@ namespace ScrcpyEX.View
                     RemoveScBlack();
                     HideKeyMapping();
                     bdRec.Visibility = Visibility.Visible;
+                    btnImgShot.Visibility = Visibility.Visible;
                     btnImgCompare.Visibility = Visibility.Collapsed;
                     popMid.Show("开启脚本录制。");
                 }
@@ -145,9 +159,10 @@ namespace ScrcpyEX.View
         /// </summary>
         private void StopRecord()
         {
-            MRS_Hook.CancelHook();
+            MRS_Hook.CancelHook(_cropImg, _cropRect);
             ShowKeyMapping();
             bdRec.Visibility = Visibility.Collapsed;
+            btnImgShot.Visibility = Visibility.Collapsed;
             popMid.Show("已停止录制操作。");
         }
 

@@ -160,6 +160,11 @@ namespace ScrcpyEX.View
             StopScriptAndRecord();
         }
 
+        private void BtnImgShot_Click(object sender, RoutedEventArgs e)
+        {
+            DoScreenshot();
+        }
+
         private void BtnImgCompare_Click(object sender, RoutedEventArgs e)
         {
             ImgCompare(_scriptInfos);

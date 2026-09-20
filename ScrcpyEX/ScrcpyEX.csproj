@@ -94,6 +94,7 @@
     </ApplicationDefinition>
     <Compile Include="Model\AdbDeviceInfo.cs" />
     <Compile Include="Model\BreadcrumbItem.cs" />
+    <Compile Include="Model\FeData.cs" />
     <Compile Include="Model\FileItem.cs" />
     <Compile Include="Model\FormSize.cs" />
     <Compile Include="Model\PointInfo.cs" />

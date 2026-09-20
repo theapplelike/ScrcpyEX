@@ -12,11 +12,25 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using static System.Resources.ResXFileRef;
 
 namespace ScrcpyEX.MyDefinition.MyClass
 {
     internal class OpenCv
     {
+        /// <summary>
+        /// BitmapSource 转 Mat 时的颜色模式。
+        /// </summary>
+        public enum ColorMode
+        {
+            /// <summary>单通道灰度图，供 SSIM 等使用。</summary>
+            Gray,
+            /// <summary>三通道 BGR 图，供 RgbHist 等使用。</summary>
+            Bgr,
+            /// <summary>四通道 BGRA 图（保留 Alpha）。</summary>
+            Bgra
+        }
+
         /// <summary>
         /// 使用结构相似性指标（SSIM）比较两张图片的相似性，速度比QualitySSIM更快。
         /// </summary>
@@ -28,24 +42,22 @@ namespace ScrcpyEX.MyDefinition.MyClass
             Stopwatch st = Stopwatch.StartNew();
             using Mat img1 = Cv2.ImRead(path1, ImreadModes.Grayscale);
             using Mat img2 = Cv2.ImRead(path2, ImreadModes.Grayscale);
-
             double reult = CompareSSIM(img1, img2);
+
             Debug.WriteLine($"SSIM:{reult}，耗时：{st.ElapsedMilliseconds}ms**");
             return reult;
-
-            //return CompareSSIM(img1, img2);
         }
 
         /// <summary>
         /// 使用结构相似性指标（SSIM）比较两张图片的相似性。
         /// </summary>
         /// <param name="path1">第一张图片的路径。</param>
-        /// <param name="bitmapSource">CroppedBitmap类型的第二张图片。</param>
+        /// <param name="bitmap">第二张图片。</param>
         /// <returns>SSIM值在0.0到1.0之间，值越大表示相似度越高。</returns>
-        public static double CompareSSIM(string path1, BitmapSource bitmapSource)
+        public static double CompareSSIM(string path1, BitmapSource bitmap)
         {
             using Mat img1 = Cv2.ImRead(path1, ImreadModes.Grayscale);
-            using Mat img2 = ConvertBitmapSourceToMat(bitmapSource);
+            using Mat img2 = ConvertBitmapSourceToMat(bitmap);
 
             return CompareSSIM(img1, img2);
         }
@@ -109,21 +121,24 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <summary>
         /// 将BitmapSource类型及其派生类型的图片转换为OpenCv可以处理的Mat类型。
         /// </summary>
-        /// <param name="bitmapSource">BitmapSource类型及其派生类型的图片。</param>
+        /// <param name="bitmap">BitmapSource类型及其派生类型的图片。</param>
+        /// <param name="mode">目标 Mat 的颜色模式，默认为灰度。</param>
         /// <returns>Mat类型。</returns>
-        public static Mat ConvertBitmapSourceToMat(BitmapSource bitmapSource)
+        public static Mat ConvertBitmapSourceToMat(BitmapSource bitmap, ColorMode mode = ColorMode.Gray)
         {
-            BitmapSource source = bitmapSource;
+            if (bitmap == null) throw new ArgumentNullException(nameof(bitmap));
+            BitmapSource source = bitmap;
 
             // 1. 转换为 BGRA32 格式
-            if (bitmapSource.Format != PixelFormats.Bgra32)
+            if (bitmap.Format != PixelFormats.Bgra32)
             {
-                FormatConvertedBitmap convertedBitmap = new();
-                convertedBitmap.BeginInit();
-                convertedBitmap.Source = bitmapSource;
-                convertedBitmap.DestinationFormat = PixelFormats.Bgra32;
-                convertedBitmap.EndInit();
-                source = convertedBitmap;
+                FormatConvertedBitmap converted = new();
+                converted.BeginInit();
+                converted.Source = bitmap;
+                converted.DestinationFormat = PixelFormats.Bgra32;
+                converted.EndInit();
+                converted.Freeze();
+                source = converted;
             }
 
             // 2. 提取像素数据
@@ -134,27 +149,42 @@ namespace ScrcpyEX.MyDefinition.MyClass
             source.CopyPixels(pixelData, stride, 0);
 
             // 3. 使用 Mat.FromPixelData 创建 Mat
-            Mat mat;
+            Mat bgra;
             unsafe
             {
                 fixed (byte* pData = pixelData)
                 {
-                    // 关键修复点：使用 FromPixelData，并传递正确的参数
-                    mat = Mat.FromPixelData(
+                    using Mat tmp = Mat.FromPixelData(
                         rows: height,
                         cols: width,
                         type: MatType.CV_8UC4,
                         data: (nint)pData,  // 转换为 nint 类型
-                        step: stride // 步长以字节为单位
+                        step: stride        // 步长以字节为单位
                     );
-
-                    mat = mat.Clone(); // 克隆以持久化数据（避免指针失效）
+                    bgra = tmp.Clone();     // 克隆以持久化数据（避免指针失效）
                 }
             }
 
-            // 4. 转换为灰度图，使用ColorConversionCodes.BGRA2BGR会异常
-            Cv2.CvtColor(mat, mat, ColorConversionCodes.BGRA2GRAY);
-            return mat;
+            //按需转换，转换时输出到新 Mat，不要就地转换
+            switch (mode)
+            {
+                case ColorMode.Bgra: return bgra;
+                case ColorMode.Bgr:
+                    {
+                        Mat bgr = new();
+                        Cv2.CvtColor(bgra, bgr, ColorConversionCodes.BGRA2BGR);
+                        bgra.Dispose();
+                        return bgr;
+                    }
+                case ColorMode.Gray:
+                default:
+                    {
+                        Mat gray = new();
+                        Cv2.CvtColor(bgra, gray, ColorConversionCodes.BGRA2GRAY);
+                        bgra.Dispose();
+                        return gray;
+                    }
+            }
         }
 
         /// <summary>
@@ -243,41 +273,95 @@ namespace ScrcpyEX.MyDefinition.MyClass
         }
 
         /// <summary>
-        /// RGB颜色直方图，统计图像中各种颜色出现的频率。适用于平移、旋转后的图像对比或基于主色调的图像检索。
-        /// 但是完全丢失空间信息，直方图只关心“有什么颜色”，完全不关心“颜色在哪儿”。
+        /// 使用RGB颜色直方图对比图像相似度。
         /// </summary>
         /// <param name="path1">第一张图片的路径。</param>
         /// <param name="path2">第二张图片的路径。</param>
+        /// <returns>返回值在 [0,1] 之间，代表两张直方图的线性相似度（如果为负数说明极端病态）。</returns>
+        public static double CalculateRgbHist(string path1, string path2)
+        {
+            Stopwatch st = Stopwatch.StartNew();
+            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Color); // 必须读彩色图
+            using Mat img2 = Cv2.ImRead(path2, ImreadModes.Color);
+            double similarity = CalculateRgbHist(img1, img2);
+
+            Debug.WriteLine($"RGB-Hist:{similarity}，耗时：{st.ElapsedMilliseconds}ms");
+            return Math.Max(0, similarity);
+        }
+
+        /// <summary>
+        /// 使用RGB颜色直方图对比图像相似度。
+        /// </summary>
+        /// <param name="path1">第一张图片的路径。</param>
+        /// <param name="bitmap">第二张图片。</param>
+        /// <returns>返回值在 [0,1] 之间，代表两张直方图的线性相似度（如果为负数说明极端病态）。</returns>
+        public static double CalculateRgbHist(string path1, BitmapSource bitmap)
+        {
+            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Color);
+            using Mat img2 = ConvertBitmapSourceToMat(bitmap, ColorMode.Bgr);
+
+            return CalculateRgbHist(img1, img2);
+        }
+
+        /// <summary>
+        /// RGB颜色直方图，统计图像中各种颜色出现的频率。适用于平移、旋转后的图像对比或基于主色调的图像检索。
+        /// 但是完全丢失空间信息，直方图只关心“有什么颜色”，完全不关心“颜色在哪儿”。
+        /// </summary>
+        /// <param name="img1">OpenCv的Mat类型。</param>
+        /// <param name="img2">OpenCv的Mat类型。</param>
         /// <returns>
         /// <para>&gt; 0.90：高度相似，可能有轻微光照、压缩或尺寸变化。</para>
         /// <para>0.70 ~ 0.90：中等相似，可能背景相同但前景不同，或有明显色彩偏移。</para>
         /// <para>0.50 ~ 0.70：相似度较低，颜色分布有明显不同。</para>
         /// <para>&lt; 0.50：差异很大，通常可视为不匹配。</para>
         /// </returns>
-        public static double CalculateRgbHist(string path1, string path2)
+        public static double CalculateRgbHist(Mat img1, Mat img2)
         {
-            Stopwatch st = Stopwatch.StartNew();
-            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Color); // 必须读彩色图
-            using Mat img2 = Cv2.ImRead(path2, ImreadModes.Color);
-
             using Mat resized1 = ResizeForHist(img1);
             using Mat resized2 = ResizeForHist(img2);
 
             // 计算直方图 (统计颜色分布)
             using Mat hist1 = new();
             using Mat hist2 = new();
-            int[] histSize = [256];
-            Rangef[] ranges = [new Rangef(0, 256)];
+            int[] histSize = [8, 8, 8];        // 3D 直方图，每通道 8 bin
+            Rangef[] ranges = [new(0, 256), new(0, 256), new(0, 256)];
 
-            // 取蓝色通道计算 (其实取任意通道都行，因为三通道分布是一起变动的)
             Cv2.CalcHist([resized1], [0], null, hist1, 1, histSize, ranges);
             Cv2.CalcHist([resized2], [0], null, hist2, 1, histSize, ranges);
 
             // 使用相关性算法比较，Correl 返回值在 [-1,1] 之间
-            double similarity = Cv2.CompareHist(hist1, hist2, HistCompMethods.Correl);
+            return Cv2.CompareHist(hist1, hist2, HistCompMethods.Correl);
+        }
 
-            Debug.WriteLine($"RGB_Hist:{similarity}，耗时：{st.ElapsedMilliseconds}ms");
+        /// <summary>
+        /// 使用HSV颜色直方图对比图像相似度。
+        /// </summary>
+        /// <param name="path1">第一张图片的路径。</param>
+        /// <param name="path2">第二张图片的路径。</param>
+        /// <returns>返回值在 [0,1] 之间，代表两张直方图的线性相似度。</returns>
+        public static double CalculateHsvHist(string path1, string path2)
+        {
+            Stopwatch st = Stopwatch.StartNew();
+            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Color);
+            using Mat img2 = Cv2.ImRead(path2, ImreadModes.Color);
+            double similarity = CalculateHsvHist(img1,img2);
+
+            Debug.WriteLine($"HSV-Hist:{similarity}，耗时：{st.ElapsedMilliseconds}ms");
             return Math.Max(0, similarity);
+        }
+
+        /// <summary>
+        /// 使用HSV颜色直方图对比图像相似度。
+        /// </summary>
+        /// <param name="path1">第一张图片的路径。</param>
+        /// <param name="bitmap">第二张图片。</param>
+        /// <returns>返回值在 [0,1] 之间，代表两张直方图的线性相似度。</returns>
+        public static double CalculateHsvHist(string path1, BitmapSource bitmap)
+        {
+            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Color);
+            using Mat img2 = ConvertBitmapSourceToMat(bitmap, ColorMode.Bgr);
+
+            return CalculateHsvHist(img1, img2);
         }
 
         /// <summary>
@@ -285,20 +369,16 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// 适用于平移、旋转后的图像对比或基于主色调的图像检索，能抵抗阴影、反光、曝光度变化带来的干扰。
         /// 但依然完全丢失空间信息。
         /// </summary>
-        /// <param name="path1">第一张图片的路径。</param>
-        /// <param name="path2">第二张图片的路径。</param>
+        /// <param name="img1">OpenCv的Mat类型。</param>
+        /// <param name="img2">OpenCv的Mat类型。</param>
         /// <returns>
         /// <para>&gt; 0.90：高度相似，可能有轻微光照、压缩或尺寸变化。</para>
         /// <para>0.70 ~ 0.90：中等相似，可能背景相同但前景不同，或有明显色彩偏移。</para>
         /// <para>0.50 ~ 0.70：相似度较低，颜色分布有明显不同。</para>
         /// <para>&lt; 0.50：差异很大，通常可视为不匹配。</para>
         /// </returns>
-        public static double CalculateHsvHist(string path1, string path2)
+        public static double CalculateHsvHist(Mat img1, Mat img2)
         {
-            Stopwatch st = Stopwatch.StartNew();
-            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Color);
-            using Mat img2 = Cv2.ImRead(path2, ImreadModes.Color);
-
             using Mat resized1 = ResizeForHist(img1);
             using Mat resized2 = ResizeForHist(img2);
 
@@ -320,30 +400,54 @@ namespace ScrcpyEX.MyDefinition.MyClass
             Cv2.CalcHist([hsv2], [0, 1], null, hist2, 2, histSize, ranges);
 
             // 计算相关度
-            double similarity = Cv2.CompareHist(hist1, hist2, HistCompMethods.Correl);
+            return Cv2.CompareHist(hist1, hist2, HistCompMethods.Correl);
+        }
 
-            Debug.WriteLine($"HSV-Hist:{similarity}，耗时：{st.ElapsedMilliseconds}ms");
-            return Math.Max(0, similarity);
+        /// <summary>
+        /// 使用 Hu矩 对比图像相似度。
+        /// </summary>
+        /// <param name="path1">第一张图片的路径。</param>
+        /// <param name="path2">第二张图片的路径。</param>
+        /// <returns>返回值在 [0,1] 之间，越大越相似。</returns>
+        public static double CalculateHuMoment(string path1, string path2)
+        {
+            Stopwatch st = Stopwatch.StartNew();
+            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Grayscale);
+            using Mat img2 = Cv2.ImRead(path2, ImreadModes.Grayscale);
+            double similarity = CalculateHuMoment(img1, img2);
+
+            Debug.WriteLine($"HuMoment:{similarity}，耗时：{st.ElapsedMilliseconds}ms");
+            return similarity;
+        }
+
+        /// <summary>
+        /// 使用 Hu矩 对比图像相似度。
+        /// </summary>
+        /// <param name="path1">第一张图片的路径。</param>
+        /// <param name="bitmap">第二张图片。</param>
+        /// <returns>返回值在 [0,1] 之间，越大越相似。</returns>
+        public static double CalculateHuMoment(string path1, BitmapSource bitmap)
+        {
+            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Color);
+            using Mat img2 = ConvertBitmapSourceToMat(bitmap);
+
+            return CalculateHuMoment(img1, img2);
         }
 
         /// <summary>
         /// Hu矩 是一组专门用于描述图像“形状”的7个不变特征量，能提取轮廓特征，并且这些特征对平移、旋转、缩放具有完全的数学不变性。
         /// 但完全忽略颜色和纹理，局部裁剪/遮挡会导致分数断崖下跌。如果缩放图像包含文字，文字的缩放会给周围带来大量的马赛克，会导致分数暴跌。
         /// </summary>
-        /// <param name="path1">第一张图片的路径。</param>
-        /// <param name="path2">第二张图片的路径。</param>
+        /// <param name="img1">OpenCv的Mat类型。</param>
+        /// <param name="img2">OpenCv的Mat类型。</param>
         /// <returns>
         /// <para>&gt; 0.90：轮廓特征高度相似。</para>
         /// <para>0.80 ~ 0.90：包含了原图特征。</para>
         /// <para>0.65 ~ 0.80：部分包含原图特征。</para>
         /// <para>&lt; 0.65：形状上有明显差异（比如文字被拉伸变形了）。</para>
         /// </returns>
-        public static double CalculateHuMoment(string path1, string path2)
+        public static double CalculateHuMoment(Mat img1, Mat img2)
         {
-            Stopwatch st = Stopwatch.StartNew();
-            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Grayscale);
-            using Mat img2 = Cv2.ImRead(path2, ImreadModes.Grayscale);
-
             // 1. 二值化 (去除抗锯齿影响)
             using Mat binary1 = new();
             using Mat binary2 = new();
@@ -353,11 +457,11 @@ namespace ScrcpyEX.MyDefinition.MyClass
             // 2. 计算矩
             Moments moments1 = Cv2.Moments(binary1);
             Moments moments2 = Cv2.Moments(binary2);
-            
+
             // 3. 计算 Hu 矩
             double[] hu1 = moments1.HuMoments();
             double[] hu2 = moments2.HuMoments();
-            
+
             // 4. 计算 Hu 矩之间的距离 (对数处理适应数量级差异)
             double distance = 0;
             for (int i = 0; i < 7; i++)
@@ -369,10 +473,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             distance = Math.Sqrt(distance); // 欧氏距离
 
             // 5. 将距离转为 0~1 的相似度，距离越小越相似
-            double similarity = 1.0 / (1.0 + distance);
-
-            Debug.WriteLine($"HuMoment:{similarity}，欧式距离：{distance}，耗时：{st.ElapsedMilliseconds}ms");
-            return similarity;
+            return 1.0 / (1.0 + distance);
         }
 
         /// <summary>

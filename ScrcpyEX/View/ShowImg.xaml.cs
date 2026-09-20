@@ -24,17 +24,6 @@ namespace ScrcpyEX.View
     /// </summary>
     public partial class ShowImg : Window
     {
-        //public ShowImg(ScriptInfo info)
-        //{
-        //    InitializeComponent();
-        //
-        //    Grid.SetColumnSpan(gOrig, 2);
-        //    imgOrig.Source = MyGM.GetImage(info.ImgName);
-        //    tbkOrigParam.Text = 
-        //        $"起始坐标：({info.CropRect.X},{info.CropRect.Y})，" +
-        //        $"图片宽高：({info.CropRect.Width},{info.CropRect.Height})。";
-        //}
-
         /// <summary>
         /// 显示单张图片。
         /// </summary>
@@ -51,22 +40,6 @@ namespace ScrcpyEX.View
                 $"起始坐标：({rect.X:F2}，{rect.Y:F2})--" +
                 $"图片宽高：({rect.Width:F2}，{rect.Height:F2})";
         }
-
-        //public ShowImg(ScriptInfo info, BitmapSource bitmap)
-        //{
-        //    InitializeComponent();
-        //
-        //    double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{info.ImgName}", bitmap);
-        //    Image img1 = new() { Margin = new Thickness(5), Source = bitmap };
-        //
-        //    //ufg.Children.Add(img1);
-        //    imgOrig.Source = MyGM.GetImage(info.ImgName);
-        //    tbkOrigParam.Text =
-        //        $"起始坐标：({info.CropRect.X},{info.CropRect.Y})，" +
-        //        $"图片宽高：({info.CropRect.Width},{info.CropRect.Height})，" +
-        //        $"相似程度：{ssim:F8}。";
-        //    
-        //}
 
         /// <summary>
         /// 显示组脚本的图片和对应区域截图的相似度。
@@ -164,14 +137,14 @@ namespace ScrcpyEX.View
         /// <param name="bmp">临时截取的图片。</param>
         private void ShowSimilarity(int row, string ImgName, BitmapSource bmp)
         {
-            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{ImgName}", bmp);
+            double hsv = OpenCv.CalculateHsvHist($@"{MV.ScriptPath}\{ImgName}", bmp);
 
             TextBlock tbk = new()
             {
                 Margin = new Thickness(10),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Text = $"相似程度：\n{ssim:P8}",
+                Text = $"相似程度：\n{hsv:P8}",
                 Background = Brushes.WhiteSmoke,
             };
             Grid.SetRow(tbk, row);

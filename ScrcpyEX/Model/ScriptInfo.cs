@@ -1,9 +1,11 @@
-﻿using System;
+﻿using ScrcpyEX.MyDefinition;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace ScrcpyEX.Model
 {
@@ -40,7 +42,7 @@ namespace ScrcpyEX.Model
         /// <summary>
         /// 说明局部图片位置大小的矩形。
         /// </summary>
-        public Rect CropRect { get; set; }
+        public Rect CropRect { get; set; } = new();
 
         /// <summary>
         /// 图像脚本是否使用自适应间隔。
@@ -78,6 +80,23 @@ namespace ScrcpyEX.Model
         {
             Name = $"脚本{DateTime.Now:yyMMddhhmmss}";
             PointInfos = [.. points];//创建独立的数据副本
+        }
+
+        /// <summary>
+        /// 使用坐标点信息列表构造类。
+        /// </summary>
+        /// <param name="points">录制的坐标点信息列表。</param>
+        /// <param name="cropImg">。</param>
+        /// <param name="cropRect">。</param>
+        public ScriptInfo(List<PointInfo> points, CroppedBitmap cropImg, Rect cropRect)
+        {
+            Name = $"脚本{DateTime.Now:yyMMddhhmmss}";
+            IsTime = false;
+            ImgName = $"Pic{DateTime.Now:yyMMddhhmm_ssfff}.png";
+            CropRect = cropRect;
+            PointInfos = [.. points];
+
+            MyGM.SavaImg(ImgName, cropImg);
         }
 
         object ICloneable.Clone() => Clone(); //显式接口实现

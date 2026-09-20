@@ -162,23 +162,10 @@
 
                         <CheckBox IsChecked="{Binding Cfg.IsCanResize}" Content="是否允许程序边缘调整大小"/>
                         <Border/>
-
-                        <!--<StackPanel Style="{StaticResource stpBox}">
-                <TextBlock Text="无线连接-IP地址" Style="{StaticResource tbkDesc}"/>
-                <TextBox Text="{Binding Cfg.IP}" Style="{StaticResource txt}"/>
-            </StackPanel>
-            <Border/>
-
-            <StackPanel Style="{StaticResource stpBox}">
-                <TextBlock Text="无线连接-端口号" Style="{StaticResource tbkDesc}"/>
-                <TextBox Text="{Binding Cfg.Port}" Style="{StaticResource txt}"/>
-            </StackPanel>
-            <Border/>-->
                     </StackPanel>
                 </Grid>
             </StackPanel>
         </ScrollViewer>
-        
 
         <Rectangle Grid.Row="1" Height="2" Fill="CornflowerBlue"/>
         

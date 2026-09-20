@@ -22,6 +22,11 @@ namespace ScrcpyEX.MyDefinition.Interface
         /// </summary>
         string Root { get; }
 
+        /// <summary>
+        /// 最后使用的目录。
+        /// </summary>
+        string LastDir { get; set; }
+
         /// <summary> 
         /// 判断路径是否为根目录（无法再向上）。
         /// </summary>

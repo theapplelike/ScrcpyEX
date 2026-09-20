@@ -1,4 +1,5 @@
-﻿using ScrcpyEX.Model;
+﻿using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition.Interface;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,12 @@ namespace ScrcpyEX.MyDefinition.MyClass
         public char Sep { get; } = '/';
 
         public string Root { get; } = "Android";
+
+        public string LastDir
+        {
+            get => MyCfg.Cfg.FeData.LastAdbDir;
+            set => MyCfg.Cfg.FeData.LastAdbDir = value;
+        }
 
         public bool IsRoot(string path)
         {
@@ -117,6 +124,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <returns>路径下子目录和文件的集合。</returns>
         private async Task<IEnumerable<FileItem>> GetDirContent(string path)
         {
+            if (_friendly.Count <= 0) await GetStorage();
             (string otp, string err, int exc) = await MyGM.AdbMoreAsync($"shell ls -la {path}");
 
             if (otp != "")
@@ -168,7 +176,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         }
 
         /// <summary>
-        /// <para>获得Android用户可用的最顶级根存储。</para>
+        /// <para>获得Android用户可用的最顶级根存储，同时初始化可用根存储的友好名称。</para>
         /// <para>/storage/emulated/0：固定指向机主（用户0）的空间。</para>
         /// <para>/storage/self/primary/：动态指向当前用户的空间。</para>
         /// <para>/sdcard/：动态指向当前用户的空间。</para>

@@ -95,6 +95,7 @@ namespace ScrcpyEX.View
             bdRec.Visibility = Visibility.Collapsed;
             dplTip.Visibility = Visibility.Collapsed;
             btnTest.Visibility = Visibility.Collapsed;
+            btnImgShot.Visibility = Visibility.Collapsed;
 
             ReadCfg();
             SetTimer();
@@ -163,10 +164,10 @@ namespace ScrcpyEX.View
                 ResizeMode = ResizeMode.CanMinimize;
             }
 
-            rdoLoc1.IsChecked = MyCfg.Cfg.Locate1;
-            rdoLoc2.IsChecked = MyCfg.Cfg.Locate2;
-            rdoLoc3.IsChecked = MyCfg.Cfg.Locate3;
-            rdoLoc4.IsChecked = MyCfg.Cfg.Locate4;
+            rdoLoc1.IsChecked = MyCfg.Cfg.Locates[0];
+            rdoLoc2.IsChecked = MyCfg.Cfg.Locates[1];
+            rdoLoc3.IsChecked = MyCfg.Cfg.Locates[2];
+            rdoLoc4.IsChecked = MyCfg.Cfg.Locates[3];
         }
 
         /// <summary>
@@ -174,10 +175,10 @@ namespace ScrcpyEX.View
         /// </summary>
         private void SaveCfg()
         {
-            MyCfg.Cfg.Locate1 = (bool)rdoLoc1.IsChecked;
-            MyCfg.Cfg.Locate2 = (bool)rdoLoc2.IsChecked;
-            MyCfg.Cfg.Locate3 = (bool)rdoLoc3.IsChecked;
-            MyCfg.Cfg.Locate4 = (bool)rdoLoc4.IsChecked;
+            MyCfg.Cfg.Locates[0] = (bool)rdoLoc1.IsChecked;
+            MyCfg.Cfg.Locates[1] = (bool)rdoLoc2.IsChecked;
+            MyCfg.Cfg.Locates[2] = (bool)rdoLoc3.IsChecked;
+            MyCfg.Cfg.Locates[3] = (bool)rdoLoc4.IsChecked;
 
             //窗体在正常状态下才记录其尺寸位置信息
             if (WindowState == WindowState.Normal)
@@ -200,7 +201,6 @@ namespace ScrcpyEX.View
             if (IsScClosed)
             {
                 btnWired.IsEnabled = btnWirel.IsEnabled = false;
-                //CheckScrcpy();
 
                 if (isWired)
                 {
@@ -221,19 +221,6 @@ namespace ScrcpyEX.View
                 popMid.Show("Scrcpy已经启动");
             }
         }
-
-        /// <summary>
-        /// 检查Scrcpy是否已经运行，如果运行则停止。
-        /// </summary>
-        //private void CheckScrcpy()
-        //{
-        //    Process[] prcs = Process.GetProcessesByName("Scrcpy");
-        //    foreach (Process prc in prcs)
-        //    {
-        //        prc.Kill();
-        //        prc.Dispose();
-        //    }
-        //}
 
         /// <summary>
         /// 准备进行有线连接，如果有多个设备，会让用户选择。
@@ -623,9 +610,9 @@ namespace ScrcpyEX.View
 
             Width = tgtWd;
             Height = tgtHt;
-            Debug.WriteLine($"缩小期望宽高：({tgtWd},{tgtHt})，实际：({ActualWidth},{ActualHeight})");
             Locate();
             RemoveScBlack();
+            Debug.WriteLine($"缩小期望宽高：({tgtWd},{tgtHt})，实际：({ActualWidth},{ActualHeight})");
         }
 
         /// <summary>

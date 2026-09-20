@@ -67,24 +67,9 @@ namespace ScrcpyEX.ExtensionMethod
         }
 
         /// <summary>
-        /// 定位到左上角。
+        /// 保存定位的数组，下标代表：0--左上角；1--右上角；2--左下角；3--右下角。
         /// </summary>
-        public bool Locate1 { get; set; } = false;
-
-        /// <summary>
-        /// 定位到右上角。
-        /// </summary>
-        public bool Locate2 { get; set; } = true;
-
-        /// <summary>
-        /// 定位到左下角。
-        /// </summary>
-        public bool Locate3 { get; set; } = false;
-
-        /// <summary>
-        /// 定位到右下角。
-        /// </summary>
-        public bool Locate4 { get; set; } = false;
+        public bool[] Locates { get; set; } = [false, true, false, false];
 
         /// <summary>
         /// 记录窗体尺寸、位置信息。
@@ -125,6 +110,11 @@ namespace ScrcpyEX.ExtensionMethod
         /// 是否允许程序边缘调整大小。
         /// </summary>
         public bool IsCanResize { get; set; } = false;
+
+        /// <summary>
+        /// 文件管理器保存的数据。
+        /// </summary>
+        public FeData FeData { get; set; } = new();
 
 
     }

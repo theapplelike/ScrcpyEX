@@ -40,7 +40,8 @@ namespace ScrcpyEX.MyDefinition.MyControl
 
             prgLoad.Visibility = Visibility.Visible;
             DirView = CollectionViewSource.GetDefaultView(_dir);
-            await NavigateTo(DirService.Root);
+            string last = DirService.LastDir;
+            await (last == "" ? NavigateTo(DirService.Root) : NavigateTo(last, true));
             prgLoad.Visibility = Visibility.Collapsed;
         }
 
@@ -54,6 +55,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 _parentWindow.RemoveHandler(PreviewMouseDownEvent, new MouseButtonEventHandler(OnPreviewMouseDown));
                 _isRegEvent = false;
             }
+            DirService.LastDir = CurPath;
         }
 
         /// <summary>
@@ -109,11 +111,12 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// <summary>
         /// 导航到指定的目录。
         /// </summary>
-        /// <param name="tgtPath">目标目录。</param>
+        /// <param name="tgtPath">目标目录，如果为空导航到根目录。</param>
         /// <param name="isRecord">是否将此目录添加到历史记录。</param>
         /// <returns>导航是否成功。</returns>
         private async Task<bool> NavigateTo(string tgtPath, bool isRecord = false)
         {
+            tgtPath = tgtPath == "" ? DirService.Root : tgtPath;
             CurPath = tgtPath;
 
             if (!await LoadDirFile(tgtPath)) return false;
@@ -152,7 +155,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// </summary>
         private void SetNaviUI()
         {
-            btnBack.IsEnabled = _curIndex >= 0;
+            btnBack.IsEnabled = _curIndex > 0;
             btnFwrd.IsEnabled = _curIndex < _history.Count - 1;
             btnGoUp.IsEnabled = !DirService.IsRoot(CurPath);
         }

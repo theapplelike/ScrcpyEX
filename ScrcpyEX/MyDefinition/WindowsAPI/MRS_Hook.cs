@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using static ScrcpyEX.MyDefinition.WindowsAPI.HookDLL;
 
 namespace ScrcpyEX.MyDefinition.WindowsAPI
@@ -42,16 +43,47 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         }
 
         /// <summary>
-        /// 注销钩子。
+        /// 注销钩子，如果存在录制的坐标点会进行保存。
         /// </summary>
-        public static void CancelHook()
+        //public static void CancelHook()
+        //{
+        //    if (HookID != IntPtr.Zero)
+        //    {
+        //        UnhookWindowsHookEx(HookID);
+        //        HookID = IntPtr.Zero;
+        //    }
+        //    if (_points.Count > 0)
+        //    {
+        //        MyCfg.Cfg.Scripts.Add(new ScriptInfo(_points));
+        //        _points.Clear();
+        //    }
+        //    //SaveRecordInfo();
+        //}
+
+        /// <summary>
+        /// 注销钩子，如果存在录制的坐标点会进行保存。
+        /// </summary>
+        /// <param name="cropImg">保存脚本时同时要保存的截图。</param>
+        /// <param name="cropRect">保存脚本时同时要保存的截图位置。</param>
+        public static void CancelHook(CroppedBitmap cropImg = null, Rect cropRect = new())
         {
             if (HookID != IntPtr.Zero)
             {
                 UnhookWindowsHookEx(HookID);
                 HookID = IntPtr.Zero;
             }
-            SaveRecordInfo();
+            if (_points.Count > 0)
+            {
+                if (cropImg == null)
+                {
+                    MyCfg.Cfg.Scripts.Add(new ScriptInfo(_points));
+                }
+                else
+                {
+                    MyCfg.Cfg.Scripts.Add(new ScriptInfo(_points, cropImg, cropRect));
+                }  
+                _points.Clear();
+            }
         }
 
         /// <summary>
@@ -86,14 +118,14 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <summary>
         /// 保存录制的信息。
         /// </summary>
-        private static void SaveRecordInfo()
-        {
-            if (_points.Count > 0)
-            {
-                MyCfg.Cfg.Scripts.Add(new ScriptInfo(_points));
-                _points.Clear();
-            }
-        }
+        //private static void SaveRecordInfo()
+        //{
+        //    if (_points.Count > 0)
+        //    {
+        //        MyCfg.Cfg.Scripts.Add(new ScriptInfo(_points));
+        //        _points.Clear();
+        //    }
+        //}
 
 
     }

@@ -155,7 +155,7 @@ namespace ScrcpyEX.View
             img.Source = MyGM.GetImage(info.ImgName);
             txtSimilarity.Text = info.Similarity.ToString();
             chkAdaptive.IsChecked = info.IsAdaptive;
-            _cropRect = Rect.Empty;
+            _cropRect = new();
 
             //Debug.WriteLine($"选择脚本图片名：{info.ImgName}，范围：{info.CropRect}，{info.Similarity}。");
         }

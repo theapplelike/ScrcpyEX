@@ -207,18 +207,19 @@ namespace ScrcpyEX.View
                 return false;
             }
 
-            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
-            if (ssim >= info.Similarity / 100)
+            double hsv = OpenCv.CalculateHsvHist($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
+            if (hsv >= info.Similarity / 100)
             {
                 if (info.IsAdaptive)
                 {
                     _vm.ScriptInterval = _vm.Running * 1000 * 0.9;//每次将上一次间隔的90%作为自适应间隔
                 }
-
+            
                 _vm.CycleNum++;
                 _stopwatch.Restart();
                 await ExecuteClickScript(info, ScHandle);
-                Debug.WriteLine($"单次对比通过，相似度：{ssim:P2}");
+
+                Debug.WriteLine($"单次对比通过，相似度：{hsv:P2}");
                 return true;
             }
             else

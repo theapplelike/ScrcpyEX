@@ -143,9 +143,9 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// 注册 传输文件请求 冒泡路由事件。
         /// </summary>
         public static readonly RoutedEvent XferFileRequestedEvent = EventManager.RegisterRoutedEvent(
-            "XferFileRequested",          // 事件名称
-            RoutingStrategy.Bubble,           // 冒泡策略
-            typeof(RoutedEventHandler),       // 处理器类型（可改为更具体的委托）
+            "XferFileRequested",        // 事件名称
+            RoutingStrategy.Bubble,     // 冒泡策略
+            typeof(RoutedEventHandler), // 处理器类型（可改为更具体的委托）
             typeof(FileExplorer)
         );            
 
