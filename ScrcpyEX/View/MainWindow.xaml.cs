@@ -74,6 +74,7 @@ namespace ScrcpyEX.View
         {
             //Debug.WriteLine($"**********窗口失活,{IsActive},");
             HideKeyMapping();
+            popMid.Close();
 
             if ((DLL.GetKeyState(VK_LMENU) & 0x8000) != 0)
             {

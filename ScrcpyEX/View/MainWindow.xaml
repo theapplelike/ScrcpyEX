@@ -66,11 +66,14 @@
         </ctrl:TimePopup>
 
         <!--主界面使用的居中提示-->
-        <ctrl:TimePopup x:Name="popMid" PopupAnimation="Slide" Placement="Center" PlacementTarget="{Binding ElementName=gMenu}">
-            <Border MinHeight="10" MinWidth="20" CornerRadius="6" BorderThickness="4" BorderBrush="{StaticResource Scb3}" Background="{StaticResource Scb1}" Margin="2">
+        <ctrl:ToastPopup x:Name="popMid" Placement="Center" PlacementTarget="{Binding ElementName=gMenu}">
+            <Border MinHeight="10" MinWidth="20" Height="58" CornerRadius="6" BorderThickness="4" BorderBrush="{StaticResource Scb3}" Background="{StaticResource Scb1}" Margin="2" HorizontalAlignment="Left">
+                <Border.RenderTransform>
+                    <TranslateTransform Y="0"/>
+                </Border.RenderTransform>
                 <TextBlock FontSize="20" Padding="10" Foreground="#3F6897"/>
             </Border>
-        </ctrl:TimePopup>
+        </ctrl:ToastPopup>
 
         <!--位置和大小的菜单-->
         <Popup x:Name="popSize" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnSizeOpt}">

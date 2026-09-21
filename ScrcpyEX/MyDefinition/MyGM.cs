@@ -20,7 +20,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace ScrcpyEX.MyDefinition
 {
@@ -59,42 +58,48 @@ namespace ScrcpyEX.MyDefinition
         /// </summary>
         /// <param name="text">要显示的文本。</param>
         /// <param name="time">Popup控件显示的时间，单位s。</param>
-        public static void POP(string text, int time = 3)
-        {
-            MV.MainWin.pop.Show(text, time);
-        }
+        public static void POP(string text, int time = 3) => MV.MainWin.pop.Show(text, time);
 
         /// <summary>
         /// 立刻关闭随鼠标显示的Popup。
         /// </summary>
-        public static void POP()
-        {
-            MV.MainWin.pop.Close();
-        }
+        public static void POP() => MV.MainWin.pop.Close();
 
         /// <summary>
         /// 在中间位置显示Popup提示，重复执行时覆盖上一个提示。
         /// </summary>
         /// <param name="text">要显示的文本。</param>
-        public static void MidPOP(string text)
-        {
-            MV.MainWin.popMid.Show(text);
-        }
+        public static void MidPOP(string text) => MV.MainWin.popMid.Show(text);
+
+        /// <summary>
+        /// 立刻关闭随鼠标显示的Popup。
+        /// </summary>
+        public static void MidPOP() => MV.MainWin.popMid.Close();
 
         /// <summary>
         /// 显示信息弹窗。
         /// </summary>
-        public static void ShwInfo(string txt, string cpt = "提示信息")
-        {
-            MessageBox.Show(txt, cpt, MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+        public static void ShwInfo(string txt, string cpt = "提示信息") => MessageBox.Show(txt, cpt, MessageBoxButton.OK, MessageBoxImage.Information);
 
         /// <summary>
         /// 显示错误弹窗。
         /// </summary>
-        public static void ShwError(string txt, string cpt = "未处理异常")
+        public static void ShwError(string txt, string cpt = "未处理异常") => MessageBox.Show(txt, cpt, MessageBoxButton.OK, MessageBoxImage.Error);
+
+        /// <summary>
+        /// 获得光标的当前坐标，以屏幕为基准，且此值已乘以了DPI比例（与DPI相关），WinForms框架。
+        /// </summary>
+        /// <returns>一个System.Drawing.Point类型的值。</returns>
+        public static System.Drawing.Point GetPosnD() => System.Windows.Forms.Cursor.Position;
+
+        /// <summary>
+        /// 获得光标的当前坐标，以屏幕为基准，且此值已乘以了DPI比例（与DPI相关），WPF框架。
+        /// </summary>
+        /// <returns>一个System.Windows.Point类型的值。</returns>
+        public static System.Windows.Point GetPosnW()
         {
-            MessageBox.Show(txt, cpt, MessageBoxButton.OK, MessageBoxImage.Error);
+            System.Drawing.Point point = System.Windows.Forms.Cursor.Position;
+            return new System.Windows.Point(point.X, point.Y);
         }
 
         /// <summary>
@@ -119,66 +124,16 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
-        /// 获得光标的当前坐标，以屏幕为基准，且此值已乘以了DPI比例（与DPI相关），WPF框架。
-        /// </summary>
-        /// <returns>一个System.Windows.Point类型的值。</returns>
-        public static System.Windows.Point GetPosnW()
-        {
-            System.Drawing.Point point = System.Windows.Forms.Cursor.Position;
-            return new System.Windows.Point(point.X, point.Y);
-        }
-
-        /// <summary>
-        /// 获得光标的当前坐标，以屏幕为基准，且此值已乘以了DPI比例（与DPI相关），WinForms框架。
-        /// </summary>
-        /// <returns>一个System.Drawing.Point类型的值。</returns>
-        public static System.Drawing.Point GetPosnD()
-        {
-            return System.Windows.Forms.Cursor.Position;
-        }
-
-        /// <summary>
         /// 如果min≤value≤max，则为value。value＜min，则为min。max＜value，则为max。
         /// </summary>
         /// <param name="value">要判定范围的值。</param>
         /// <param name="min">结果的下限。</param>
         /// <param name="max">结果的上限。</param>
-        public static int Clamp(int value, int min, int max)
+        public static T Clamp<T>(T value, T min, T max) where T : IComparable<T>
         {
-            if (value < min)
-            {
-                return min;
-            }
-            else if (value > max)
-            {
-                return max;
-            }
-            else
-            {
-                return value;
-            }
-        }
-
-        /// <summary>
-        /// 如果min≤value≤max，则为value。value＜min，则为min。max＜value，则为max。
-        /// </summary>
-        /// <param name="value">要判定范围的值。</param>
-        /// <param name="min">结果的下限。</param>
-        /// <param name="max">结果的上限。</param>
-        public static double Clamp(double value, double min, double max)
-        {
-            if (value < min)
-            {
-                return min;
-            }
-            else if (value > max)
-            {
-                return max;
-            }
-            else
-            {
-                return value;
-            }
+            if (value.CompareTo(min) < 0) return min;
+            if (value.CompareTo(max) > 0) return max;
+            return value;
         }
 
         /// <summary>
@@ -292,11 +247,7 @@ namespace ScrcpyEX.MyDefinition
         /// <returns>返回一个位图源，名称为空时返回null。</returns>
         public static BitmapImage GetImage(string imgName)
         {
-            if (imgName == "")
-            {
-                return null;
-            }
-
+            if (imgName == "") return null;
             try
             {
                 //创建BitmapImage并设置Source
