@@ -14,6 +14,30 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
     public class DLL
     {
         /// <summary>
+        /// 指向RECT结构的指针，该结构接收窗口左上角和右下角的屏幕坐标。
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct LpRect
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+            public readonly int Width => Right - Left;
+            public readonly int Height => Bottom - Top;
+        }
+
+        /// <summary>
+        /// POINT结构定义点的x坐标和y坐标。
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int x;
+            public int y;
+        }
+
+        /// <summary>
         /// 获得一个与给定名称相匹配的顶层窗口的句柄，不查找子窗口，查找时不区分大小写。至少需要其中一个参数。
         /// 若要从指定的子窗口开始搜索子窗口，请使用FindWindowEx函数。
         /// </summary>
@@ -98,20 +122,6 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <returns>返回值是前台窗口的句柄。在某些情况下（例如，当窗口丢失激活时），前台窗口可以为NULL。</returns>
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
-
-        /// <summary>
-        /// 指向RECT结构的指针，该结构接收窗口左上角和右下角的屏幕坐标。
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
-        public struct LpRect
-        {
-            public int Left;
-            public int Top;
-            public int Right;
-            public int Bottom;
-            public readonly int Width => Right - Left;
-            public readonly int Height => Bottom - Top;
-        }
 
         /// <summary>
         /// 检索指定窗口的边界矩形的尺寸。尺寸以相对于屏幕左上角的屏幕坐标提供。
@@ -315,6 +325,26 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <returns>true--只表示调用被系统接受，并不保证窗口一定成为前台窗口；false--失败，可通过 GetLastError() 获取错误码。</returns>
         [DllImport("user32.dll")]
         public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        /// <summary>
+        /// 检索鼠标光标的当前位置，以屏幕坐标表示，是物理像素坐标。
+        /// </summary>
+        /// <param name="lpPoint">输出参数，鼠标光标的当前位置。</param>
+        /// <returns>true--调用成功，lpPoint 中已填入有效的屏幕坐标；false--调用失败，lpPoint 内容不可用。</returns>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetCursorPos(out POINT lpPoint);
+
+        /// <summary>
+        /// 把一组屏幕坐标转换为相对于指定窗口客户区左上角的坐标。客户区不包含窗口边框、标题栏、菜单栏、滚动条等非客户区部分。
+        /// 输入的坐标是物理像素坐标，则结果也是物理像素坐标；输入是逻辑坐标，结果是逻辑坐标。
+        /// </summary>
+        /// <param name="hWnd">目标窗口的句柄。</param>
+        /// <param name="lpPoint">传入的是屏幕坐标，函数执行后会改写为指定窗口左上角的坐标。</param>
+        /// <returns>true--转换成功，lpPoint 中已是客户区坐标；false--转换失败，lpPoint 内容未定义。</returns>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
 
         //[DllImport("user32.dll")]
         //public static extern IntPtr GetDesktopWindow();

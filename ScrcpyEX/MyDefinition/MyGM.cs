@@ -87,15 +87,15 @@ namespace ScrcpyEX.MyDefinition
         public static void ShwError(string txt, string cpt = "未处理异常") => MessageBox.Show(txt, cpt, MessageBoxButton.OK, MessageBoxImage.Error);
 
         /// <summary>
-        /// 获得光标的当前坐标，以屏幕为基准，且此值已乘以了DPI比例（与DPI相关），WinForms框架。
+        /// 获得光标的当前坐标，以屏幕为基准，物理像素坐标。
         /// </summary>
-        /// <returns>一个System.Drawing.Point类型的值。</returns>
+        /// <returns>一个System.Drawing.Point类型的值，WinForms框架。</returns>
         public static System.Drawing.Point GetPosnD() => System.Windows.Forms.Cursor.Position;
 
         /// <summary>
-        /// 获得光标的当前坐标，以屏幕为基准，且此值已乘以了DPI比例（与DPI相关），WPF框架。
+        /// 获得光标的当前坐标，以屏幕为基准，物理像素坐标。
         /// </summary>
-        /// <returns>一个System.Windows.Point类型的值。</returns>
+        /// <returns>一个System.Windows.Point类型的值，WPF框架。</returns>
         public static System.Windows.Point GetPosnW()
         {
             System.Drawing.Point point = System.Windows.Forms.Cursor.Position;
@@ -169,7 +169,7 @@ namespace ScrcpyEX.MyDefinition
         /// <returns>主程序区域的截图。</returns>
         public static CroppedBitmap CaptureProcessArea(double DpiScaleX, double DpiScaleY)
         {
-            //创建与屏幕大小相同的位图对象，SystemParameters与DPI无关，需要乘以DPI系数
+            //创建与屏幕大小相同的位图对象，SystemParameters的值是逻辑坐标，需要乘以DPI系数
             System.Drawing.Bitmap bmp = new((int)(SystemParameters.VirtualScreenWidth * DpiScaleX), (int)(SystemParameters.VirtualScreenHeight * DpiScaleY), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
             //使用位图对象来创建Graphics的对象

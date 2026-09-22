@@ -11,14 +11,14 @@ namespace ScrcpyEX.ViewModel
     internal class MainWindowVM : NotificationObject
     {
         /// <summary>
-        /// 说明投屏的分辨率、比例。
+        /// 说明SC视频流的纹理尺寸。
         /// </summary>
-        public string Resolution
+        public string Texture
         {
-            get => _resolution;
-            set => SetProperty(ref _resolution, value);
+            get => _texture;
+            set => SetProperty(ref _texture, value);
         }
-        private string _resolution = "未进行投屏";
+        private string _texture = "未进行投屏";
 
         /// <summary>
         /// 说明程序当前的缩放比例。

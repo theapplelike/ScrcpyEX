@@ -46,31 +46,31 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 显示分辨率信息到界面上。
+        /// 将SC的视频帧宽高信息显示到界面上。
         /// </summary>
-        /// <param name="texture">当前分辨率，第一个参数是宽，第二个参数是高。</param>
-        public void ShowResolutionDesc(string texture)
+        /// <param name="texture">说明视频帧宽高的字符串，第一个参数是宽，第二个参数是高。</param>
+        public void ShowTextureInfo(string texture)
         {
             Regex reg = new("[0-9]+");
             MatchCollection mc = reg.Matches(texture);
 
-            _vm.Resolution = GetResolutionRatio(mc);
+            _vm.Texture = GetTextureInfo(mc);
         }
 
         /// <summary>
         /// 获得分辨率和比值。
         /// </summary>
-        private string GetResolutionRatio(MatchCollection mc)
+        private string GetTextureInfo(MatchCollection mc)
         {
             int.TryParse(mc[0].Value, out int a);
             int.TryParse(mc[1].Value, out int b);
 
-            _verticalReso = b;
-            _horizontalReso = a;
-            _resoRatio = a > b ? a * 1.0 / b : b * 1.0 / a;
+            _ScFrameHt = b;
+            _ScFrameWd = a;
+            _ScAspectRatio = a > b ? a * 1.0 / b : b * 1.0 / a;
             MDC_Hook.Enable = a < b;
 
-            return $"投屏分辨率 {a}*{b}，比值 {_resoRatio:F2}";
+            return $"投屏纹理 {a}*{b}，比值 {_ScAspectRatio:F2}";
         }
 
         /// <summary>

@@ -505,13 +505,13 @@ namespace ScrcpyEX.View
         private void QuarterMove()
         {
             double ratio;
-            if (_verticalReso > _horizontalReso)
+            if (_ScFrameHt > _ScFrameWd)
             {
-                ratio = 1.0 * _horizontalReso / _verticalReso;
+                ratio = 1.0 * _ScFrameWd / _ScFrameHt;
             }
             else
             {
-                ratio = 1.0 * _verticalReso / _horizontalReso;
+                ratio = 1.0 * _ScFrameHt / _ScFrameWd;
             }
 
             Width = SystemParameters.WorkArea.Width / 2;
@@ -532,16 +532,16 @@ namespace ScrcpyEX.View
 
             if (MyCfg.Cfg.IsKeepLandscape)
             {
-                double hope = ScActualHeight * _resoRatio + ExtraWidth;
+                double hope = ScActualHeight * _ScAspectRatio + ExtraWidth;
                 if (hope < 0) return;
 
                 Width = hope;
                 Debug.WriteLine($"保持横屏，调整宽度，期望：{hope}，实际：{ActualWidth}");
             }
-            else if (_horizontalReso < _verticalReso)
+            else if (_ScFrameWd < _ScFrameHt)
             {
                 double currResoRatio = ScActualHeight / ScActualWidth;
-                if (currResoRatio > _resoRatio)
+                if (currResoRatio > _ScAspectRatio)
                 {
                     Debug.WriteLine($"竖屏，上下有黑边，{currResoRatio}");
                     AdjustHeight();
@@ -555,7 +555,7 @@ namespace ScrcpyEX.View
             else
             {
                 double currResoRatio = ScActualWidth / ScActualHeight;
-                if (currResoRatio < _resoRatio)
+                if (currResoRatio < _ScAspectRatio)
                 {
                     Debug.WriteLine($"横屏，上下有黑边，{currResoRatio}");
                     AdjustHeight();
@@ -573,7 +573,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void AdjustHeight()
         {
-            double ratio = _verticalReso * 1.0 / _horizontalReso;
+            double ratio = _ScFrameHt * 1.0 / _ScFrameWd;
             Height = ScActualWidth * ratio + ExtraHeight;
             Debug.WriteLine($"调整高度：{ratio}，期望：{ScActualWidth * ratio + ExtraHeight}，实际：{ActualHeight}");
         }
@@ -583,7 +583,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void AdjustWidth()
         {
-            double ratio = _horizontalReso * 1.0 / _verticalReso;
+            double ratio = _ScFrameWd * 1.0 / _ScFrameHt;
             Width = ScActualHeight * ratio + ExtraWidth;
             Debug.WriteLine($"调整宽度：{ratio}，期望：{ScActualHeight * ratio + ExtraWidth}，实际：{ActualWidth}");
         }
@@ -600,7 +600,7 @@ namespace ScrcpyEX.View
                 return;
             }
 
-            double tgtWd = Width - _resoRatio * step;
+            double tgtWd = Width - _ScAspectRatio * step;
             double tgtHt = Height - step;
             
             if (tgtWd < 0 || tgtHt < 0)
@@ -627,13 +627,13 @@ namespace ScrcpyEX.View
                 return;
             }
 
-            if (Width + _resoRatio * step > SystemParameters.WorkArea.Width)
+            if (Width + _ScAspectRatio * step > SystemParameters.WorkArea.Width)
             {
                 Width = SystemParameters.WorkArea.Width;
             }
             else
             {
-                Width += _resoRatio * step;
+                Width += _ScAspectRatio * step;
             }
             if (Height + step > SystemParameters.WorkArea.Height)
             {

@@ -79,7 +79,7 @@
         <Popup x:Name="popSize" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnSizeOpt}">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
                 <StackPanel Background="White">
-                    <TextBlock Text="{Binding Resolution}" Background="White" Padding="5"/>
+                    <TextBlock Text="{Binding Texture}" Background="White" Padding="5"/>
                     <TextBlock Text="{Binding Scaling}" Background="White" Padding="5"/>
                     <UniformGrid Rows="2" Columns="2" Margin="0,3" Background="lavender">
                         <RadioButton x:Name="rdoLoc1" Content="↖左上" Margin="0,5,0,2" Focusable="False"/>

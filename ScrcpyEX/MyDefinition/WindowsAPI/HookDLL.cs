@@ -13,56 +13,6 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
     internal class HookDLL
     {
         /// <summary>
-        /// 定义一个委托来表示鼠标钩子回调函数。
-        /// </summary>
-        /// <param name="nCode">事件状态码，如果小于0则挂钩过程必须将消息传递给CallNextHookEx函数，而无需进一步处理，并且应返回CallNextHookEx返回的值。</param>
-        /// <param name="wParam">鼠标消息的标识符。可以是WM_LBUTTONDOWN等常量。</param>
-        /// <param name="lParam">指向MSLLHOOKSTRUCT结构的指针。</param>
-        /// <returns>0--允许该事件继续传播；大于0--此事件到此为止，不再向下传播。建议使用CallNextHookEx函数的处理值。</returns>
-        //public delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
-
-        /// <summary>
-        /// 安装钩子来监听系统的某些类型的事件。 
-        /// </summary>
-        /// <param name="idHook">指定要监听的钩子类型。</param>
-        /// <param name="lpfn">指向钩子过程的指针，也就是钩子触发时要执行的委托。</param>
-        /// <param name="hMod">表示持有钩子函数的进程号。</param>
-        /// <param name="dwThreadId">要与之关联的钩子过程的线程的标识符。 </param>
-        /// <returns>函数成功，返回钩子过程的句柄；函数失败，返回null。</returns>
-        //[DllImport("user32.dll", EntryPoint = "SetWindowsHookEx", CharSet = CharSet.Auto, SetLastError = true)]
-        //public static extern IntPtr SetMouseHook(int idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
-
-        /// <summary>
-        /// 定义一个委托来表示键盘钩子回调函数。
-        /// </summary>
-        /// <param name="nCode">事件状态码，如果小于0则挂钩过程必须将消息传递给CallNextHookEx函数，而无需进一步处理，并且应返回CallNextHookEx返回的值。</param>
-        /// <param name="wParam">键盘消息的标识符。可以是WM_KEYDOWN、WM_KEYUP等常量。</param>
-        /// <param name="lParam">指向KBDLLHOOKSTRUCT结构的指针。</param>
-        /// <returns>使用CallNextHookEx函数的处理值。</returns>
-        //public delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
-
-        /// <summary>
-        /// 安装钩子来监听系统的某些类型的事件。 
-        /// </summary>
-        /// <param name="idHook">指定要监听的钩子类型。</param>
-        /// <param name="lpfn">指向钩子过程的指针，也就是钩子触发时要执行的委托。</param>
-        /// <param name="hMod">表示持有钩子函数的进程号。</param>
-        /// <param name="dwThreadId">要与之关联的钩子过程的线程的标识符。 </param>
-        /// <returns>函数成功，返回钩子过程的句柄；函数失败，返回null。</returns>
-        //[DllImport("user32.dll", EntryPoint = "SetWindowsHookEx", CharSet = CharSet.Auto, SetLastError = true)]
-        //public static extern IntPtr SetKeyboardHook(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
-
-        /// <summary>
-        /// POINT结构定义点的x坐标和y坐标。
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
-        public struct POINT
-        {
-            public int x;
-            public int y;
-        }
-
-        /// <summary>
         /// 定义MOUSEHOOKSTRUCT结构体，用于接收鼠标事件数据。
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
@@ -71,7 +21,7 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
             /// <summary>
             /// 坐标值结构体。
             /// </summary>
-            public POINT pt;
+            public DLL.POINT pt;
 
             /// <summary>
             /// 如果消息是WM_MOUSEWHEEL，则该成员的高16位字节是滚动方向及距离，低16位字节被保留。

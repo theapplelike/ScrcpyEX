@@ -91,25 +91,25 @@ namespace ScrcpyEX.View
         private readonly System.Timers.Timer _testTimer = new();
 
         /// <summary>
-        /// Scrcpy的默认初始宽高（在100%缩放下），使用比例为15：7，华为nova 4e。
+        /// Scrcpy的默认初始宽高（在100%缩放下），单位是逻辑像素，使用比例为15：7。
         /// </summary>
         private readonly int _scWidth = 960, _scHeight = 448;
         //private readonly int _scWidth = 1156, _scHeight = 540;
 
         /// <summary>
-        /// SC投屏水平方向分辨率。
+        /// SC视频帧的宽度（像素）。
         /// </summary>
-        private int _horizontalReso;
+        private int _ScFrameWd;
 
         /// <summary>
-        /// SC投屏垂直方向分辨率。
+        /// SC视频帧的高度（像素）。
         /// </summary>
-        private int _verticalReso;
+        private int _ScFrameHt;
 
         /// <summary>
-        /// 分辨率比例，由长边除以短边得到，reso->resolution。
+        /// SC视频帧的宽高比。
         /// </summary>
-        private double _resoRatio = 0;
+        private double _ScAspectRatio = 0;
 
         /// <summary>
         /// 保存已选中的原始脚本。
@@ -147,7 +147,7 @@ namespace ScrcpyEX.View
         private System.Windows.Rect _cropRect = new();
 
         /// <summary>
-        /// 窗口除开Scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
+        /// 窗口除开SC的额外宽度，单位为逻辑像素，与屏幕DPI无关。不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
         private double ExtraWidth
         {
@@ -165,7 +165,7 @@ namespace ScrcpyEX.View
         }
 
         /// <summary>
-        /// 窗口除开Scrcpy的额外高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
+        /// 窗口除开SC的额外高度，单位为逻辑像素，与屏幕DPI无关。不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
         /// </summary>
         private double ExtraHeight
         {
@@ -181,16 +181,6 @@ namespace ScrcpyEX.View
                 }
             }
         }
-
-        /// <summary>
-        /// 窗口除开Scrcpy的额外左侧宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
-        /// </summary>
-        private double ExtraWidthLeft => gShow.Margin.Left;
-
-        /// <summary>
-        /// 窗口除开Scrcpy的额外上方高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
-        /// </summary>
-        private double ExtraHeightTop => gMenu.ActualHeight + gShow.Margin.Top;
 
         /// <summary>
         /// 屏幕X轴上的DPI比例。
@@ -233,12 +223,12 @@ namespace ScrcpyEX.View
         public double ScRatioY => ScActualHeight / _scHeight;
 
         /// <summary>
-        /// Scrcpy当前的实际宽度，与DPI无关。
+        /// Scrcpy当前的实际宽度，单位是逻辑像素，与DPI无关。
         /// </summary>
         public double ScActualWidth => ActualWidth - ExtraWidth;
 
         /// <summary>
-        /// Scrcpy当前的实际高度，与DPI无关。
+        /// Scrcpy当前的实际高度，单位是逻辑像素，与DPI无关。
         /// </summary>
         public double ScActualHeight => ActualHeight - ExtraHeight;
 

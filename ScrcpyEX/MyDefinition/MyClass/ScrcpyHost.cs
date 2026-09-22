@@ -239,13 +239,13 @@ namespace ScrcpyEX.MyDefinition.MyClass
         {
             if (e.Data == null) return;
             Debug.WriteLine($"[I]{e.Data}");
-        
-            //获得当前分辨率，第一个参数是宽，第二个参数是高
+
+            //获得当前视频帧的宽高，第一个参数是宽，第二个参数是高
             if (e.Data.Contains("Texture"))
             {
                 //Scrcpy在横竖屏转换的时候会导致坐标错位，鼠标点击失效，需要重绘窗口
                 _hwndHost?.RefreshScWindow();
-                MV.MainWin.ShowResolutionDesc(e.Data);
+                MV.MainWin.ShowTextureInfo(e.Data);
             }
         }
 

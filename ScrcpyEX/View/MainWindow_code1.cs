@@ -29,34 +29,24 @@ namespace ScrcpyEX.View
     public partial class MainWindow//code1
     {
         /// <summary>
-        /// 获得鼠标相对于Scrcpy左上角的坐标，
-        /// X轴需要额外减去：左额外距离*DPI比例-左非工作区距离*DPI比例，
-        /// Y轴需要额外减去：上额外距离*DPI比例。
+        /// 获得鼠标相对于SC左上角的坐标，SC未启动时返回的是相对于屏幕左上角的坐标。
         /// </summary>
-        /// <returns>鼠标相对于Scrcpy左上角的坐标，以元组表示（X，Y）。</returns>
+        /// <returns>鼠标相对于SC左上角的坐标，以元组表示（x，y）。</returns>
         public (double, double) GetPointRelativeToScrcpy()
         {
-            Point pt1 = PointToScreen(new Point(0, 0)); //获得程序左上角相对于屏幕的位置，获得的值与DPI相关
-            Point pt2 = MyGM.GetPosnW();                //获取鼠标相对于屏幕的位置
+            DLL.GetCursorPos(out DLL.POINT scPt);
+            DLL.ScreenToClient(ScHandle, ref scPt);
 
-            double x = pt2.X - pt1.X - ExtraWidthLeft * MV.DpiScaleX + SystemParameters.WindowNonClientFrameThickness.Left * MV.DpiScaleX;
-            double y = pt2.Y - pt1.Y - ExtraHeightTop * MV.DpiScaleY;
-
-            //Debug.WriteLine($"程序相对于屏幕：({pt1.X}, {pt1.Y})，{SystemParameters.WindowNonClientFrameThickness.Left}。");
-            //Debug.WriteLine($"鼠标相对于屏幕：({pt2.X}, {pt2.Y})。");
-            //Debug.WriteLine($"Scrcpy相对于：({x}, {y})。");
-
-            return (x, y);
+            return (scPt.x, scPt.y);
         }
 
         /// <summary>
-        /// 获得鼠标在Scrcpy中的坐标，计算最大宽度和高度时需要乘以DPI比例。
+        /// 获得鼠标在SC中的坐标。
         /// </summary>
-        /// <returns>如果鼠标在Scrcpy中，返回鼠标在Scrcpy中的坐标；否则返回null。</returns>
+        /// <returns>返回鼠标在SC中的坐标；如果鼠标不在SC中，或上层有Popup等窗口遮挡则返回null。</returns>
         public Point? GetPointInScrcpy()
         {
-            //判定是否点击在Scrcpy上，如果上层有Popup等窗口遮挡则返回null
-            IntPtr hWndUnderMouse = DLL.WindowFromPoint(System.Windows.Forms.Cursor.Position);
+            IntPtr hWndUnderMouse = DLL.WindowFromPoint(MyGM.GetPosnD());
             if (hWndUnderMouse != ScHandle)
             {
                 //Debug.WriteLine($"点击在非Scrcpy窗口");
@@ -75,8 +65,6 @@ namespace ScrcpyEX.View
             
             if (x > 0 && x < maxW && y > 0 && y < maxH)
             {
-                //Console.WriteLine($"YES，鼠标在Scrcpy中。");
-                //Console.WriteLine($"////////////////////。\n");
                 return new Point(actuclX, actuclY);
             }
             else
