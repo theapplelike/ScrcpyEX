@@ -393,7 +393,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             // H 的值低：抗噪声能力越强，会丢失细节差异，特别是小面积前景颜色差异可能被忽略
             using Mat hist1 = new();
             using Mat hist2 = new();
-            int[] histSize = [45, 16];
+            int[] histSize = [15, 8];
             Rangef[] ranges = [new Rangef(0, 180), new Rangef(0, 256)];
 
             Cv2.CalcHist([hsv1], [0, 1], null, hist1, 2, histSize, ranges);
@@ -428,7 +428,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <returns>返回值在 [0,1] 之间，越大越相似。</returns>
         public static double CalculateHuMoment(string path1, BitmapSource bitmap)
         {
-            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Color);
+            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Grayscale);
             using Mat img2 = ConvertBitmapSourceToMat(bitmap);
 
             return CalculateHuMoment(img1, img2);

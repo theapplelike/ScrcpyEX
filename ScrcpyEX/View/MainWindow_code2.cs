@@ -207,8 +207,8 @@ namespace ScrcpyEX.View
                 return false;
             }
 
-            double hsv = OpenCv.CalculateHsvHist($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
-            if (hsv >= info.Similarity / 100)
+            double rgb = OpenCv.CalculateRgbHist($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
+            if (rgb >= info.Similarity / 100)
             {
                 if (info.IsAdaptive)
                 {
@@ -219,7 +219,7 @@ namespace ScrcpyEX.View
                 _stopwatch.Restart();
                 await ExecuteClickScript(info, ScHandle);
 
-                Debug.WriteLine($"单次对比通过，相似度：{hsv:P2}");
+                Debug.WriteLine($"单次对比通过，相似度：{rgb:P2}");
                 return true;
             }
             else
