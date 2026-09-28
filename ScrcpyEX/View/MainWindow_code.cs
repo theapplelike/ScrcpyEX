@@ -95,7 +95,7 @@ namespace ScrcpyEX.View
             bdRec.Visibility = Visibility.Collapsed;
             dplTip.Visibility = Visibility.Collapsed;
             btnTest.Visibility = Visibility.Collapsed;
-            btnImgShot.Visibility = Visibility.Collapsed;
+            dplImgShot.Visibility = Visibility.Collapsed;
 
             ReadCfg();
             SetTimer();

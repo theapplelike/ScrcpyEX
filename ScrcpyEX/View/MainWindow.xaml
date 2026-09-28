@@ -169,9 +169,12 @@
                                 <TextBlock Text="秒" VerticalAlignment="Center" FontSize="16" Margin="0,0,2,0"/>
                                 <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
                             </DockPanel>
+                            
                             <Button x:Name="btnRecStop" Click="BtnRecStop_Click" Style="{StaticResource ScriptBtn}" Content="&#xe769;" ToolTip="停止脚本/录制"/>
-                            <TextBlock FontSize="20" Width="4" Height="22" Background="SteelBlue"/>
-                            <Button x:Name="btnImgShot" Click="BtnImgShot_Click" Style="{StaticResource ScriptBtn}" Content="&#xf7ed;" ToolTip="截取脚本图像"/>
+                            <DockPanel x:Name="dplImgShot">
+                                <TextBlock FontSize="20" Width="4" Height="22" Background="SteelBlue"/>
+                                <Button x:Name="btnImgShot" Click="BtnImgShot_Click" Style="{StaticResource ScriptBtn}" Content="&#xf7ed;" ToolTip="截取脚本图像"/>
+                            </DockPanel>
                         </DockPanel>
                     </Border>
 

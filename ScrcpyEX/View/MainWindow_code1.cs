@@ -127,7 +127,7 @@ namespace ScrcpyEX.View
                     RemoveScBlack();
                     HideKeyMapping();
                     bdRec.Visibility = Visibility.Visible;
-                    btnImgShot.Visibility = Visibility.Visible;
+                    dplImgShot.Visibility = Visibility.Visible;
                     btnImgCompare.Visibility = Visibility.Collapsed;
                     popMid.Show("开启脚本录制。");
                 }
@@ -150,7 +150,7 @@ namespace ScrcpyEX.View
             MRS_Hook.CancelHook(_cropImg, _cropRect);
             ShowKeyMapping();
             bdRec.Visibility = Visibility.Collapsed;
-            btnImgShot.Visibility = Visibility.Collapsed;
+            dplImgShot.Visibility = Visibility.Collapsed;
             popMid.Show("已停止录制操作。");
         }
 
