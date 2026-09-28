@@ -136,7 +136,7 @@ namespace ScrcpyEX.View
         private async Task TimedScript_Tick(List<ScriptInfo> infos)
         {
             //Debug.WriteLine($"Timed进入新一轮，已产生的间隔：{_vm.Running}。");
-            _vm.CycleNum++;
+            _vm.CurCycleNum++;
             _stopwatch.Restart();
 
             for (int i = 0; i < infos.Count; i++)
@@ -152,10 +152,7 @@ namespace ScrcpyEX.View
         private async Task ImageScript_Tick(List<ScriptInfo> infos)
         {
             // 防止重叠执行
-            if (!await _imageScriptLock.WaitAsync(0))
-            {
-                return;
-            }
+            if (!await _imageScriptLock.WaitAsync(0))return;
 
             try
             {
@@ -167,8 +164,10 @@ namespace ScrcpyEX.View
                     }
                     else
                     {
-                        bool isOk = await ImageCompare(infos[_siSuccess % infos.Count]);
-                        if (isOk)
+                        int index = _siSuccess % infos.Count;
+                        bool isAdd = sg.IsAloneAdd || index == infos.Count - 1;
+
+                        if (await ImageCompare(infos[index], isAdd))
                         {
                             _vm.ScriptInterval = 5000;
                             _siSuccess++;
@@ -197,8 +196,9 @@ namespace ScrcpyEX.View
         /// 使用脚本中的图像和当前Scrcpy的截图进行比对。
         /// </summary>
         /// <param name="info">脚本信息类实例。</param>
+        /// <param name="isAddCount">对比成功后是否增加计数。</param>
         /// <returns>图形对比是否通过。</returns>
-        private async Task<bool> ImageCompare(ScriptInfo info)
+        private async Task<bool> ImageCompare(ScriptInfo info, bool isAddCount = true)
         {
             CroppedBitmap scWindow = await GetScriptImg(ScHandle, _mainHandle, info.CropRect);
             if (scWindow == null)
@@ -207,19 +207,21 @@ namespace ScrcpyEX.View
                 return false;
             }
 
-            double rgb = OpenCv.CalculateRgbHist($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
-            if (rgb >= info.Similarity / 100)
+            double result = OpenCv.CalculateRgbHist($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
+            if (result >= info.Similarity / 100)
             {
                 if (info.IsAdaptive)
                 {
                     _vm.ScriptInterval = _vm.Running * 1000 * 0.9;//每次将上一次间隔的90%作为自适应间隔
                 }
-            
-                _vm.CycleNum++;
-                _stopwatch.Restart();
+                if (isAddCount)
+                {
+                    _vm.CurCycleNum++;
+                    _stopwatch.Restart();
+                }
+               
                 await ExecuteClickScript(info, ScHandle);
-
-                Debug.WriteLine($"单次对比通过，相似度：{rgb:P2}");
+                Debug.WriteLine($"单次对比通过，相似度：{result:P2}");
                 return true;
             }
             else
@@ -271,7 +273,7 @@ namespace ScrcpyEX.View
             }
 
             //如果为有限次循环，检查是否到循环次数
-            if (isCheckExit && info.IsLimited && info.CycleNumber <= _vm.CycleNum)
+            if (isCheckExit && info.IsLimited && info.CycleNumber <= _vm.CurCycleNum)
             {
                 await Dispatcher.BeginInvoke(StopScriptAndRecord);
             }

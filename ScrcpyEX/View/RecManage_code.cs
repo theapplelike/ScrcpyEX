@@ -24,8 +24,7 @@ namespace ScrcpyEX.View
         {
             _vm.ScriptItems = new(MyCfg.Cfg.Scripts);
             gSuboption.Visibility = Visibility.Hidden;
-            stpExeMode.Visibility = Visibility.Collapsed;
-            cmbMultipleScript.Visibility = Visibility.Hidden;
+            stpGrp.Visibility = Visibility.Hidden;
 
             _pointDt.Columns.Add("LastTime", typeof(double));
             _pointDt.Columns.Add("XAxis", typeof(double));

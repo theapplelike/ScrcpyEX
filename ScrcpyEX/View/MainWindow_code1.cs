@@ -46,8 +46,8 @@ namespace ScrcpyEX.View
         /// <returns>返回鼠标在SC中的坐标；如果鼠标不在SC中，或上层有Popup等窗口遮挡则返回null。</returns>
         public Point? GetPointInScrcpy()
         {
-            IntPtr hWndUnderMouse = DLL.WindowFromPoint(MyGM.GetPosnD());
-            if (hWndUnderMouse != ScHandle)
+            IntPtr hWnd = DLL.WindowFromPoint(MyGM.GetPosnD());
+            if (hWnd != ScHandle)
             {
                 //Debug.WriteLine($"点击在非Scrcpy窗口");
                 return null;
@@ -209,7 +209,7 @@ namespace ScrcpyEX.View
 
             //UI和变量初始化
             _vm.Running = 0;
-            _vm.CycleNum = 0;
+            _vm.CurCycleNum = 0;
             _scriptItem = item;
             _scriptInfos = infos;
             _stopwatch = Stopwatch.StartNew();

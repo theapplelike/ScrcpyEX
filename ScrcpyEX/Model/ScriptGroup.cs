@@ -13,7 +13,7 @@ namespace ScrcpyEX.Model
     /// <summary>
     /// 组脚本，包含多个脚本信息。
     /// </summary>
-    internal class ScriptGroup : ScriptItem, ICloneable
+    public class ScriptGroup : ScriptItem, ICloneable
     {
         /// <summary>
         /// 脚本信息列表。
@@ -24,6 +24,11 @@ namespace ScrcpyEX.Model
         /// 组脚本执行时的衔接模式。
         /// </summary>
         public LinkMode LinkMode { get; set; } = LinkMode.InTurn;
+
+        /// <summary>
+        /// true--其中的每个脚本执行后计数加一；false--完整执行所有脚本后计数加一。
+        /// </summary>
+        public bool IsAloneAdd { get; set; } = false;
 
         /// <summary>
         /// 组脚本的默认构造函数。

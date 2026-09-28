@@ -127,7 +127,22 @@ namespace ScrcpyEX.View
             MRS_Hook.CancelHook();
             MDC_Hook.CancelHook();
 
-            if (!Debugger.IsAttached) MyGM.StopAdbServer();
+            _scHost?.Disposed += ClearAdb;
+        }
+
+        /// <summary>
+        /// 最后一个程序实例退出后清理ADB。
+        /// </summary>
+        private void ClearAdb()
+        {
+            if (!Debugger.IsAttached)
+            {
+                Process[] instance = Process.GetProcessesByName("ScrcpyEx");
+                if (instance.Length <= 1)
+                {
+                    MyGM.StopAdbServer();
+                }
+            }
         }
 
         /// <summary>

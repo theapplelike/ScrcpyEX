@@ -9,7 +9,7 @@ namespace ScrcpyEX.MyDefinition
     /// <summary>
     /// 自定义的枚举。
     /// </summary>
-    internal class MyEnum
+    public class MyEnum
     {
         /// <summary>
         /// ADB设备的类型。

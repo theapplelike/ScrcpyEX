@@ -173,17 +173,13 @@ namespace ScrcpyEX.View
             }
         }
 
-        private void BtnHelp_Click(object sender, RoutedEventArgs e)
+        private void BtnGrpSet_Click(object sender, RoutedEventArgs e)
         {
-            string desc = 
-                "执行组脚本时，如果其中第一个是计时脚本，则执行参数以第一个脚本为准。" +
-                "每次执行都会将其中所有脚本的点击操作执行一遍。" +
-                "如果第一个是图像脚本，则其中所有的脚本都需要是图像脚本，且有图像。\n" +
-                "顺序轮流模式下，如果有图像脚本包含（A，B），则会按照A-B-A-B的顺序比较图像相似度，对比成功后执行对应脚本。\n"+
-                "成功继续模式下，如果有图像脚本包含（A，B），则会按照 [A-A...]成功->[B-B...]成功 的顺序执行，只有当前的脚本通过相似度比对后才会继续下一个脚本。";
-            MyGM.ShwInfo(desc);
+            if (_currScript is ScriptGroup group)
+            {
+                GroupMode gm = new(group);
+                gm.ShowDialog();
+            }
         }
-
-
     }
 }

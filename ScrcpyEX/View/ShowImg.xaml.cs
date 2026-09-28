@@ -137,14 +137,14 @@ namespace ScrcpyEX.View
         /// <param name="bmp">临时截取的图片。</param>
         private void ShowSimilarity(int row, string ImgName, BitmapSource bmp)
         {
-            double hsv = OpenCv.CalculateHsvHist($@"{MV.ScriptPath}\{ImgName}", bmp);
+            double result = OpenCv.CalculateHsvHist($@"{MV.ScriptPath}\{ImgName}", bmp);
 
             TextBlock tbk = new()
             {
                 Margin = new Thickness(10),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Text = $"相似程度：\n{hsv:P8}",
+                Text = $"相似程度：\n{result:P8}",
                 Background = Brushes.WhiteSmoke,
             };
             Grid.SetRow(tbk, row);

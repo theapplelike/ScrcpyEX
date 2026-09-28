@@ -31,9 +31,9 @@ namespace ScrcpyEX.ViewModel
         private string _scaling = "未进行投屏";
 
         /// <summary>
-        /// 脚本的循环次数。
+        /// 当前脚本已经循环的次数。
         /// </summary>
-        public int CycleNum
+        public int CurCycleNum
         {
             get => _cycleNum;
             set => SetProperty(ref _cycleNum, value);

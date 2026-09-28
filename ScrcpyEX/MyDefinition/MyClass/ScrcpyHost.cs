@@ -54,6 +54,11 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         public IntPtr ScHandle { get; set; } = IntPtr.Zero;
 
+        /// <summary>
+        /// Scrcpy完全退出且相关资源全部释放后触发。
+        /// </summary>
+        public Action Disposed;
+
         public ScrcpyHost()
         {
             SetProcess();
@@ -267,6 +272,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             _prc.Dispose();
             _hwndHost.Dispose();
             Debug.WriteLine($"ScHost：所有资源清理完毕。");
+            Disposed?.Invoke();
         }
 
         /// <summary>

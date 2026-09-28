@@ -24,12 +24,17 @@
             <Setter Property="Height" Value="30"/>
             <Setter Property="Width" Value="40"/>
         </Style>
-        <Style x:Key="Btn" TargetType="{x:Type Button}" BasedOn="{StaticResource MenuBtn}">
+        <Style x:Key="thisBtn" TargetType="{x:Type Button}" BasedOn="{StaticResource MenuBtn}">
             <Setter Property="FontFamily" Value="幼圆"/>
             <Setter Property="FontSize" Value="15"/>
             <Setter Property="Width" Value="80"/>
             <Setter Property="Background" Value="LightSteelBlue"/>
             <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style x:Key="iconBtn" TargetType="{x:Type Button}" BasedOn="{StaticResource MenuBtn}">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Background" Value="LightSteelBlue"/>
         </Style>
         <Style TargetType="{x:Type ListBoxItem}">
             <Setter Property="Focusable" Value="False"/>
@@ -129,17 +134,13 @@
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel x:Name="stpExeMode" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
-                    <TextBlock Text="执行模式"/>
-                    <RadioButton x:Name="rdoInTurn" Content="顺序轮流" GroupName="mode" Margin="5,0"/>
-                    <RadioButton x:Name="rdoKeepOn" Content="成功继续" GroupName="mode" Margin="0,0,5,0"/>
-                    <Button x:Name="btnHelp" Click="BtnHelp_Click" Content="&#xe9ce;" Style="{StaticResource MenuBtn}" Width="32"/>
-                </StackPanel>
-
                 <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
                     <TextBlock Text="详细信息" />
                     <!--显示组脚本中的脚本列表-->
-                    <ComboBox x:Name="cmbMultipleScript" SelectionChanged="CmbMultipleScript_SelectionChanged" Margin="5,2" Width="140"/>
+                    <StackPanel x:Name="stpGrp" Orientation="Horizontal">
+                        <ComboBox x:Name="cmbMultipleScript" SelectionChanged="CmbMultipleScript_SelectionChanged" Margin="5,2" Width="140"/>
+                        <Button x:Name="btnGrpSet" Click="BtnGrpSet_Click" Content="&#xf168;" Style="{StaticResource iconBtn}" ToolTip="组脚本设置"/>
+                    </StackPanel>
                 </StackPanel>
 
                 <DataGrid x:Name="dgPoint" Grid.Row="2" AutoGenerateColumns="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionUnit="Cell">
@@ -189,7 +190,7 @@
                         <Grid Width="40" Margin="5,0" Background="Gainsboro">
                             <Image x:Name="img" MouseLeftButtonDown="Img_MouseLeftButtonDown"/>
                         </Grid>
-                        <Button x:Name="btnScreenshot" Click="BtnScreenshot_Click" Content="截图" Style="{StaticResource Btn}" Width="60"/>
+                        <Button x:Name="btnScreenshot" Click="BtnScreenshot_Click" Content="截图" Style="{StaticResource thisBtn}" Width="60"/>
                     </StackPanel>
 
                     <Grid x:Name="gSuboption" Grid.Row="5" Grid.Column="1" Margin="18,0,0,0">
@@ -212,8 +213,8 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Button x:Name="btnFouce" Width="10" Height="10"/>
-                    <Button x:Name="btnSave" Click="BtnSave_Click" Content="保存" Style="{StaticResource Btn}"/>
-                    <Button x:Name="btnExit" Click="BtnExit_Click" Content="关闭" Style="{StaticResource Btn}" Grid.Column="1"/>
+                    <Button x:Name="btnSave" Click="BtnSave_Click" Content="保存" Style="{StaticResource thisBtn}"/>
+                    <Button x:Name="btnExit" Click="BtnExit_Click" Content="关闭" Style="{StaticResource thisBtn}" Grid.Column="1"/>
                 </Grid>
             </Grid>
         
