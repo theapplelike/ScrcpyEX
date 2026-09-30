@@ -476,11 +476,44 @@ namespace ScrcpyEX.MyDefinition.MyClass
         }
 
         /// <summary>
-        /// 尺度不变特征变换，是局部特征检测，在图像被旋转、缩放、平移时有很好的识别率，部分被遮挡有较好的识别率。
-        /// 但是完全不认颜色，计算时彩图会转化为灰度图，对模糊和光滑表面失效，计算量大速度慢。
+        /// 使用 SIFT 对比图像相似度，和ORB相比准确度高但速度慢。
         /// </summary>
         /// <param name="path1">第一张图片的路径。</param>
         /// <param name="path2">第二张图片的路径。</param>
+        /// <param name="ratioThreshold">Lowe's 比率测试阈值。</param>
+        /// <returns>返回值在 [0,1] 之间，越大越相似。</returns>
+        public static double CalculateSIFT(string path1, string path2, double ratioThreshold = 0.85)
+        {
+            Stopwatch st = Stopwatch.StartNew();
+            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Grayscale);
+            using Mat img2 = Cv2.ImRead(path2, ImreadModes.Grayscale);
+            double similarity = CalculateSIFT(img1, img2, ratioThreshold);
+
+            Debug.WriteLine($"SIFT耗时：{st.ElapsedMilliseconds}ms");
+            return similarity;
+        }
+
+        /// <summary>
+        /// 使用 SIFT 对比图像相似度，和ORB相比准确度高但速度慢。
+        /// </summary>
+        /// <param name="path1">第一张图片的路径。</param>
+        /// <param name="bitmap">第二张图片。</param>
+        /// <param name="ratioThreshold">Lowe's 比率测试阈值。</param>
+        /// <returns>返回值在 [0,1] 之间，越大越相似。</returns>
+        public static double CalculateSIFT(string path1, BitmapSource bitmap, double ratioThreshold = 0.85)
+        {
+            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Grayscale);
+            using Mat img2 = ConvertBitmapSourceToMat(bitmap);
+
+            return CalculateSIFT(img1, img2, ratioThreshold);
+        }
+
+        /// <summary>
+        /// 尺度不变特征变换，是局部特征检测，在图像被旋转、缩放、平移时有很好的识别率，部分被遮挡有较好的识别率。
+        /// 但是完全不认颜色，计算时彩图会转化为灰度图，对模糊和光滑表面失效，计算量大速度慢。
+        /// </summary>
+        /// <param name="img1">OpenCv的Mat类型。</param>
+        /// <param name="img2">OpenCv的Mat类型。</param>
         /// <param name="ratioThreshold">Lowe's 比率测试阈值。</param>
         /// <returns>
         /// <para>&gt; 0.90：高度相似，原图级别的旋转、平移，或特征能匹配上的缩放。</para>
@@ -488,45 +521,54 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <para>0.65 ~ 0.80：局部相似，整体不相似，能召回的特征点大幅下降。</para>
         /// <para>&lt; 0.65：大幅度的拉伸、缩放等导致特征匹配度低，或完全不相似。</para>
         /// </returns>
-        public static double CalculateSIFT(string path1, string path2, double ratioThreshold = 0.85)
+        public static double CalculateSIFT(Mat img1, Mat img2, double ratioThreshold = 0.85)
+        {
+            using Mat use1 = EnsureMinimumDimension(img1);
+            using Mat use2 = EnsureMinimumDimension(img2);
+            using SIFT sift = SIFT.Create();
+            
+            return CalculateFeatureMatchInternal(use1, use2, sift, NormTypes.L2, "SIFT", ratioThreshold);
+        }
+
+        /// <summary>
+        /// 使用 ORB 对比图像相似度，和SIFT相比准确度低但速度更快。
+        /// </summary>
+        /// <param name="path1">第一张图片的路径。</param>
+        /// <param name="path2">第二张图片的路径。</param>
+        /// <param name="ratioThreshold">Lowe's 比率测试阈值。</param>
+        /// <returns>返回值在 [0,1] 之间，越大越相似。</returns>
+        public static double CalculateORB(string path1, string path2, double ratioThreshold = 0.85)
         {
             Stopwatch st = Stopwatch.StartNew();
             using Mat img1 = Cv2.ImRead(path1, ImreadModes.Grayscale);
             using Mat img2 = Cv2.ImRead(path2, ImreadModes.Grayscale);
+            double similarity = CalculateORB(img1, img2, ratioThreshold);
 
-            // 对小尺寸图像进行【双三次插值放大】 (解决 10% 缩放、极小微缩导致特征点丢失的问题)
-            using Mat use1 = new();
-            using Mat use2 = new();
-            int minDim = 80; // 强制目标最小边长为 80 像素
+            Debug.WriteLine($"ORB耗时：{st.ElapsedMilliseconds}ms");
+            return similarity;
+        }
 
-            double scaleX1 = (img1.Width < minDim) ? (double)minDim / img1.Width : 1.0;
-            double scaleY1 = (img1.Height < minDim) ? (double)minDim / img1.Height : 1.0;
-            double scaleX2 = (img2.Width < minDim) ? (double)minDim / img2.Width : 1.0;
-            double scaleY2 = (img2.Height < minDim) ? (double)minDim / img2.Height : 1.0;
+        /// <summary>
+        /// 使用 ORB 对比图像相似度，和SIFT相比准确度低但速度更快。
+        /// </summary>
+        /// <param name="path1">第一张图片的路径。</param>
+        /// <param name="bitmap">第一张图片。</param>
+        /// <param name="ratioThreshold">Lowe's 比率测试阈值。</param>
+        /// <returns>返回值在 [0,1] 之间，越大越相似。</returns>
+        public static double CalculateORB(string path1, BitmapSource bitmap, double ratioThreshold = 0.85)
+        {
+            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Grayscale);
+            using Mat img2 = ConvertBitmapSourceToMat(bitmap);
 
-            if (scaleX1 != 1.0 || scaleY1 != 1.0)
-                Cv2.Resize(img1, use1, new Size((int)(img1.Width * scaleX1), (int)(img1.Height * scaleY1)), 0, 0, InterpolationFlags.Cubic);
-            else
-                img1.CopyTo(use1);
-
-            if (scaleX2 != 1.0 || scaleY2 != 1.0)
-                Cv2.Resize(img2, use2, new Size((int)(img2.Width * scaleX2), (int)(img2.Height * scaleY2)), 0, 0, InterpolationFlags.Cubic);
-            else
-                img2.CopyTo(use2);
-
-            using SIFT sift = SIFT.Create();
-            double result = CalculateFeatureMatchInternal(use1, use2, sift, NormTypes.L2, "SIFT", ratioThreshold);
-            Debug.WriteLine($"SIFT耗时：{st.ElapsedMilliseconds}ms");
-            return result;
-            //return CalculateFeatureMatchInternal(img1, img2, sift, NormTypes.L2, "SIFT", ratioThreshold);
+            return CalculateORB(img1, img2, ratioThreshold);
         }
 
         /// <summary>
         /// ORB（Oriented FAST and Rotated BRIEF），各项性能和SIFT相似，在降低了准确度的同时提升了速度。
         /// 限定了图形最小边为80像素，在极小缩放时可以比SIFT有更好的表现，平移时表现差距略大。
         /// </summary>
-        /// <param name="path1">第一张图片的路径。</param>
-        /// <param name="path2">第二张图片的路径。</param>
+        /// <param name="img1">OpenCv的Mat类型。</param>
+        /// <param name="img2">OpenCv的Mat类型。</param>
         /// <param name="ratioThreshold">Lowe's 比率测试阈值。</param>
         /// <returns>
         /// <para>&gt; 0.85：高度相似，原图级别的旋转、平移，或特征能匹配上的缩放。</para>
@@ -534,31 +576,10 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// <para>0.60 ~ 0.70：局部相似，能召回的特征点大幅下降，但仍可通过。</para>
         /// <para>&lt; 0.60：边缘状态、弱匹配，图形发生较大的形变或内点过少。</para>
         /// </returns>
-        public static double CalculateORB(string path1, string path2, double ratioThreshold = 0.75)
+        public static double CalculateORB(Mat img1, Mat img2, double ratioThreshold = 0.85)
         {
-            Stopwatch st = Stopwatch.StartNew();
-            using Mat img1 = Cv2.ImRead(path1, ImreadModes.Grayscale);
-            using Mat img2 = Cv2.ImRead(path2, ImreadModes.Grayscale);
-
-            // 对小尺寸图像进行【双三次插值放大】 (解决 10% 缩放、极小微缩导致特征点丢失的问题)
-            using Mat use1 = new();
-            using Mat use2 = new();
-            int minDim = 80; // 强制目标最小边长为 80 像素
-            
-            double scaleX1 = (img1.Width < minDim) ? (double)minDim / img1.Width : 1.0;
-            double scaleY1 = (img1.Height < minDim) ? (double)minDim / img1.Height : 1.0;
-            double scaleX2 = (img2.Width < minDim) ? (double)minDim / img2.Width : 1.0;
-            double scaleY2 = (img2.Height < minDim) ? (double)minDim / img2.Height : 1.0;
-            
-            if (scaleX1 != 1.0 || scaleY1 != 1.0)
-                Cv2.Resize(img1, use1, new Size((int)(img1.Width * scaleX1), (int)(img1.Height * scaleY1)), 0, 0, InterpolationFlags.Cubic);
-            else
-                img1.CopyTo(use1);
-            
-            if (scaleX2 != 1.0 || scaleY2 != 1.0)
-                Cv2.Resize(img2, use2, new Size((int)(img2.Width * scaleX2), (int)(img2.Height * scaleY2)), 0, 0, InterpolationFlags.Cubic);
-            else
-                img2.CopyTo(use2);
+            using Mat use1 = EnsureMinimumDimension(img1);
+            using Mat use2 = EnsureMinimumDimension(img2);
 
             // 使用两张图的等效边长计算特殊点数量 
             double areaSqrt1 = Math.Sqrt(img1.Width * img1.Height);
@@ -566,12 +587,34 @@ namespace ScrcpyEX.MyDefinition.MyClass
             double minArea = Math.Min(areaSqrt1, areaSqrt2);
             double maxArea = Math.Max(areaSqrt1, areaSqrt2);
             int targetFeatures = (int)Math.Min(2000, Math.Max(300, maxArea + minArea));
-
             using ORB orb = ORB.Create(nFeatures: targetFeatures, edgeThreshold: 15);
-            double result = CalculateFeatureMatchInternal(use1, use2, orb, NormTypes.Hamming, "ORB", ratioThreshold, 2.0);
-            Debug.WriteLine($"ORB耗时：{st.ElapsedMilliseconds}ms");
-            return result;
-            //return CalculateFeatureMatchInternal(processedImg1, processedImg2, orb, NormTypes.Hamming, "ORB", ratioThreshold, 2.0);
+
+            return CalculateFeatureMatchInternal(use1, use2, orb, NormTypes.Hamming, "ORB", ratioThreshold, 2.0);
+        }
+
+        /// <summary>
+        /// 确保图像的最小边长不小于指定像素。如果小于，则进行双三次插值放大。解决 10% 缩放、极小微缩导致特征点丢失的问题。
+        /// </summary>
+        /// <param name="src">原始图像。</param>
+        /// <param name="minDim">允许的最小边长，默认 80 像素。</param>
+        /// <returns>返回处理后的新 Mat（调用方需负责 Dispose）。</returns>
+        private static Mat EnsureMinimumDimension(Mat src, int minDim = 80)
+        {
+            double scaleX = (src.Width < minDim) ? (double)minDim / src.Width : 1.0;
+            double scaleY = (src.Height < minDim) ? (double)minDim / src.Height : 1.0;
+
+            if (scaleX != 1.0 || scaleY != 1.0)
+            {
+                Mat resized = new();
+                Size size = new(src.Width * scaleX, src.Height * scaleY);
+                Cv2.Resize(src, resized, size, 0, 0, InterpolationFlags.Cubic);
+
+                return resized;
+            }
+            else
+            {
+                return src.Clone();// 返回克隆，避免调用方意外修改原图
+            }
         }
 
         /// <summary>

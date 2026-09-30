@@ -163,7 +163,7 @@
                             <Button x:Name="btnImgCompare" Click="BtnImgCompare_Click" Style="{StaticResource ScriptBtn}" Content="&#xf58c;" ToolTip="查看脚本比对图像"/>
                             <DockPanel x:Name="dplTip" Height="22">
                                 <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
-                                <TextBlock Text="{Binding CycleNum}" VerticalAlignment="Center" FontSize="16" Margin="2,0,0,0"/>
+                                <TextBlock Text="{Binding CurCycleNum}" VerticalAlignment="Center" FontSize="16" Margin="2,0,0,0"/>
                                 <TextBlock Text="次⊱⊰" VerticalAlignment="Center" FontSize="16"/>
                                 <TextBlock Text="{Binding Running}" VerticalAlignment="Center" FontSize="16"/>
                                 <TextBlock Text="秒" VerticalAlignment="Center" FontSize="16" Margin="0,0,2,0"/>
