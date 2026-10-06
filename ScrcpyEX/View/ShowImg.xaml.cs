@@ -46,7 +46,7 @@ namespace ScrcpyEX.View
         /// </summary>
         /// <param name="infos">一组脚本信息。</param>
         /// <param name="bmps">和组脚本对应的临时截图。</param>
-        public ShowImg(List<ScriptInfo> infos, List<BitmapSource> bmps)
+        public ShowImg(List<ScriptInfo> infos, List<BitmapSource> bmps, List<string> debug)
         {
             InitializeComponent();
 
@@ -70,6 +70,13 @@ namespace ScrcpyEX.View
 
                 DrawLine(i);
                 i++;
+            }
+            foreach (string de in debug)
+            {
+                rtb.AppendText($"{de}\r\n");
+
+                //Paragraph paragraph = new(new Run(de));
+                //rtb.Document.Blocks.Add(paragraph);
             }
         }
 
@@ -137,19 +144,32 @@ namespace ScrcpyEX.View
         /// <param name="bmp">临时截取的图片。</param>
         private void ShowSimilarity(int row, string ImgName, BitmapSource bmp)
         {
-            double result = OpenCv.CalculateHsvHist($@"{MV.ScriptPath}\{ImgName}", bmp);
+            double rgb = OpenCv.CalculateRgbHist($@"{MV.ScriptPath}\{ImgName}", bmp);
+            double hsv = OpenCv.CalculateHsvHist($@"{MV.ScriptPath}\{ImgName}", bmp);
+            double huM = OpenCv.CalculateHuMoment($@"{MV.ScriptPath}\{ImgName}", bmp);
+            double orb = OpenCv.CalculateORB($@"{MV.ScriptPath}\{ImgName}", bmp);
+            double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{ImgName}", bmp);
+            double sift = OpenCv.CalculateSIFT($@"{MV.ScriptPath}\{ImgName}", bmp);
 
-            TextBlock tbk = new()
-            {
-                Margin = new Thickness(10),
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Text = $"相似程度：\n{result:P8}",
-                Background = Brushes.WhiteSmoke,
-            };
-            Grid.SetRow(tbk, row);
-            Grid.SetColumnSpan(tbk, 3);
-            gMain.Children.Add(tbk);
+            TextBlock rgbTbk = MakeTbk($"RGB直方图:\n{rgb:P4}");
+            TextBlock hsvTbk = MakeTbk($"HSV直方图:\n{hsv:P4}");
+            TextBlock huMTbk = MakeTbk($"Hu矩:\n{huM:P4}");
+            TextBlock orbTbk = MakeTbk($"ORB:\n{orb:P4}");
+            TextBlock siftTbk = MakeTbk($"SIFT:\n{sift:P4}");
+            TextBlock ssimTbk = MakeTbk($"SSIM:\n{ssim:P4}");
+
+            StackPanel stp = new();
+            stp.Children.Add(rgbTbk);
+            stp.Children.Add(hsvTbk);
+            stp.Children.Add(huMTbk);
+            stp.Children.Add(orbTbk);
+            stp.Children.Add(siftTbk);
+            stp.Children.Add(ssimTbk);
+
+            Grid.SetRow(stp, row);
+            Grid.SetColumn(stp, 1);
+            Grid.SetColumnSpan(stp, 1);
+            gMain.Children.Add(stp);
         }
 
         /// <summary>
@@ -167,6 +187,28 @@ namespace ScrcpyEX.View
             gMain.Children.Add(rect);
         }
 
+        /// <summary>
+        /// 创建携带样式的TextBlock。
+        /// </summary>
+        /// <param name="text">要显示的文字内容。</param>
+        /// <returns>携带样式的TextBlock。</returns>
+        private TextBlock MakeTbk(string text) => new()
+        {
+            Text = text,
+            Style = (Style)FindResource("tbk")
+        };
 
+        private void Btn_Click(object sender, RoutedEventArgs e)
+        {
+            //if (rtb.Visibility == Visibility.Collapsed)
+            //{
+            //    rtb.Visibility = Visibility.Visible;
+            //}
+            //else
+            //{
+            //    rtb.Visibility = Visibility.Collapsed;
+            //}
+            popDebug.IsOpen = true;
+        }
     }
 }

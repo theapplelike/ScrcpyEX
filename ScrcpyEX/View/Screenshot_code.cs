@@ -1,8 +1,8 @@
 ﻿using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.MyDefinition;
+using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.IO;
@@ -54,21 +54,26 @@ namespace ScrcpyEX.View
         /// </summary>
         private void OnRendering(object sender, EventArgs e)
         {
-            if (!popTool.IsOpen)
+            if (popTool.IsOpen)
             {
-                System.Windows.Point mousePos = Mouse.GetPosition(this);
+                if (popMagnifier.IsOpen) { popMagnifier.IsOpen = false; }
+                return;
+            }
 
-                if (mousePos.X >= 0 && mousePos.X <= ActualWidth &&
-                    mousePos.Y >= 0 && mousePos.Y <= ActualHeight)
-                {
-                    // 鼠标在窗口内，打开放大镜（如果已关闭则重新打开）
-                    if (!popMagnifier.IsOpen) { popMagnifier.IsOpen = true; }
-                    UpdateMagnifier(mousePos);
-                }
-                else
-                {
-                    if (popMagnifier.IsOpen) { popMagnifier.IsOpen = false; }
-                }
+            // 通过【当前坐标-窗口左上角转换到屏幕坐标】算鼠标相对于窗口的坐标
+            DLL.GetCursorPos(out DLL.POINT pt);
+            Point windowTopLeft = PointToScreen(new(0, 0));
+
+            //换算为逻辑坐标
+            double relX = (pt.X - windowTopLeft.X) / DpiScaleX;
+            double relY = (pt.Y - windowTopLeft.Y) / DpiScaleY;
+
+            if (relX >= 0 && relX <= ActualWidth &&
+                relY >= 0 && relY <= ActualHeight)
+            {
+                // 鼠标在窗口内，打开放大镜（如果已关闭则重新打开）
+                if (!popMagnifier.IsOpen) { popMagnifier.IsOpen = true; }
+                UpdateMagnifier(new Point(relX, relY));
             }
             else
             {

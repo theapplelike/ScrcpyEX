@@ -207,7 +207,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
         /// </summary>
         private void Prc_Exited(object sender, EventArgs e)
         {
-            //_prc.Exited -= Prc_Exited;
+            _prc.Exited -= Prc_Exited;
             _prc.CancelOutputRead();
             _prc.CancelErrorRead();
             _job?.Dispose();

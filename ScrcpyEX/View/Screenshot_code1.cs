@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScrcpyEX.MyDefinition.WindowsAPI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,11 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using System.Windows.Media;
-using ScrcpyEX.MyDefinition;
-using System.Windows.Forms;
-using System.Diagnostics;
 
 namespace ScrcpyEX.View
 {
@@ -64,7 +61,7 @@ namespace ScrcpyEX.View
             rct.Height = ht;
 
             tbk.Margin = new Thickness(x, y - 20, 0, 0);
-            tbk.Text = $"{wd}×{ht}";
+            tbk.Text = $"{wd:0.##}×{ht:0.##}";
 
             UpdateMask();
         }
@@ -98,8 +95,9 @@ namespace ScrcpyEX.View
         {
             _endPoint = endPoint;
 
-            popTool.HorizontalOffset = endPoint.X + 10;
-            popTool.VerticalOffset = GetY(endPoint);
+            DLL.GetCursorPos(out DLL.POINT pt);
+            popTool.HorizontalOffset = pt.X /DpiScaleX + 10;
+            popTool.VerticalOffset = pt.Y /DpiScaleY;
             popTool.IsOpen = true;
         }
 
@@ -109,40 +107,40 @@ namespace ScrcpyEX.View
         /// 出来鼠标在屏幕垂直一半的位置上，所有副屏上菜单始终向上靠拢。
         /// </summary>
         /// <param name="endPoint">截图结束时的坐标点。</param>
-        private double GetY(Point endPoint)
-        {
-            if (endPoint.X < SystemParameters.PrimaryScreenWidth)
-            {
-                if (endPoint.Y + stp.ActualHeight > SystemParameters.PrimaryScreenHeight)
-                {
-                    return endPoint.Y - stp.ActualHeight;
-                }
-                else
-                {
-                    return endPoint.Y;
-                }
-            }
-            else
-            {
-                if (_startPoint.Y > stp.ActualWidth)
-                {
-                    return _startPoint.Y - stp.ActualHeight;
-                }
-                else if (_startPoint.Y < stp.ActualWidth && rct.ActualHeight > stp.ActualWidth * 2)
-                {
-                    return endPoint.Y - stp.ActualHeight;
-                }
-                else
-                {
-                    return endPoint.Y;
-                }
-            }
-        }
+        //private double GetY(Point endPoint)
+        //{
+        //    if (endPoint.X < SystemParameters.PrimaryScreenWidth)
+        //    {
+        //        if (endPoint.Y + stp.ActualHeight > SystemParameters.PrimaryScreenHeight)
+        //        {
+        //            return endPoint.Y - stp.ActualHeight;
+        //        }
+        //        else
+        //        {
+        //            return endPoint.Y;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (_startPoint.Y > stp.ActualWidth)
+        //        {
+        //            return _startPoint.Y - stp.ActualHeight;
+        //        }
+        //        else if (_startPoint.Y < stp.ActualWidth && rct.ActualHeight > stp.ActualWidth * 2)
+        //        {
+        //            return endPoint.Y - stp.ActualHeight;
+        //        }
+        //        else
+        //        {
+        //            return endPoint.Y;
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// 更新放大镜内容和位置。放大比例为：放大镜控件宽/放大区域直径，不计算DPI系数。
         /// </summary>
-        /// <param name="curPoint">鼠标的当前位置。</param>
+        /// <param name="curPoint">鼠标的当前位置，逻辑坐标。</param>
         private void UpdateMagnifier(Point curPoint)
         {
             // 以鼠标为中心计算请求的源矩形
@@ -179,8 +177,8 @@ namespace ScrcpyEX.View
                 _magnifierBitmap.WritePixels(destRect, srcPixels, stride, 0);
             }
 
-            //Popup控件的偏移和DPI相关，所以给出的原始值要与DPI无关
-            (double left, double top) = GetLocation(PointToScreen(curPoint), 15);
+            //Popup控件的偏移是逻辑像素
+            (double left, double top) = GetLocation(curPoint, 20);
             popMagnifier.HorizontalOffset = left / DpiScaleX;
             popMagnifier.VerticalOffset = top / DpiScaleY;
         }
@@ -205,29 +203,29 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 获得放大镜的位置，会确保放大镜始终在可视范围内。
         /// </summary>
-        /// <param name="curPoint">鼠标的当前位置。</param>
+        /// <param name="relativePt">鼠标相对于程序左上角的坐标。</param>
         /// <param name="r">放大镜和鼠标的距离。</param>
-        /// <returns>返回左和上的位置。</returns>
-        private (double, double) GetLocation(Point curPoint, double r)
+        /// <returns>返回左和上的位置，物理坐标。</returns>
+        private (double, double) GetLocation(Point relativePt, double r)
         {
             double left, top;
-            System.Drawing.Rectangle rect = Screen.FromPoint(MyGM.GetPosnD()).WorkingArea;
+            Point absolutePt = PointToScreen(relativePt);
 
-            if (curPoint.X + r + gMagnifier.Width > rect.Width)
+            if (relativePt.X > ActualWidth / 2)
             {
-                left = curPoint.X - r - gMagnifier.Width;
+                left = absolutePt.X - r * 2 - gMagnifier.Width;
             }
             else
             {
-                left = curPoint.X + r;
+                left = absolutePt.X + r;
             }
-            if (curPoint.Y + r + gMagnifier.Height > rect.Height)
+            if (relativePt.Y > ActualHeight / 2)
             {
-                top = curPoint.Y - r - gMagnifier.Height;
+                top = absolutePt.Y - r * 2 - gMagnifier.Height;
             }
             else
             {
-                top = curPoint.Y + r;
+                top = absolutePt.Y + r;
             }
 
             return (left, top);

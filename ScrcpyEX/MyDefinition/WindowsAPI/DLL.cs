@@ -33,8 +33,8 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         [StructLayout(LayoutKind.Sequential)]
         public struct POINT
         {
-            public int x;
-            public int y;
+            public int X;
+            public int Y;
         }
 
         /// <summary>

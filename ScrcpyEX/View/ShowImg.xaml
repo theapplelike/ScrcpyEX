@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ScrcpyEX.View"
         mc:Ignorable="d"
-        Title="图片详情" Width="800" Height="450" WindowStartupLocation="CenterScreen">
+        Title="图片详情" Width="860" Height="550" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <Style x:Key="sepH" TargetType="Rectangle">
@@ -19,14 +19,26 @@
             <Setter Property="Width" Value="2"/>
             <Setter Property="Margin" Value="2"/>
         </Style>
+        <Style x:Key="tbk" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,10,0,0"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Background" Value="WhiteSmoke"/>
+        </Style>
+        
     </Window.Resources>
     
     <Grid x:Name="gMain" Background="WhiteSmoke">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="70"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+
+        <Popup x:Name="popDebug" Width="450" Height="500" Placement="Center">
+            <RichTextBox x:Name="rtb" IsReadOnly="True"/>
+        </Popup>
         
         <Grid x:Name="gOrig">
             <Grid.RowDefinitions>
@@ -39,6 +51,7 @@
         </Grid>
 
         <Rectangle x:Name="sepV" Grid.Column="1" Grid.RowSpan="10" Style="{StaticResource sepV}"/>
+        <Button x:Name="btn" Click="Btn_Click" Width="10" Height="10" Grid.Column="1" VerticalAlignment="Bottom"/>
 
     </Grid>
 </Window>

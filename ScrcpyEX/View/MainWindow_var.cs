@@ -147,6 +147,11 @@ namespace ScrcpyEX.View
         private System.Windows.Rect _cropRect = new();
 
         /// <summary>
+        /// 脚本的调试信息。
+        /// </summary>
+        private readonly List<string> _debug = [];
+
+        /// <summary>
         /// 窗口除开SC的额外宽度，单位为逻辑像素，与屏幕DPI无关。不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
         /// </summary>
         private double ExtraWidth

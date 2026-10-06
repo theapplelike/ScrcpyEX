@@ -28,7 +28,7 @@ namespace ScrcpyEX.Model
         /// <summary>
         /// true--其中的每个脚本执行后计数加一；false--完整执行所有脚本后计数加一。
         /// </summary>
-        public bool IsAloneAdd { get; set; } = false;
+        public bool IsAloneAdd { get; set; } = true;
 
         /// <summary>
         /// 组脚本的默认构造函数。

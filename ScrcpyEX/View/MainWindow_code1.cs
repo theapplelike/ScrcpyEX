@@ -37,7 +37,7 @@ namespace ScrcpyEX.View
             DLL.GetCursorPos(out DLL.POINT scPt);
             DLL.ScreenToClient(ScHandle, ref scPt);
 
-            return (scPt.x, scPt.y);
+            return (scPt.X, scPt.Y);
         }
 
         /// <summary>

@@ -400,6 +400,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
 
             // 计算相关度
             return Cv2.CompareHist(hist1, hist2, HistCompMethods.Correl);
+
+            //double distance = Cv2.CompareHist(hist1, hist2, HistCompMethods.Bhattacharyya);
+            //return 1.0 - distance;
         }
 
         /// <summary>
@@ -640,9 +643,13 @@ namespace ScrcpyEX.MyDefinition.MyClass
             feature.DetectAndCompute(img1, null, out KeyPoint[] keypoints1, descriptors1);
             feature.DetectAndCompute(img2, null, out KeyPoint[] keypoints2, descriptors2);
 
-            if (descriptors1.Rows == 0 || descriptors2.Rows == 0)
+            // 计算自适应最小特征点数：大图需要更多特征点支撑几何计算，小图可以放宽要求
+            // 但无论如何，至少需要 8 个（保证 RANSAC 有足够的采样冗余）
+            int minRequired = Math.Max(8, (int)(Math.Min(img1.Width, img1.Height) / 20.0));
+
+            if (keypoints1.Length < minRequired || keypoints2.Length < minRequired)
             {
-                Debug.WriteLine($"{methodName}: 特征点不足 (图1: {descriptors1.Rows}, 图2: {descriptors2.Rows})");
+                Debug.WriteLine($"{methodName}：特征点不足(图1:{keypoints1.Length}，图2:{keypoints2.Length}，要求≥{minRequired})");
                 return 0;
             }
 
@@ -660,19 +667,26 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 }
             }
 
-            if (goodMatches.Count == 0) return 0;
+
+            // 最少不低于 8 个，且要求匹配点数至少达到图 1 特征点总数的 2%（防止在大图上因零星噪声误匹配）
+            int minRequiredMatches = Math.Max(8, (int)(keypoints1.Length * 0.02));
+            if (goodMatches.Count < minRequiredMatches)
+            {
+                Debug.WriteLine($"{methodName}：优质匹配点不足(当前:{goodMatches.Count}，要求:{minRequiredMatches})，无法进行可靠的几何验证");
+                return 0;
+            }
 
             // 3. 提取匹配点对坐标
             Point2f[] srcPoints = [.. goodMatches.Select(m => keypoints1[m.QueryIdx].Pt)];
             Point2f[] dstPoints = [.. goodMatches.Select(m => keypoints2[m.TrainIdx].Pt)];
 
-            if (srcPoints.Length < 4)
-            {
-                // 匹配点极度不足，说明物理位置相关性极低，给一个很低的分数即可
-                double backupScore = Math.Min(1.0, goodMatches.Count / 50.0);
-                Debug.WriteLine($"{methodName}: 回退得分 {backupScore} (匹配点小于4个，无法单应性计算。匹配点:{goodMatches.Count})");
-                return backupScore;
-            }
+            //if (srcPoints.Length < 4)
+            //{
+            //    // 匹配点极度不足，说明物理位置相关性极低，给一个很低的分数即可
+            //    //double backupScore = Math.Min(1.0, goodMatches.Count / 50.0);
+            //    Debug.WriteLine($"{methodName}: 匹配点仅{goodMatches.Count}个，无法单应性计算");
+            //    return 0;
+            //}
 
             // 4. 计算单应性矩阵并利用 RANSAC 获取内点
             using Mat mask = new();
@@ -689,12 +703,13 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 }
             }
 
-            // 如果 RANSAC 没找到内点，回退
-            if (inliersMatches.Count < 4)
+            // 内点数下限至少 8 个，大图内点数占优质匹配数的比例至少 25%
+            int minRequiredInliers = Math.Max(8, (int)(goodMatches.Count * 0.25));
+            if (inliersMatches.Count < minRequiredInliers)
             {
-                double backupScore = Math.Min(1.0, goodMatches.Count / 50.0);
-                Debug.WriteLine($"{methodName}: 回退得分 {backupScore} (内点不足，内点：{inliersMatches.Count}，原始匹配点:{goodMatches.Count})");
-                return backupScore;
+                //double backupScore = Math.Min(1.0, goodMatches.Count / 50.0);
+                Debug.WriteLine($"{methodName}：内点不足(当前:{inliersMatches.Count}，要求:{minRequiredInliers}，优质匹配:{goodMatches.Count})，几何验证失败，返回0");
+                return 0;
             }
 
             // 5. 计算重投影误差
@@ -743,7 +758,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             double geometryScore = Math.Exp(-meanReprojectionError / geometryDenominator);
             double similarity = weight * geometryScore;
 
-            Debug.WriteLine($"{methodName}:{similarity:f2},召回率:{recallRate:f2},强度:{strengthRate:f2},纯度:{purityRate:f2},重投影误差:{meanReprojectionError:F2}px,内点数:{inliersMatches.Count}/{goodMatches.Count}，{keypoints1.Length}-{keypoints2.Length}");
+            Debug.WriteLine($"{methodName}:{similarity:f2},召回率:{recallRate:f2},强度:{strengthRate:f2},纯度:{purityRate:f2},重投影误差:{meanReprojectionError:F2}px,内点/匹配点:{inliersMatches.Count}/{goodMatches.Count}，图1/图2 特征点:{keypoints1.Length}/{keypoints2.Length}");
             return similarity;
         }
 

@@ -26,7 +26,7 @@
             <Rectangle x:Name="rct" Stroke="Green" StrokeThickness="1" Visibility="Hidden"/>
 
             <!--截图完成后显示的操作菜单-->
-            <Popup x:Name="popTool" IsOpen="False" AllowsTransparency="True">
+            <Popup x:Name="popTool" IsOpen="False" Placement="Absolute" AllowsTransparency="True">
                 <StackPanel x:Name="stp" Orientation="Horizontal">
                     <Button x:Name="btnNo" Click="BtnNo_Click" Content="&#xe947;" Style="{StaticResource WhiteBtn}" Foreground="Red"/>
                     <Button x:Name="btnOk" Click="BtnOk_Click" Content="&#xe94b;" Style="{StaticResource WhiteBtn}" Foreground="Green"/>
