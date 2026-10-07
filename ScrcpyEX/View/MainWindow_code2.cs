@@ -167,13 +167,13 @@ namespace ScrcpyEX.View
                         int index = _siSuccess % infos.Count;
                         bool isAdd = sg.IsAloneAdd || index == infos.Count - 1;
 
-                        Console.WriteLine("- - - - - - - - - -");
-                        Console.WriteLine($"索引：{_siSuccess}，{index}，循环次数是否加一：{isAdd}");
+                        //Console.WriteLine("- - - - - - - - - -");
+                        //Console.WriteLine($"索引：{_siSuccess}，{index}，循环次数是否加一：{isAdd}");
                         if (await ImageCompare(infos[index], isAdd))
                         {
                             _vm.ScriptInterval = 5000;
                             _siSuccess++;
-                            Console.WriteLine($"索引下标加一：{_siSuccess}");
+                            //Console.WriteLine($"索引下标加一：{_siSuccess}");
                         }
                     }
                 }
@@ -211,7 +211,7 @@ namespace ScrcpyEX.View
             }
 
             //double rgb = OpenCv.CalculateRgbHist($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
-            double hsv = OpenCv.CalculateHsvHist($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
+            //double hsv = OpenCv.CalculateHsvHist($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
             //double hu = OpenCv.CalculateHuMoment($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
             //double ssim = OpenCv.CompareSSIM($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
             //double sift = OpenCv.CalculateSIFT($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
@@ -221,8 +221,9 @@ namespace ScrcpyEX.View
 
             //Console.WriteLine($"rgb:{rgb:F2},hsv:{hsv:F2},hu:{hu:F2},ssim:{ssim:F2},sift:{sift:F2},orb:{orb:F2}");
             //Console.WriteLine($"- - - - - - - - - - - - - - - -");
-            _debug.Add($"hsv:{hsv:F2},orb:{orb:F2}，最终：{result:F2}，阈值：{info.Similarity / 100}，是否通过：{result >= info.Similarity / 100}");
+            _debug.Add($"orb:{orb:F2}，最终：{result:F2}，阈值：{info.Similarity / 100}，是否通过：{result >= info.Similarity / 100}");
             //Console.WriteLine($"hsv:{hsv:F2},orb:{orb:F2}，最终：{result:F2}，阈值：{info.Similarity / 100}，是否通过：{result >= info.Similarity / 100}");
+            
             if (result >= info.Similarity / 100)
             {
                 if (info.IsAdaptive)
@@ -231,7 +232,6 @@ namespace ScrcpyEX.View
                 }
                 if (isAddCount)
                 {
-                    Console.WriteLine($"CurCycleNum加一");
                     _vm.CurCycleNum++;
                     _stopwatch.Restart();
                 }

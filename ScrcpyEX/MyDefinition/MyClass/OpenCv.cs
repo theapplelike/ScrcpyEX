@@ -646,7 +646,6 @@ namespace ScrcpyEX.MyDefinition.MyClass
             // 计算自适应最小特征点数：大图需要更多特征点支撑几何计算，小图可以放宽要求
             // 但无论如何，至少需要 8 个（保证 RANSAC 有足够的采样冗余）
             int minRequired = Math.Max(8, (int)(Math.Min(img1.Width, img1.Height) / 20.0));
-
             if (keypoints1.Length < minRequired || keypoints2.Length < minRequired)
             {
                 Debug.WriteLine($"{methodName}：特征点不足(图1:{keypoints1.Length}，图2:{keypoints2.Length}，要求≥{minRequired})");
@@ -667,26 +666,17 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 }
             }
 
-
             // 最少不低于 8 个，且要求匹配点数至少达到图 1 特征点总数的 2%（防止在大图上因零星噪声误匹配）
             int minRequiredMatches = Math.Max(8, (int)(keypoints1.Length * 0.02));
             if (goodMatches.Count < minRequiredMatches)
             {
-                Debug.WriteLine($"{methodName}：优质匹配点不足(当前:{goodMatches.Count}，要求:{minRequiredMatches})，无法进行可靠的几何验证");
+                Debug.WriteLine($"{methodName}：优质匹配点不足(当前:{goodMatches.Count}，要求≥{minRequiredMatches})，无法进行可靠的几何验证");
                 return 0;
             }
 
             // 3. 提取匹配点对坐标
             Point2f[] srcPoints = [.. goodMatches.Select(m => keypoints1[m.QueryIdx].Pt)];
             Point2f[] dstPoints = [.. goodMatches.Select(m => keypoints2[m.TrainIdx].Pt)];
-
-            //if (srcPoints.Length < 4)
-            //{
-            //    // 匹配点极度不足，说明物理位置相关性极低，给一个很低的分数即可
-            //    //double backupScore = Math.Min(1.0, goodMatches.Count / 50.0);
-            //    Debug.WriteLine($"{methodName}: 匹配点仅{goodMatches.Count}个，无法单应性计算");
-            //    return 0;
-            //}
 
             // 4. 计算单应性矩阵并利用 RANSAC 获取内点
             using Mat mask = new();
@@ -707,8 +697,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             int minRequiredInliers = Math.Max(8, (int)(goodMatches.Count * 0.25));
             if (inliersMatches.Count < minRequiredInliers)
             {
-                //double backupScore = Math.Min(1.0, goodMatches.Count / 50.0);
-                Debug.WriteLine($"{methodName}：内点不足(当前:{inliersMatches.Count}，要求:{minRequiredInliers}，优质匹配:{goodMatches.Count})，几何验证失败，返回0");
+                Debug.WriteLine($"{methodName}：内点不足(当前:{inliersMatches.Count}，要求≥{minRequiredInliers}，优质匹配:{goodMatches.Count})，几何验证失败，返回0");
                 return 0;
             }
 

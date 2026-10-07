@@ -81,8 +81,8 @@ namespace ScrcpyEX.View
             //await MyGM.AdbMoreAsync($"shell echo $SECONDARY_STORAGE");
             //await MyGM.AdbMoreAsync($"shell ls -la storage/A409-11E9/");
             //await MyGM.AdbMoreAsync($"shell setprop service.adb.tcp.port -1");
-            (string otp, string _, int exc) = await MyGM.AdbMoreAsync($"shell getprop service.adb.tcp.port");
-            MyGM.POP($"service.adb.tcp.port：{otp}，终止值：{exc}");
+            //(string otp, string _, int exc) = await MyGM.AdbMoreAsync($"shell getprop service.adb.tcp.port");
+            //MyGM.POP($"service.adb.tcp.port：{otp}，终止值：{exc}");
 
             //PicTest(@"F:\new\Pic\测试");
             //PicTest(@"F:\new\Pic\截图4");

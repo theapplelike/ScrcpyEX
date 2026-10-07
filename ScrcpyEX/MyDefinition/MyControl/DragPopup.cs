@@ -14,6 +14,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 using Keys = System.Windows.Forms.Keys;
 
@@ -82,12 +83,17 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// <summary>
         /// 上一次的鼠标坐标。
         /// </summary>
-        private Point _lastPoint;
+        //private Point _lastPoint;
 
         /// <summary>
         /// 当前鼠标的坐标。
         /// </summary>
-        private Point _nowPoint;
+        //private Point _nowPoint;
+
+        /// <summary>
+        /// 鼠标按下时，鼠标位置相对 popup 左上角的偏移（在 PlacementTarget 坐标系中）。
+        /// </summary>
+        private Point _grabOffset;
 
         /// <summary>
         /// 是否处于可拖拽的状态。
@@ -113,6 +119,38 @@ namespace ScrcpyEX.MyDefinition.MyControl
         /// 是否已释放资源。
         /// </summary>
         private bool _disposed = false;
+
+        #region 吸附相关字段
+        /// <summary>
+        /// 吸附触发阈值（像素）。
+        /// </summary>
+        private const double SnapThreshold = 6.0;
+
+        /// <summary>
+        /// 吸附线所在图层（挂在 PlacementTarget 上）。
+        /// </summary>
+        private Canvas _snapLayer = null;
+
+        /// <summary>
+        /// 垂直吸附线。
+        /// </summary>
+        private Line _vSnapLine = null;
+
+        /// <summary>
+        /// 水平吸附线。
+        /// </summary>
+        private Line _hSnapLine = null;
+
+        /// <summary>
+        /// 吸附线颜色。
+        /// </summary>
+        private readonly Brush _snapBrush = Brushes.Blue;
+
+        /// <summary>
+        /// 吸附图层的标识（防止重复创建）。
+        /// </summary>
+        private const string SnapLayerTag = "DragPopup.SnapLayer";
+        #endregion
 
         /// <summary>
         /// 当前映射绑定的字符。
@@ -162,6 +200,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         {
             ControlInit(_rx, _ry, 0.3);
             ControlEventBinding();
+            EnsureSnapLayer();
             SetEditingStatus(_isInitEdit);
         }
 
@@ -269,7 +308,7 @@ namespace ScrcpyEX.MyDefinition.MyControl
         }
 
         /// <summary>
-        /// 鼠标按下时发生的事件，处于编辑状态时允许移动且记录当前坐标，不可编辑时应将点击操作发给Scrcpy。
+        /// 鼠标按下时发生的事件，处于编辑状态时允许移动且记录当前坐标。
         /// 嵌套顺序应该为Popup->Border(提供边框)->TextBox(提供输入框)、TextBlock(提供定位点)。
         /// </summary>
         private void Pop_MouseDown(object sender, MouseButtonEventArgs e)
@@ -281,7 +320,11 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 SelectAll(_txtInput);
 
                 //记录当前坐标为上一次的坐标
-                _lastPoint = MyGM.GetPosnW();
+                //_lastPoint = MyGM.GetPosnW();
+
+                // 记录鼠标相对 popup 左上角的偏移
+                Point mouseInTarget = Mouse.GetPosition(PlacementTarget);
+                _grabOffset = new Point( mouseInTarget.X - HorizontalOffset, mouseInTarget.Y - VerticalOffset);
             }
 
             //double radius = 50 * MV.MainWin.ScRatioX / 2;
@@ -299,9 +342,10 @@ namespace ScrcpyEX.MyDefinition.MyControl
             {
                 Mouse.Capture(null);
                 _isDragging = false;
+                HideAllSnapLines();
             }
         }
-
+        
         /// <summary>
         /// 鼠标移动时发生的事件。
         /// </summary>
@@ -309,19 +353,27 @@ namespace ScrcpyEX.MyDefinition.MyControl
         {
             if (_isDragging && _isEdit)
             {
-                _nowPoint = MyGM.GetPosnW();//现在的坐标
+                //_nowPoint = MyGM.GetPosnW();//现在的坐标
+                //double newX = HorizontalOffset + (_nowPoint.X - _lastPoint.X) / MV.DpiScaleX;
+                //double newY = VerticalOffset + (_nowPoint.Y - _lastPoint.Y) / MV.DpiScaleY;
 
-                double newX = HorizontalOffset + (_nowPoint.X - _lastPoint.X) / MV.DpiScaleX;
-                double newY = VerticalOffset + (_nowPoint.Y - _lastPoint.Y) / MV.DpiScaleY;
+                // 直接拿到鼠标相对 PlacementTarget 的绝对坐标
+                Point mouseInTarget = Mouse.GetPosition(PlacementTarget);
+
+                // popup 目标位置 = 鼠标位置 − 抓取偏移
+                double newX = mouseInTarget.X - _grabOffset.X;
+                double newY = mouseInTarget.Y - _grabOffset.Y;
 
                 if (!_isLeaveParent)//是否允许离开父控件
                 {
                     LimitToParent(ref newX, ref newY);
                 }
 
+                ApplySnap(ref newX, ref newY);
+
                 HorizontalOffset = newX;
                 VerticalOffset = newY;
-                _lastPoint = _nowPoint;
+                //_lastPoint = _nowPoint;
             }
         }
 
@@ -501,6 +553,179 @@ namespace ScrcpyEX.MyDefinition.MyControl
                 newY = maxTop - Height;
             }
         }
+
+        #region 吸附相关方法
+        /// <summary>
+        /// 在 PlacementTarget 上准备一个不会影响布局、不参与命中的 Canvas 作为吸附线图层。
+        /// </summary>
+        private void EnsureSnapLayer()
+        {
+            if (PlacementTarget is not Panel panel) return;
+
+            _snapLayer = panel.Children.OfType<Canvas>().FirstOrDefault(c => Equals(c.Tag, SnapLayerTag));
+
+            if (_snapLayer == null)
+            {
+                _snapLayer = new Canvas
+                {
+                    Tag = SnapLayerTag,
+                    IsHitTestVisible = false,
+                    Background = null,
+                };
+                // 放到最上层
+                Panel.SetZIndex(_snapLayer, 5);
+                panel.Children.Add(_snapLayer);
+            }
+
+            _vSnapLine = new Line
+            {
+                Stroke = _snapBrush,
+                StrokeThickness = 1,
+                SnapsToDevicePixels = true,
+                Visibility = Visibility.Collapsed,
+                IsHitTestVisible = false,
+            };
+            _hSnapLine = new Line
+            {
+                Stroke = _snapBrush,
+                StrokeThickness = 1,
+                SnapsToDevicePixels = true,
+                Visibility = Visibility.Collapsed,
+                IsHitTestVisible = false,
+            };
+
+            _snapLayer.Children.Add(_vSnapLine);
+            _snapLayer.Children.Add(_hSnapLine);
+        }
+
+        /// <summary>
+        /// 对给定的 popup 位置进行吸附修正，并显示/隐藏吸附线。
+        /// </summary>
+        private void ApplySnap(ref double newX, ref double newY)
+        {
+            // 根据左、右、上、下边缘分组
+            List<double> leftTargets = [];
+            List<double> rightTargets = [];
+            List<double> topTargets = [];
+            List<double> bottomTargets = [];
+
+            foreach (DragPopup other in MV.DragPopups)
+            {
+                if (ReferenceEquals(other, this)) continue;
+
+                double l = other.HorizontalOffset;
+                double t = other.VerticalOffset;
+                double w = other.Width;
+                double h = other.Height;
+
+                leftTargets.Add(l);          // 其他 popup 的左边缘
+                rightTargets.Add(l + w);     // 其他 popup 的右边缘
+                topTargets.Add(t);           // 其他 popup 的上边缘
+                bottomTargets.Add(t + h);    // 其他 popup 的下边缘
+            }
+
+            TrySnapOnAxis(true, leftTargets, rightTargets, ref newX);
+            TrySnapOnAxis(false, topTargets, bottomTargets, ref newY);
+        }
+
+        /// <summary>
+        /// 计算是否需要吸附，吸附时改变当前方向的位置并显示吸附线。
+        /// </summary>
+        /// <param name="isXAxis">是否X轴方向。</param>
+        /// <param name="targets1">起点边的目标数组。</param>
+        /// <param name="targets2">终点边的目标数组。</param>
+        /// <param name="cur">当前方向上的位置。</param>
+        private void TrySnapOnAxis(bool isXAxis, List<double> targets1, List<double> targets2, ref double cur)
+        {
+            double bestDist = SnapThreshold;
+            double bestTarget = double.NaN;
+            double bestDelta = 0;
+            double offset = isXAxis ? Width : Height;
+
+            // 计算第一个边缘
+            foreach (double tx in targets1)
+            {
+                double d = Math.Abs(cur - tx);
+                if (d < bestDist)
+                {
+                    bestDist = d;
+                    bestTarget = tx;
+                    bestDelta = tx - cur;
+                }
+            }
+
+            // 计算第二个边缘
+            foreach (double tx in targets2)
+            {
+                double d = Math.Abs(cur + offset - tx);
+                if (d < bestDist)
+                {
+                    bestDist = d;
+                    bestTarget = tx;
+                    bestDelta = tx - (cur + offset);
+                }
+            }
+
+            if (bestDist < SnapThreshold)
+            {
+                cur += bestDelta;
+                if (isXAxis) ShowVSnapLine(bestTarget);
+                else ShowHSnapLine(bestTarget);
+            }
+            else
+            {
+                if (isXAxis) HideVSnapLine();
+                else HideHSnapLine();
+            }
+        }
+
+        /// <summary>
+        /// 在指定X轴位置显示垂直吸附线。
+        /// </summary>
+        /// <param name="x">X轴位置。</param>
+        private void ShowVSnapLine(double x)
+        {
+            double h = _snapLayer.ActualHeight > 0 ? _snapLayer.ActualHeight : _snapLayer.Height;
+            _vSnapLine.X1 = x;
+            _vSnapLine.X2 = x;
+            _vSnapLine.Y1 = 0;
+            _vSnapLine.Y2 = h;
+            _vSnapLine.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// 在指定Y轴位置显示水平吸附线。
+        /// </summary>
+        /// <param name="y">Y轴位置。</param>
+        private void ShowHSnapLine(double y)
+        {
+            double w = _snapLayer.ActualWidth > 0 ? _snapLayer.ActualWidth : _snapLayer.Width;
+            _hSnapLine.X1 = 0;
+            _hSnapLine.X2 = w;
+            _hSnapLine.Y1 = y;
+            _hSnapLine.Y2 = y;
+            _hSnapLine.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// 隐藏垂直吸附线。
+        /// </summary>
+        private void HideVSnapLine() => _vSnapLine.Visibility = Visibility.Collapsed;
+
+        /// <summary>
+        /// 隐藏水平吸附线。
+        /// </summary>
+        private void HideHSnapLine() => _hSnapLine.Visibility = Visibility.Collapsed;
+
+        /// <summary>
+        /// 隐藏所有吸附线。
+        /// </summary>
+        private void HideAllSnapLines()
+        {
+            HideVSnapLine();
+            HideHSnapLine();
+        }
+        #endregion
 
         /// <summary>
         /// 设置Popup的编辑状态。
