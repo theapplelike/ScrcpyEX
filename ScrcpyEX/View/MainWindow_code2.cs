@@ -51,7 +51,7 @@ namespace ScrcpyEX.View
         /// <param name="texture">说明视频帧宽高的字符串，第一个参数是宽，第二个参数是高。</param>
         public void ShowTextureInfo(string texture)
         {
-            Regex reg = new("[0-9]+");
+            Regex reg = new(@"(\d+)x(\d+)");
             MatchCollection mc = reg.Matches(texture);
 
             _vm.Texture = GetTextureInfo(mc);
@@ -62,8 +62,8 @@ namespace ScrcpyEX.View
         /// </summary>
         private string GetTextureInfo(MatchCollection mc)
         {
-            int.TryParse(mc[0].Value, out int a);
-            int.TryParse(mc[1].Value, out int b);
+            int.TryParse(mc[0].Groups[1].Value, out int a);
+            int.TryParse(mc[0].Groups[2].Value, out int b);
 
             _ScFrameHt = b;
             _ScFrameWd = a;
