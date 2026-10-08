@@ -133,9 +133,9 @@ namespace ScrcpyEX.MyDefinition.MyClass
                         }
                         Debug.WriteLine($">>>>>>>>>>>>>>{++i}：尝试启动Scrcpy。");
                     }
-                    catch(InvalidOperationException)
+                    catch(Exception ex)
                     {
-                        MyGM.MidPOP($"第{i}次时启动失败，进程已退出。");
+                        MyGM.ShwError($"第{i + 1}次启动时发生异常：\n{ex}");
                         break;
                     }
                 }

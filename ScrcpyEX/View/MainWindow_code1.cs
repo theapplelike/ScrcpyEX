@@ -288,11 +288,11 @@ namespace ScrcpyEX.View
         /// <param name="desc">说明当前状态的字符串。</param>
         private void MappingEdit(string desc)
         {
-            if (IsScClosed)
-            {
-                popMid.Show("未进行投屏，不能进行映射编辑。");
-                return;
-            }
+            //if (IsScClosed)
+            //{
+            //    popMid.Show("未进行投屏，不能进行映射编辑。");
+            //    return;
+            //}
 
             if (desc == "映射编辑")
             {

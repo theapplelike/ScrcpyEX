@@ -28,7 +28,7 @@ namespace ScrcpyEX.ExtensionMethod
         /// <summary>
         /// Scrcpy的版本号。
         /// </summary>
-        public static string ScVersion = "v4.0";
+        public static string ScVersion = "v5.0";
 
         /// <summary>
         /// Scrcpy的路径。
