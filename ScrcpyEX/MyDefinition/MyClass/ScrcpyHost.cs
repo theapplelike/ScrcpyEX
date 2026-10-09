@@ -17,7 +17,7 @@ using System.Windows.Interop;
 
 namespace ScrcpyEX.MyDefinition.MyClass
 {
-    internal class ScrcpyHost
+    internal class ScrcpyHost : IDisposable
     {
         /// <summary>
         /// 对第三方程序的引用。
@@ -50,14 +50,14 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private ScrcpyJob _job = null;
 
         /// <summary>
+        /// 是否已释放资源。
+        /// </summary>
+        private bool _disposed = false;
+
+        /// <summary>
         /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。
         /// </summary>
         public IntPtr ScHandle { get; set; } = IntPtr.Zero;
-
-        /// <summary>
-        /// Scrcpy完全退出且相关资源全部释放后触发。
-        /// </summary>
-        public Action Disposed;
 
         public ScrcpyHost()
         {
@@ -85,12 +85,11 @@ namespace ScrcpyEX.MyDefinition.MyClass
             }
 
             // 创建真正的HwndHost
-            _hwndHost = new InternalHwndHost(ScHandle);
-            _hwndHost.WindowDestroyed += DisposeScrcpy;
+            _hwndHost = new InternalHwndHost(ScHandle, _prc.Id);
 
             HashSet<int> hs = [.. MyCfg.Cfg.KeyMappings.Select(k => (int)k.VkCode)];
             KMC_Hook.InitUserHotkeys(hs);
-            MDC_Hook.RegisterHook(ScHandle);
+            //MDC_Hook.RegisterHook(ScHandle);
 
             return _hwndHost;
         }
@@ -208,14 +207,14 @@ namespace ScrcpyEX.MyDefinition.MyClass
         private void Prc_Exited(object sender, EventArgs e)
         {
             _prc.Exited -= Prc_Exited;
-            _prc.CancelOutputRead();
-            _prc.CancelErrorRead();
+            //_prc.CancelOutputRead();
+            //_prc.CancelErrorRead();
             _job?.Dispose();
             _job = null;
 
             ScHandle = IntPtr.Zero;
             KMC_Hook.ClearUserHotkeys();
-            MDC_Hook.CancelHook();
+            //MDC_Hook.CancelHook();
             Debug.WriteLine($"ScHost：Process的Exieted事件执行结束。");
         }
 
@@ -249,7 +248,7 @@ namespace ScrcpyEX.MyDefinition.MyClass
             if (e.Data.Contains("Texture"))
             {
                 //Scrcpy在横竖屏转换的时候会导致坐标错位，鼠标点击失效，需要重绘窗口
-                _hwndHost?.RefreshScWindow();
+                //_hwndHost?.RefreshScWindow();
                 MV.MainWin.ShowTextureInfo(e.Data);
             }
         }
@@ -262,23 +261,33 @@ namespace ScrcpyEX.MyDefinition.MyClass
             _hwndHost?.RefreshScWindow();
         }
 
-        /// <summary>
-        /// 关闭Scrcpy并释放其使用的资源。
-        /// </summary>
-        public void DisposeScrcpy()
+        public void Dispose()
         {
-            _prc.CloseMainWindow(); //进程退出后会调用Exited事件，前提是EnableRaisingEvents属性要设置为true
-            _prc.WaitForExit();     //进程退出后要一直等待，防止Exited事件未执行完就执行Dispose()
-            _prc.Dispose();
-            _hwndHost.Dispose();
-            Debug.WriteLine($"ScHost：所有资源清理完毕。");
-            Disposed?.Invoke();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            _disposed = true;
+
+            if (disposing)
+            {
+                _hwndHost?.Dispose();
+                _hwndHost = null;
+
+                _prc.CloseMainWindow(); //进程退出后会调用Exited事件，前提是EnableRaisingEvents属性要设置为true
+                _prc.WaitForExit();     //进程退出后要一直等待，防止Exited事件未执行完就执行Dispose()
+                _prc.Dispose();
+                Debug.WriteLine($"ScHost：所有资源清理完毕。");
+            }
         }
 
         /// <summary>
         /// HwndHost中不支持异步，所以外部启动Scrcpy，内部封装Scrcpy。
         /// </summary>
-        private class InternalHwndHost(IntPtr scHandle) : HwndHost
+        private class InternalHwndHost(IntPtr scHandle, int scPid) : HwndHost
         {
             /// <summary>
             /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。
@@ -286,14 +295,39 @@ namespace ScrcpyEX.MyDefinition.MyClass
             private readonly IntPtr _scHandle = scHandle;
 
             /// <summary>
+            /// Scrcpy的进程ID。
+            /// </summary>
+            private readonly int _scPid = scPid;
+
+            /// <summary>
             /// Scrcpy上一次的Rect。
             /// </summary>
             internal Rect _lastRect = new();
 
             /// <summary>
-            /// 底层窗口被销毁时触发，用于通知宿主做进程关闭和资源释放。
+            /// 监听Scrcpy位置/大小变化的钩子句柄。
             /// </summary>
-            public Action WindowDestroyed = null;
+            private IntPtr _winEventHook;
+
+            /// <summary>
+            /// 回调的引用，防止 GC 回收。
+            /// </summary>
+            private DLL.WinEventDelegate _winEventDelegate;
+
+            /// <summary>
+            /// 对象位置/尺寸变化。
+            /// </summary>
+            private const uint EVENT_OBJECT_LOCATIONCHANGE = 0x800B;
+
+            /// <summary>
+            /// 回调在当前进程里执行（系统把事件 post 到当前进程的消息队列）。
+            /// </summary>
+            private const uint WINEVENT_OUTOFCONTEXT = 0x0000;
+
+            /// <summary>
+            /// 跳过调用方自己进程产生的事件（防止自己监听自己）。
+            /// </summary>
+            private const uint WINEVENT_SKIPOWNPROCESS = 0x0002;
 
             /// <summary>
             /// 当 HwndHost 被添加到可视化树时自动调用，创建并返回要嵌入的 Win32 窗口句柄。
@@ -309,6 +343,13 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 DLL.SetParent(_scHandle, hwndParent.Handle);
                 DLL.ShowWindow(_scHandle, SW.SW_SHOWNOACTIVATE);
 
+                //注册监听SC窗口的回调，在双击黑边窗口消失后将窗口还原
+                _winEventDelegate = WinEventCallback;
+                _winEventHook = DLL.SetWinEventHook(
+                    EVENT_OBJECT_LOCATIONCHANGE, EVENT_OBJECT_LOCATIONCHANGE,
+                    IntPtr.Zero, _winEventDelegate, (uint)_scPid, 0,
+                    WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
+
                 return new HandleRef(this, _scHandle);
             }
 
@@ -319,7 +360,13 @@ namespace ScrcpyEX.MyDefinition.MyClass
             protected override void DestroyWindowCore(HandleRef hwnd)
             {
                 Debug.WriteLine("InternalHwndHost：Scrcpy窗口从父级移除。");
-                WindowDestroyed?.Invoke();
+
+                if (_winEventHook != IntPtr.Zero)
+                {
+                    DLL.UnhookWinEvent(_winEventHook);
+                    _winEventHook = IntPtr.Zero;
+                }
+                _winEventDelegate = null;
             }
 
             /// <summary>
@@ -332,10 +379,37 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 {
                     return;
                 }
-                
+
                 _lastRect = rcBoundingBox;
                 DLL.MoveWindow(_scHandle, 0, 0, (int)rcBoundingBox.Width, (int)rcBoundingBox.Height, true);
                 base.OnWindowPositionChanged(rcBoundingBox);
+            }
+
+            /// <summary>
+            /// 监听Scrcpy位置/尺寸改变的回调。
+            /// </summary>
+            /// <param name="hWinEventHook">钩子句柄。</param>
+            /// <param name="eventType">触发的事件类型。</param>
+            /// <param name="hwnd">事件关联的窗口句柄，根据句柄筛选指定窗口的事件。</param>
+            /// <param name="idObject">触发事件的对象ID。OBJID_WINDOW=0：窗口对象。</param>
+            /// <param name="idChild">触发事件的子元素ID。CHILDID_SELF=0：对象自身。</param>
+            /// <param name="dwEventThread">事件发生的线程ID。</param>
+            /// <param name="dwmsEventTime">事件发生的时间戳（毫秒）。</param>
+            private void WinEventCallback(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+            {
+                if (hwnd != _scHandle) return;
+                if (idObject != 0) return;
+                if (idChild != 0) return;
+
+                DLL.GetWindowRect(_scHandle, out DLL.LpRect r);
+                int w = r.Width;
+                int h = r.Height;
+
+                if (Math.Abs(w - _lastRect.Width) > 1 || Math.Abs(h - _lastRect.Height) > 1)
+                {
+                    Debug.WriteLine($"尺寸偏离：实际 {w}×{h}，期望 {_lastRect.Width}×{_lastRect.Height}，触发重绘");
+                    RefreshScWindow();
+                }
             }
 
             /// <summary>

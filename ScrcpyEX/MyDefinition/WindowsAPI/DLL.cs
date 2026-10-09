@@ -38,6 +38,32 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         }
 
         /// <summary>
+        /// WinEventDelegate 回调定义。
+        /// </summary>
+        /// <param name="hWinEventHook">注册时的钩子句柄。</param>
+        /// <param name="eventType">实际触发的事件类型（eventMin~eventMax 之间）。</param>
+        /// <param name="hwnd">事件关联的窗口句柄。</param>
+        /// <param name="idObject">
+        /// <para>OBJID_WINDOW=0：窗口对象。</para>
+        /// <para>OBJID_SYSMENU=-1：系统菜单。</para>
+        /// <para>OBJID_CLIENT=-4：客户区。</para>
+        /// <para>OBJID_CARET=-8：文本插入符。</para>
+        /// <para>OBJID_CURSOR=-9：鼠标光标。</para>
+        /// <para>OBJID_ALERT=-10：警告框。</para>
+        /// </param>
+        /// <param name="idChild">子元素 ID；对象自身触发时为 CHILDID_SELF=0。</param>
+        /// <param name="dwEventThread">事件发生的线程 ID。</param>
+        /// <param name="dwmsEventTime">事件发生的时间戳（毫秒）。</param>
+        public delegate void WinEventDelegate(
+            IntPtr hWinEventHook,
+            uint eventType,
+            IntPtr hwnd,
+            int idObject,
+            int idChild,
+            uint dwEventThread,
+            uint dwmsEventTime);
+
+        /// <summary>
         /// 获得一个与给定名称相匹配的顶层窗口的句柄，不查找子窗口，查找时不区分大小写。至少需要其中一个参数。
         /// 若要从指定的子窗口开始搜索子窗口，请使用FindWindowEx函数。
         /// </summary>
@@ -345,6 +371,44 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
+
+        /// <summary>
+        /// 注册一个"事件观察者"，让系统在指定的 WinEvent 事件发生时，回调提供的委托。
+        /// </summary>
+        /// <param name="eventMin">
+        /// 要监听的事件范围下界（含）。
+        /// <para>单位是 WinEvent 常量（如 EVENT_OBJECT_LOCATIONCHANGE = 0x800B）。</para>
+        /// <para>和 eventMax 一起构成闭区间 [eventMin, eventMax]，区间内的所有事件都会投递给你。</para>
+        /// <para>只监听单个事件时，eventMin = eventMax = 该事件常量。</para>
+        /// <para>想监听一大类事件，例如所有 EVENT_OBJECT_*，可以 eventMin = 0x8000, eventMax = 0x80FF。</para>
+        /// </param>
+        /// <param name="eventMax">要监听的事件范围上界（含）。一般和 eventMin 相同（只监听一个事件），否则回调量大。</param>
+        /// <param name="hmodWinEventProc">
+        /// 包含回调函数的模块句柄（DLL 句柄）。
+        /// <para>只在 WINEVENT_INCONTEXT 模式下才需要（见 dwFlags）；此时系统要加载这个 DLL 到目标进程，以便在目标进程上下文执行回调。</para>
+        /// <para>在 WINEVENT_OUTOFCONTEXT 模式下，传入 IntPtr.Zero。</para>
+        /// </param>
+        /// <param name="lpfnWinEventProc">回调委托，事件触发时被调用。</param>
+        /// <param name="idProcess">0--接收所有进程产生的事件；指定PID--只收该进程的事件。</param>
+        /// <param name="idThread">0--接收所有线程产生的事件；指定TID--只收该线程的事件。</param>
+        /// <param name="dwFlags">
+        /// 控制钩子行为的位标志。
+        /// <para>WINEVENT_OUTOFCONTEXT=0x0000：回调在当前进程里执行。</para>
+        /// <para>WINEVENT_SKIPOWNTHREAD=0x0001：跳过调用方自己的线程。</para>
+        /// <para>WINEVENT_SKIPOWNPROCESS=0x0002：跳过调用方自己进程产生的事件（防止自己监听自己）。</para>
+        /// <para>WINEVENT_INCONTEXT=0x0004：回调注入目标进程执行，需要 hmodWinEventProc 指向一个 DLL。仅限同位数、且目标进程没有启用阻止 DLL 注入时才能用。</para>
+        /// </param>
+        /// <returns>非零--钩子句柄，用 UnhookWinEvent(handle) 卸载；零--安装失败。</returns>
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+
+        /// <summary>
+        /// 卸载由 SetWinEventHook 安装的事件钩子，并释放系统为该钩子分配的资源。
+        /// </summary>
+        /// <param name="hWinEventHook">要卸载的钩子句柄，即 SetWinEventHook 函数的返回值。</param>
+        /// <returns>true--卸载成功；false--卸载失败（句柄无效、已卸载、或不属于当前进程等）。</returns>
+        [DllImport("user32.dll")]
+        public static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
         //[DllImport("user32.dll")]
         //public static extern IntPtr GetDesktopWindow();

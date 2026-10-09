@@ -125,9 +125,10 @@ namespace ScrcpyEX.View
             
             KMC_Hook.CancelHook();
             MRS_Hook.CancelHook();
-            MDC_Hook.CancelHook();
+            //MDC_Hook.CancelHook();
 
-            _scHost?.Disposed += ClearAdb;
+            _scHost?.Dispose();
+            ClearAdb();
         }
 
         /// <summary>
@@ -331,7 +332,7 @@ namespace ScrcpyEX.View
         {
             if (!IsScClosed)
             {
-                _scHost.DisposeScrcpy();
+                _scHost.Dispose();
                 btnFouce.Focus();
                 bdShow.Child = null;
                 StopScriptAndRecord();

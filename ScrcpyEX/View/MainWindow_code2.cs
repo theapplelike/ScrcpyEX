@@ -68,7 +68,7 @@ namespace ScrcpyEX.View
             _ScFrameHt = b;
             _ScFrameWd = a;
             _ScAspectRatio = a > b ? a * 1.0 / b : b * 1.0 / a;
-            MDC_Hook.Enable = a < b;
+            //MDC_Hook.Enable = a < b;
 
             return $"投屏纹理 {a}*{b}，比值 {_ScAspectRatio:F2}";
         }
