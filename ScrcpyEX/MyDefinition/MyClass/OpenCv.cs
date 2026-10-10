@@ -643,12 +643,20 @@ namespace ScrcpyEX.MyDefinition.MyClass
             feature.DetectAndCompute(img1, null, out KeyPoint[] keypoints1, descriptors1);
             feature.DetectAndCompute(img2, null, out KeyPoint[] keypoints2, descriptors2);
 
-            // 计算自适应最小特征点数：大图需要更多特征点支撑几何计算，小图可以放宽要求
-            // 但无论如何，至少需要 8 个（保证 RANSAC 有足够的采样冗余）
-            int minRequired = Math.Max(8, (int)(Math.Min(img1.Width, img1.Height) / 20.0));
+            // 计算自适应最小特征点数
+            int minRequired = Math.Max(10, (int)(Math.Min(img1.Width, img1.Height) / 20.0));
             if (keypoints1.Length < minRequired || keypoints2.Length < minRequired)
             {
                 Debug.WriteLine($"{methodName}：特征点不足(图1:{keypoints1.Length}，图2:{keypoints2.Length}，要求≥{minRequired})");
+                return 0;
+            }
+
+            //特征点数量比例检查
+            int maxKeypoints = Math.Max(keypoints1.Length, keypoints2.Length);
+            int minKeypoints = Math.Min(keypoints1.Length, keypoints2.Length);
+            if (minKeypoints < maxKeypoints * 0.15)
+            {
+                Debug.WriteLine($"{methodName}：特征点差距过大(图1:{keypoints1.Length}，图2:{keypoints2.Length}，最少≥{maxKeypoints * 0.15})");
                 return 0;
             }
 
@@ -666,8 +674,8 @@ namespace ScrcpyEX.MyDefinition.MyClass
                 }
             }
 
-            // 最少不低于 8 个，且要求匹配点数至少达到图 1 特征点总数的 2%（防止在大图上因零星噪声误匹配）
-            int minRequiredMatches = Math.Max(8, (int)(keypoints1.Length * 0.02));
+            // 匹配点数至少有最大特征点的 2%（防止在大图上因零星噪声误匹配）
+            int minRequiredMatches = Math.Max(10, (int)(maxKeypoints * 0.02));
             if (goodMatches.Count < minRequiredMatches)
             {
                 Debug.WriteLine($"{methodName}：优质匹配点不足(当前:{goodMatches.Count}，要求≥{minRequiredMatches})，无法进行可靠的几何验证");
@@ -721,11 +729,15 @@ namespace ScrcpyEX.MyDefinition.MyClass
             double meanReprojectionError = totalError / inlierSrcPts.Length;
 
             // 计算召回率，内点数占原图最少特征点数量的比例，看图是否完整，越完整得分越高
-            double recallRate = Math.Min(1.0, (double)inliersMatches.Count / Math.Min(keypoints1.Length, keypoints2.Length));
+            double recallRate = Math.Min(1.0, (double)inliersMatches.Count / minKeypoints);
 
             // 计算绝对强度得分，抗缩放/裁剪，内点数和等效边长的比例
-            double minArea = Math.Min(img1.Width * img1.Height, img2.Width * img2.Height);
-            double adaptiveStrength = Math.Min(50.0, Math.Max(15.0, Math.Sqrt(minArea) / 15.0));
+            //double minArea = Math.Min(img1.Width * img1.Height, img2.Width * img2.Height);
+            //double adaptiveStrength = Math.Min(50.0, Math.Max(15.0, Math.Sqrt(minArea) / 15.0));
+
+            // 计算绝对强度得分，抗缩放/裁剪，内点数/(特征点*系数)
+            double ratio = methodName == "SIFT" ? 0.4 : 0.2;
+            double adaptiveStrength = MyGM.Clamp(minKeypoints * ratio, 15.0, 120.0);
             double strengthRate = Math.Min(1.0, inliersMatches.Count / adaptiveStrength);
 
             // 匹配纯度，内点数占优质匹配点总数的比例，用于噪声/异常值的剔除
@@ -735,11 +747,13 @@ namespace ScrcpyEX.MyDefinition.MyClass
             double weight;
             if (methodName == "SIFT")
             {
-                weight = (recallRate * 0.4) + (strengthRate * 0.4) + (purityRate * 0.2);
+                //weight = (recallRate * 0.4) + (strengthRate * 0.4) + (purityRate * 0.2);
+                weight = (recallRate * 0.35) + (strengthRate * 0.4) + (purityRate * 0.25);
             }
             else
             {
-                weight = (recallRate * 0.25) + (strengthRate * 0.6) + (purityRate * 0.15);
+                //weight = (recallRate * 0.25) + (strengthRate * 0.6) + (purityRate * 0.15);
+                weight = (recallRate * 0.3) + (strengthRate * 0.4) + (purityRate * 0.3);
             }
 
             // 计算几何形变得分，SIFT 要求严苛（分母8），ORB 宽容度稍大（分母14）

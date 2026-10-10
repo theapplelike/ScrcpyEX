@@ -451,7 +451,6 @@ namespace ScrcpyEX.MyDefinition.MyControl
         private void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
             MV.DragPopups.Remove(this);
-            IsOpen = false;
             Dispose();
         }
 
@@ -738,35 +737,65 @@ namespace ScrcpyEX.MyDefinition.MyControl
             }
         }
 
+        //public void Dispose()
+        //{
+        //    Dispose(true);
+        //    GC.SuppressFinalize(this);
+        //}
+
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
             if (_disposed) return;
-            
-            if (disposing)
-            {
-                // 取消所有事件订阅
-                _txtInput.PreviewTextInput -= TextBox_PreviewTextInput;
-                _txtInput.TextChanged -= TextBox_TextChanged;
-                _btnDelete.Click -= BtnDelete_Click;
-                _showTimer.Tick -= Pop_Tick;
-
-                Loaded -= Popup_Loaded;
-                MouseEnter -= Popup_MouseEnter;
-                MouseDown -= Pop_MouseDown;
-                MouseMove -= Pop_MouseMove;
-                MouseUp -= Pop_MouseUp;
-            }
-            
             _disposed = true;
+
+            if (_isDragging)
+            {
+                Mouse.Capture(null);
+                _isDragging = false;
+            }
+
+            //清理计时器
+            _showTimer.Stop();
+            _showTimer.Tick -= Pop_Tick;
+
+            // 清理Popup
+            if (_vSnapLine != null)
+            {
+                _vSnapLine.IsOpen = false;
+                _vSnapLine.Child = null;
+                _vSnapLine = null;
+            }
+            if (_hSnapLine != null)
+            {
+                _hSnapLine.IsOpen = false;
+                _hSnapLine.Child = null;
+                _hSnapLine = null;
+            }
+            IsOpen = false;
+            Debug.WriteLine($"清理Popup");
         }
 
-        ~DragPopup() => Dispose(false);
+        //protected virtual void Dispose(bool disposing)
+        //{
+        //    if (_disposed) return;
+        //
+        //    if (disposing)
+        //    {
+        //        // 取消所有事件订阅
+        //        _txtInput.PreviewTextInput -= TextBox_PreviewTextInput;
+        //        _txtInput.TextChanged -= TextBox_TextChanged;
+        //        _btnDelete.Click -= BtnDelete_Click;
+        //        _showTimer.Tick -= Pop_Tick;
+        //
+        //        Loaded -= Popup_Loaded;
+        //        MouseEnter -= Popup_MouseEnter;
+        //        MouseDown -= Pop_MouseDown;
+        //        MouseMove -= Pop_MouseMove;
+        //        MouseUp -= Pop_MouseUp;
+        //    }
+        //
+        //    _disposed = true;
+        //}
 
 
     }

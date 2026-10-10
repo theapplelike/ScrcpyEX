@@ -33,6 +33,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 using DPoint = System.Drawing.Point;  //Windows Forms的Point
 using WPoint = System.Windows.Point;  //WPF的Point
@@ -54,19 +55,14 @@ namespace ScrcpyEX.View
         /// adb开启USB网络-y
         /// 虚拟屏幕能否呈现为宽屏-京东等应用不支持分屏，在虚拟屏幕上运行会强制回到主屏幕
         /// </summary>
-        private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            //IntPtr hwnd = DLL.GetForegroundWindow();
-            Dispatcher.BeginInvoke(() =>
-            {
-                //Debug.WriteLine($"窗体/SC：{IsActive}，{hwnd}，{hwnd == ScHandle}。");
-            });
-        }
-
-        private void BtnTest_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            //MyGM.POP("yesclick");
-        }
+        //private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
+        //{
+        //    //IntPtr hwnd = DLL.GetForegroundWindow();
+        //    Dispatcher.BeginInvoke(() =>
+        //    {
+        //        //Debug.WriteLine($"窗体/SC：{IsActive}，{hwnd}，{hwnd == ScHandle}。");
+        //    });
+        //}
 
         /// <summary>
         /// 测试用的小屏无黑边尺寸205,136
@@ -85,7 +81,7 @@ namespace ScrcpyEX.View
             //MyGM.POP($"service.adb.tcp.port：{otp}，终止值：{exc}");
 
             //PicTest(@"F:\new\Pic\测试");
-            //PicTest(@"F:\new\Pic\截图4");
+            PicTest(@"F:\new\Pic\截图6");
             //PicTest(@"F:\new\Pic\fox");
             //PicTest(@"F:\new\Pic\拍照");
             //PicTest(@"F:\new\Pic\按钮");
@@ -101,14 +97,14 @@ namespace ScrcpyEX.View
                 string ext = Path.GetExtension(file);
                 string name = Path.GetFileName(file);
                 Debug.WriteLine($"- - - - -{name}");
-
-                OpenCv.CompareSSIM(@$"{root}\原始{ext}", file);
-                OpenCv.CalculateRgbHist(@$"{root}\原始{ext}", file);
-                OpenCv.CalculateHsvHist(@$"{root}\原始{ext}", file);
-                OpenCv.CalculateHuMoment(@$"{root}\原始{ext}", file);
+            
+                //OpenCv.CompareSSIM(@$"{root}\原始{ext}", file);
+                //OpenCv.CalculateRgbHist(@$"{root}\原始{ext}", file);
+                //OpenCv.CalculateHsvHist(@$"{root}\原始{ext}", file);
+                //OpenCv.CalculateHuMoment(@$"{root}\原始{ext}", file);
                 OpenCv.CalculateSIFT(@$"{root}\原始{ext}", file);
                 OpenCv.CalculateORB(@$"{root}\原始{ext}", file);
-
+            
                 //MatchUITemplate(@$"{root}\原始{ext}", file, @$"{root}\result{++i}-{name}");
             }
         }

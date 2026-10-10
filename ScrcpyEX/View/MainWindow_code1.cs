@@ -375,7 +375,6 @@ namespace ScrcpyEX.View
             foreach (DragPopup drag in MV.DragPopups)
             {
                 drag.Dispose();
-                drag.IsOpen = false;
             }
             MV.DragPopups.Clear();
 

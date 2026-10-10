@@ -3,6 +3,7 @@ using ScrcpyEX.ExtensionMethod.MyAttribute;
 using ScrcpyEX.Model;
 using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.MyClass;
+using ScrcpyEX.MyDefinition.MyControl;
 using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
@@ -126,6 +127,14 @@ namespace ScrcpyEX.View
             KMC_Hook.CancelHook();
             MRS_Hook.CancelHook();
             //MDC_Hook.CancelHook();
+
+            _scriptTimer.Stop();
+            _countTimer.Stop();
+
+            foreach (DragPopup drag in MV.DragPopups)
+            {
+                drag.Dispose();
+            }
 
             _scHost?.Dispose();
             ClearAdb();

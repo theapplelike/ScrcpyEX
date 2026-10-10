@@ -91,8 +91,8 @@ namespace ScrcpyEX.View
             _countTimer.Elapsed += (sender, e) => Count_Tick();
             _countTimer.Interval = 1000;
 
-            _testTimer.Elapsed += Test_Tick;
-            _testTimer.Interval = 3000;
+            //_testTimer.Elapsed += Test_Tick;
+            //_testTimer.Interval = 3000;
         }
 
         /// <summary>

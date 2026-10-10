@@ -88,7 +88,7 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 测试用计时器。
         /// </summary>
-        private readonly System.Timers.Timer _testTimer = new();
+        //private readonly System.Timers.Timer _testTimer = new();
 
         /// <summary>
         /// Scrcpy的默认初始宽高（在100%缩放下），单位是逻辑像素，使用比例为15：7。
