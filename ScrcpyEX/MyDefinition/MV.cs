@@ -23,6 +23,7 @@ namespace ScrcpyEX.ExtensionMethod
         static MV()
         {
             Directory.CreateDirectory(ScriptPath);
+            Directory.CreateDirectory(SuccessImgPath);
         }
 
         /// <summary>
@@ -44,6 +45,11 @@ namespace ScrcpyEX.ExtensionMethod
         /// 脚本图片的保存路径。
         /// </summary>
         public static string ScriptPath { get; set; } = @".\main\Local\Script";
+
+        /// <summary>
+        /// 识别成功图片的保存路径。
+        /// </summary>
+        public static string SuccessImgPath { get; set; } = @".\main\Local\SuccessImg";
 
         /// <summary>
         /// 主窗体的引用。

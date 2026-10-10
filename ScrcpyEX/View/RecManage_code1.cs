@@ -193,7 +193,7 @@ namespace ScrcpyEX.View
                 string newName = $"Pic{DateTime.Now:yyMMddhhmm_ssfff}.png";
 
                 ReplaceImg(si.ImgName, newName);
-                MyGM.SavaImg(newName, (BitmapSource)img.Source);
+                MyGM.SavaScriptImg(newName, (BitmapSource)img.Source);
                 si.ImgName = newName;
                 si.CropRect = _cropRect;
             }

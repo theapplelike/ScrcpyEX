@@ -45,24 +45,6 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
         /// <summary>
         /// 注销钩子，如果存在录制的坐标点会进行保存。
         /// </summary>
-        //public static void CancelHook()
-        //{
-        //    if (HookID != IntPtr.Zero)
-        //    {
-        //        UnhookWindowsHookEx(HookID);
-        //        HookID = IntPtr.Zero;
-        //    }
-        //    if (_points.Count > 0)
-        //    {
-        //        MyCfg.Cfg.Scripts.Add(new ScriptInfo(_points));
-        //        _points.Clear();
-        //    }
-        //    //SaveRecordInfo();
-        //}
-
-        /// <summary>
-        /// 注销钩子，如果存在录制的坐标点会进行保存。
-        /// </summary>
         /// <param name="cropImg">保存脚本时同时要保存的截图。</param>
         /// <param name="cropRect">保存脚本时同时要保存的截图位置。</param>
         public static void CancelHook(CroppedBitmap cropImg = null, Rect cropRect = new())
@@ -114,18 +96,6 @@ namespace ScrcpyEX.MyDefinition.WindowsAPI
                 Debug.WriteLine($"添加点：{pt.X},{pt.Y}。");
             }
         }
-
-        /// <summary>
-        /// 保存录制的信息。
-        /// </summary>
-        //private static void SaveRecordInfo()
-        //{
-        //    if (_points.Count > 0)
-        //    {
-        //        MyCfg.Cfg.Scripts.Add(new ScriptInfo(_points));
-        //        _points.Clear();
-        //    }
-        //}
 
 
     }

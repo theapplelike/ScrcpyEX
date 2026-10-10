@@ -63,7 +63,7 @@ namespace ScrcpyEX.View
                 }
                 else
                 {
-                    AddImageGroup(i, 0, si.CropRect, MyGM.GetImage(si.ImgName));
+                    AddImageGroup(i, 0, si.CropRect, MyGM.GetScriptImg(si.ImgName));
                     AddImageGroup(i, 3, si.CropRect, bmps[i]);
                     ShowSimilarity(i, si.ImgName, bmps[i]);
                 }
@@ -74,10 +74,8 @@ namespace ScrcpyEX.View
             foreach (string de in debug)
             {
                 rtb.AppendText($"{de}\r\n");
-
-                //Paragraph paragraph = new(new Run(de));
-                //rtb.Document.Blocks.Add(paragraph);
             }
+            debug.Clear();
         }
 
         /// <summary>
@@ -200,14 +198,6 @@ namespace ScrcpyEX.View
 
         private void Btn_Click(object sender, RoutedEventArgs e)
         {
-            //if (rtb.Visibility == Visibility.Collapsed)
-            //{
-            //    rtb.Visibility = Visibility.Visible;
-            //}
-            //else
-            //{
-            //    rtb.Visibility = Visibility.Collapsed;
-            //}
             popDebug.IsOpen = true;
         }
     }

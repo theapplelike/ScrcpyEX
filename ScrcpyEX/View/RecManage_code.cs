@@ -151,7 +151,7 @@ namespace ScrcpyEX.View
             rdoTime.IsChecked = info.IsTime;
             rdoImage.IsChecked = !info.IsTime;
             txtCycleInterval.Text = info.CycleInterval.ToString();
-            img.Source = MyGM.GetImage(info.ImgName);
+            img.Source = MyGM.GetScriptImg(info.ImgName);
             txtSimilarity.Text = info.Similarity.ToString();
             chkAdaptive.IsChecked = info.IsAdaptive;
             _cropRect = new();

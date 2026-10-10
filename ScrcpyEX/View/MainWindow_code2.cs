@@ -217,14 +217,14 @@ namespace ScrcpyEX.View
             //double sift = OpenCv.CalculateSIFT($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
             double orb = OpenCv.CalculateORB($@"{MV.ScriptPath}\{info.ImgName}", scWindow);
             //double result = hsv > 0 ? (hsv + orb) / 2 : orb;
-            double result = orb;
+            //double result = orb;
 
             //Console.WriteLine($"rgb:{rgb:F2},hsv:{hsv:F2},hu:{hu:F2},ssim:{ssim:F2},sift:{sift:F2},orb:{orb:F2}");
             //Console.WriteLine($"- - - - - - - - - - - - - - - -");
-            _debug.Add($"orb:{orb:F2}，最终：{result:F2}，阈值：{info.Similarity / 100}，是否通过：{result >= info.Similarity / 100}");
+            //_debug.Add($"orb:{orb:F2}，最终：{result:F2}，阈值：{info.Similarity / 100}，是否通过：{result >= info.Similarity / 100}");
             //Console.WriteLine($"hsv:{hsv:F2},orb:{orb:F2}，最终：{result:F2}，阈值：{info.Similarity / 100}，是否通过：{result >= info.Similarity / 100}");
             
-            if (result >= info.Similarity / 100)
+            if (orb >= info.Similarity / 100)
             {
                 if (info.IsAdaptive)
                 {
@@ -234,6 +234,10 @@ namespace ScrcpyEX.View
                 {
                     _vm.CurCycleNum++;
                     _stopwatch.Restart();
+                }
+                if (MyCfg.Cfg.IsSaveSuccessImg)
+                {
+                    MyGM.SavaSuccessImg($"[{DateTime.Now:MM-dd HH:mm:ss}]第{_vm.CurCycleNum}次_{orb:P2}", scWindow);
                 }
                
                 await ExecuteClickScript(info, ScHandle);

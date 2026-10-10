@@ -162,6 +162,18 @@
 
                         <CheckBox IsChecked="{Binding Cfg.IsCanResize}" Content="是否允许程序边缘调整大小"/>
                         <Border/>
+
+                        <CheckBox IsChecked="{Binding Cfg.IsSaveSuccessImg}" HorizontalContentAlignment="Stretch">
+                            <Grid >
+                                <StackPanel>
+                                    <TextBlock Text="图像脚本识别成功时保存图片"/>
+                                    <TextBlock Text="用于调试" Style="{StaticResource tbkSmall}"/>
+                                </StackPanel>
+
+                                <Button x:Name="btnOpenPath" Click="BtnOpenPath_Click" Content="打开路径" Style="{StaticResource Btn}" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </CheckBox>
+                        <Border/>
                     </StackPanel>
                 </Grid>
             </StackPanel>

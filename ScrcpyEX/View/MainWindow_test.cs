@@ -81,6 +81,7 @@ namespace ScrcpyEX.View
             //MyGM.POP($"service.adb.tcp.port：{otp}，终止值：{exc}");
 
             //PicTest(@"F:\new\Pic\测试");
+            PicTest(@"F:\new\Pic\截图5");
             PicTest(@"F:\new\Pic\截图6");
             //PicTest(@"F:\new\Pic\fox");
             //PicTest(@"F:\new\Pic\拍照");

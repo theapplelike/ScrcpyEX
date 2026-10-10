@@ -112,6 +112,11 @@ namespace ScrcpyEX.ExtensionMethod
         public bool IsCanResize { get; set; } = false;
 
         /// <summary>
+        /// 是否保存脚本识别成功时的图片。
+        /// </summary>
+        public bool IsSaveSuccessImg { get; set; } = false;
+
+        /// <summary>
         /// 文件管理器保存的数据。
         /// </summary>
         public FeData FeData { get; set; } = new();

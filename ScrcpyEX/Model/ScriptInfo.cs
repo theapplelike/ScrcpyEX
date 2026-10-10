@@ -96,7 +96,7 @@ namespace ScrcpyEX.Model
             CropRect = cropRect;
             PointInfos = [.. points];
 
-            MyGM.SavaImg(ImgName, cropImg);
+            MyGM.SavaScriptImg(ImgName, cropImg);
         }
 
         object ICloneable.Clone() => Clone(); //显式接口实现

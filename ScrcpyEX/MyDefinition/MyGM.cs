@@ -243,9 +243,9 @@ namespace ScrcpyEX.MyDefinition
         /// <summary>
         /// 获得指定名称的脚本图片。
         /// </summary>
-        /// <param name="imgName">图片的名称。</param>
+        /// <param name="imgName">图片的名称，不包括路径。</param>
         /// <returns>返回一个位图源，名称为空时返回null。</returns>
-        public static BitmapImage GetImage(string imgName)
+        public static BitmapImage GetScriptImg(string imgName)
         {
             if (imgName == "") return null;
             try
@@ -271,9 +271,22 @@ namespace ScrcpyEX.MyDefinition
         /// </summary>
         /// <param name="name">图片名称，不包括路径。</param>
         /// <param name="source">图片的源。</param>
-        public static void SavaImg(string name, BitmapSource source)
+        public static void SavaScriptImg(string name, BitmapSource source)
         {
             using FileStream fs = new(@$"{MV.ScriptPath}\{name}", FileMode.Create);
+            PngBitmapEncoder encoder = new();
+            encoder.Frames.Add(BitmapFrame.Create(source));
+            encoder.Save(fs);
+        }
+
+        /// <summary>
+        /// 保存调试的图片到本地。
+        /// </summary>
+        /// <param name="name">图片名称，不包括路径。</param>
+        /// <param name="source">图片的源。</param>
+        public static void SavaSuccessImg(string name, BitmapSource source)
+        {
+            using FileStream fs = new(@$"{MV.SuccessImgPath}\{name}", FileMode.Create);
             PngBitmapEncoder encoder = new();
             encoder.Frames.Add(BitmapFrame.Create(source));
             encoder.Save(fs);
