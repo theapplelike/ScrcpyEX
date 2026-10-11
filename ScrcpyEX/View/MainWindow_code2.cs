@@ -237,7 +237,7 @@ namespace ScrcpyEX.View
                 }
                 if (MyCfg.Cfg.IsSaveSuccessImg)
                 {
-                    MyGM.SavaSuccessImg($"[{DateTime.Now:MM-dd HH:mm:ss}]第{_vm.CurCycleNum}次_{orb:P2}", scWindow);
+                    MyGM.SavaSuccessImg($"[{DateTime.Now:MM-dd HH.mm.ss}]第{_vm.CurCycleNum}次_{orb:P2}.png", scWindow);
                 }
                
                 await ExecuteClickScript(info, ScHandle);
