@@ -189,7 +189,6 @@ namespace ScrcpyEX.View
             }
             finally
             {
-                //Debug.WriteLine($"自适应间隔:{_vm.ScriptInterval / 1000}秒。");
                 _scriptTimer.Interval = _vm.ScriptInterval;
                 _imageScriptLock.Release(); // 释放锁
             }
@@ -229,6 +228,7 @@ namespace ScrcpyEX.View
                 if (info.IsAdaptive)
                 {
                     _vm.ScriptInterval = _vm.Running * 1000 * 0.9;//每次将上一次间隔的90%作为自适应间隔
+                    _vm.RunningColor = WBrushes.Gray;
                 }
                 if (isAddCount)
                 {
@@ -248,6 +248,7 @@ namespace ScrcpyEX.View
                 //每次未匹配上增加间隔时间，间隔达到12秒以上时重新从5秒间隔开始
                 double interval = _vm.ScriptInterval * 1.5;
                 _vm.ScriptInterval = interval > 12000 ? 5000 : interval;
+                _vm.RunningColor = WBrushes.Black;
                 return false;
             }
         }

@@ -165,7 +165,7 @@
                                 <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
                                 <TextBlock Text="{Binding CurCycleNum}" VerticalAlignment="Center" FontSize="16" Margin="2,0,0,0"/>
                                 <TextBlock Text="次⊱⊰" VerticalAlignment="Center" FontSize="16"/>
-                                <TextBlock Text="{Binding Running}" VerticalAlignment="Center" FontSize="16"/>
+                                <TextBlock Text="{Binding Running}" Foreground="{Binding RunningColor}" VerticalAlignment="Center" FontSize="16"/>
                                 <TextBlock Text="秒" VerticalAlignment="Center" FontSize="16" Margin="0,0,2,0"/>
                                 <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
                             </DockPanel>

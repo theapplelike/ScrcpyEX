@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace ScrcpyEX.ViewModel
 {
@@ -49,6 +50,16 @@ namespace ScrcpyEX.ViewModel
             set => SetProperty(ref _running, value);
         }
         private int _running = 0;
+
+        /// <summary>
+        /// 已产生时间字符串显示的颜色。
+        /// </summary>
+        public Brush RunningColor
+        {
+            get => _runningColor;
+            set => SetProperty(ref _runningColor, value);
+        }
+        private Brush _runningColor = Brushes.Black;
 
         /// <summary>
         /// 用于图像脚本计时器的自适应间隔，单位是毫秒，最小为5000豪秒。
