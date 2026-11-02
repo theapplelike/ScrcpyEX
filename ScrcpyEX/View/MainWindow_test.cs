@@ -54,6 +54,7 @@ namespace ScrcpyEX.View
         /// com.bilibili.azurlane
         /// adb开启USB网络-y
         /// 虚拟屏幕能否呈现为宽屏-京东等应用不支持分屏，在虚拟屏幕上运行会强制回到主屏幕
+        /// 启动时如果程序在屏幕外，定位回屏幕内
         /// </summary>
         //private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         //{

@@ -13,7 +13,7 @@
         WindowStartupLocation="CenterScreen" UseLayoutRounding="True" SnapsToDevicePixels="True"
         Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged"
         Activated="Window_Activated" Deactivated="Window_Deactivated"
-        LocationChanged="Window_LocationChanged">
+        LocationChanged="Window_LocationChanged" SourceInitialized="Window_SourceInitialized">
 
     <Window.DataContext>
         <ViewModel:MainWindowVM/>

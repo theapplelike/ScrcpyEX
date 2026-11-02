@@ -206,7 +206,7 @@ namespace ScrcpyEX.View
             MyCfg.Cfg.Locates[3] = (bool)rdoLoc4.IsChecked;
 
             //窗体在正常状态下才记录其尺寸位置信息
-            if (WindowState == WindowState.Normal)
+            if (WindowState == WindowState.Normal && !_isMaximize)
             {
                 MyCfg.Cfg.Size.Top = Top;
                 MyCfg.Cfg.Size.Left = Left;
@@ -453,6 +453,7 @@ namespace ScrcpyEX.View
             {
                 LoadTempSize(_tempSize);
                 btnMaximize.Content = "\ue922";
+                _isMaximize = false;
             }
             else
             {
@@ -461,6 +462,7 @@ namespace ScrcpyEX.View
                 Width = wd;
                 Height = ht;
                 btnMaximize.Content = "\ue923";
+                _isMaximize = true;
             }
         }
 
@@ -841,8 +843,18 @@ namespace ScrcpyEX.View
             }
             else
             {
-                string lb = err == "" ? "" : "\n";
-                MyGM.POP($"{err}{lb}USB网络共享打开失败，请检查设备连接");
+                if (err == "")
+                {
+                    MyGM.POP($"USB网络共享打开失败，请检查设备连接");
+                }
+                else if (err.Contains("device unauthorized"))
+                {
+                    MyGM.POP($"{err}\n设备未授权，请检查设备对话框进行授权");
+                }
+                else
+                {
+                    MyGM.POP($"{err}\nUSB网络共享打开失败，请检查设备连接");
+                }
             }
         }
 

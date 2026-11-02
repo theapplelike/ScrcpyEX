@@ -46,6 +46,11 @@ namespace ScrcpyEX.View
         private FormSize _tempSize = null;
 
         /// <summary>
+        /// 窗口当前是否处于最大化。
+        /// </summary>
+        private bool _isMaximize = false;
+
+        /// <summary>
         /// 准确的测量运行时间。
         /// </summary>
         private Stopwatch _stopwatch = new();

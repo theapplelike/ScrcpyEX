@@ -527,6 +527,55 @@ namespace ScrcpyEX.MyDefinition
         }
 
         /// <summary>
+        /// 检查一个矩形是否在任一屏幕的工作区内拥有至少1/3可见面积。
+        /// </summary>
+        /// <param name="rect">一个程序的矩形。</param>
+        /// <returns>true--至少1/3可见面积；false--可见面积不足1/3。</returns>
+        public static bool IsRectangleOnAnyScreen(System.Drawing.Rectangle rect)
+        {
+            foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
+            {
+                System.Drawing.Rectangle intersection = System.Drawing.Rectangle.Intersect(rect, screen.WorkingArea);
+                if (intersection.Width * intersection.Height >= rect.Width * rect.Height / 3)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 将指定的 WPF 窗口安全地约束到某个屏幕的可见区域内。
+        /// </summary>
+        /// <param name="window">WPF 窗口。</param>
+        public static void EnsureWindowOnScreen(Window window)
+        {
+            // 构建窗口当前（或即将使用）的矩形
+            System.Drawing.Rectangle windowRect = new(
+                (int)window.Left,
+                (int)window.Top,
+                (int)window.Width,
+                (int)window.Height
+            );
+
+            //程序不在任何屏幕时回到主屏幕居中
+            if (!IsRectangleOnAnyScreen(windowRect))
+            {
+                window.WindowStartupLocation = WindowStartupLocation.Manual;
+                window.Top = (SystemParameters.WorkArea.Height - window.Width) / 2;
+                window.Left = (SystemParameters.WorkArea.Width - window.Height) / 2;
+            }
+
+            // 位置无效，重置到主屏幕的工作区，并居中显示
+            //var primaryWorkArea = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea;
+
+            // 设置 WindowStartupLocation 为 Manual 后，Left/Top 才会生效
+            //window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            //window.Left = primaryWorkArea.Left + (primaryWorkArea.Width - window.Width) / 2;
+            //window.Top = primaryWorkArea.Top + (primaryWorkArea.Height - window.Height) / 2;
+        }
+
+        /// <summary>
         /// 记录普通日志。
         /// </summary>
         /// <param name="text">日志内容。</param>
