@@ -88,7 +88,6 @@ namespace ScrcpyEX.View
             //PicTest(@"F:\new\Pic\fox");
             //PicTest(@"F:\new\Pic\拍照");
             //PicTest(@"F:\new\Pic\按钮");
-
         }
 
         private void PicTest(string root)
