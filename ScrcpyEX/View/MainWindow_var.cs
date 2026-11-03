@@ -137,7 +137,7 @@ namespace ScrcpyEX.View
         private int _siSuccess = 0;
 
         /// <summary>
-        /// 现在是否可以调整映射Popup。。
+        /// 现在是否可以调整映射Popup。
         /// </summary>
         private bool _isAdjustPop = true;
 
