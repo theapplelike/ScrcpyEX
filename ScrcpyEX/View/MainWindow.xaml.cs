@@ -95,11 +95,6 @@ namespace ScrcpyEX.View
                 _locationChangeTimer.Start();
             }
         }
-
-        private void Window_SourceInitialized(object sender, EventArgs e)
-        {
-            MyGM.EnsureWindowOnScreen(this);
-        }
         #endregion
 
         #region 自定义菜单栏按钮事件

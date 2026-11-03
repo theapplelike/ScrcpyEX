@@ -114,6 +114,7 @@ namespace ScrcpyEX.View
 
             //注册键盘钩子
             KMC_Hook.RegisterHook(_mainHandle);
+            MyGM.EnsureWindowOnScreen(this);
         }
 
         /// <summary>

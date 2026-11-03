@@ -34,6 +34,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 using DPoint = System.Drawing.Point;  //Windows Forms的Point
 using WPoint = System.Windows.Point;  //WPF的Point
