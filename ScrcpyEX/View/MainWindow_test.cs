@@ -73,7 +73,7 @@ namespace ScrcpyEX.View
         private async void BtnTest_Click(object sender, RoutedEventArgs e)
         {
             await Task.Delay(1);
-            await MyGM.AdbMoreAsync($"devices -l");
+            //await MyGM.AdbMoreAsync($"devices -l");
             //await MyGM.AdbMoreAsync($"shell ls -l /sdcard/");
             //await MyGM.AdbMoreAsync($"shell ls -la /sdcard/");
             //await MyGM.AdbMoreAsync($"shell echo $SECONDARY_STORAGE");
