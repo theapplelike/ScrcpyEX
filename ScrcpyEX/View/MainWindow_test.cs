@@ -50,12 +50,7 @@ namespace ScrcpyEX.View
         /// 
         /// 双击黑边SC会消失但不会关闭--目前SC消失时不能获得消息，使用双击拦截临时解决
         /// 横屏时拦截双击体验差，能否只拦截黑色区域的双击--会有20ms左右的延迟-y
-        /// border和scrcpy相同大小，监听SDL的消息-x
-        /// 虚拟屏幕-y
-        /// com.bilibili.azurlane
-        /// adb开启USB网络-y
         /// 虚拟屏幕能否呈现为宽屏-京东等应用不支持分屏，在虚拟屏幕上运行会强制回到主屏幕
-        /// 启动时如果程序在屏幕外，定位回屏幕内
         /// </summary>
         //private void Test_Tick(object sender, System.Timers.ElapsedEventArgs e)
         //{
