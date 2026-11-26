@@ -26,7 +26,7 @@ namespace ScrcpyEX.View
         private ScrcpyHost _scHost = null;
 
         /// <summary>
-        /// 窗体对应的ViewModel。
+        /// 窗体对应的ViewModel  。
         /// </summary>
         private readonly MainWindowVM _vm;
 
