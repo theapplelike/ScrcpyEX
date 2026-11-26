@@ -1,114 +1,120 @@
 ﻿using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.ExtensionMethod.MyAttribute;
+using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition;
+using ScrcpyEX.MyDefinition.MyClass;
+using ScrcpyEX.MyDefinition.MyControl;
+using ScrcpyEX.MyDefinition.WindowsAPI;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Interop;
-using System.Windows;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
-using System.Windows.Media;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
-using ScrcpyEX.MyDefinition;
-using ScrcpyEX.MyDefinition.WindowsAPI;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media;
+using static ScrcpyEX.MyDefinition.MyEnum;
+using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
+using static ScrcpyEX.MyDefinition.WindowsAPI.DLL;
 
 namespace ScrcpyEX.View
 {
     public partial class MainWindow//code
     {
         /// <summary>
+        /// 拦截和处理发送到窗口的所有Windows消息。
+        /// </summary>
+        /// <param name="hwnd">接收消息的窗口的句柄。</param>
+        /// <param name="msg">消息标识符，这是一个整数，表示特定的Windows消息。</param>
+        /// <param name="wParam">附加消息参数。</param>
+        /// <param name="lParam">长消息参数。</param>
+        /// <param name="handled">消息处理状态标志，如果设置为true则表示消息已被处理，不再传递给默认的消息处理程序。</param>
+        /// <returns>消息处理结果，大多数情况下返回 IntPtr.Zero（表示使用默认处理）。</returns>
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            switch (msg)
+            {
+                case WM.ACTIVATE:
+                    #region wParam高字节为0X20，低字节为1时，说明窗口被激活，但处于最小化
+                    if ((int)wParam == 0X200001)
+                    {
+                        handled = true;
+                        Debug.WriteLine($"拦截消息：{msg:X4}，{(int)wParam:X4}，{(int)lParam:X4}，窗口被激活，但处于最小化");
+                    }
+                    #endregion
+                    break;
+                case WM.DPICHANGED:
+                    #region DPI 改变时重新获取
+                    MV.DpiScaleX = VisualTreeHelper.GetDpi(this).DpiScaleX;
+                    MV.DpiScaleY = VisualTreeHelper.GetDpi(this).DpiScaleY;
+                    Debug.WriteLine($"DPI 改变了，重新获取当前窗口的 DPI");
+                    #endregion
+                    break;
+                case WM.SYSKEYDOWN:
+                    #region 转发SC的快捷键
+                    if (wParam.ToInt32() == VK_O && (lParam.ToInt64() & (1L << 29)) != 0)
+                    {
+                        if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0)//Shift是否按下
+                        {
+                            PostShortcutsThree(VK_O);
+                        }
+                        else
+                        {
+                            PostShortcutsTwo(VK_O);
+                        }
+                        handled = true;
+                    }
+                    #endregion
+                    break;
+                default:
+                    //Debug.WriteLine($"MEG：{msg:X4}，{(long)wParam:X4}，{(long)lParam:X4}");
+                    break;
+            }
+
+            return IntPtr.Zero;
+        }
+
+        /// <summary>
         /// 自定义初始化。
         /// </summary>
         private void MyInit()
         {
             MV.MainWin = this;
-            MV.Pop = pop;
-            _mainHandle = new WindowInteropHelper(this).Handle;
-            bdRec.Visibility = Visibility.Hidden;
+            MV.DpiScaleX = VisualTreeHelper.GetDpi(this).DpiScaleX;
+            MV.DpiScaleY = VisualTreeHelper.GetDpi(this).DpiScaleY;
+
+            bdRec.Visibility = Visibility.Collapsed;
             dplTip.Visibility = Visibility.Collapsed;
+            btnTest.Visibility = Visibility.Collapsed;
+            dplImgShot.Visibility = Visibility.Collapsed;
 
-            SetControlEvent();
-            SetProcess();
-            SetTimer();
             ReadCfg();
-            SetUISize(true);
-        }
+            SetTimer();
+            ScOptInit();
+            SetControlEvent();
+            SetUISize(MyCfg.Cfg.IsUseLastSize);
 
-        /// <summary>
-        /// 如果不使用上一次的尺寸位置，则设置为默认初始大小，
-        /// 宽=scrcpy宽+左右边距，高=scrcpy高+上下边距+标题栏高。
-        /// </summary>
-        /// <param name="isUseLastSize">是否使用上一次的大小和位置。</param>
-        private void SetUISize(bool isUseLastSize = false)
-        {
-            if (isUseLastSize && MyCfg.Cfg.Size.IsRecord)
-            {
-                Width = MyCfg.Cfg.Size.Width;
-                Height = MyCfg.Cfg.Size.Height;
-                Left = MyCfg.Cfg.Size.Left;
-                Top = MyCfg.Cfg.Size.Top;
-            }
-            else
-            {
-                Width = _scWidth + ExtraWidth;
-                Height = _scHeight + ExtraHeight;
-                Left = (SystemParameters.WorkArea.Width - ActualWidth) / 2;
-                Top = (SystemParameters.WorkArea.Height - ActualHeight) / 2;
-            }
-            //Console.WriteLine($"窗体尺寸：{Width},{Height}。");
-        }
+            //添加消息钩子监听程序的所有消息
+            _hwndSource = PresentationSource.FromVisual(this) as HwndSource;
+            _hwndSource.AddHook(WndProc);
+            _mainHandle = _hwndSource.Handle;
 
-        /// <summary>
-        /// 检查scrcpy是否已经运行，如果运行则停止。
-        /// </summary>
-        private void CheckScrcpy()
-        {
-            // 查询指定名称的进程（无需包含.exe扩展名）
-            Process[] processes = Process.GetProcessesByName("scrcpy");
+            //输入法设置为英文模式，通过焦点按钮实现
+            btnFouce.Focus();
 
-            if (processes.Length > 0)
-            {
-                //Console.WriteLine($"进程ID: {processes[0].Id}");
-                //Console.WriteLine($"主模块路径: {processes[0].MainModule?.FileName}");
-                processes[0].Kill();
-            }
-        }
-
-        /// <summary>
-        /// 读取配置的值给UI界面。
-        /// </summary>
-        private void ReadCfg()
-        {
-            rdoLoc1.IsChecked = MyCfg.Cfg.Locate1;
-            rdoLoc2.IsChecked = MyCfg.Cfg.Locate2;
-            rdoLoc3.IsChecked = MyCfg.Cfg.Locate3;
-            rdoLoc4.IsChecked = MyCfg.Cfg.Locate4;
-        }
-
-        /// <summary>
-        /// 将UI界面的值保存到配置当中。
-        /// </summary>
-        private void SaveCfg()
-        {
-            MyCfg.Cfg.Locate1 = (bool)rdoLoc1.IsChecked;
-            MyCfg.Cfg.Locate2 = (bool)rdoLoc2.IsChecked;
-            MyCfg.Cfg.Locate3 = (bool)rdoLoc3.IsChecked;
-            MyCfg.Cfg.Locate4 = (bool)rdoLoc4.IsChecked;
-
-            //窗体在正常状态下才记录其尺寸位置信息
-            if (WindowState == WindowState.Normal)
-            {
-                MyCfg.Cfg.Size.Width = Width;
-                MyCfg.Cfg.Size.Height = Height;
-                MyCfg.Cfg.Size.Left = Left;
-                MyCfg.Cfg.Size.Top = Top;
-            }
-            MyCfg.Save();
+            //注册键盘钩子
+            KMC_Hook.RegisterHook(_mainHandle);
+            MyGM.EnsureWindowOnScreen(this);
         }
 
         /// <summary>
@@ -116,41 +122,100 @@ namespace ScrcpyEX.View
         /// </summary>
         private void MyClose()
         {
-            _resizeTimer.Stop();
-
+            _hwndSource.RemoveHook(WndProc);
             SaveCfg();
-            ClosePrc();
-            CloseOther();
+            
+            KMC_Hook.CancelHook();
+            MRS_Hook.CancelHook();
+            //MDC_Hook.CancelHook();
+
+            _scriptTimer.Stop();
+            _countTimer.Stop();
+
+            foreach (DragPopup drag in MV.DragPopups)
+            {
+                drag.Dispose();
+            }
+
+            _scHost?.Dispose();
+            ClearAdb();
         }
 
         /// <summary>
-        /// 外部程序未关闭时需要关闭，并且在关闭前要一直等待，防止Exited事件未执行完就执行Close()和Dispose()，
-        /// 这样会导致非托管资源不能被释放。
+        /// 最后一个程序实例退出后清理ADB。
         /// </summary>
-        private void ClosePrc()
+        private void ClearAdb()
         {
-            if (_scHandle != IntPtr.Zero)
+            if (!Debugger.IsAttached)
             {
-                _prc.Kill();
-                _prc.WaitForExit();
-                Console.WriteLine("Main程序应用退出时关闭Scrcpy。");
+                Process[] instance = Process.GetProcessesByName("ScrcpyEx");
+                if (instance.Length <= 1)
+                {
+                    MyGM.StopAdbServer();
+                }
             }
-
-            _prc.Close();
-            _prc.Dispose();
-            Console.WriteLine("Scrcpy已清理完毕。");
         }
 
         /// <summary>
-        /// 关闭其他一些程序使用的资源。
+        /// 如果不使用上一次的尺寸位置，则设置为默认初始大小，
+        /// 宽=Scrcpy宽+左右边距，高=Scrcpy高+上下边距+标题栏高。
         /// </summary>
-        private void CloseOther()
+        /// <param name="isUseLastSize">是否使用上一次的大小和位置。</param>
+        private void SetUISize(bool isUseLastSize = false)
         {
-            if (MouseScript.HookID != IntPtr.Zero)
+            if (isUseLastSize && MyCfg.Cfg.Size.IsRecord)
             {
-                MouseScript.CancelHook();
+                Top = MyCfg.Cfg.Size.Top;
+                Left = MyCfg.Cfg.Size.Left;
+                Width = MyCfg.Cfg.Size.Width;
+                Height = MyCfg.Cfg.Size.Height;
             }
-            wfh.Dispose();
+            else
+            {
+                Top = (SystemParameters.WorkArea.Height - ActualHeight) / 2;
+                Left = (SystemParameters.WorkArea.Width - ActualWidth) / 2;
+                Width = _scWidth + ExtraWidth;
+                Height = _scHeight + ExtraHeight;
+            }
+            //Debug.WriteLine($"窗体尺寸：{Width},{Height}。");
+        }
+
+        /// <summary>
+        /// 读取配置的值给UI界面。
+        /// </summary>
+        private void ReadCfg()
+        {
+            if (!MyCfg.Cfg.IsCanResize)
+            {
+                ResizeMode = ResizeMode.CanMinimize;
+            }
+
+            rdoLoc1.IsChecked = MyCfg.Cfg.Locates[0];
+            rdoLoc2.IsChecked = MyCfg.Cfg.Locates[1];
+            rdoLoc3.IsChecked = MyCfg.Cfg.Locates[2];
+            rdoLoc4.IsChecked = MyCfg.Cfg.Locates[3];
+        }
+
+        /// <summary>
+        /// 将UI界面的值保存到配置当中。
+        /// </summary>
+        private void SaveCfg()
+        {
+            MyCfg.Cfg.Locates[0] = (bool)rdoLoc1.IsChecked;
+            MyCfg.Cfg.Locates[1] = (bool)rdoLoc2.IsChecked;
+            MyCfg.Cfg.Locates[2] = (bool)rdoLoc3.IsChecked;
+            MyCfg.Cfg.Locates[3] = (bool)rdoLoc4.IsChecked;
+
+            //窗体在正常状态下才记录其尺寸位置信息
+            if (WindowState == WindowState.Normal && !_isMaximize)
+            {
+                MyCfg.Cfg.Size.Top = Top;
+                MyCfg.Cfg.Size.Left = Left;
+                MyCfg.Cfg.Size.Width = Width;
+                MyCfg.Cfg.Size.Height = Height;
+                MyCfg.Cfg.Size.IsRecord = true;
+            }
+            MyCfg.Save();
         }
 
         /// <summary>
@@ -159,164 +224,220 @@ namespace ScrcpyEX.View
         /// <param name="isWired">是否使用有线形式启动。</param>
         private async void StartScrcpy(bool isWired)
         {
-            if (_scHandle == IntPtr.Zero)
+            if (IsScClosed)
             {
                 btnWired.IsEnabled = btnWirel.IsEnabled = false;
-                CheckScrcpy();
-                await ConnectScrcpy(isWired);
+
+                if (isWired)
+                {
+                    popScOpt.ExchangeMainBtn(btnWired);
+                    await PrepareWired();
+                }
+                else
+                {
+                    popScOpt.ExchangeMainBtn(btnWirel);
+                    await PrepareWireless();
+                }
+
+                MyCfg.Cfg.IsUseWiredInLast = isWired;
                 btnWired.IsEnabled = btnWirel.IsEnabled = true;
-            }
-        }
-
-        /// <summary>
-        /// 启动Scrcpy并以指定方式连接手机，并不能使用WaitForInputIdle()等待Scrcpy启动完成，因为Process启动的是命令行，
-        /// 图像界面是由命令行启动的。
-        /// </summary>
-        /// <param name="isWired">是否使用有线形式启动。</param>
-        private async Task ConnectScrcpy(bool isWired)
-        {
-            ProcessStartInfo info = new(MV.ScrcpyPath)
-            {
-                Arguments = GetCommandLine(isWired),
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-            };
-            _prc.StartInfo = info;
-
-            if (_prc.Start())
-            {
-                _prc.BeginOutputReadLine();
-                _prc.BeginErrorReadLine();
-                int i = 0;
-
-                do
-                {
-                    await Task.Delay(500);
-                    if (EmbeddedForm())
-                    {
-                        KeyboardHook.RegisterHook();
-                        CreateSavedPop();
-                        return;
-                    }
-                    Console.WriteLine($">>>>>>>>>>>>>>{i++}:查找程序：{_scName}，程序是否被关闭：{_prc.HasExited}。");
-                }
-                while (!_prc.HasExited || i < 30);
-                MessageBox.Show("未能成功启动程序，请重试。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        /// <summary>
-        /// 获得Scrcpy启动时附带的命令行参数。
-        /// </summary>
-        /// <param name="isWired">是否使用有线形式启动。</param>
-        private string GetCommandLine(bool isWired)
-        {
-            StringBuilder sb = new();
-
-            //根据用户设置获得的命令行参数
-            foreach (PropertyInfo prop in typeof(MyCfg).GetProperties())
-            {
-                string str = GetArg(prop.Name);
-                if (str != null && ConvToBool(prop.GetValue(MyCfg.Cfg)))
-                {
-                    sb.Append($"{str} ");
-                }
-                //Console.WriteLine($"属性{prop.Name}：{prop.GetValue(MyCfg.Cfg)}，{GetArg(prop.Name)}。");
-            }
-
-            //键盘使用UHID可以输入中文，对设备输入中文时电脑输入法必须为英文
-            _scName = $"{DateTime.Now:HHmmss}mook";
-            sb.Append($"--keyboard=uhid --window-title={_scName} ");
-
-            if (isWired)
-            {
-                sb.Append("--select-usb");
             }
             else
             {
-                sb.Append($"--tcpip={MyCfg.Cfg.IP}:{MyCfg.Cfg.Port}");
+                popMid.Show("Scrcpy已经启动");
             }
-
-            //Console.WriteLine($"命令行：{sb}。");
-            return sb.ToString();
         }
 
         /// <summary>
-        /// 获得指定属性（Property）的特性（Attribute），如果没有特性（Attribute）则返回null。
+        /// 准备进行有线连接，如果有多个设备，会让用户选择。
         /// </summary>
-        /// <param name="Prop">属性（Property）的名称。</param>
-        private string GetArg(string Prop)
+        private async Task PrepareWired()
         {
-            var info = typeof(MyCfg).GetProperty(Prop).GetCustomAttribute<CommandLineAttribute>();
-            return info?.Arguments ?? null;
-        }
+            List<string> devices = await GetSpecifiedAdbDevices(AdbDeviceType.Usb);
 
-        /// <summary>
-        /// 判断传入的对象是否可以转化为bool，不能返回false，如果可以返回其bool值。
-        /// </summary>
-        private bool ConvToBool(object val) => val is bool result && result;
-
-        /// <summary>
-        /// 获得scrcpy的句柄，并将scrcpy放到panel中。
-        /// </summary>
-        /// <returns>true--嵌入成功；false嵌入失败。</returns>
-        private bool EmbeddedForm()
-        {
-            // 查询指定名称的进程（无需包含.exe扩展名）
-            Process[] processes = Process.GetProcessesByName("scrcpy");
-            //Console.WriteLine($"进程的数量：{processes.Length}。");
-            if (processes.Length > 0 && processes[0].MainWindowHandle != IntPtr.Zero)
+            if (devices.Count == 0)
             {
-                _scHandle = processes[0].MainWindowHandle;
+                popMid.Show("没有任何设备可以连接。");
+            }
+            else if (devices.Count == 1)
+            {
+                await ScrcpyInit(true);
+            }
+            else
+            {
+                SelectDevice select = new(devices, true);
+                if (select.ShowDialog() == true)
+                {
+                    await ScrcpyInit(true, devices[select.Index]);
+                }
+            }
+        }
 
-                HideTitleBar(_scHandle);
-                IntPtr parent = DLL.SetParent(_scHandle, pnlShow.Handle);
-                DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
+        /// <summary>
+        /// 准备进行无线连接，连接前会查询局域网中所有IP和端口开放和ADB可以识别的设备，如有多个设备则会让用户选择。
+        /// </summary>
+        private async Task PrepareWireless()
+        {
+            AdbDeviceScanner scanner = new();
+            List<string> devices = await scanner.ScanNetworkForAdbDevicesAsync();
+            List<string> socketAddr = await GetSpecifiedAdbDevices(AdbDeviceType.Tcp);
 
-                Console.WriteLine($"Scrcpy句柄：{_scHandle}，名称：{processes[0].MainWindowTitle}，父级句柄：{parent}。");
-                return parent != IntPtr.Zero;
+            //添加ADB可以识别的设备
+            foreach (string addr in socketAddr)
+            {
+                string ip = MyGM.ExtractIpAddress(addr);
+                if (ip != "" && !devices.Contains(ip))
+                {
+                    devices.Add(ip);
+                }
             }
 
-            //23.6.17
-            //foreach (var p in Process.GetProcesses())
-            //{
-            //    if (p.MainWindowTitle.Contains(_scName))
-            //    {
-            //        _scHandle = p.MainWindowHandle;
-            //
-            //        HideTitleBar(_scHandle);
-            //        DLL.SetParent(_scHandle, pnlShow.Handle);
-            //        DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
-            //
-            //        Console.WriteLine($"Scrcpy句柄：{_scHandle}，名称：{p.MainWindowTitle}。");
-            //        return true;
-            //    }
-            //}
+            if (devices.Count <= 0)
+            {
+                popMid.Show("局域网中没有可以连接的设备。");
+            }
+            else if (devices.Count == 1)
+            {
+                await ScrcpyInit(false, devices[0]);
+            }
+            else
+            {
+                SelectDevice select = new(devices, false);
+                if (select.ShowDialog() == true)
+                {
+                    await ScrcpyInit(false, devices[select.Index]);
+                }
+            }
+        }
 
+        /// <summary>
+        /// Scrcpy启动完成后，初始化Scrcpy相关的所有功能。
+        /// </summary>
+        /// <param name="isWired">是否使用有线形式启动。</param>
+        /// <param name="sign">有线形式--【设备序列号】，无线模式--【设备IP地址】。</param>
+        /// <param name="port">无线形式启动启动时的端口号。</param>
+        private async Task ScrcpyInit(bool isWired, string sign = "", string port = "5555")
+        {
+            _scHost = new ScrcpyHost();
+            bdShow.Child = await _scHost.StartScrcpyAsync(isWired, sign, port);
+
+            if (bdShow.Child != null)
+            {
+                Activate();
+                CreateSavedPop(false, GetForegroundWindow() == _mainHandle);
+                InputModeSwitcher.SwitchToEnglishMode(ScHandle);
+
+                Debug.WriteLine($"-*-激活:{IsActive}，主:{_mainHandle}，SC:{ScHandle}");
+            }
+            else
+            {
+                MyGM.ShwError("bdShow.Child为null，SC添加失败");
+            }
+        }
+
+        /// <summary>
+        /// 关闭Scrcpy，同时回收焦点。
+        /// </summary>
+        private void CloseScrcpy()
+        {
+            if (!IsScClosed)
+            {
+                _scHost.Dispose();
+                btnFouce.Focus();
+                bdShow.Child = null;
+                StopScriptAndRecord();
+                Debug.WriteLine($"用户结束Scrcpy程序。");
+            }
+        }
+
+        /// <summary>
+        /// 打开设备的无线调试功能，开启后可以无线连接，需要在同一个网络中。
+        /// 通过ADB将USB连接的设备打开无线调试，然后重启Scrcpy，打开无线调试的设备可以被Tcpclient访问。
+        /// </summary>
+        /// <returns>设备无线调试是否打开成功。</returns>
+        private async Task<bool> WirelessDebug()
+        {
+            popMid.Show("请保持USB连接稳定。");
+            List<string> devices = await GetSpecifiedAdbDevices(AdbDeviceType.Usb);
+
+            foreach (string dev in devices)
+            {
+                //获得指定设备IP，awk 是一个文本处理工具，按行处理文本
+                //{print $9}表示打印每一行的第9个字段，字段默认以空格或制表符分隔
+                string ip = (await MyGM.AdbAsync($@"-s {dev} shell ip route | awk '{{print $9}}'")).Trim();
+                if (ip == "")
+                {
+                    popMid.Show("未获得设备IP地址，请检查是否在同一网络中。");
+                    return false; ;
+                }
+
+                //将安卓设备上的 ADB 服务从 USB 模式切换为网络模式
+                await MyGM.AdbAsync($"-s {dev} tcpip 5555");
+
+                //连接指定 IP 地址和端口上的 Android 设备，须在同一局域网中
+                await MyGM.AdbAsync($"connect {ip}:5555");
+
+                CloseScrcpy();
+                await Task.Delay(1000);
+                popMid.Show("匹配完成，正在启动Scrcpy。");
+
+                StartScrcpy(false);
+                return true;
+            }
+
+            popMid.Show("没有设备或未打开USB调试。");
             return false;
         }
 
         /// <summary>
-        /// 隐藏指定窗口的标题栏。通过位运算移除WS_CAPTION样式，从而隐藏标题栏。然后设置为新的窗口样式。
+        /// 获取指定类型的 ADB 设备序列号列表。
         /// </summary>
-        /// <param name="handle">窗口的句柄。</param>
-        private void HideTitleBar(IntPtr handle)
+        /// <param name="type">指定 ADB 设备类型。</param>
+        /// <returns>USB连接的物理设备，是其序列号；网络连接的设备，格式为 IP地址:端口号；模拟器是 emulator-端口号。</returns>
+        private async Task<List<string>> GetSpecifiedAdbDevices(AdbDeviceType type)
         {
-            int GWL_STYLE = -16;//检索窗口的样式
-            int WS_CAPTION = 0xC00000;//是窗口标题栏的样式标志
-            int WS_THICKFRAME = 0x00040000;//允许通过拖动边缘来调整窗口大小
-            int style = DLL.GetWindowLong(handle, GWL_STYLE);
+            List<string> allDevices = await GetAllAdbDevices();
+            List<string> result = [];
 
-            //删除WS_CAPTION样式以隐藏标题栏  
-            style &= ~WS_CAPTION;
+            foreach (string serial in allDevices)
+            {
+                bool isEmulator = serial.StartsWith("emulator-");
+                bool isTcp = serial.Contains(":");
+                bool isUsb = !isEmulator && !isTcp;
 
-            //删除WS_THICKFRAME样式以隐藏窗体可以调整大小的边框
-            style &= ~WS_THICKFRAME;
+                switch (type)
+                {
+                    case AdbDeviceType.All:
+                        result.Add(serial);
+                        break;
+                    case AdbDeviceType.Usb:
+                        if (isUsb) result.Add(serial);
+                        break;
+                    case AdbDeviceType.Tcp:
+                        if (isTcp) result.Add(serial);
+                        break;
+                    case AdbDeviceType.Emulator:
+                        if (isEmulator) result.Add(serial);
+                        break;
+                }
+            }
 
-            //设置为新的窗口样式
-            DLL.SetWindowLong(handle, GWL_STYLE, style);
+            return result;
+        }
+
+        /// <summary>
+        /// 所有当前连接到电脑的 Android 设备或模拟器。
+        /// </summary>
+        /// <returns>USB连接的物理设备，是其序列号；网络连接的设备，格式为 IP地址:端口号；模拟器是 emulator-端口号。</returns>
+        private async Task<List<string>> GetAllAdbDevices()
+        {
+            string output = await MyGM.AdbAsync("devices");
+            return [.. output
+                .SplitReal(['\r', '\n'])
+                .Where(line => !line.StartsWith("List of devices") && !string.IsNullOrWhiteSpace(line))
+                .Select(line => line.SplitReal(['\t', ' ']))
+                .Where(parts => parts.Length >= 2 && parts[1] == "device")
+                .Select(parts => parts[0].Trim())];
         }
 
         /// <summary>
@@ -326,64 +447,47 @@ namespace ScrcpyEX.View
         {
             double wd = SystemParameters.WorkArea.Width;
             double ht = SystemParameters.WorkArea.Height;
+            _isAdjustPop = false;
+            HideKeyMapping();
+
             if (Width >= wd && Height >= ht)
             {
-                LoadTempSize();
+                LoadTempSize(_tempSize);
                 btnMaximize.Content = "\ue922";
+                _isMaximize = false;
             }
             else
             {
                 SaveTempSize();
-                Width = wd; 
+                Top = Left = 0;
+                Width = wd;
                 Height = ht;
-                Left = Top = 0;
                 btnMaximize.Content = "\ue923";
+                _isMaximize = true;
             }
         }
 
         /// <summary>
         /// 保存当前窗体的尺寸和位置到临时变量中。
         /// </summary>
-        private void SaveTempSize() => _tempSize = new(Width, Height, Left, Top);
+        private void SaveTempSize() => _tempSize = new(Top, Left, Width, Height);
 
         /// <summary>
-        /// 获得临时变量中的窗体尺寸和位置。
+        /// 应用临时变量中的窗体尺寸和位置。
         /// </summary>
-        private void LoadTempSize()
+        private void LoadTempSize(FormSize size)
         {
-            if (_tempSize == null)
+            if (size == null)
             {
                 SetUISize();
+                Locate();
+                return;
             }
-            else
-            {
-                Width = _tempSize.Width;
-                Height = _tempSize.Height;
-                Left = _tempSize.Left;
-                Top = _tempSize.Top;
-            }
-        }
 
-        /// <summary>
-        /// 重新设置scrcpy窗口的大小，以完全贴合父级panel，需要先最小化再最大化，防止相对坐标错误。
-        /// 如果相对坐标仍然错误，两次操作间需要增加延时，给系统足够的处理时间。
-        /// </summary>
-        private async void ResizeSC()
-        {
-            Console.WriteLine($"重新设置scrcpy大小。");
-
-            DLL.ShowWindow(_scHandle, SW.SW_SHOWNORMAL);
-            await Task.Delay(100);
-            DLL.ShowWindow(_scHandle, SW.SW_SHOWMAXIMIZED);
-
-            Dispatcher.Invoke(() =>
-            {
-                foreach (Popup pop in MV.TempPopups)
-                {
-                    pop.IsOpen = false;
-                }
-                CreateSavedPop();
-            });
+            Top = size.Top;
+            Left = size.Left;
+            Width = size.Width;
+            Height = size.Height;
         }
 
         /// <summary>
@@ -392,147 +496,391 @@ namespace ScrcpyEX.View
         /// </summary>
         private void Locate()
         {
+            System.Drawing.Rectangle workArea = MyGM.GetCurScreenRect(_mainHandle);
+
             if ((bool)rdoLoc1.IsChecked)
             {
-                Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
-                Top = 0;
+                Top = LostDpi(workArea.Top);
+                Left = LostDpi(workArea.Left);
             }
             else if ((bool)rdoLoc2.IsChecked)
             {
-                Left = SystemParameters.WorkArea.Width - Width;
-                Top = 0;
+                Top = LostDpi(workArea.Top);
+                Left = LostDpi(workArea.Right) - Width;
             }
             else if ((bool)rdoLoc3.IsChecked)
             {
-                Left = 0 - SystemParameters.WindowNonClientFrameThickness.Left;
-                Top = SystemParameters.WorkArea.Height - Height;
+                Top = LostDpi(workArea.Bottom) - Height;
+                Left = LostDpi(workArea.Left);
             }
             else if ((bool)rdoLoc4.IsChecked)
             {
-                Left = SystemParameters.WorkArea.Width - Width;
-                Top = SystemParameters.WorkArea.Height - Height;
+                Top = LostDpi(workArea.Bottom) - Height;
+                Left = LostDpi(workArea.Right) - Width;
             }
         }
 
         /// <summary>
-        /// 窗体宽度修改为屏幕的四分之一并移动定位，高度根据15:7调整。
+        /// 将值除以DPI比例，变成与DPI无关的值。
+        /// </summary>
+        /// <param name="x">和DPI相关的值。</param>
+        /// <returns>与DPI无关的值。</returns>
+        private double LostDpi(double x) => x * 1.0 / MV.DpiScaleX;
+
+        /// <summary>
+        /// 窗体宽度修改为屏幕的四分之一并移动定位，高度根据短比调整。
         /// </summary>
         private void QuarterMove()
         {
+            double ratio;
+            if (_ScFrameHt > _ScFrameWd)
+            {
+                ratio = 1.0 * _ScFrameWd / _ScFrameHt;
+            }
+            else
+            {
+                ratio = 1.0 * _ScFrameHt / _ScFrameWd;
+            }
+
             Width = SystemParameters.WorkArea.Width / 2;
-            Height = (Width - ExtraWidth) * 1.0 / 15 * 7 + ExtraHeight;
+            Height = (Width - ExtraWidth) * ratio + ExtraHeight;
             Locate();
-            Console.WriteLine($"宽高：{Width},{Height}。");
         }
 
         /// <summary>
-        /// 外部程序被Kill()后，会执行Exited事件，前提是EnableRaisingEvents要设置为true。
+        /// 消除Scrcpy的黑边。
         /// </summary>
-        private void HandStopScrcpy()
+        private void RemoveScBlack()
         {
-            if (_scHandle != IntPtr.Zero)
+            if (IsScClosed)
             {
-                _prc.Kill();
-                StopScriptAndRecord();
-                Console.WriteLine("手动结束scrcpy程序。");
-            }
-        }
-
-        /// <summary>
-        /// 消除投屏的黑边。
-        /// </summary>
-        private void RemoveBlack()
-        {
-            if (_scHandle == IntPtr.Zero)
-            {
-                popMid.Show("未进行投屏，不能进行调整。");
+                popMid.Show("未投屏，无需消除黑边。");
                 return;
             }
 
-            int scWidth = (int)ScActualWidth;
-            int scHeight = (int)ScActualHeight;
-            int max = GetGreatestCommonDivisor(scWidth, scHeight);
-
-            int xProportion = scWidth / max;
-            int yProportion = scHeight / max;
-            Console.WriteLine($"当前Scrcpy的比例：({scWidth / max}，{scHeight / max})，期望比例:({_horizontalRatio},{_verticalRatio})。");
-
-            //计算通分后的分子，如果标准分子大，应以宽为准，调整高度；反之调整宽度
-            int currentNumerator = xProportion * _verticalRatio;
-            int standardNumerator = yProportion * _horizontalRatio;
-            if (currentNumerator > standardNumerator)
+            if (MyCfg.Cfg.IsKeepLandscape)
             {
-                Width = ScActualHeight / _verticalRatio * _horizontalRatio + ExtraWidth;
+                double hope = ScActualHeight * _ScAspectRatio + ExtraWidth;
+                if (hope < 0) return;
+
+                Width = hope;
+                Debug.WriteLine($"保持横屏，调整宽度，期望：{hope}，实际：{ActualWidth}");
             }
-            else if (currentNumerator < standardNumerator)
+            else if (_ScFrameWd < _ScFrameHt)
             {
-                Height = ScActualWidth / _horizontalRatio * _verticalRatio + ExtraHeight;
+                double currResoRatio = ScActualHeight / ScActualWidth;
+                if (currResoRatio > _ScAspectRatio)
+                {
+                    Debug.WriteLine($"竖屏，上下有黑边，{currResoRatio}");
+                    AdjustHeight();
+                }
+                else
+                {
+                    Debug.WriteLine($"竖屏，左右有黑边，{currResoRatio}");
+                    AdjustWidth();
+                }
+            }
+            else
+            {
+                double currResoRatio = ScActualWidth / ScActualHeight;
+                if (currResoRatio < _ScAspectRatio)
+                {
+                    Debug.WriteLine($"横屏，上下有黑边，{currResoRatio}");
+                    AdjustHeight();
+                }
+                else
+                {
+                    Debug.WriteLine($"横屏，左右有黑边，{currResoRatio}");
+                    AdjustWidth();
+                }
             }
         }
 
         /// <summary>
-        /// 缩小指定步长的尺寸，以15:7为标准。
+        /// 黑边在上下，调整高度。
         /// </summary>
-        /// <param name="step">步长，默认为8。</param>
-        private void ReduceSize(int step = 8)
+        private void AdjustHeight()
         {
-            if (_scHandle == IntPtr.Zero)
+            double ratio = _ScFrameHt * 1.0 / _ScFrameWd;
+            Height = ScActualWidth * ratio + ExtraHeight;
+            Debug.WriteLine($"调整高度：{ratio}，期望：{ScActualWidth * ratio + ExtraHeight}，实际：{ActualHeight}");
+        }
+
+        /// <summary>
+        /// 黑边在左右，调整宽度。
+        /// </summary>
+        private void AdjustWidth()
+        {
+            double ratio = _ScFrameWd * 1.0 / _ScFrameHt;
+            Width = ScActualHeight * ratio + ExtraWidth;
+            Debug.WriteLine($"调整宽度：{ratio}，期望：{ScActualHeight * ratio + ExtraWidth}，实际：{ActualWidth}");
+        }
+
+        /// <summary>
+        /// 缩小程序指定步长的尺寸，以 宽边/短边 为步长基准。
+        /// </summary>
+        /// <param name="step">步长。</param>
+        private void ReduceSize(int step = 50)
+        {
+            if (IsScClosed)
             {
                 popMid.Show("未进行投屏，不能缩放尺寸。");
                 return;
             }
-            if (ScRatioX <= 0.25 || ScRatioY <= 0.25)
+
+            double tgtWd = Width - _ScAspectRatio * step;
+            double tgtHt = Height - step;
+            
+            if (tgtWd < 0 || tgtHt < 0)
             {
-                popMid.Show("不能再继续缩小。");
                 return;
             }
 
-            Width -= _horizontalRatio * step;
-            Height -= _verticalRatio * step;
+            Width = tgtWd;
+            Height = tgtHt;
             Locate();
-            RemoveBlack();
+            RemoveScBlack();
+            Debug.WriteLine($"缩小期望宽高：({tgtWd},{tgtHt})，实际：({ActualWidth},{ActualHeight})");
         }
 
         /// <summary>
-        /// 放大指定步长的尺寸，以15:7为标准。
+        /// 放大程序指定步长的尺寸，以 宽边/短边 为步长基准。
         /// </summary>
-        /// <param name="step">步长，默认为8。</param>
-        private void AmplifySize(int step = 8)
+        /// <param name="step">步长。</param>
+        private void AmplifySize(int step = 50)
         {
-            if (_scHandle == IntPtr.Zero)
+            if (IsScClosed)
             {
                 popMid.Show("未进行投屏，不能缩放尺寸。");
                 return;
             }
-            if (ScRatioX >= 1.5)
-            {
-                //X轴不能再放大
-            }
-            else if (Width + _horizontalRatio * step > SystemParameters.WorkArea.Width)
+
+            if (Width + _ScAspectRatio * step > SystemParameters.WorkArea.Width)
             {
                 Width = SystemParameters.WorkArea.Width;
             }
             else
             {
-                Width += _horizontalRatio * step;
+                Width += _ScAspectRatio * step;
             }
-
-            if (ScRatioY >= 1.5)
-            {
-                //Y轴不能再放大
-            }
-            else if (Height + _verticalRatio * step > SystemParameters.WorkArea.Height)
+            if (Height + step > SystemParameters.WorkArea.Height)
             {
                 Height = SystemParameters.WorkArea.Height;
             }
             else
             {
-                Height += _verticalRatio * step;
+                Height += step;
             }
+            Debug.WriteLine($"放大后：{ActualWidth},{ActualHeight}");
 
             Locate();
-            RemoveBlack();
+            RemoveScBlack();
         }
+
+        /// <summary>
+        /// 窗口尺寸改变后要进行的操作。
+        /// </summary>
+        /// <param name="e">SizeChanged事件相关的数据。</param>
+        private void WindowSizeChanged(SizeChangedEventArgs e)
+        {
+            //Debug.WriteLine($"现在的宽度：{e.NewSize.Width}");
+
+            _vm.Scaling = $"缩放比例 {ScRatioX:P}:{ScRatioY:P}";
+            if (!IsScClosed)
+            {
+                _resizeTimer.Start();
+            }
+
+            //计算菜单栏右侧按钮是否需要放入移出溢出菜单
+            if (e.NewSize.Width >= 329)
+            {
+                while (stpRightMenu.Children.Count < 3)
+                {
+                    MoveOutSysMenu();
+                }
+            }
+            else if (e.NewSize.Width < 329 && e.NewSize.Width >= 229)
+            {
+                if (stpRightMenu.Children.Count > 2)
+                {
+                    MoveInSysMenu(false);
+                }
+                else if (stpRightMenu.Children.Count < 2)
+                {
+                    MoveOutSysMenu();
+                }
+            }
+            else if (e.NewSize.Width < 229)
+            {
+                while (stpRightMenu.Children.Count > 1)
+                {
+                    MoveInSysMenu(true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 将系统按钮加入系统悬停菜单。
+        /// </summary>
+        /// <param name="isTopmost">加入溢出菜单的按钮是否放到最前面。</param>
+        private void MoveInSysMenu(bool isTopmost = true)
+        {
+            Button btn = stpRightMenu.Children[stpRightMenu.Children.Count - 1] as Button;
+            popSysOpt.Add(btn, isTopmost);
+        }
+
+        /// <summary>
+        /// 将系统按钮移出系统悬停菜单。
+        /// </summary>
+        private void MoveOutSysMenu() => popSysOpt.MoveOutTo(stpRightMenu);
+
+        /// <summary>
+        /// 初始化Scrcpy的主要功能按钮和附属Popup菜单。
+        /// </summary>
+        private void ScOptInit()
+        {
+            if (MyCfg.Cfg.IsUseWiredInLast)
+            {
+                ProcessButton(btnWired);
+            }
+            else
+            {
+                ProcessButton(btnWirel);
+            }
+        }
+
+        /// <summary>
+        /// 处理Scrcpy相关的按钮。
+        /// </summary>
+        /// <param name="mainBtn">作为主要功能的按钮。</param>
+        private void ProcessButton(Button mainBtn)
+        {
+            popScOpt.PlacementTarget = mainBtn;
+
+            //非主要按钮加入Popup菜单
+            List<Button> buttons = [.. dcpScMain.Children.OfType<Button>().Where(b => b.Name != mainBtn.Name)];
+            foreach (Button btn in buttons)
+            {
+                popScOpt.Add(btn);
+            }
+        }
+
+        /// <summary>
+        /// 打开指定菜单，在溢出菜单中时，不再依赖按钮，在鼠标位置弹出菜单。
+        /// </summary>
+        /// <param name="btn">打开菜单的按钮。</param>
+        /// <param name="pop">需要打开的菜单。</param>
+        private void OpenMenu(Button btn, Popup pop)
+        {
+            if (pop.IsOpen)
+            {
+                pop.IsOpen = false;
+                return;
+            }
+
+            if (ToolBar.GetIsOverflowItem(btn))
+            {
+                pop.PlacementTarget = null;
+                pop.Placement = PlacementMode.MousePoint;
+            }
+            else
+            {
+                pop.PlacementTarget = btn;
+                pop.Placement = PlacementMode.Bottom;
+            }
+            pop.IsOpen = true;
+        }
+
+        /// <summary>
+        /// 焦点在SC上时使用Alt+Tab切换窗口，SC会收到Alt按下事件，但不会收到抬起事件，
+        /// 导致Alt+Tab回来后SC即使有焦点也不能触发键盘输入，如果此时按下H会触发Alt+H快捷键。
+        /// Win+Tab不会导致问题，鼠标切换也不会导致问题。
+        /// 所以需要向SC发送Alt键抬起消息。
+        /// </summary>
+        /// <param name="hWnd">目标窗口句柄。</param>
+        /// <param name="isRightAlt">是否为右Alt。</param>
+        public void SendAltKeyUp(IntPtr hWnd, bool isRightAlt)
+        {
+            uint vk = isRightAlt ? VK_RMENU : VK_LMENU;
+            uint scanCode = MapVirtualKey(vk, 0);
+            uint extended = isRightAlt ? 1u : 0u;
+
+            IntPtr lParamUp = BuildLParam(1, scanCode, extended, 0, 1, 1);
+            PostMessage(hWnd, WM.SYSKEYUP, (IntPtr)vk, lParamUp);
+        }
+
+        /// <summary>
+        /// 组装WM_KEYDOWN、WM_KEYUP、WM_SYSKEYDOWN、WM_SYSKEYUP键盘消息的 lParam 参数。
+        /// </summary>
+        /// <param name="repeatCount">0-15：重复次数。</param>
+        /// <param name="scanCode">16-23：OEM 扫描码。</param>
+        /// <param name="extendedKey">24：扩展键标志(是扩展键，值为1；否则为0)，左Alt为0，右Alt为1。</param>
+        /// <param name="contextCode">29：上下文码（仅当消息为 WM_SYSKEYDOWN 或 WM_SYSKEYUP，并且 Alt 键被按住时，值才为 1）。</param>
+        /// <param name="previousState">30：前一个键状态（0=之前是抬起，1=之前是按下）。</param>
+        /// <param name="transitionState">31：转换状态（0=本次按下，1=本次抬起）。</param>
+        /// <returns>IntPtr类型的 lParam 参数。</returns>
+        private IntPtr BuildLParam(uint repeatCount, uint scanCode, uint extendedKey, uint contextCode, uint previousState, uint transitionState)
+        {
+            uint lParam = (scanCode << 16)
+                        | (extendedKey << 24)
+                        | (contextCode << 29)
+                        | (previousState << 30)
+                        | (transitionState << 31)
+                        | (repeatCount & 0x0000FFFF);
+            return (IntPtr)lParam;
+        }
+
+        /// <summary>
+        /// 通过ADB打开安卓的Remote NDIS。
+        /// </summary>
+        private async Task OpenRndis()
+        {
+            MyGM.POP("正在打开USB网络共享");
+            (string otp, string err, int exc) = await MyGM.AdbMoreAsync("shell svc usb setFunctions rndis");
+            if (exc == 255)
+            {
+                string lb = otp == "" ? "" : "\n";
+                MyGM.POP($"{otp}{lb}USB网络共享打开成功");
+            }
+            else
+            {
+                if (err == "")
+                {
+                    MyGM.POP($"USB网络共享打开失败，请检查设备连接");
+                }
+                else if (err.Contains("device unauthorized"))
+                {
+                    MyGM.POP($"{err}\n设备未授权，请检查设备对话框进行授权");
+                }
+                else
+                {
+                    MyGM.POP($"{err}\nUSB网络共享打开失败，请检查设备连接");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 将指定句柄的窗口置于前台。
+        /// </summary>
+        /// <param name="topHwnd">要置于前台的窗口句柄。</param>
+        private void BringWindowToFront(IntPtr topHwnd)
+        {
+            uint topThreadId = GetWindowThreadProcessId(topHwnd, out _);
+            uint thisThreadId = GetWindowThreadProcessId(_mainHandle, out _);
+
+            if (topThreadId != thisThreadId)
+            {
+                // 设置前台进程需要自己是前台进程，如果自己不是则应该附加到前台进程再操作
+                AttachThreadInput(thisThreadId, topThreadId, true);
+                SetForegroundWindow(topHwnd);
+                AttachThreadInput(thisThreadId, topThreadId, false);
+            }
+            else
+            {
+                SetForegroundWindow(topHwnd);
+            }
+        }
+
 
     }
 }

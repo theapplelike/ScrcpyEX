@@ -1,10 +1,13 @@
 ﻿using ScrcpyEX.ExtensionMethod;
 using ScrcpyEX.MyDefinition;
+using ScrcpyEX.MyDefinition.MyClass;
+using ScrcpyEX.MyDefinition.WindowsAPI;
 using ScrcpyEX.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static ScrcpyEX.MyDefinition.WindowsAPI.VK;
 
 namespace ScrcpyEX.View
 {
@@ -44,21 +48,60 @@ namespace ScrcpyEX.View
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            //Console.WriteLine($"窗体大小进行改变，Scrcpy当前：（{ScActualWidth}，{ScActualHeight}），比例：（{ScRatioX}，{ScRatioY}）。");
+            WindowSizeChanged(e);
+        }
 
-            //scrcpy程序句柄不为空调整scrcpy大小
-            if (_scHandle != IntPtr.Zero)
+        private void Window_Activated(object sender, EventArgs e)
+        {
+            //Debug.WriteLine($"++++++++++窗口激活,{IsActive},{DLL.GetForegroundWindow()}");
+
+            // 延迟检查，确保窗口已经完全激活
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                _resizeTimer.Start();
+                IntPtr topHwnd = DLL.GetForegroundWindow();
+                if (topHwnd == _mainHandle)
+                {
+                    ShowKeyMapping();
+                }
+                else
+                {
+                    BringWindowToFront(topHwnd);
+                }
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        }
+
+        private void Window_Deactivated(object sender, EventArgs e)
+        {
+            //Debug.WriteLine($"**********窗口失活,{IsActive},");
+            HideKeyMapping();
+            popMid.Close();
+
+            if ((DLL.GetKeyState(VK_LMENU) & 0x8000) != 0)
+            {
+                //Debug.WriteLine($"左 Alt 卡住");
+                SendAltKeyUp(ScHandle, false);
+            }
+            else if ((DLL.GetKeyState(VK_RMENU) & 0x8000) != 0)
+            {
+                //Debug.WriteLine($"右 Alt 卡住");
+                SendAltKeyUp(ScHandle, true);
+            }
+        }
+
+        private void Window_LocationChanged(object sender, EventArgs e)
+        {
+            if (!IsScClosed && IsActive)
+            {
+                _locationChangeTimer.Start();
             }
         }
         #endregion
 
-        #region 自定义菜单栏事件
+        #region 自定义菜单栏按钮事件
         /// <summary>
-        /// 点击自定义标题栏拖拽窗口。
+        /// 点击自定义菜单栏拖拽窗口。
         /// </summary>
-        private void Dpl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void GMenu_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DragMove();
         }
@@ -75,7 +118,7 @@ namespace ScrcpyEX.View
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
-            HandStopScrcpy();
+            CloseScrcpy();
         }
 
         private void BtnClosePrg_Click(object sender, RoutedEventArgs e)
@@ -93,43 +136,24 @@ namespace ScrcpyEX.View
             WindowState = WindowState.Minimized;
         }
 
-        /// <summary>
-        /// 定位的两个按钮颜色联动，鼠标进入时同时修改背景色。
-        /// </summary>
-        private void Btn_MouseEnter(object sender, MouseEventArgs e)
-        {
-            MyGM.SetSameColor(dpl, Brushes.LightBlue, ((Button)sender).Tag);
-        }
-
-        /// <summary>
-        /// 定位的两个按钮颜色联动，鼠标离开时同时修改背景色。
-        /// </summary>
-        private void Btn_MouseLeave(object sender, MouseEventArgs e)
-        {
-            MyGM.SetSameColor(dpl, Brushes.Transparent, ((Button)sender).Tag);
-        }
-
-        private void BtnLocate_Click(object sender, RoutedEventArgs e)
-        {
-            Locate();
-        }
-
-        private void BtnLocOpt_Click(object sender, RoutedEventArgs e)
-        {
-            //联动两个定位按钮，显示一致的背景色
-            popMenu.IsOpen = true;
-            btnLocate.Background = btnLocOpt.Background = Brushes.LightBlue;
-        }
-
         private void BtnRecManage_Click(object sender, RoutedEventArgs e)
         {
             OpenRecordManage();
         }
 
-        private void BtnRecOption_Click(object sender, RoutedEventArgs e)
+        private void BtnSetManage_Click(object sender, RoutedEventArgs e)
         {
-            popRec.IsOpen = true;
-            btnRecManage.Background = btnRecOption.Background = Brushes.LightBlue;
+            new Setup().ShowDialog();
+        }
+
+        private void BtnSizeOpt_Click(object sender, RoutedEventArgs e)
+        {
+            OpenMenu(sender as Button, popSize);
+        }
+
+        private void BtnFuncOpt_Click(object sender, RoutedEventArgs e)
+        {
+            OpenMenu(sender as Button, popFunc);
         }
 
         private void BtnRecStop_Click(object sender, RoutedEventArgs e)
@@ -137,40 +161,51 @@ namespace ScrcpyEX.View
             StopScriptAndRecord();
         }
 
+        private void BtnImgShot_Click(object sender, RoutedEventArgs e)
+        {
+            DoScreenshot();
+        }
+
         private void BtnImgCompare_Click(object sender, RoutedEventArgs e)
         {
-            ImgCompare(_recInfo);
+            ImgCompare(_scriptInfos);
+        }
+
+        private void BtnFouce_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            _vm.IsScHasFouce = false;
+            KMC_Hook.IsScHasFocus = false;
+            Debug.WriteLine($"BtnFouce收到键盘输入焦点");
+        }
+
+        private void BtnFouce_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (ScHandle != IntPtr.Zero && DLL.GetFocus() == ScHandle)
+            {
+                _vm.IsScHasFouce = true;
+                KMC_Hook.IsScHasFocus = true;
+                Debug.WriteLine($"BtnFouce失去键盘输入焦点，焦点给到SC");
+            }
+        }
+
+        private void BtnDataSync_Click(object sender, RoutedEventArgs e)
+        {
+            new DataSync().ShowDialog();
         }
         #endregion
 
-        #region 弹出菜单事件
-        private void PopMid_Opened(object sender, EventArgs e)
-        {
-            popMid.VerticalOffset = (ExtraHeightTop + popMid.Child.RenderSize.Height) / 2 + wfh.Margin.Top;
-        }
-
-        private void Pop_Closed(object sender, EventArgs e)
-        {
-            MyGM.SetSameColor(dpl, Brushes.Transparent, ((Popup)sender).Tag);
-        }
-
+        #region 位置和大小的菜单
         private void BtnQuarterLoc_Click(object sender, RoutedEventArgs e)
         {
             QuarterMove();
-            popMenu.IsOpen = false;
+            popSize.IsOpen = false;
         }
 
         private void BtnOriginalLoc_Click(object sender, RoutedEventArgs e)
         {
             SetUISize();
             Locate();
-            popMenu.IsOpen = false;
-        }
-
-        private void BtnRemoveBlack_Click(object sender, RoutedEventArgs e)
-        {
-            RemoveBlack();
-            popMenu.IsOpen = false;
+            popSize.IsOpen = false;
         }
 
         private void BtnReduce_Click(object sender, RoutedEventArgs e)
@@ -182,18 +217,50 @@ namespace ScrcpyEX.View
         {
             AmplifySize();
         }
+        #endregion
 
-        private void BtnScr_Click(object sender, RoutedEventArgs e)
+        #region 功能菜单
+        /// <summary>
+        /// 开始录制脚本。
+        /// </summary>
+        private void BtnRecScr_Click(object sender, RoutedEventArgs e)
         {
-            StartRecord();
-            popRec.IsOpen = false;
+            ScriptRecordSwitch();
+            popFunc.IsOpen = false;
         }
 
-        private void BtnSet_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// 打开Remote NDIS。
+        /// </summary>
+        private async void BtnOpenRndis_Click(object sender, RoutedEventArgs e)
         {
-            new Setup().ShowDialog();
+            popFunc.IsOpen = false;
+            await OpenRndis();
         }
 
+        /// <summary>
+        /// 打开无线调试。
+        /// </summary>
+        private async void BtnOpenWireless_Click(object sender, RoutedEventArgs e)
+        {
+            await WirelessDebug();
+        }
+
+        private void BtnRemoveBlack_Click(object sender, RoutedEventArgs e)
+        {
+            RemoveScBlack();
+            popFunc.IsOpen = false;
+        }
+
+        private void BtnScGotFocus_Click(object sender, RoutedEventArgs e)
+        {
+            ScFocusSwitch();
+            popFunc.IsOpen = false;
+        }
+
+        /// <summary>
+        /// 映射按钮编辑。
+        /// </summary>
         private void BtnMappingEdit_Click(object sender, RoutedEventArgs e)
         {
             MappingEdit(btnMappingEdit.Content.ToString());
@@ -204,6 +271,10 @@ namespace ScrcpyEX.View
             MappingAdd();
         }
 
+        private void BtnMappingBack_Click(object sender, RoutedEventArgs e)
+        {
+            MappingCancel();
+        }
 
         #endregion
 

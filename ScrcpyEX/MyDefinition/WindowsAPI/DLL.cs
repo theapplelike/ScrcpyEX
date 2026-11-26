@@ -6,10 +6,63 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace ScrcpyEX.MyDefinition
+namespace ScrcpyEX.MyDefinition.WindowsAPI
 {
-    internal class DLL
+    /// <summary>
+    /// 系统的DLL声明在此类中。
+    /// </summary>
+    public class DLL
     {
+        /// <summary>
+        /// 指向RECT结构的指针，该结构接收窗口左上角和右下角的屏幕坐标。
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct LpRect
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+            public readonly int Width => Right - Left;
+            public readonly int Height => Bottom - Top;
+        }
+
+        /// <summary>
+        /// POINT结构定义点的x坐标和y坐标。
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
+        /// <summary>
+        /// WinEventDelegate 回调定义。
+        /// </summary>
+        /// <param name="hWinEventHook">注册时的钩子句柄。</param>
+        /// <param name="eventType">实际触发的事件类型（eventMin~eventMax 之间）。</param>
+        /// <param name="hwnd">事件关联的窗口句柄。</param>
+        /// <param name="idObject">
+        /// <para>OBJID_WINDOW=0：窗口对象。</para>
+        /// <para>OBJID_SYSMENU=-1：系统菜单。</para>
+        /// <para>OBJID_CLIENT=-4：客户区。</para>
+        /// <para>OBJID_CARET=-8：文本插入符。</para>
+        /// <para>OBJID_CURSOR=-9：鼠标光标。</para>
+        /// <para>OBJID_ALERT=-10：警告框。</para>
+        /// </param>
+        /// <param name="idChild">子元素 ID；对象自身触发时为 CHILDID_SELF=0。</param>
+        /// <param name="dwEventThread">事件发生的线程 ID。</param>
+        /// <param name="dwmsEventTime">事件发生的时间戳（毫秒）。</param>
+        public delegate void WinEventDelegate(
+            IntPtr hWinEventHook,
+            uint eventType,
+            IntPtr hwnd,
+            int idObject,
+            int idChild,
+            uint dwEventThread,
+            uint dwmsEventTime);
+
         /// <summary>
         /// 获得一个与给定名称相匹配的顶层窗口的句柄，不查找子窗口，查找时不区分大小写。至少需要其中一个参数。
         /// 若要从指定的子窗口开始搜索子窗口，请使用FindWindowEx函数。
@@ -47,7 +100,7 @@ namespace ScrcpyEX.MyDefinition
         /// <param name="nWidth">窗口的新宽度。</param>
         /// <param name="nHeight">窗口的新高度。</param>
         /// <param name="repaint">指示是否重新绘制窗口。如果此参数为TRUE，则窗口将收到消息。如果参数为FALSE，则不会进行任何类型的重新绘制。这适用于工作区、非工作区 (包括标题栏和滚动条) ，以及由于移动子窗口而发现父窗口的任何部分。</param>
-        /// <returns>如果该函数成功，则返回值为非零值。如果函数失败，则返回值为零。 要获得更多的错误信息，请调用 GetLastError。</returns>
+        /// <returns>如果该函数成功，则返回值为非零值。如果函数失败，则返回值为零。要获得更多的错误信息，请调用 GetLastError。</returns>
         [DllImport("user32.dll", SetLastError = true)]
         public static extern bool MoveWindow(IntPtr hwnd, int x, int y, int nWidth, int nHeight, bool repaint);
 
@@ -90,25 +143,11 @@ namespace ScrcpyEX.MyDefinition
         public static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
         /// <summary>
-        /// 检索前台窗口的句柄， 即用户当前正在使用的窗口。
+        /// 检索前台窗口的句柄，即用户当前正在使用的窗口。
         /// </summary>
         /// <returns>返回值是前台窗口的句柄。在某些情况下（例如，当窗口丢失激活时），前台窗口可以为NULL。</returns>
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
-
-        /// <summary>
-        /// 指向RECT结构的指针，该结构接收窗口左上角和右下角的屏幕坐标。
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
-        public struct LpRect
-        {
-            public int Left;
-            public int Top;
-            public int Right;
-            public int Bottom;
-            public readonly int Width => Right - Left;
-            public readonly int Height => Bottom - Top;
-        }
 
         /// <summary>
         /// 检索指定窗口的边界矩形的尺寸。尺寸以相对于屏幕左上角的屏幕坐标提供。
@@ -132,7 +171,7 @@ namespace ScrcpyEX.MyDefinition
         /// </summary>
         /// <param name="hwnd">要复制的窗口的句柄。</param>
         /// <param name="hdcBlt">设备上下文的句柄。</param>
-        /// <param name="nFlags">绘图选项。0x1，捕获窗口的客户区，即窗口内部内容，排除标题栏、边框等非客户区。0x2，捕获窗口的完整内容，包括非客户区（标题栏、边框等）</param>
+        /// <param name="nFlags">绘图选项。0x1--捕获窗口的客户区，即窗口内部内容，排除标题栏、边框等非客户区。0x2--捕获窗口的完整内容，包括非客户区（标题栏、边框等）。</param>
         /// <returns>true--函数成功；false--函数失败。</returns>
         [DllImport("user32.dll")]
         public static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
@@ -151,12 +190,229 @@ namespace ScrcpyEX.MyDefinition
         [DllImport("user32.dll")]
         public static extern int mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);
 
-        //[DllImport("user32.dll", SetLastError = true)]
-        //public static extern IntPtr SetFocus(IntPtr hWnd);
-        //
-        //[DllImport("User32.dll", EntryPoint = "SendMessage", SetLastError = true)]
-        //public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-        //
+        /// <summary>
+        /// 销毁指定句柄的窗口，销毁成功后句柄会置为0。函数将 WM_DESTROY 和 WM_NCDESTROY 消息发送到窗口，以停用窗口并从窗口中删除键盘焦点。
+        /// </summary>
+        /// <param name="hwnd">要销毁的窗口的句柄。</param>
+        /// <returns>true--函数成功；false--函数失败。</returns>
+        [DllImport("user32.dll", EntryPoint = "DestroyWindow", CharSet = CharSet.Unicode)]
+        public static extern bool DestroyWindow(IntPtr hwnd);
+
+        /// <summary>
+        /// 将键盘焦点设置为指定的窗口。 窗口必须附加到调用线程的消息队列。
+        /// </summary>
+        /// <param name="hWnd">将接收键盘输入的窗口的句柄。 如果此参数为 NULL，则忽略击键。</param>
+        /// <returns>如果函数成功，则返回值是以前具有键盘焦点的窗口的句柄。如果hWnd参数无效或窗口未附加到调用线程的消息队列，则返回值为NULL。</returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr SetFocus(IntPtr hWnd);
+
+        /// <summary>
+        /// 将指定的消息发送到一个或多个窗口。SendMessage函数调用指定窗口的窗口过程，在窗口过程处理消息之前不会返回。
+        /// 参考：https://learn.microsoft.com/zh-cn/windows/win32/api/winuser/nf-winuser-sendmessage。
+        /// </summary>
+        /// <param name="hWnd">窗口的句柄，其窗口过程将接收消息。</param>
+        /// <param name="Msg">要发送的消息。</param>
+        /// <param name="wParam">其他的消息特定信息。</param>
+        /// <param name="lParam">其他的消息特定信息。</param>
+        /// <returns>返回值指定消息处理的结果，这取决于发送的消息。</returns>
+        [DllImport("User32.dll", EntryPoint = "SendMessage", SetLastError = true)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        /// <summary>
+        /// 将字符转换为其对应的虚拟键码和Shift状态。
+        /// </summary>
+        /// <param name="ch">要转换的字符。</param>
+        /// <returns>低字节(0-7位)：虚拟键码；高字节(8-15位)：Shift状态标志位。在当前键盘布局下没有对应的虚拟键码时返回-1。</returns>
+        [DllImport("user32.dll")]
+        public static extern short VkKeyScan(char ch);
+
+        /// <summary>
+        /// 检索包含指定点的窗口的句柄。
+        /// </summary>
+        /// <param name="point">System.Drawing.Point类型的坐标点。</param>
+        /// <returns>返回值是包含点的窗口的句柄。如果给定点不存在窗口，则返回值为IntPtr.Zero。</returns>
+        [DllImport("user32.dll")]
+        public static extern IntPtr WindowFromPoint(System.Drawing.Point point);
+
+        /// <summary>
+        /// 获取当前系统设置中，两次鼠标点击被认定为“双击”的最大时间间隔（毫秒）。
+        /// </summary>
+        /// <returns>“双击”的最大时间间隔（毫秒）。</returns>
+        [DllImport("user32.dll")]
+        public static extern uint GetDoubleClickTime();
+
+        /// <summary>
+        /// 检索系统各种尺寸和配置值。
+        /// </summary>
+        /// <param name="nIndex">配置值的索引。</param>
+        /// <returns>成功--返回请求的值；失败--返回值为0。</returns>
+        [DllImport("user32.dll")]
+        public static extern int GetSystemMetrics(int nIndex);
+
+        /// <summary>
+        /// 如果窗口附加到调用线程的消息队列，则检索具有键盘焦点的窗口的句柄。
+        /// </summary>
+        /// <returns>具有键盘焦点的窗口的句柄。</returns>
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetFocus();
+
+        /// <summary>
+        /// 在虚拟键码、扫描码和字符之间进行转换。
+        /// </summary>
+        /// <param name="uCode">要转换的码（虚拟键码 或 扫描码，取决于uMapType）。</param>
+        /// <param name="uMapType">映射类型，指明转换方向。0 (MAPVK_VK_TO_VSC)，虚拟键码 → 扫描码。其他参考：https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-mapvirtualkeya</param>
+        /// <returns>返回虚拟键码、扫描码和字符，取决于uMapType。</returns>
+        [DllImport("user32.dll")]
+        public static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
+        /// <summary>
+        /// 获取指定虚拟键在当前消息产生时刻的状态（而非实时物理状态）。
+        /// </summary>
+        /// <param name="nVirtKey">虚拟键码。</param>
+        /// <returns>最高位(bit 15)：1 = 按下，0 = 抬起；最低位(bit 0)用于切换键：1 = 开启（如 Caps Lock 开启），0 = 关闭。</returns>
+        [DllImport("user32.dll")]
+        public static extern short GetKeyState(int nVirtKey);
+
+        /// <summary>
+        /// 获取指定虚拟键在当前消息产生时刻的状态（而非实时物理状态）。
+        /// </summary>
+        /// <param name="nVirtKey">虚拟键码。</param>
+        /// <returns>最高位(bit 15)：1 = 按下，0 = 抬起；最低位(bit 0)用于切换键：1 = 开启（如 Caps Lock 开启），0 = 关闭。</returns>
+        public static short GetKeyState(uint nVirtKey) => GetKeyState((int)nVirtKey);
+
+        /// <summary>
+        /// 获取指定虚拟键在当前消息产生时刻的状态（硬件中断的实时状态）。
+        /// </summary>
+        /// <param name="vKey">虚拟键码。</param>
+        /// <returns>最高位(bit 15)：1 = 按下，0 = 抬起；最低位(bit 0)指示自从上次调用 GetAsyncKeyState 以来，该键是否被按下过，但并不可靠。</returns>
+        [DllImport("user32.dll")]
+        public static extern short GetAsyncKeyState(int vKey);
+
+        /// <summary>
+        /// 获取指定虚拟键在当前消息产生时刻的状态（硬件中断的实时状态）。
+        /// </summary>
+        /// <param name="vKey">虚拟键码。</param>
+        /// <returns>最高位(bit 15)：1 = 按下，0 = 抬起；最低位(bit 0)指示自从上次调用 GetAsyncKeyState 以来，该键是否被按下过，但并不可靠。</returns>
+        public static short GetAsyncKeyState(uint vKey) => GetAsyncKeyState((int)vKey);
+
+        /// <summary>
+        /// 获取指定设备上下文（DC）上某个坐标点的像素颜色。
+        /// </summary>
+        /// <param name="hdc">设备上下文句柄。</param>
+        /// <param name="nXPos">要读取的点的逻辑坐标X。</param>
+        /// <param name="nYPos">要读取的点的逻辑坐标Y。</param>
+        /// <returns>一个 COLORREF 值，格式为 0x00BBGGRR，即低8位是红色，次8位是绿色，高8位是蓝色。如果坐标超出裁剪区域，返回 CLR_INVALID(0xFFFFFFFF)。</returns>
+        [DllImport("gdi32.dll")]
+        public static extern uint GetPixel(IntPtr hdc, int nXPos, int nYPos);
+
+        /// <summary>
+        /// 获取设备上下文句柄（Device Context）。
+        /// </summary>
+        /// <param name="hWnd">
+        /// <para>如果传递具体窗口的句柄，返回的 DC 就只对应该窗口的客户区，绘图操作会被自动裁剪到窗口边界内。</para>
+        /// <para>如果传递 IntPtr.Zero（NULL），则返回整个屏幕的 DC，可以在屏幕任意位置绘制，常用于截屏、取色等全局操作。</para>
+        /// </param>
+        /// <returns>指向设备上下文的句柄（HDC）。如果失败，返回 IntPtr.Zero。</returns>
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetDC(IntPtr hWnd);
+
+        /// <summary>
+        /// 释放由 GetDC 或 GetWindowDC 获取的设备上下文（DC），将资源归还给系统。
+        /// </summary>
+        /// <param name="hWnd">窗口句柄，必须与当初调用 GetDC 时传入的句柄完全一致（如果是获取屏幕 DC，这里就是 IntPtr.Zero）。</param>
+        /// <param name="hDC">要释放的设备上下文句柄，来自 GetDC 的返回值。</param>
+        /// <returns>1--释放成功；0--释放失败。</returns>
+        [DllImport("user32.dll")]
+        public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+        /// <summary>
+        /// 根据窗口句柄获取创建该窗口的线程 ID 和（可选的）进程 ID。
+        /// </summary>
+        /// <param name="hWnd">要查询的窗口句柄。可以是顶层窗口，也可以是子窗口。</param>
+        /// <param name="ProcessId">获得进程的 ID，窗口＜线程＜进程。</param>
+        /// <returns>创建指定窗口的线程 ID，如果 hWnd 无效或函数失败，返回 0。</returns>
+        [DllImport("user32.dll")]
+        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
+        /// <summary>
+        /// 附加或分离两个线程的输入处理机制，附加后两个线程会共享输入处理状态：例如键盘状态、鼠标捕获、焦点、活动窗口等。
+        /// </summary>
+        /// <param name="idAttach">要被附加的线程 ID。通常传入你自己的 UI 线程 ID</param>
+        /// <param name="idAttachTo">目标线程 ID，即 idAttach 要附加到的线程。附加后，idAttach 就加入了 idAttachTo 的输入队列。</param>
+        /// <param name="fAttach">true--附加；false--分离。分离时，必须使用与附加时相同的 idAttach 和 idAttachTo，否则可能无法正确分离。</param>
+        /// <returns>true--操作成功；false--操作失败。</returns>
+        [DllImport("user32.dll")]
+        public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+        /// <summary>
+        /// 将指定窗口带到前台并激活，并通常被置于 Z 序的顶部。
+        /// </summary>
+        /// <param name="hWnd">要激活并置于前台的窗口句柄。</param>
+        /// <returns>true--只表示调用被系统接受，并不保证窗口一定成为前台窗口；false--失败，可通过 GetLastError() 获取错误码。</returns>
+        [DllImport("user32.dll")]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        /// <summary>
+        /// 检索鼠标光标的当前位置，以屏幕坐标表示，是物理像素坐标。
+        /// </summary>
+        /// <param name="lpPoint">输出参数，鼠标光标的当前位置。</param>
+        /// <returns>true--调用成功，lpPoint 中已填入有效的屏幕坐标；false--调用失败，lpPoint 内容不可用。</returns>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetCursorPos(out POINT lpPoint);
+
+        /// <summary>
+        /// 把一组屏幕坐标转换为相对于指定窗口客户区左上角的坐标。客户区不包含窗口边框、标题栏、菜单栏、滚动条等非客户区部分。
+        /// 输入的坐标是物理像素坐标，则结果也是物理像素坐标；输入是逻辑坐标，结果是逻辑坐标。
+        /// </summary>
+        /// <param name="hWnd">目标窗口的句柄。</param>
+        /// <param name="lpPoint">传入的是屏幕坐标，函数执行后会改写为指定窗口左上角的坐标。</param>
+        /// <returns>true--转换成功，lpPoint 中已是客户区坐标；false--转换失败，lpPoint 内容未定义。</returns>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
+
+        /// <summary>
+        /// 注册一个"事件观察者"，让系统在指定的 WinEvent 事件发生时，回调提供的委托。
+        /// </summary>
+        /// <param name="eventMin">
+        /// 要监听的事件范围下界（含）。
+        /// <para>单位是 WinEvent 常量（如 EVENT_OBJECT_LOCATIONCHANGE = 0x800B）。</para>
+        /// <para>和 eventMax 一起构成闭区间 [eventMin, eventMax]，区间内的所有事件都会投递给你。</para>
+        /// <para>只监听单个事件时，eventMin = eventMax = 该事件常量。</para>
+        /// <para>想监听一大类事件，例如所有 EVENT_OBJECT_*，可以 eventMin = 0x8000, eventMax = 0x80FF。</para>
+        /// </param>
+        /// <param name="eventMax">要监听的事件范围上界（含）。一般和 eventMin 相同（只监听一个事件），否则回调量大。</param>
+        /// <param name="hmodWinEventProc">
+        /// 包含回调函数的模块句柄（DLL 句柄）。
+        /// <para>只在 WINEVENT_INCONTEXT 模式下才需要（见 dwFlags）；此时系统要加载这个 DLL 到目标进程，以便在目标进程上下文执行回调。</para>
+        /// <para>在 WINEVENT_OUTOFCONTEXT 模式下，传入 IntPtr.Zero。</para>
+        /// </param>
+        /// <param name="lpfnWinEventProc">回调委托，事件触发时被调用。</param>
+        /// <param name="idProcess">0--接收所有进程产生的事件；指定PID--只收该进程的事件。</param>
+        /// <param name="idThread">0--接收所有线程产生的事件；指定TID--只收该线程的事件。</param>
+        /// <param name="dwFlags">
+        /// 控制钩子行为的位标志。
+        /// <para>WINEVENT_OUTOFCONTEXT=0x0000：回调在当前进程里执行。</para>
+        /// <para>WINEVENT_SKIPOWNTHREAD=0x0001：跳过调用方自己的线程。</para>
+        /// <para>WINEVENT_SKIPOWNPROCESS=0x0002：跳过调用方自己进程产生的事件（防止自己监听自己）。</para>
+        /// <para>WINEVENT_INCONTEXT=0x0004：回调注入目标进程执行，需要 hmodWinEventProc 指向一个 DLL。仅限同位数、且目标进程没有启用阻止 DLL 注入时才能用。</para>
+        /// </param>
+        /// <returns>非零--钩子句柄，用 UnhookWinEvent(handle) 卸载；零--安装失败。</returns>
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+
+        /// <summary>
+        /// 卸载由 SetWinEventHook 安装的事件钩子，并释放系统为该钩子分配的资源。
+        /// </summary>
+        /// <param name="hWinEventHook">要卸载的钩子句柄，即 SetWinEventHook 函数的返回值。</param>
+        /// <returns>true--卸载成功；false--卸载失败（句柄无效、已卸载、或不属于当前进程等）。</returns>
+        [DllImport("user32.dll")]
+        public static extern bool UnhookWinEvent(IntPtr hWinEventHook);
+
+        //[DllImport("user32.dll")]
+        //public static extern IntPtr GetDesktopWindow();
+
         //[DllImport("user32.dll", CharSet = CharSet.Auto)]
         //public static extern bool PostThreadMessage(uint idThread, uint Msg, IntPtr wParam, IntPtr lParam);
         //
@@ -165,12 +421,6 @@ namespace ScrcpyEX.MyDefinition
         //
         //[DllImport("user32.dll")]
         //public static extern int SetCursorPos(int x, int y);//让鼠标移动到指定位置
-        //
-
-        //
-        //[DllImport("user32.dll")]
-        //[return: MarshalAs(UnmanagedType.Bool)]
-        //public static extern bool SetForegroundWindow(IntPtr hWnd);
 
     }
 }

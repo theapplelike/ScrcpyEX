@@ -1,4 +1,5 @@
 ﻿using ScrcpyEX.Model;
+using ScrcpyEX.MyDefinition;
 using ScrcpyEX.MyDefinition.MyClass;
 using ScrcpyEX.ViewModel;
 using System;
@@ -7,10 +8,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Timers;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace ScrcpyEX.View
@@ -18,9 +21,9 @@ namespace ScrcpyEX.View
     public partial class MainWindow//var
     {
         /// <summary>
-        /// 对第三方程序的引用。
+        /// Scrcpy主机，封装Scrcpy启动、关闭、大小调整的功能。
         /// </summary>
-        private readonly Process _prc = new();
+        private ScrcpyHost _scHost = null;
 
         /// <summary>
         /// 窗体对应的ViewModel。
@@ -28,19 +31,14 @@ namespace ScrcpyEX.View
         private readonly MainWindowVM _vm;
 
         /// <summary>
-        /// scrcpy的句柄，为IntPtr.Zero时代表scrcpy没有启动。
-        /// </summary>
-        private IntPtr _scHandle = IntPtr.Zero;
-
-        /// <summary>
-        /// scrcpy窗口的名称。
-        /// </summary>
-        private string _scName;
-
-        /// <summary>
         /// 主程序的句柄。
         /// </summary>
         private IntPtr _mainHandle;
+
+        /// <summary>
+        /// 句柄源，用于注册消息钩子。
+        /// </summary>
+        private HwndSource _hwndSource;
 
         /// <summary>
         /// 保存窗体的临时尺寸、位置。
@@ -48,124 +46,202 @@ namespace ScrcpyEX.View
         private FormSize _tempSize = null;
 
         /// <summary>
-        /// 用于图像脚本计时器的自适应间隔，最小为5秒。
+        /// 窗口当前是否处于最大化。
         /// </summary>
-        private int _scriptInterval = 5;
+        private bool _isMaximize = false;
 
         /// <summary>
         /// 准确的测量运行时间。
         /// </summary>
-        private Stopwatch _stopwatch;
+        private Stopwatch _stopwatch = new();
 
         /// <summary>
-        /// 计时脚本对应的委托。
-        /// </summary>
-        private EventHandler _timedHandler;
-
-        /// <summary>
-        /// 图像脚本对应的委托。
-        /// </summary>
-        private EventHandler _imageHandler;
-
-        /// <summary>
-        /// 调整scrcpy窗口大小的计时器。
+        /// 调整窗口大小改变时触发的计时器。
         /// </summary>
         private readonly DispatcherTimer _resizeTimer = new();
 
         /// <summary>
+        /// 窗口位置改变时触发的计时器。
+        /// </summary>
+        private readonly DispatcherTimer _locationChangeTimer = new();
+
+        /// <summary>
+        /// 图像脚本任务锁。
+        /// </summary>
+        private readonly SemaphoreSlim _imageScriptLock = new(1, 1);
+
+        /// <summary>
+        /// 计时脚本对应的委托。
+        /// </summary>
+        private ElapsedEventHandler _timedHandler;
+
+        /// <summary>
+        /// 图像脚本对应的委托。
+        /// </summary>
+        private ElapsedEventHandler _imageHandler;
+
+        /// <summary>
         /// 脚本计时器，可能会绑定计时脚本或图像脚本。
         /// </summary>
-        private readonly DispatcherTimer _scriptTimer = new();
+        private readonly System.Timers.Timer _scriptTimer = new();
 
         /// <summary>
         /// 对每次脚本间隔进行计数。
         /// </summary>
-        private readonly DispatcherTimer _countTimer = new();
+        private readonly System.Timers.Timer _countTimer = new();
 
         /// <summary>
         /// 测试用计时器。
         /// </summary>
-        private readonly DispatcherTimer _testTimer = new();
+        //private readonly System.Timers.Timer _testTimer = new();
 
         /// <summary>
-        /// scrcpy的默认初始宽高（在100%缩放下），使用比例为15：7。
+        /// Scrcpy的默认初始宽高（在100%缩放下），单位是逻辑像素，使用比例为15：7。
         /// </summary>
         private readonly int _scWidth = 960, _scHeight = 448;
+        //private readonly int _scWidth = 1156, _scHeight = 540;
 
         /// <summary>
-        /// 说明当前投屏的状态，true--横屏；false--竖屏。
+        /// SC视频帧的宽度（像素）。
         /// </summary>
-        //private bool _isLandscape = false;
+        private int _ScFrameWd;
 
         /// <summary>
-        /// 投屏分辨率的横向比例。
+        /// SC视频帧的高度（像素）。
         /// </summary>
-        private int _horizontalRatio;
+        private int _ScFrameHt;
 
         /// <summary>
-        /// 投屏分辨率的纵向比例。
+        /// SC视频帧的宽高比。
         /// </summary>
-        private int _verticalRatio;
+        private double _ScAspectRatio = 0;
 
         /// <summary>
-        /// 保存已选中的脚本。
+        /// 保存已选中的原始脚本。
         /// </summary>
-        private RecInfo _recInfo = null;
+        private ScriptItem _scriptItem = null;
 
         /// <summary>
-        /// 鼠标左键是否处于按下状态。
+        /// 保存已选中的脚本列表。
         /// </summary>
-        //private bool _isPressMouse = false;
+        private List<ScriptInfo> _scriptInfos = null;
 
         /// <summary>
-        /// 窗口除开scrcpy的额外宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
+        /// ScriptInfo，执行图像组脚本时顺序模式下，指向组列表下标的变量。
         /// </summary>
-        private double ExtraWidth => gShow.Margin.Left + gShow.Margin.Right;
+        private int _siOrder = 0;
 
         /// <summary>
-        /// 窗口除开scrcpy的额外高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
+        /// ScriptInfo，执行图像组脚本时成功继续模式下，指向组列表下标的变量。
         /// </summary>
-        private double ExtraHeight => dpl.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom;
+        private int _siSuccess = 0;
 
         /// <summary>
-        /// 窗口除开scrcpy的额外左侧宽度，不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
+        /// 现在是否可以调整映射Popup。
         /// </summary>
-        public double ExtraWidthLeft => gShow.Margin.Left;
+        private bool _isAdjustPop = true;
 
         /// <summary>
-        /// 窗口除开scrcpy的额外上方高度，不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
+        /// 保存录制脚本时截取的临时图像。
         /// </summary>
-        public double ExtraHeightTop => dpl.ActualHeight + gShow.Margin.Top;
+        private CroppedBitmap _cropImg = null;
 
         /// <summary>
-        /// X轴上的DPI比例。
+        /// 说明截图结果位置大小的矩形。
         /// </summary>
-        public double DpiScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;
+        private System.Windows.Rect _cropRect = new();
 
         /// <summary>
-        /// Y轴上的DPI比例。
+        /// 脚本的调试信息。
         /// </summary>
-        public double DpiScaleY => VisualTreeHelper.GetDpi(this).DpiScaleY;
+        private readonly List<string> _debug = [];
+
+        /// <summary>
+        /// 窗口除开SC的额外宽度，单位为逻辑像素，与屏幕DPI无关。不能在构造函数中调用，控件没有显示时其ActualWidth始终为0。
+        /// </summary>
+        private double ExtraWidth
+        {
+            get
+            {
+                if (gShow.CheckAccess()) //检查是否在UI线程
+                {
+                    return gShow.Margin.Left + gShow.Margin.Right;
+                }
+                else
+                {
+                    return Dispatcher.Invoke(() => gShow.Margin.Left + gShow.Margin.Right);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 窗口除开SC的额外高度，单位为逻辑像素，与屏幕DPI无关。不能在构造函数中调用，控件没有显示时其ActualHeight始终为0。
+        /// </summary>
+        private double ExtraHeight
+        {
+            get
+            {
+                if (gShow.CheckAccess()) //检查是否在UI线程
+                {
+                    return gMenu.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom;
+                }
+                else
+                {
+                    return Dispatcher.Invoke(() => gMenu.ActualHeight + gShow.Margin.Top + gShow.Margin.Bottom);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 屏幕X轴上的DPI比例。
+        /// </summary>
+        //public double DpiScaleX => VisualTreeHelper.GetDpi(this).DpiScaleX;
+
+        /// <summary>
+        /// 屏幕Y轴上的DPI比例。
+        /// </summary>
+        //public double DpiScaleY => VisualTreeHelper.GetDpi(this).DpiScaleY;
+
+        /// <summary>
+        /// Scrcpy是否处于关闭状态，true--关闭状态；false--启动状态。
+        /// </summary>
+        private bool IsScClosed => _scHost == null || _scHost.ScHandle == IntPtr.Zero;
+
+        /// <summary>
+        /// 圆形DragPopup的宽度。
+        /// </summary>
+        private double PopWd => 50 * ScRatioX;
+
+        /// <summary>
+        /// 圆形DragPopup的高度。
+        /// </summary>
+        private double PopHt => 50 * ScRatioY;
+
+        /// <summary>
+        /// Scrcpy的句柄，为IntPtr.Zero时代表Scrcpy没有启动。
+        /// </summary>
+        public IntPtr ScHandle => _scHost?.ScHandle ?? IntPtr.Zero;
 
         /// <summary>
         /// Scrcpy当前宽度和默认宽度的比值。
         /// </summary>
-        private double ScRatioX => ScActualWidth / _scWidth;
+        public double ScRatioX => ScActualWidth / _scWidth;
 
         /// <summary>
         /// Scrcpy当前高度和默认高度的比值。
         /// </summary>
-        private double ScRatioY => ScActualHeight / _scHeight;
+        public double ScRatioY => ScActualHeight / _scHeight;
 
         /// <summary>
-        /// Scrcpy当前的实际宽度。
+        /// Scrcpy当前的实际宽度，单位是逻辑像素，与DPI无关。
         /// </summary>
         public double ScActualWidth => ActualWidth - ExtraWidth;
 
         /// <summary>
-        /// Scrcpy当前的实际高度。
+        /// Scrcpy当前的实际高度，单位是逻辑像素，与DPI无关。
         /// </summary>
         public double ScActualHeight => ActualHeight - ExtraHeight;
+
 
     }
 }

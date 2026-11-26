@@ -4,6 +4,7 @@ using ScrcpyEX.MyDefinition;
 using ScrcpyEX.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -18,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace ScrcpyEX.View
 {
@@ -26,10 +28,15 @@ namespace ScrcpyEX.View
     /// </summary>
     public partial class RecManage : Window
     {
-        public RecManage()
+        /// <summary>
+        /// 录制的脚本管理界面。
+        /// </summary>
+        /// <param name="scHandle">Scrcpy的句柄。</param>
+        public RecManage(IntPtr scHandle)
         {
             InitializeComponent();
             _vm = (RecManageVM)DataContext;
+            _scHandle = scHandle;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -39,12 +46,17 @@ namespace ScrcpyEX.View
 
         private void Root_Closed(object sender, EventArgs e)
         {
-            _vm.SaveData();
+            MyClose();
+        }
+
+        private void G_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
         }
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
-            EditName(((Button)sender).DataContext as RecInfo);
+            EditName(((Button)sender).DataContext as ScriptItem);
         }
 
         private void BtnAct_Click(object sender, RoutedEventArgs e)
@@ -69,11 +81,6 @@ namespace ScrcpyEX.View
 
         private void BtnExit_Click(object sender, RoutedEventArgs e)
         {
-            //if (TempRecInfo != null)
-            //{
-            //    ValToUI(TempRecInfo);
-            //    _vm.Canel();
-            //}
             DialogResult = false;
         }
 
@@ -84,18 +91,95 @@ namespace ScrcpyEX.View
 
         private void Img_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            ShowImg showImg = new(TempRecInfo);
+            ShowImg showImg;
+            if (_cropRect.Width > 0 && _cropRect.Height > 0)
+            {
+                showImg = new(img.Source, _cropRect);
+            }
+            else
+            {
+                showImg = new(img.Source, GetCurrScript().CropRect);
+            }
             showImg.ShowDialog();
         }
 
         private void RdoImage_Checked(object sender, RoutedEventArgs e)
         {
-            chkAdaptive.Visibility = Visibility.Visible;
+            gSuboption.Visibility = Visibility.Visible;
         }
 
         private void RdoImage_Unchecked(object sender, RoutedEventArgs e)
         {
-            chkAdaptive.Visibility = Visibility.Hidden;
+            gSuboption.Visibility = Visibility.Hidden;
+        }
+
+        private void CmbMultipleScript_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cmbMultipleScript.SelectedItem is ScriptInfo script)
+            {
+                ValToUI(script);
+                LoadPointInfos(script.PointInfos);
+            }
+        }
+
+        private void ListBoxItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _dragSourceItem = sender as ListBoxItem;
+            _dragStartPoint = e.GetPosition(null);
+        }
+
+        private void ListBoxItem_MouseMove(object sender, MouseEventArgs e)
+        {
+            DragListBoxItem(_dragSourceItem, e);
+        }
+
+        private void ListBoxItem_DragEnter(object sender, DragEventArgs e)
+        {
+            // 只接受来自内部的自定义数据格式
+            if (e.Data.GetDataPresent(typeof(ScriptInfo)) || e.Data.GetDataPresent(typeof(ScriptGroup)))
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+            e.Handled = true;
+        }
+
+        private void ListBoxItem_Drop(object sender, DragEventArgs e)
+        {
+            CreatGroupScript((sender as ListBoxItem).DataContext, e.Data.GetData(typeof(ScriptInfo)));
+            e.Handled = true;
+        }
+
+        private void Lst_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0)
+            {
+                EditScript(e.AddedItems[0]);
+            }
+        }
+
+        /// <summary>
+        /// 文本框获得焦点的时候选择其中所有内容。
+        /// </summary>
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox txt)
+            {
+                txt.SelectAll();
+                Dispatcher.BeginInvoke(() => txt.SelectAll(), DispatcherPriority.Input);
+            }
+        }
+
+        private void BtnGrpSet_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currScript is ScriptGroup group)
+            {
+                GroupMode gm = new(group);
+                gm.ShowDialog();
+            }
         }
     }
 }

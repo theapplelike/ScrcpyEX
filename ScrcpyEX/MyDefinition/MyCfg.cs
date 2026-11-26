@@ -21,7 +21,9 @@ namespace ScrcpyEX.ExtensionMethod
         /// </summary>
         public static MyCfg Cfg { get; set; } = null;
 
-        //全局配置保存路径
+        /// <summary>
+        /// 全局配置保存路径。
+        /// </summary>
         private static readonly string _cfgPath = @".\main\Local\UserData\config.json";
 
         static MyCfg()
@@ -41,7 +43,12 @@ namespace ScrcpyEX.ExtensionMethod
             }
 
             using StreamReader reader = File.OpenText(_cfgPath);
-            return JsonConvert.DeserializeObject<MyCfg>(reader.ReadToEnd());
+            JsonSerializerSettings set = new()
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+            };
+
+            return JsonConvert.DeserializeObject<MyCfg>(reader.ReadToEnd(), set);
         }
 
         /// <summary>
@@ -50,77 +57,69 @@ namespace ScrcpyEX.ExtensionMethod
         public static void Save()
         {
             Directory.CreateDirectory(Path.GetDirectoryName(_cfgPath));
-            File.WriteAllText(_cfgPath, JsonConvert.SerializeObject(Cfg));
+
+            JsonSerializerSettings set = new()
+            {
+                TypeNameHandling = TypeNameHandling.Auto,   //对象的运行时类型与声明类型不一致时添加Type信息
+                Formatting = Formatting.Indented,           //添加缩进
+            };
+            File.WriteAllText(_cfgPath, JsonConvert.SerializeObject(Cfg, set));
         }
 
         /// <summary>
-        /// 无线连接的IP地址。
+        /// 保存定位的数组，下标代表：0--左上角；1--右上角；2--左下角；3--右下角。
         /// </summary>
-        public string IP { get; set; }
+        public bool[] Locates { get; set; } = [false, true, false, false];
 
         /// <summary>
-        /// 无线连接的端口号。
-        /// </summary>
-        public string Port { get; set; } = "5555";
-
-        /// <summary>
-        /// 定位到左上角。
-        /// </summary>
-        public bool Locate1 { get; set; } = false;
-
-        /// <summary>
-        /// 定位到右上角。
-        /// </summary>
-        public bool Locate2 { get; set; } = true;
-
-        /// <summary>
-        /// 定位到左下角。
-        /// </summary>
-        public bool Locate3 { get; set; } = false;
-
-        /// <summary>
-        /// 定位到右下角。
-        /// </summary>
-        public bool Locate4 { get; set; } = false;
-
-        /// <summary>
-        /// 记录窗体的位置、大小。
+        /// 记录窗体尺寸、位置信息。
         /// </summary>
         public FormSize Size { get; set; } = new();
 
         /// <summary>
-        /// 录制操作信息的集合。
+        /// 脚本信息的集合。
         /// </summary>
-        public List<RecInfo> RecInfos { get; set; } = [];
+        public List<ScriptItem> Scripts { get; set; } = [];
 
         /// <summary>
-        /// 按键映射类的列表。
+        /// 键盘映射信息类列表，用于保存键盘映射信息。
         /// </summary>
-        public List<KeyMapping> KeyMappings = [];
+        public List<KeyMapping> KeyMappings { get; set; } = [];
 
         /// <summary>
-        /// 保持清醒，防止设备进入休眠状态（无线连接时无效）。
+        /// 记录Scrcpy相关的设置。
         /// </summary>
-        [CommandLine("--stay-awake")]
-        public bool StayAwake { get; set; }
+        public ScrcpySet ScrcpySet { get; set; } = new();
 
         /// <summary>
-        /// 关闭屏幕，镜像时关闭设备屏幕，但不会进入休眠。
+        /// 最后一次连接Scrcpy是否使用有线连接。
         /// </summary>
-        [CommandLine("--turn-screen-off")]
-        public bool OffScreen { get; set; }
+        public bool IsUseWiredInLast { get; set; } = true;
 
         /// <summary>
-        /// 显示触控，镜像时手指在触碰设备的地方显示接触点。
+        /// 是否使用上一次退出时的位置和大小。
         /// </summary>
-        [CommandLine("--show-touches")]
-        public bool ShowTouches { get; set; }
+        public bool IsUseLastSize { get; set; } = true;
 
         /// <summary>
-        /// 停止镜像时关闭设备屏幕，让设备进入休眠状态。
+        /// 是否保持横屏。
         /// </summary>
-        [CommandLine("--power-off-on-close")]
-        public bool DeviceSleep { get; set; }
+        public bool IsKeepLandscape { get; set; } = false;
+
+        /// <summary>
+        /// 是否允许程序边缘调整大小。
+        /// </summary>
+        public bool IsCanResize { get; set; } = false;
+
+        /// <summary>
+        /// 是否保存脚本识别成功时的图片。
+        /// </summary>
+        public bool IsSaveSuccessImg { get; set; } = false;
+
+        /// <summary>
+        /// 文件管理器保存的数据。
+        /// </summary>
+        public FeData FeData { get; set; } = new();
 
 
     }

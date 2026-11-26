@@ -1,6 +1,8 @@
-﻿using ScrcpyEX.ViewModel;
+﻿using ScrcpyEX.ExtensionMethod;
+using ScrcpyEX.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,14 +33,29 @@ namespace ScrcpyEX.View
             MyInit();
         }
 
+        private void Window_Unloaded(object sender, RoutedEventArgs e)
+        {
+            MyClose();
+        }
+
         private void BtnScrcpy_Click(object sender, RoutedEventArgs e)
         {
-            MenuStateTransition(stp1);
+            MenuStateTransition(stp1, 0);
         }
 
         private void BtnProg_Click(object sender, RoutedEventArgs e)
         {
-            MenuStateTransition(stp2);
+            MenuStateTransition(stp2, 1);
+        }
+
+        private void BtnExit_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+        }
+
+        private void BtnOpenPath_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("explorer.exe", $"\"{MV.SuccessImgPath}\"");
         }
     }
 }

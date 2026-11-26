@@ -1,0 +1,77 @@
+﻿<Window x:Class="ScrcpyEX.View.DataSync"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScrcpyEX.View"
+        xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel"
+        xmlns:mcl="clr-namespace:MyControlLibrary.Controls;assembly=MyControlLibrary"
+        xmlns:ctrl="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
+        mc:Ignorable="d"
+        Title="数据同步" Height="600" Width="1100" WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded">
+
+    <Window.DataContext>
+        <ViewModel:DataSyncVM/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <Style x:Key="thisBtn" TargetType="Button" BasedOn="{StaticResource MenuBtn}">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Background" Value="LightSteelBlue"/>
+        </Style>
+        <Style x:Key="Btn" TargetType="{x:Type Button}" BasedOn="{StaticResource MenuBtn}">
+            <Setter Property="FontFamily" Value="幼圆"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="0,10,0,0"/>
+            <Setter Property="Background" Value="LightSteelBlue"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <ctrl:FileExplorer x:Name="fleLcl" Grid.Column="0" DirService="{Binding LclService}" XferFileRequested="FleLcl_XferFileRequested"/>
+        <ctrl:FileExplorer x:Name="fleAdb" Grid.Column="2" DirService="{Binding AdbService}" XferFileRequested="FleAdb_XferFileRequested"/>
+
+        <StackPanel x:Name="stpOper" Grid.Column="1" Margin="0" VerticalAlignment="Center">
+            <Button x:Name="btnToAdb" Click="BtnToAdb_Click" Content="&#xE8B6;" Style="{StaticResource thisBtn}" ToolTip="将本地目录下所有文件推送到安卓设备，已存在的文件不会再次推送"/>
+            <Button x:Name="btnToLcl" Click="BtnToLcl_Click"
+                    Content="&#xE8B6;"
+                    Style="{StaticResource thisBtn}"
+                    RenderTransformOrigin="0.5,0.5"
+                    Margin="0,5"
+                    ToolTip="将安卓目录下所有文件拉取到本地目录，已存在的文件不会再次拉取">
+                <Button.RenderTransform>
+                    <RotateTransform Angle="180"/>
+                </Button.RenderTransform>
+            </Button>
+            <Button x:Name="btnSync" Click="BtnSync_Click" Content="&#xedab;" Style="{StaticResource thisBtn}" ToolTip="同步双方目录下所有文件，已存在的文件不会覆盖"/>
+        </StackPanel>
+
+        <Button x:Name="btnCompare"
+                Click="BtnCompare_Click"
+                Grid.Column="1" 
+                Content="&#xe735;"
+                Margin="0,0,0,30" 
+                VerticalAlignment="Bottom"
+                Style="{StaticResource CoinFlipBtn}" 
+                ToolTip="筛选双方目录下名称相同但大小不同的文件"/>
+        
+        <Grid x:Name="gMask" Grid.ColumnSpan="3" IsHitTestVisible="True" Background="#CCFFFFFF" Visibility="Collapsed" MouseDown="GMask_MouseDown">
+            <StackPanel VerticalAlignment="Center">
+                <mcl:ProgressRing x:Name="prgLoad" RingType="3" Text="传输中..." VerticalAlignment="Center"/>
+                <Button x:Name="btnStop" Click="BtnStop_Click" Content="停止传输" Style="{StaticResource Btn}"/>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</Window>

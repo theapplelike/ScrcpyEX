@@ -6,138 +6,196 @@
         xmlns:local="clr-namespace:ScrcpyEX.View"
         mc:Ignorable="d"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
-        xmlns:wfI="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+        xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:ViewModel="clr-namespace:ScrcpyEX.ViewModel" 
-        xmlns:mycontrol="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
-        Title="MainWindow" Height="488" Width="970" WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged">
+        xmlns:ctrl="clr-namespace:ScrcpyEX.MyDefinition.MyControl"
+        Title="MainWindow" Width="970" Height="493"
+        WindowStartupLocation="CenterScreen" UseLayoutRounding="True" SnapsToDevicePixels="True"
+        Loaded="Window_Loaded" Closed="Window_Closed" SizeChanged="Window_SizeChanged"
+        Activated="Window_Activated" Deactivated="Window_Deactivated"
+        LocationChanged="Window_LocationChanged">
 
     <Window.DataContext>
         <ViewModel:MainWindowVM/>
     </Window.DataContext>
-
+    
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False" NonClientFrameEdges="Left,Bottom,Right" ResizeBorderThickness="5"></WindowChrome>
+        <WindowChrome CaptionHeight="0" UseAeroCaptionButtons="False" ResizeBorderThickness="3,2,3,3"/>
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
-        <Style x:Key="ItemBtn" TargetType="Button">
-            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Style x:Key="thisBtn" TargetType="Button" BasedOn="{StaticResource MenuBtn}">
             <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="AliceBlue"/>
+        </Style>
+        <Style x:Key="ScriptBtn" TargetType="Button" BasedOn="{StaticResource MenuBtn}">
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Foreground" Value="SteelBlue"/>
+            <Setter Property="Background" Value="AliceBlue"/>
+        </Style>
+        <Style x:Key="ItemBtn" TargetType="Button">
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Focusable" Value="False"/>
         </Style>
         <Style TargetType="RadioButton">
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
+        <Style x:Key="sep" TargetType="Rectangle">
+            <Setter Property="Fill" Value="Gray"/>
+            <Setter Property="Width" Value="2"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Margin" Value="2,0"/>
+        </Style>
         <SolidColorBrush x:Key="Scb1" Color="#D5EBFB" Opacity="0.6"/>
-        <SolidColorBrush x:Key="Scb2" Color="#5B9DF0" Opacity="0.5"/>
+        <SolidColorBrush x:Key="Scb2" Color="#D5EBFB" Opacity="0.9"/>
+        <SolidColorBrush x:Key="Scb3" Color="#5B9DF0" Opacity="0.5"/>
     </Window.Resources>
 
     <Grid x:Name="gMain" Background="LightSteelBlue">
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!--程序通用的鼠标提示-->
-        <mycontrol:TimePopup x:Name="pop" PopupAnimation="Fade" Placement="Mouse" StaysOpen="True" AllowsTransparency="True">
-            <Border MinHeight="10" MinWidth="10" CornerRadius="5" BorderThickness="2" BorderBrush="{StaticResource Scb2}" Background="#D5EBFB" Margin="5">
-                <TextBlock Text="提示文本" Padding="10"/>
+        <ctrl:TimePopup x:Name="pop" PopupAnimation="Fade" Placement="Mouse">
+            <Border MinHeight="10" MinWidth="20" CornerRadius="5" BorderThickness="2" BorderBrush="{StaticResource Scb3}" Background="{StaticResource Scb2}" Margin="3">
+                <TextBlock Padding="16" FontWeight="Bold" LineHeight="12" LineStackingStrategy="BlockLineHeight"/>
             </Border>
-        </mycontrol:TimePopup>
+        </ctrl:TimePopup>
 
         <!--主界面使用的居中提示-->
-        <mycontrol:TimePopup x:Name="popMid" PopupAnimation="Slide" Placement="Center" StaysOpen="True" AllowsTransparency="True"  PlacementTarget="{Binding ElementName=dpl}" Opened="PopMid_Opened">
-            <Border MinHeight="10" MinWidth="10" CornerRadius="10" BorderThickness="4" BorderBrush="{StaticResource Scb2}" Background="{StaticResource Scb1}" Margin="5">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="10" ShadowDepth="0" Color="Gray"/>
-                </Border.Effect>
+        <ctrl:ToastPopup x:Name="popMid" Placement="Center" PlacementTarget="{Binding ElementName=gMenu}">
+            <Border MinHeight="10" MinWidth="20" Height="58" CornerRadius="6" BorderThickness="4" BorderBrush="{StaticResource Scb3}" Background="{StaticResource Scb1}" Margin="2" HorizontalAlignment="Left">
+                <Border.RenderTransform>
+                    <TranslateTransform Y="0"/>
+                </Border.RenderTransform>
                 <TextBlock FontSize="20" Padding="10" Foreground="#3F6897"/>
             </Border>
-        </mycontrol:TimePopup>
+        </ctrl:ToastPopup>
 
-        <!--设置位置和定位的菜单-->
-        <Popup x:Name="popMenu" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnLocate}" Tag="g1" Closed="Pop_Closed">
+        <!--位置和大小的菜单-->
+        <Popup x:Name="popSize" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnSizeOpt}">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
-                <StackPanel>
-                    <TextBlock Text="{Binding ResolutionDesc}" Background="White" Padding="10"/>
-                    <UniformGrid Rows="2" Columns="2" Background="WhiteSmoke">
-                        <RadioButton x:Name="rdoLoc1" Content="↖左上" Margin="0,10,0,5"/>
-                        <RadioButton x:Name="rdoLoc2" Content="↗右上" Margin="0,10,0,5"/>
-                        <RadioButton x:Name="rdoLoc3" Content="↙左下" Margin="0,0,0,10"/>
-                        <RadioButton x:Name="rdoLoc4" Content="↘右下" Margin="0,0,0,10"/>
+                <StackPanel Background="White">
+                    <TextBlock Text="{Binding Texture}" Background="White" Padding="5"/>
+                    <TextBlock Text="{Binding Scaling}" Background="White" Padding="5"/>
+                    <UniformGrid Rows="2" Columns="2" Margin="0,3" Background="lavender">
+                        <RadioButton x:Name="rdoLoc1" Content="↖左上" Margin="0,5,0,2" Focusable="False"/>
+                        <RadioButton x:Name="rdoLoc2" Content="↗右上" Margin="0,5,0,2" Focusable="False"/>
+                        <RadioButton x:Name="rdoLoc3" Content="↙左下" Margin="0,2,0,5" Focusable="False"/>
+                        <RadioButton x:Name="rdoLoc4" Content="↘右下" Margin="0,2,0,5" Focusable="False"/>
                     </UniformGrid>
 
-                    <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并定位" BorderThickness="0,1"/>
+                    <Button x:Name="btnQuarterLoc"  Click="BtnQuarterLoc_Click"  Style="{StaticResource ItemBtn}" Content="¼电脑屏幕尺寸并定位"/>
                     <Button x:Name="btnOriginalLoc" Click="BtnOriginalLoc_Click" Style="{StaticResource ItemBtn}" Content="▣默认原始尺寸并定位"/>
-                    <Button x:Name="btnRemoveBlack" Click="BtnRemoveBlack_Click" Style="{StaticResource ItemBtn}" Content="消除投屏黑边"/>
-                    
+
                     <UniformGrid Rows="1" Columns="2">
                         <Button x:Name="btnReduce"  Click="BtnReduce_Click"  Style="{StaticResource ItemBtn}" Content="缩小尺寸"/>
-                        <Button x:Name="btnAmplify" Click="BtnAmplify_Click" Style="{StaticResource ItemBtn}" Content="放大尺寸" BorderThickness="1,0,0,1"/>
+                        <Button x:Name="btnAmplify" Click="BtnAmplify_Click" Style="{StaticResource ItemBtn}" Content="放大尺寸"/>
                     </UniformGrid>
                     <!--<Button Style="{StaticResource ItemBtn}" Content="⌂居中"/>-->
                 </StackPanel>
             </Border>
         </Popup>
-
+        
         <!--功能菜单-->
-        <Popup x:Name="popRec" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="False" PlacementTarget="{Binding ElementName=btnRecManage}" Tag="g2" Closed="Pop_Closed">
+        <Popup x:Name="popFunc" PopupAnimation="Fade" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=btnFuncOpt}">
             <Border BorderBrush="Gainsboro" BorderThickness="2" MinWidth="200">
-                <StackPanel>
-                    <TextBlock Text="功能菜单" Background="White" Padding="10"/>
-                    <Button x:Name="btnScr" Click="BtnScr_Click" Style="{StaticResource ItemBtn}" Content="录制脚本" BorderThickness="0,1"/>
-                    <Button x:Name="btnSet" Click="BtnSet_Click" Style="{StaticResource ItemBtn}" Content="功能设置"/>
+                <StackPanel Background="White">
+                    <TextBlock Text="功能菜单" Background="AliceBlue" Padding="10"/>
+                    <!--&#xe9a1-->
+                    <Button x:Name="btnRecScr" Click="BtnRecScr_Click" Style="{StaticResource ItemBtn}" Content="录制脚本(F4)"/>
+                    <Button x:Name="btnOpenRndis" Click="BtnOpenRndis_Click" Style="{StaticResource ItemBtn}" Content="打开USB网络共享(F9)"/>
+                    <Button x:Name="btnScGotFocus" Click="BtnScGotFocus_Click" Style="{StaticResource ItemBtn}" Content="激活投屏输入(F11)"/>
 
                     <UniformGrid Rows="1" Columns="2">
-                        <Button x:Name="btnMappingEdit" Click="BtnMappingEdit_Click" Style="{StaticResource ItemBtn}" Content="进行映射编辑"/>
-                        <Button x:Name="btnMappingAdd"  Click="BtnMappingAdd_Click"  Style="{StaticResource ItemBtn}" Content="添加映射按钮" BorderThickness="1,0,0,1" IsEnabled="False"/>
+                        <Button x:Name="btnRemoveBlack" Click="BtnRemoveBlack_Click" Style="{StaticResource ItemBtn}" Content="消除投屏黑边"/>
+                        <Button x:Name="btnOpenWireless" Click="BtnOpenWireless_Click" Style="{StaticResource ItemBtn}" Content="开启无线调试" ToolTip="将USB连接电脑的设备开启无线调试，开启后可以进行无线连接，设备和电脑需要处于一个网络中。"/>
+                    </UniformGrid>
+
+                    <UniformGrid Rows="1" Columns="3">
+                        <Button x:Name="btnMappingEdit" Click="BtnMappingEdit_Click" Style="{StaticResource ItemBtn}" Content="映射编辑"/>
+                        <Button x:Name="btnMappingBack" Click="BtnMappingBack_Click" Style="{StaticResource ItemBtn}" Content="取消修改" IsEnabled="False"/>
+                        <Button x:Name="btnMappingAdd"  Click="BtnMappingAdd_Click"  Style="{StaticResource ItemBtn}" Content="添加映射" IsEnabled="False"/>
                     </UniformGrid>
                 </StackPanel>
             </Border>
         </Popup>
 
+        <!--放置右侧按钮的悬停菜单-->
+        <ctrl:HoverPopup x:Name="popSysOpt" PlacementTarget="{Binding ElementName=btnClosePrg}">
+        </ctrl:HoverPopup>
+
+        <!--Scrcpy功能选项悬停菜单-->
+        <ctrl:HoverPopup x:Name="popScOpt">
+        </ctrl:HoverPopup>
+
         <!--自定义菜单栏-->
-        <DockPanel x:Name="dpl" Background="AliceBlue" MouseLeftButtonDown="Dpl_MouseLeftButtonDown">
-            <Button x:Name="btnWired" Style="{StaticResource MenuBtn}" Content="&#xF0B9;" Click="BtnWired_Click" Margin="0" ToolTip="有线连接"/>
-            <Button x:Name="btnWirel" Style="{StaticResource MenuBtn}" Content="&#xe952;" Click="BtnWirel_Click" ToolTip="无线连接"/>
-            <Button x:Name="btnStop"  Style="{StaticResource MenuBtn}" Content="&#xECCB;" Click="BtnStop_Click" ToolTip="停止投屏"/>
-            <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
+        <Grid x:Name="gMenu" Background="AliceBlue" MouseLeftButtonDown="GMenu_MouseLeftButtonDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
 
-            <Button x:Name="btnLocate" Click="BtnLocate_Click" Style="{StaticResource MenuBtn}" Content="&#xe7f7;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g1" Width="40" ToolTip="快速定位"/>
-            <Button x:Name="btnLocOpt" Click="BtnLocOpt_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g1" Width="22" ToolTip="定位与大小选项"/>
-            <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
+            <ToolBarTray Margin="-3,0,0,0">
+                <ToolBar ToolBarTray.IsLocked="True">
 
-            <Button x:Name="btnRecManage" Click="BtnRecManage_Click" Style="{StaticResource MenuBtn}" Content="&#xea40;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="40" ToolTip="脚本管理"/>
-            <Button x:Name="btnRecOption" Click="BtnRecOption_Click" Style="{StaticResource MenuBtn}" Content="&#xeb11;" MouseEnter="Btn_MouseEnter" MouseLeave="Btn_MouseLeave" Tag="g2" Width="22" ToolTip="功能菜单"/>
-            <TextBlock Text="|" VerticalAlignment="Center" FontSize="20" />
-
-            <Button x:Name="btnTest"  Style="{StaticResource MenuBtn}" Content="&#xEC26;" Click="BtnTest_Click" PreviewMouseDoubleClick="BtnTest_PreviewMouseDoubleClick"/>
-
-            <Button x:Name="btnClosePrg" Click="BtnClosePrg_Click" Style="{StaticResource MenuBtn}" Content="&#xe711;" DockPanel.Dock="Right" Margin="0"/>
-            <Button x:Name="btnMaximize" Click="BtnMaximize_Click" Style="{StaticResource MenuBtn}" Content="&#xe922;" DockPanel.Dock="Right"/>
-            <Button x:Name="btnMinimize" Click="BtnMinimize_Click" Style="{StaticResource MenuBtn}" Content="&#xe73c;" DockPanel.Dock="Right"/>
-
-            <Border x:Name="bdRec" HorizontalAlignment="Right" BorderBrush="SteelBlue" BorderThickness="4">
-                <DockPanel>
-                    <Button x:Name="btnImgCompare" Click="BtnImgCompare_Click" Style="{StaticResource MenuBtn}" Content="&#xf58c;" Foreground="SteelBlue" Margin="0" ToolTip="查看脚本比对图像"/>
-                    <DockPanel x:Name="dplTip">
-                        <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
-                        <TextBlock Text="{Binding CycleNum}" VerticalAlignment="Center" FontSize="16" Margin="2,0,0,0"/>
-                        <TextBlock Text="次⊱⊰" VerticalAlignment="Center" FontSize="16"/>
-                        <TextBlock Text="{Binding Running}" VerticalAlignment="Center" FontSize="16"/>
-                        <TextBlock Text="秒" VerticalAlignment="Center" FontSize="16" Margin="0,0,2,0"/>
-                        <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
+                    <DockPanel x:Name="dcpScMain">
+                        <Button x:Name="btnWired" Click="BtnWired_Click" Content="&#xF0B9;" Style="{StaticResource thisBtn}" ToolTip="有线连接(F1)"/>
+                        <Button x:Name="btnWirel" Click="BtnWirel_Click" Content="&#xe93e;" Style="{StaticResource thisBtn}" ToolTip="无线连接(F2)"/>
+                        <Button x:Name="btnStop"  Click="BtnStop_Click"  Content="&#xECCB;" Style="{StaticResource thisBtn}" ToolTip="停止投屏(F3)"/>
                     </DockPanel>
-                    <Button x:Name="btnRecStop" Click="BtnRecStop_Click" Style="{StaticResource MenuBtn}" Content="&#xe769;" Foreground="SteelBlue" Margin="0"/>
-                </DockPanel>
-            </Border>
-        </DockPanel>
+                    <Rectangle Style="{StaticResource sep}"/>
+                    
+                    <ctrl:IconButton x:Name="btnRecManage" Click="BtnRecManage_Click" MainIcon="&#xea40;" CornerIcon="&#xE712;" ToolTip="脚本管理(F5)"/>
+                    <ctrl:IconButton x:Name="btnSetManage" Click="BtnSetManage_Click" MainIcon="&#xe713;" CornerIcon="&#xE712;" ToolTip="程序设置(F6)"/>
+                    <ctrl:IconButton x:Name="btnDataSync"  Click="BtnDataSync_Click"  MainIcon="&#xe8f7;" CornerIcon="&#xE712;" ToolTip="数据同步(F10)"/>
+                    <Rectangle Style="{StaticResource sep}"/>
 
-        <Grid x:Name="gShow" Grid.Row="1" Margin="5">
-            <WindowsFormsHost x:Name="wfh" Background="Gray">
-                <wf:Panel x:Name="pnlShow" Dock="Fill" AutoSize="True"/>
-            </WindowsFormsHost>
+                    <ctrl:IconButton x:Name="btnSizeOpt" Click="BtnSizeOpt_Click" MainIcon="&#xe78a;" CornerIcon="&#xE7bc;" ToolTip="位置与大小选项(F7)"/>
+                    <ctrl:IconButton x:Name="btnFuncOpt" Click="BtnFuncOpt_Click" MainIcon="&#xebd2;" CornerIcon="&#xE7bc;" ToolTip="功能菜单(F8)"/>
+                    <Button x:Name="btnTest" Style="{StaticResource thisBtn}" Content="&#xf133;" Click="BtnTest_Click"/>
+                    
+                    <Border x:Name="bdRec" HorizontalAlignment="Right" BorderBrush="SteelBlue" BorderThickness="4">
+                        <DockPanel>
+                            <Button x:Name="btnImgCompare" Click="BtnImgCompare_Click" Style="{StaticResource ScriptBtn}" Content="&#xf58c;" ToolTip="查看脚本比对图像"/>
+                            <DockPanel x:Name="dplTip" Height="22">
+                                <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
+                                <TextBlock Text="{Binding CurCycleNum}" VerticalAlignment="Center" FontSize="16" Margin="2,0,0,0"/>
+                                <TextBlock Text="次⊱⊰" VerticalAlignment="Center" FontSize="16"/>
+                                <TextBlock Text="{Binding Running}" Foreground="{Binding RunningColor}" VerticalAlignment="Center" FontSize="16"/>
+                                <TextBlock Text="秒" VerticalAlignment="Center" FontSize="16" Margin="0,0,2,0"/>
+                                <TextBlock FontSize="20" Width="4" Background="SteelBlue"/>
+                            </DockPanel>
+                            
+                            <Button x:Name="btnRecStop" Click="BtnRecStop_Click" Style="{StaticResource ScriptBtn}" Content="&#xe769;" ToolTip="停止脚本/录制"/>
+                            <DockPanel x:Name="dplImgShot">
+                                <TextBlock FontSize="20" Width="4" Height="22" Background="SteelBlue"/>
+                                <Button x:Name="btnImgShot" Click="BtnImgShot_Click" Style="{StaticResource ScriptBtn}" Content="&#xf7ed;" ToolTip="截取脚本图像"/>
+                            </DockPanel>
+                        </DockPanel>
+                    </Border>
+
+                </ToolBar>
+            </ToolBarTray>
+
+            <!---->
+            <Button x:Name="btnFouce" Grid.Column="1" Width="1" Height="1" InputMethod.IsInputMethodEnabled="False" PreviewGotKeyboardFocus="BtnFouce_PreviewGotKeyboardFocus" LostKeyboardFocus="BtnFouce_LostKeyboardFocus"/>
+            <StackPanel x:Name="stpRightMenu" Grid.Column="1" Orientation="Horizontal" FlowDirection="RightToLeft" Margin="9,0,0,0">
+                <Button x:Name="btnClosePrg" Click="BtnClosePrg_Click" Style="{StaticResource thisBtn}" Content="&#xe711;"/>
+                <Button x:Name="btnMaximize" Click="BtnMaximize_Click" Style="{StaticResource thisBtn}" Content="&#xe922;"/>
+                <Button x:Name="btnMinimize" Click="BtnMinimize_Click" Style="{StaticResource thisBtn}" Content="&#xe73c;"/>
+            </StackPanel>
         </Grid>
 
+        <TextBlock Grid.Row="1" Text="&#xf0e2;" Visibility="{Binding IconVis}" Style="{StaticResource txtIcon}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+        
+        <!--承载Scrcpy的Grid和Border不能设置固定大小，否则Scrcpy会错位-->
+        <Grid x:Name="gShow" Grid.Row="1" Margin="5">
+            <Border x:Name="bdShow" Background="Gray"/>
+        </Grid>
+        
     </Grid>
 </Window>

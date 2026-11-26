@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScrcpyEX.MyDefinition.WindowsAPI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using System.Windows.Media;
-using ScrcpyEX.MyDefinition;
-using System.Windows.Forms;
 
 namespace ScrcpyEX.View
 {
@@ -28,8 +26,7 @@ namespace ScrcpyEX.View
             rct.Visibility = Visibility.Visible;
             rctMask.Visibility = Visibility.Visible;
 
-            stp.Visibility = Visibility.Hidden;
-            //Console.WriteLine($"开始的位置:{_startPoint.X},{_startPoint.Y}。");
+            popTool.IsOpen = false;
         }
 
         /// <summary>
@@ -37,7 +34,7 @@ namespace ScrcpyEX.View
         /// </summary>
         private void RightClick()
         {
-            if (stp.Visibility == Visibility.Visible)
+            if (popTool.IsOpen)
             {
                 Recapture();
             }
@@ -64,10 +61,9 @@ namespace ScrcpyEX.View
             rct.Height = ht;
 
             tbk.Margin = new Thickness(x, y - 20, 0, 0);
-            tbk.Text = $"{wd}×{ht}";
+            tbk.Text = $"{wd:0.##}×{ht:0.##}";
 
             UpdateMask();
-            //Console.WriteLine("截图中...");
         }
 
         /// <summary>
@@ -99,9 +95,10 @@ namespace ScrcpyEX.View
         {
             _endPoint = endPoint;
 
-            stp.Margin = new Thickness(endPoint.X - stp.ActualWidth, GetY(endPoint), 0, 0);
-            stp.Visibility = Visibility.Visible;
-            //Console.WriteLine($"截图结束位置：{endPoint.X}，{endPoint.Y}。");
+            DLL.GetCursorPos(out DLL.POINT pt);
+            popTool.HorizontalOffset = pt.X /DpiScaleX + 10;
+            popTool.VerticalOffset = pt.Y /DpiScaleY;
+            popTool.IsOpen = true;
         }
 
         /// <summary>
@@ -110,95 +107,127 @@ namespace ScrcpyEX.View
         /// 出来鼠标在屏幕垂直一半的位置上，所有副屏上菜单始终向上靠拢。
         /// </summary>
         /// <param name="endPoint">截图结束时的坐标点。</param>
-        private double GetY(Point endPoint)
-        {
-            if (endPoint.X < SystemParameters.PrimaryScreenWidth)
-            {
-                if (endPoint.Y + stp.ActualHeight > SystemParameters.PrimaryScreenHeight)
-                {
-                    return endPoint.Y - stp.ActualHeight;
-                }
-                else
-                {
-                    return endPoint.Y;
-                }
-            }
-            else
-            {
-                if (_startPoint.Y > stp.ActualWidth)
-                {
-                    return _startPoint.Y - stp.ActualHeight;
-                }
-                else if (_startPoint.Y < stp.ActualWidth && rct.ActualHeight > stp.ActualWidth * 2)
-                {
-                    return endPoint.Y - stp.ActualHeight;
-                }
-                else
-                {
-                    return endPoint.Y;
-                }
-            }
-        }
+        //private double GetY(Point endPoint)
+        //{
+        //    if (endPoint.X < SystemParameters.PrimaryScreenWidth)
+        //    {
+        //        if (endPoint.Y + stp.ActualHeight > SystemParameters.PrimaryScreenHeight)
+        //        {
+        //            return endPoint.Y - stp.ActualHeight;
+        //        }
+        //        else
+        //        {
+        //            return endPoint.Y;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (_startPoint.Y > stp.ActualWidth)
+        //        {
+        //            return _startPoint.Y - stp.ActualHeight;
+        //        }
+        //        else if (_startPoint.Y < stp.ActualWidth && rct.ActualHeight > stp.ActualWidth * 2)
+        //        {
+        //            return endPoint.Y - stp.ActualHeight;
+        //        }
+        //        else
+        //        {
+        //            return endPoint.Y;
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// 更新放大镜内容和位置。放大比例为：放大镜控件宽/放大区域直径，不计算DPI系数。
         /// </summary>
-        /// <param name="curPoint">鼠标的当前位置。</param>
+        /// <param name="curPoint">鼠标的当前位置，逻辑坐标。</param>
         private void UpdateMagnifier(Point curPoint)
         {
-            int sourceX = (int)(curPoint.X * DpiScaleX - _d / 2);
-            int sourceY = (int)(curPoint.Y * DpiScaleY - _d / 2);
+            // 以鼠标为中心计算请求的源矩形
+            int requestX = (int)(curPoint.X * DpiScaleX - _d / 2);
+            int requestY = (int)(curPoint.Y * DpiScaleY - _d / 2);
+            Int32Rect requestRect = new(requestX, requestY, _d, _d);
 
-            // 边界检查
-            sourceX = MyGM.Clamp(sourceX, 0, _sourceBitmap.PixelWidth - _d);
-            sourceY = MyGM.Clamp(sourceY, 0, _sourceBitmap.PixelHeight - _d);
-            try
+            // 源位图的有效区域
+            Int32Rect sourceBounds = new(0, 0, _sourceBitmap.PixelWidth, _sourceBitmap.PixelHeight);
+
+            // 求交集（如果请求区域完全在屏幕外，则交集为空）
+            Int32Rect intersect = GetIntersection(requestRect, sourceBounds);
+
+            // 先将整个放大镜位图填充为黑色透明(BGRA = 0,0,0,0)
+            int stride = _magnifierBitmap.BackBufferStride;
+            byte[] blackPixels = new byte[stride * _d];
+            _magnifierBitmap.WritePixels(new Int32Rect(0, 0, _d, _d), blackPixels, stride, 0);
+
+            // 如果有交集，将其从源位图复制到放大镜位图的对应位置
+            if (!intersect.IsEmpty)
             {
-                _magnifierBitmap.Lock();
+                // 目标矩形：交集在放大镜中的偏移
+                Int32Rect destRect = new(
+                    intersect.X - requestX,
+                    intersect.Y - requestY,
+                    intersect.Width,
+                    intersect.Height);
 
-                // 将源背景图的指定像素直接复制给放大镜位图
-                _sourceBitmap.CopyPixels(
-                    new Int32Rect(sourceX, sourceY, _d, _d),
-                    _magnifierBitmap.BackBuffer,
-                    _magnifierBitmap.BackBufferStride * _d,
-                    _magnifierBitmap.BackBufferStride);
+                // 将交集像素复制到临时数组（按目标 stride 存放，方便直接写入）
+                byte[] srcPixels = new byte[stride * intersect.Height];
+                _sourceBitmap.CopyPixels(intersect, srcPixels, stride, 0);
 
-                _magnifierBitmap.AddDirtyRect(new Int32Rect(0, 0, _d, _d));
+                // 写入放大镜位图的有效部分（周围已为黑色透明）
+                _magnifierBitmap.WritePixels(destRect, srcPixels, stride, 0);
             }
-            finally
-            {
-                _magnifierBitmap.Unlock();
-            }
 
-            (double left, double top) = GetLocation(curPoint, 15);
-            gMagnifier.Margin = new Thickness(left, top, 0, 0);
+            //Popup控件的偏移是逻辑像素
+            (double left, double top) = GetLocation(curPoint, 20);
+            popMagnifier.HorizontalOffset = left / DpiScaleX;
+            popMagnifier.VerticalOffset = top / DpiScaleY;
         }
 
         /// <summary>
-        /// 获得放大镜的位置，和程序相对的左和上的位置，会确保放大镜始终在可视范围内。
+        /// 获得两个Int32Rect的交集。
         /// </summary>
-        /// <param name="curPoint">鼠标的当前位置。</param>
+        /// <param name="r1">第一个Int32Rect。</param>
+        /// <param name="r2">第二个Int32Rect。</param>
+        /// <returns>两个Int32Rect的交集。</returns>
+        private Int32Rect GetIntersection(Int32Rect r1, Int32Rect r2)
+        {
+            int x = Math.Max(r1.X, r2.X);
+            int y = Math.Max(r1.Y, r2.Y);
+            int right = Math.Min(r1.X + r1.Width, r2.X + r2.Width);
+            int bottom = Math.Min(r1.Y + r1.Height, r2.Y + r2.Height);
+            int width = Math.Max(0, right - x);
+            int height = Math.Max(0, bottom - y);
+            return new Int32Rect(x, y, width, height);
+        }
+
+        /// <summary>
+        /// 获得放大镜的位置，会确保放大镜始终在可视范围内。
+        /// </summary>
+        /// <param name="relativePt">鼠标相对于程序左上角的坐标。</param>
         /// <param name="r">放大镜和鼠标的距离。</param>
-        /// <returns>返回左和上的位置。</returns>
-        private (double, double) GetLocation(Point curPoint, double r)
+        /// <returns>返回左和上的位置，物理坐标。</returns>
+        private (double, double) GetLocation(Point relativePt, double r)
         {
             double left, top;
-            if (curPoint.X + r + gMagnifier.Width > Width)
+            Point absolutePt = PointToScreen(relativePt);
+
+            if (relativePt.X > ActualWidth / 2)
             {
-                left = curPoint.X - r - gMagnifier.Width;
+                left = absolutePt.X - r * 2 - gMagnifier.Width;
             }
             else
             {
-                left = curPoint.X + r;
+                left = absolutePt.X + r;
             }
-            if (curPoint.Y + r + gMagnifier.Height > Height)
+            if (relativePt.Y > ActualHeight / 2)
             {
-                top = curPoint.Y - r - gMagnifier.Height;
+                top = absolutePt.Y - r * 2 - gMagnifier.Height;
             }
             else
             {
-                top = curPoint.Y + r;
+                top = absolutePt.Y + r;
             }
+
             return (left, top);
         }
 

@@ -2,6 +2,7 @@
 using ScrcpyEX.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,14 +19,19 @@ namespace ScrcpyEX.View
         private readonly RecManageVM _vm;
 
         /// <summary>
-        /// 是否处于脚本名称的编辑状态。
+        /// Scrcpy的句柄。
         /// </summary>
-        //private bool _isEditing = false;
+        private readonly IntPtr _scHandle = IntPtr.Zero;
+
+        /// <summary>
+        /// 坐标点的DataTable。
+        /// </summary>
+        private readonly DataTable _pointDt = new();
 
         /// <summary>
         /// 说明截图结果位置大小的矩形。
         /// </summary>
-        private Int32Rect _cropRect;
+        private Rect _cropRect = new();
 
         /// <summary>
         /// 存储当前编辑脚本的UI对象的引用。
@@ -35,12 +41,22 @@ namespace ScrcpyEX.View
         /// <summary>
         /// 保存当前正在编辑名称的脚本。
         /// </summary>
-        private RecInfo _lastItem = null;
+        private ScriptItem _lastItem = null;
 
         /// <summary>
-        /// 临时存储正在编辑的脚本信息。
+        /// ListBox项拖动起点。
         /// </summary>
-        public RecInfo TempRecInfo { get; set; } = null;
+        private Point _dragStartPoint;
+
+        /// <summary>
+        /// ListBox中按下时的源项。
+        /// </summary>
+        private ListBoxItem _dragSourceItem;
+
+        /// <summary>
+        /// 当前选中的脚本项的引用，使用时需要判断是单脚本还是组脚本。
+        /// </summary>
+        private ScriptItem _currScript = null;
 
 
     }

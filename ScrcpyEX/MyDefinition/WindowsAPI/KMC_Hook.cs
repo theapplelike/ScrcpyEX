@@ -1,0 +1,146 @@
+﻿using ScrcpyEX.ExtensionMethod;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using static ScrcpyEX.MyDefinition.WindowsAPI.DLL;
+using static ScrcpyEX.MyDefinition.WindowsAPI.HookDLL;
+using Application = System.Windows.Application;
+
+namespace ScrcpyEX.MyDefinition.WindowsAPI
+{
+    /// <summary>
+    /// Keyboard Mapping Click，按键输入映射为鼠标点击的钩子。
+    /// </summary>
+    internal class KMC_Hook
+    {
+        /// <summary>
+        /// 安装监视低级别键盘输入事件的hook过程，获得的消息更全面。
+        /// </summary>
+        private const int WH_KEYBOARD_LL = 13;  
+
+        /// <summary>
+        /// 钩子句柄，为IntPtr.Zero时未注册鼠标钩子。
+        /// </summary>
+        private static IntPtr _hookId = IntPtr.Zero;
+
+        /// <summary>
+        /// 主程序的句柄。
+        /// </summary>
+        private static IntPtr _mainHandle = IntPtr.Zero;
+
+        /// <summary>
+        /// 用户定义的映射键集合。
+        /// </summary>
+        private static HashSet<int> UserHotkeys = [];
+
+        /// <summary>
+        /// 程序使用的快捷键集合。
+        /// </summary>
+        private static readonly HashSet<int> SysHotkeys =
+        [
+            (int)Keys.F1,
+            (int)Keys.F2,
+            (int)Keys.F3,
+            (int)Keys.F4,
+            (int)Keys.F5,
+            (int)Keys.F6,
+            (int)Keys.F7,
+            (int)Keys.F8,
+            (int)Keys.F9,
+            (int)Keys.F10,
+            (int)Keys.F11,
+            (int)Keys.F12
+        ];
+
+        /// <summary>
+        /// SC是否拥有焦点。
+        /// </summary>
+        public static bool IsScHasFocus { get; set; } = false;
+
+        /// <summary>
+        /// 注册监听键盘消息的句柄。
+        /// </summary>
+        /// <returns>true--注册成功；false--注册失败。</returns>
+        public static bool RegisterHook(IntPtr mainHandle)
+        {
+            IntPtr hMod = Marshal.GetHINSTANCE(typeof(KMC_Hook).Module);
+            _hookId = SetWindowsHookEx(WH_KEYBOARD_LL, HookCallback, hMod, 0);
+            _mainHandle = mainHandle;
+
+            return _hookId != IntPtr.Zero;
+        }
+
+        /// <summary>
+        /// 注销键盘钩子。
+        /// </summary>
+        public static void CancelHook()
+        {
+            if (_hookId != IntPtr.Zero)
+            {
+                UnhookWindowsHookEx(_hookId);
+                _hookId = IntPtr.Zero;
+            }
+        }
+
+        /// <summary>
+        /// 键盘钩子回调函数。
+        /// </summary>
+        /// <param name="nCode">如果为HC_ACTION(0)，表示 wParam 和 lParam 包含有效信息，否则应返回CallNextHookEx的处理值。</param>
+        /// <param name="wParam">键盘消息的标识符，例如WM_KEYDOWN。</param>
+        /// <param name="lParam">指向KBDLLHOOKSTRUCT结构的指针。</param>
+        /// <returns>CallNextHookEx函数的处理值；返回值大于0不再向下传播消息。</returns>
+        private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        {
+            if (nCode >= 0)
+            {
+                //MV.St = Stopwatch.StartNew();
+                int vkCode = Marshal.ReadInt32(lParam);
+                bool isSysKey = SysHotkeys.Contains(vkCode);
+                bool isUserKey = UserHotkeys.Contains(vkCode);
+
+                if ((isSysKey || isUserKey) && GetForegroundWindow() == _mainHandle)
+                {
+                    if (isUserKey)
+                    {
+                        if ((int)wParam == WM.KEYDOWN && !IsScHasFocus)
+                        {
+                            Application.Current.Dispatcher.BeginInvoke(() => MV.MainWin.KeyboardMapping((Keys)vkCode));
+                        }
+                    }
+                    else if (isSysKey)
+                    {
+                        if ((int)wParam == WM.KEYUP)
+                        {
+                            Application.Current.Dispatcher.BeginInvoke(() => MV.MainWin.ShortcutKey((Keys)vkCode));
+                        }
+                        // 拦截热键的按下和抬起（成对拦截），避免SC收到这些键
+                        return (IntPtr)1;
+                    }
+                    //Debug.WriteLine($"前台：{MV.St.ElapsedMilliseconds}ms");
+                }
+            }
+            //Debug.WriteLine($"继续：{MV.St.ElapsedMilliseconds}ms");
+            return CallNextHookEx(_hookId, nCode, wParam, lParam);
+        }
+
+        /// <summary>
+        /// 使用集合初始化用户热键集合。
+        /// </summary>
+        /// <param name="hs">用户热键集合。</param>
+        public static void InitUserHotkeys(HashSet<int> hs)
+        {
+            UserHotkeys = hs;
+        }
+
+        /// <summary>
+        /// 清空用户热键集合。
+        /// </summary>
+        public static void ClearUserHotkeys()
+        {
+            UserHotkeys.Clear();
+        }
+
+
+    }
+}

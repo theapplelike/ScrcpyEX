@@ -1,13 +1,15 @@
 ﻿using ScrcpyEX.ExtensionMethod;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Animation;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace ScrcpyEX.View
 {
@@ -18,87 +20,77 @@ namespace ScrcpyEX.View
             stp1.Visibility = Visibility.Collapsed;
             stp2.Visibility = Visibility.Collapsed;
             _vm.Cfg = MyCfg.Cfg;
+            _oldIsCanResize = MyCfg.Cfg.IsCanResize;
+        }
+
+        private void MyClose()
+        {
+            MyCfg.Save();
+
+            if (_oldIsCanResize != MyCfg.Cfg.IsCanResize)
+            {
+                AdjResizeMode(MV.MainWin);
+            }
         }
 
         /// <summary>
-        /// 菜单状态转换，如果菜单显示，持续减少高度后隐藏；如果菜单隐藏，显示菜单后，持续增加高度到最大值。
+        /// 调整主窗口的ResizeMode属性。
         /// </summary>
-        /// <param name="pnl">要进行状态转换的菜单。</param>
-        private async void MenuStateTransition(StackPanel stp)
+        private void AdjResizeMode(MainWindow main)
         {
-            if (stp.IsVisible)
+            if (MyCfg.Cfg.IsCanResize)
             {
-                stp.Height = stp.ActualHeight;
-                for (int i = 0; i < 5; i++)
-                {
-                    stp.Height -= (int)(stp.Height * 0.2);
-                    //Console.WriteLine($"降低高度：{stp.Height},{stp.ActualHeight}。");
-                    await Task.Delay(10);
-                }
-                stp.Visibility = Visibility.Collapsed;
+                main.ResizeMode = ResizeMode.CanResize;
             }
             else
             {
-                stp.Visibility = Visibility.Visible;
-                for (int i = 0; i < 5; i++)
-                {
-                    stp.Height += (int)(stp.Height * 0.2);
-                    //Console.WriteLine($"++增加高度：{stp.Height},{stp.ActualHeight}。");
-                    await Task.Delay(10);
-                }
-                stp.Height = stp.ActualHeight;
+                main.ResizeMode = ResizeMode.CanMinimize;
             }
         }
 
-        private void MenuStateTransition1(StackPanel stp)
+        /// <summary>
+        /// 菜单显示状态转换，使用动画过度效果。
+        /// </summary>
+        /// <param name="stp">要进行状态转换的菜单。</param>
+        /// <param name="i">菜单的位置索引，从0开始。</param>
+        private void MenuStateTransition(StackPanel stp, int i)
         {
-            EnsureTransform(stp);
-            if (stp.IsVisible)
+            // 停止可能正在进行的动画，避免冲突
+            stp.BeginAnimation(HeightProperty, null);
+            
+            if (_isExpands[i]) // 当前可见 → 折叠
             {
-                // 创建动画作用于 Y 属性
+                _isExpands[i] = false;
+                stp.Tag = null;
+                double fromHeight = stp.ActualHeight;
+
                 DoubleAnimation animation = new()
                 {
-                    To = -stp.ActualHeight,
-                    From = 0,
-                    Duration = TimeSpan.FromSeconds(1),
-                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-                };
-
-                // 动画完成后隐藏面板
-                animation.Completed += (s, _) => stp.Visibility = Visibility.Collapsed;
-
-                // 应用动画
-                stp.RenderTransform.BeginAnimation(TranslateTransform.YProperty, animation);
-            }
-            else
-            {
-                stp.Visibility = Visibility.Visible;
-
-                // 创建动画作用于 Y 属性
-                DoubleAnimation animation = new()
-                {
+                    From = fromHeight,
                     To = 0,
-                    From = -stp.ActualHeight,
                     Duration = TimeSpan.FromSeconds(1),
                     EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
                 };
 
-                // 应用动画
-                stp.RenderTransform.BeginAnimation(TranslateTransform.YProperty, animation);
+                stp.BeginAnimation(HeightProperty, animation);
             }
-        }
-
-        /// <summary>
-        /// 确保控件有可用的 TranslateTransform。
-        /// </summary>
-        /// <param name="element">指定的控件。</param>
-        private void EnsureTransform(UIElement element)
-        {
-            if (element.RenderTransform == null ||
-                element.RenderTransform is not TranslateTransform ||
-                element.RenderTransform.IsFrozen)
+            else // 当前隐藏 → 展开
             {
-                element.RenderTransform = new TranslateTransform();
+                _isExpands[i] = true;
+                stp.Tag = 1;
+                stp.Visibility = Visibility.Visible;
+                double targetHeight = stp.ActualHeight;
+
+                // 准备动画从 0 到目标高度
+                DoubleAnimation animation = new()
+                {
+                    From = 0,
+                    To = targetHeight,
+                    Duration = TimeSpan.FromSeconds(1),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                };
+
+                stp.BeginAnimation(HeightProperty, animation);
             }
         }
 
